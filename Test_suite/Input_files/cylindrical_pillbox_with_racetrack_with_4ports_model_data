@@ -1,0 +1,179 @@
+##################
+# WORKAROUND until Warner fixes the underlying bug
+-debug
+    dielwake=yes
+###################################################
+-mesh
+    spacing= STPSZE
+    perfectmesh= no
+    
+    xperiodic= no
+    yperiodic= no
+    zperiodic= no
+    
+    pxlow= -cav_rad - 1e-3, pxhigh= cav_rad + 1e-3
+    pylow= -cav_rad - 1e-3,  pyhigh= cav_rad + 1e-3
+     pzlow= -cav_length *3/2 - extension_length, pzhigh= cav_length/2 + extension_length
+
+    cxlow= electric, cxhigh= electric
+    cylow= electric, cyhigh= electric
+    czlow= electric, czhigh= electric
+
+    #
+    # We enforce a meshline at the position of the linecharge
+    # by enforcing two meshplanes
+    #
+    xfixed(1, 0, 0)
+    yfixed(1, 0, 0)
+    #
+    zfixed(2, -cav_length/2, cav_length/2 )
+
+#################################################
+# Geometry description
+
+# Put in metal bricks
+#PEC for the pipe
+-brick
+     material= PEC
+     xlow= -INF, xhigh= INF
+     ylow= -INF, yhigh= INF
+     zlow= -INF, zhigh= INF
+     doit
+	 
+# Material for the cavity
+-brick
+     material= cav_mat
+     xlow= -INF, xhigh= INF
+     ylow= -INF, yhigh= INF
+     zlow= -cav_length/2 - 2e-3, zhigh= cav_length/2 + 2e-3
+     doit
+
+# Material for the pipes
+-brick
+     material= bp_in
+     xlow= -INF, xhigh= INF
+     ylow= -INF, yhigh= INF
+     zlow= -INF, zhigh= -cav_length/2 - 2e-3
+     doit
+
+# carve out the racetrack beam pipe
+-transform, reset
+-rotate,
+     axis = (0,0,1)
+     angle = 45
+     doit
+-ggcylinder
+     material= vacuum
+     origin = (0 ,0, 0)
+	 xprimedirection= (1,0,0)
+	 yprimedirection= (0,1,0)
+	 range = (-INF, INF)
+	 xslope=0
+	 yslope=0
+
+	 clear
+	 point= (bp_major - bp_minor, -bp_minor)
+	 arc, radius= bp_minor, type=counterclockwise
+	 point= (bp_major - bp_minor, bp_minor)
+	 point= (-bp_major + bp_minor, bp_minor)
+	 arc, radius= bp_minor, type=counterclockwise
+	 point= (-bp_major + bp_minor, -bp_minor)
+	 point= (bp_major - bp_minor, -bp_minor)
+	 doit
+	 -transform, reset
+	 
+ # carve out the port pipes
+-gcc
+    material= vacuum
+  radius    = 9e-3 
+  length    = 2*INF
+  origin    = (INF ,0, 0) 
+  direction = ( -1,0,0)  
+   doit
+   
+   -gcc
+    material= vacuum
+  radius    = 9e-3 
+  length    = 2*INF
+  origin    = (0, INF , 0) 
+  direction = ( 0,-1,0)  
+   doit
+   
+   # make coax lines
+   -gcc
+    material= PEC
+  radius    = 4e-3 
+  length    = INF
+  origin    = (-cav_rad + 5e-3 ,0, 0) 
+  direction = ( -1,0,0)  
+   doit
+   
+     -gcc
+    material= PEC
+  radius    = 4e-3 
+  length    = INF
+  origin    = (cav_rad - 5e-3 ,0, 0) 
+  direction = ( 1,0,0)  
+   doit
+   
+     -gcc
+    material= PEC
+  radius    = 4e-3 
+  length    = INF
+  origin    = (0, -cav_rad + 5e-3 , 0) 
+  direction = ( 0,-1,0)  
+   doit
+   
+        -gcc
+    material= PEC
+  radius    = 4e-3 
+  length    = INF
+  origin    = (0, cav_rad - 5e-3 , 0) 
+  direction = ( 0,1,0)  
+   doit
+   
+ 
+##################################################
+-fdtd   
+    -ports
+       name = port_bp_in
+       plane = zlow
+       npml = NPMLs
+       modes= 25
+       doit
+       
+    -ports
+       name = port_bp_out
+       plane = zhigh
+       npml = NPMLs
+       modes= 25
+       doit
+	   
+	 -ports
+       name = port_signal_out1
+       plane = xlow
+       npml = NPMLs
+       modes= 5
+       doit
+	   
+	   -ports
+       name = port_signal_out2
+       plane = ylow
+       npml = NPMLs
+       modes= 5
+       doit
+	  
+	  -ports
+       name = port_signal_out3
+       plane = xhigh
+       npml = NPMLs
+       modes= 5
+       doit
+	  
+	  -ports
+       name = port_signal_out4
+       plane = yhigh
+       npml = NPMLs
+       modes= 5
+       doit
+    
