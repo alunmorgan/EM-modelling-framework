@@ -6,5 +6,9 @@ for ks = 1:length(arc_names)
     if strcmp(rep_type, 'w')
         Generate_wake_report([results_path, '/',  arc_names{ks}], Author, Report_num, Graphic_path)
     end
+    if strcmp(rep_type, 's')
+        Generate_s_parameter_report([results_path, '/',  arc_names{ks}], Author, Report_num, Graphic_path)
+    end
+    
 end
 

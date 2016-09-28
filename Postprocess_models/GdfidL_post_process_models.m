@@ -73,6 +73,7 @@ try
                 [~] = system('mkdir pp_link/s_parameter');
             end
             % Move files to the post processing folder.
+            copyfile('data_link/s_parameters/run_inputs.mat','pp_link/s_parameter/');
             [d_list, pth] = dir_list_gen('data_link/s_parameters','dirs');
             d_list = d_list(3:end);
             copyfile([pth, d_list{1},'/model.gdf'],'pp_link/s_parameter/model.gdf');
@@ -94,7 +95,7 @@ try
             % Generate the plots for the report.
             GdfidL_plot_s_parameters(pp_data.s_parameter_data, ppi, fig_pos, 'pp_link/s_parameter/');
         catch
-            warning('S-paramter postprocessing failed')
+            warning('S-parameter postprocessing failed')
         end
     end
     %% Post processing eigenmode

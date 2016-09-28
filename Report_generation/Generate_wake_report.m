@@ -28,7 +28,7 @@ if ~isfield(pp_data, 'wake_data')
 end
 
 % Setting up the latex headers etc.
-[param_list, param_vals] = extract_parameters(mi, run_logs);
+[param_list, param_vals] = extract_parameters(mi, run_logs, 'w');
 param_list = regexprep(param_list,'_',' ');
 report_input.author = Author;
 report_input.doc_num = rep_num;
