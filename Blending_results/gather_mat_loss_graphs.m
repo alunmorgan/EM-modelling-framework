@@ -7,7 +7,7 @@ else
 end
 
 ov = {''};
-for hse = 1:length(source_reps)
+for hse = length(source_reps):-1:1
     source = [doc_root, slh, source_reps{hse},slh, 'wake', slh,  mgnme,'.eps'];
     dest = [output_path, slh, mgnme,'_',num2str(hse), '.eps'];
     try

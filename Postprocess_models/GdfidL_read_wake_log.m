@@ -1,4 +1,4 @@
-function log  = GdfidL_read_wake_log( log_file )
+function lg  = GdfidL_read_wake_log( log_file )
 %Reads in the log file and extracts parameter data from it.
 %
 % log file is a string containing the full path to the file.
@@ -10,7 +10,7 @@ function log  = GdfidL_read_wake_log( log_file )
 data = read_in_text_file(log_file);
 if strcmp(data{end}, ' rc:  -1')
     warning('error in wake simulation')
-    log = data;
+    lg = data;
     return
 end
 %% Remove the commented out parts of the input file
@@ -32,7 +32,7 @@ for aj = 1:length(defines)
     tmd = regexp(defines{aj},'.*(define\(.*,([.\d -e+z]+|\s*steel.*|\s*carbon.*|\s*copper.*)?\).*)"', 'tokens');
     if ~isempty(tmd)
         tmd = tmd{1}{1};
-        log.defs{ajs} = tmd;
+        lg.defs{ajs} = tmd;
         ajs = ajs +1;
     end
 end
@@ -40,48 +40,54 @@ end
 %generate a look up between material names and numbers.
 mat_names_ind = find_position_in_cell_lst(regexp(data,'material>\s*material'));
 mat_type_inds = find_position_in_cell_lst(regexp(data,'material>\s*type='));
-for ng = 1:length(mat_names_ind)
+% Explicit preallocation:
+% mat_index = zeros(1, length(mat_names_ind));
+% Implicitly preallocate by sweeping the loop backwards:
+for ng = length(mat_names_ind):-1:1
     temp = data{mat_names_ind(ng)};
     tokens = regexp(temp, 'material>\s*material\s*=\s*(\d*)\s*#*\s*(.*)', 'tokens');
-    log.mat_losses.single_mat_data{ng,1} = str2num(tokens{1}{1});
-    log.mat_losses.single_mat_data{ng,2} = tokens{1}{2};
+    lg.mat_losses.single_mat_data{ng,1} = str2double(tokens{1}{1});
+    lg.mat_losses.single_mat_data{ng,2} = tokens{1}{2};
     temp2 = data{mat_type_inds(ng)};
     tokens = regexp(temp2, 'material>\s*type\s*=\s*(.*)', 'tokens');
-    log.mat_losses.single_mat_data{ng,3} = (tokens{1}{1});
-    mat_index(ng) = log.mat_losses.single_mat_data{ng,1};
+    lg.mat_losses.single_mat_data{ng,3} = (tokens{1}{1});
+    mat_index(ng) = lg.mat_losses.single_mat_data{ng,1};
 end
 clear ng tokens temp mat_names_ind
 % find the total material loss.
 total_loss_inds = find_position_in_cell_lst(strfind(data,'IntegratedSumPowerAll'));
 for nse = 1:length(total_loss_inds)
     temp = sscanf(regexprep(data{total_loss_inds(nse)},'<=.*',''),'%f%f');
-    log.mat_losses.loss_time(nse) = temp(1);
-    log.mat_losses.total_loss(nse) = temp(2);
+    lg.mat_losses.loss_time(nse) = temp(1);
+    lg.mat_losses.total_loss(nse) = temp(2);
 end
 clear nse temp
 % find the loss for each metal.
 metal_loss_inds = find_position_in_cell_lst(strfind(data,'IntegratedSumPowerMat'));
 metals = data(metal_loss_inds);
-for jse = 1:length(metals)
+for jse = length(metals):-1:1
     tmp = regexp(metals{jse},'IntegratedSumPowerMat(.*)','tokens');
-    metal_num(jse) = str2num(tmp{1}{1});
+    metal_num(jse) = str2double(tmp{1}{1});
 end
 clear tmp jse
-cer = strcmp(log.mat_losses.single_mat_data(:,3), 'normal');
+cer = strcmp(lg.mat_losses.single_mat_data(:,3), 'normal');
 % Find the number of ceramics in the model
 
 n_ceramics = sum(cer);
-num_ceramics = log.mat_losses.single_mat_data((cer ==1),1);
+num_ceramics = lg.mat_losses.single_mat_data((cer ==1),1);
 % find the total loss for each all ceramics.
 ceramic_loss_inds = find_position_in_cell_lst(strfind(data,'IntegratedSumPower-'));
 ceramics_tmp = data(ceramic_loss_inds);
 
 cer_ck = 0;
+n = length(ceramics_tmp) * n_ceramics;
+ceramic_num = zeros(1, n);
+ceramics = cell(n, 1);
 for jse = 1:length(ceramics_tmp)
     for kw = 1:n_ceramics
         cer_ck = cer_ck +1;
-    ceramic_num(cer_ck) = num_ceramics{kw};
-    ceramics{cer_ck,1} = ceramics_tmp{jse};
+        ceramic_num(cer_ck) = num_ceramics{kw};
+        ceramics{cer_ck,1} = ceramics_tmp{jse};
     end
 end
 clear tmp jse
@@ -100,65 +106,65 @@ mats = unique(mat_num);
 num_mats = length(mats);
 for wan = 1:num_mats
     % find the losses for a specific material.
-    mat_loc = find(mat_num == mats(wan));
-    dat_loc = find(mat_index == mats(wan));
+    mat_loc = mat_num == mats(wan);
+    dat_loc = mat_index == mats(wan);
     single_material = materials(mat_loc);
-    for anv = 1:length(single_material)
+    for anv = length(single_material):-1:1
         tmp = sscanf(regexprep(single_material{anv},'<=.*',''),'%f%f');
         tmp2(anv,1) = tmp(1);
         tmp2(anv,2) = tmp(2);
     end
     % as the ceramics are not reported separately then split the energy
     % equally.
-    indw = find(cell2mat(log.mat_losses.single_mat_data(:,1)) ==mats(wan));
-    type_mat = log.mat_losses.single_mat_data{indw,3};
+    indw = cell2mat(lg.mat_losses.single_mat_data(:,1)) ==mats(wan);
+    type_mat = lg.mat_losses.single_mat_data{indw,3};
     if strcmp(type_mat, 'normal')
         tmp2(:,2) = tmp2(:,2) ./ n_ceramics;
     end
     
     % Write the loss data to the structure.
-    log.mat_losses.single_mat_data{dat_loc,4} = tmp2;
+    lg.mat_losses.single_mat_data{dat_loc,4} = tmp2;
     clear tmp tmp2
     clear  mat_loc single_material dat_loc
 end
 % if any of the materials has an empty cell where the losses are normally.
 % It means that there were no losses recorded. However in order to stop
 % later code panicking I will replace the empty cell with zeros.
-dt = log.mat_losses.single_mat_data(:,4);
+dt = lg.mat_losses.single_mat_data(:,4);
 for sen = 1:length(dt)
     if ~isempty(dt{sen})
         z_data = dt{sen};
-        z_data = cat(2,z_data(:,1), repmat(0, size(z_data,1),1));
+        z_data = cat(2,z_data(:,1), zeros(size(z_data,1),1));
         break
     end
 end
 for sen = 1:length(dt)
     if isempty(dt{sen})
-        log.mat_losses.single_mat_data{sen,4} = z_data;
+        lg.mat_losses.single_mat_data{sen,4} = z_data;
     end
 end
 % find the date and time the simulation was run.
 dte_ind = find_position_in_cell_lst(strfind(data,'Start Date : '));
 dte = regexp(data{dte_ind},'.*Start\s+Date\s*:\s*(\d\d/\d\d/\d\d\d\d)', 'tokens');
-log.dte = char(dte{1});
+lg.dte = char(dte{1});
 tme_ind = find_position_in_cell_lst(strfind(data,'Start Time : '));
 tme = regexp(data{tme_ind},'.*Start\s+Time\s*:\s*(\d\d:\d\d:\d\d)', 'tokens');
-log.tme = char(tme{1});
+lg.tme = char(tme{1});
 
 % find the GdfidL version.
 ver_ind = find_position_in_cell_lst(strfind(data,'Version is '));
 ver = regexp(data{ver_ind},'.*Version is\s*(.+)', 'tokens');
-log.ver = ver{1}{1};
+lg.ver = ver{1}{1};
 
 % find the line containing info on the number of cores used
 cores_ind = find_position_in_cell_lst(strfind(data,'nrofthreads='));
 cores = regexp(data{cores_ind(end)},'.*nrofthreads=\s*(\d+)', 'tokens');
-log.cores = str2num(char(cores{1}));
+lg.cores = str2double(char(cores{1}));
 
 % find the GdfidL version.
 mesh_step_size_ind = find_position_in_cell_lst(regexp(data,'mesh>\s*spacing\s*=\s*'));
 mesh_step_size = regexp(data{mesh_step_size_ind},'mesh>\s*spacing\s*=\s*(.*)', 'tokens');
-log.mesh_step_size = str2num(char(mesh_step_size{1}));
+lg.mesh_step_size = str2double(char(mesh_step_size{1}));
 
 % find the line containing the charge info
 lcharges_ind = find_position_in_cell_lst(strfind(data,'lcharges>'));
@@ -166,19 +172,19 @@ charge_ind = find_position_in_cell_lst(regexp(data,'charge\s*=\s*'));
 charge_ind = intersect(charge_ind,lcharges_ind);
 charge = regexprep(data{charge_ind},'.*charge\s*=\s*','');
 charge = regexprep(charge,'"','');
-log.charge = str2num(charge);
+lg.charge = str2double(charge);
 
 % find the set beam sigma.
 beam_sigma_ind = find_position_in_cell_lst(regexp(data,'lcharges>\s*sigma\s*=\s*'));
 beam_sigma = regexp(data{beam_sigma_ind},'lcharges>\s*sigma\s*=\s*([^,]*)(?:\s*,|\s*$)', 'tokens');
-log.beam_sigma = str2num(char(beam_sigma{1}));
+lg.beam_sigma = str2double(char(beam_sigma{1}));
 %find the memory usage
 memory_ind = find_position_in_cell_lst(strfind(data,'The Memory Usage is at least'));
 memory = regexprep(data{memory_ind},'The Memory Usage is at least','');
 memory = regexprep(memory,'##','');
 memory = regexprep(memory,'MBytes','');
 memory = regexprep(memory,'\.','');
-log.memory = str2num(memory);
+lg.memory = str2double(memory);
 
 % find the meshing extent.
 mesh_extent_zlow_ind = find_position_in_cell_lst(regexp(data,'mesh>\s*pzlow\s*=\s*'));
@@ -193,25 +199,21 @@ mesh_extent_xlow = regexp(data{mesh_extent_xlow_ind},'mesh>\s*pxlow\s*=\s*([^,]*
 mesh_extent_xhigh = regexp(data{mesh_extent_xhigh_ind},'mesh>\s*(?:[^,]*\s*,)?\s*pxhigh\s*=\s*(.*)', 'tokens');
 mesh_extent_ylow = regexp(data{mesh_extent_ylow_ind},'mesh>\s*pylow\s*=\s*([^,]*)(?:\s*,|\s*$)', 'tokens');
 mesh_extent_yhigh = regexp(data{mesh_extent_yhigh_ind},'mesh>\s*(?:[^,]*\s*,)?\s*pyhigh\s*=\s*(.*)', 'tokens');
-% The regular expressions below are to cope with the fact theat Matlab
-% str2num will return the result of a calculation if the - has a space
-% beween it and the following number. But, it will return a list if there
-% is no space. I know that in this case it is always a calculation
-% therefore I force the spacing to the appropriate convention.
-log.mesh_extent_zlow = str2num(regexprep(regexprep(char(mesh_extent_zlow{1}),'-','- '),'(\d)(?:e|E)\s*-\s*(\d)','$1e-$2'));
-log.mesh_extent_zhigh = str2num(regexprep(regexprep(char(mesh_extent_zhigh{1}),'-','- '),'(\d)(?:e|E)\s*-\s*(\d)','$1e-$2'));
-log.mesh_extent_xlow = str2num(regexprep(regexprep(char(mesh_extent_xlow{1}),'-','- '),'(\d)(?:e|E)\s*-\s*(\d)','$1e-$2'));
-log.mesh_extent_xhigh = str2num(regexprep(regexprep(char(mesh_extent_xhigh{1}),'-','- '),'(\d)(?:e|E)\s*-\s*(\d)','$1e-$2'));
-log.mesh_extent_ylow = str2num(regexprep(regexprep(char(mesh_extent_ylow{1}),'-','- '),'(\d)(?:e|E)\s*-\s*(\d)','$1e-$2'));
-log.mesh_extent_yhigh = str2num(regexprep(regexprep(char(mesh_extent_yhigh{1}),'-','- '),'(\d)(?:e|E)\s*-\s*(\d)','$1e-$2'));
+
+lg.mesh_extent_zlow = eval(char(mesh_extent_zlow{1}{1}));
+lg.mesh_extent_zhigh = eval(char(mesh_extent_zhigh{1}{1}));
+lg.mesh_extent_xlow = eval(char(mesh_extent_xlow{1}{1}));
+lg.mesh_extent_xhigh = eval(char(mesh_extent_xhigh{1}{1}));
+lg.mesh_extent_ylow = eval(char(mesh_extent_ylow{1}{1}));
+lg.mesh_extent_yhigh = eval(char(mesh_extent_yhigh{1}{1}));
 
 % find the ports on the z boundarys
 port_on_zlow_ind = find_position_in_cell_lst(regexp(data,'#\s*\.\.\s*The Port is at zlow'));
 num_pmls_zlow = regexp(data{port_on_zlow_ind+1},'#\s*\.\.\s*PML-Thickness\s*:\s*(\d*)', 'tokens');
 port_on_zhigh_ind = find_position_in_cell_lst(regexp(data,'#\s*\.\.\s*The Port is at zhigh'));
 num_pmls_zhigh = regexp(data{port_on_zhigh_ind+1},'#\s*\.\.\s*PML-Thickness\s*:\s*(\d*)', 'tokens');
-log.pmls_zlow = str2num(char(num_pmls_zlow{1}));
-log.pmls_zhigh = str2num(char(num_pmls_zhigh{1}));
+lg.pmls_zlow = str2double(char(num_pmls_zlow{1}));
+lg.pmls_zhigh = str2double(char(num_pmls_zhigh{1}));
 % find symetry planes
 % assume any magnetic boundary is also a symetry plane.
 boundaries_ind1 = find_position_in_cell_lst(regexp(data,'mesh>\s*c[xyz]low\s*= '));
@@ -222,86 +224,83 @@ planes = cell(1,2);
 for esn = 1:length(boundaries_ind)
     [planes_tmp, ~] = regexp(data{boundaries_ind(esn)},'mesh>\s*c([xyz])low\s*=\s*(.*),\s*c([xyz])high\s*=\s*(.*)', 'tokens');
     planes_tmp = reshape(planes_tmp{1},2,size(planes_tmp{1},2)/2)';
-%     tsn = 1;
+    %     tsn = 1;
     if isempty(planes_tmp)
         [planes_tmp, ~] = regexp(data{boundaries_ind(esn)},'mesh>\s*c([xyz])low\s*=\s*(.*)', 'tokens');
         planes_tmp = planes_tmp{1};
-%         tsn = 2;
+        %         tsn = 2;
     end
     if isempty(planes_tmp)
         [planes_tmp, ~] = regexp(data{boundaries_ind(esn)},'mesh>\s*c([xyz])high\s*=\s*(.*)', 'tokens');
         planes_tmp = planes_tmp{1};
-%         planes_tmp= reduce_cell_depth(planes_tmp);
-%         tsn = 3;
+        %         planes_tmp= reduce_cell_depth(planes_tmp);
+        %         tsn = 3;
     end
     planes = cat(1, planes, planes_tmp);
 end
 planes = planes(2:end,:);
-x_ind = find(strcmp(planes(:,1),'x'));
-y_ind = find(strcmp(planes(:,1),'y'));
-z_ind = find(strcmp(planes(:,1),'z'));
+x_ind = strcmp(planes(:,1),'x');
+y_ind = strcmp(planes(:,1),'y');
+z_ind = strcmp(planes(:,1),'z');
 
-log.planes.XY = 'no';
-log.planes.XZ = 'no';
-log.planes.YZ = 'no';
+lg.planes.XY = 'no';
+lg.planes.XZ = 'no';
+lg.planes.YZ = 'no';
 if sum(strcmp(planes(x_ind,2), 'magnetic')) > 0
-    log.planes.YZ = 'yes';
+    lg.planes.YZ = 'yes';
 end
 if sum(strcmp(planes(y_ind,2), 'magnetic')) > 0
-    log.planes.XZ = 'yes';
+    lg.planes.XZ = 'yes';
 end
 if sum(strcmp(planes(z_ind,2), 'magnetic')) > 0
-   log.planes.XY = 'yes';
+    lg.planes.XY = 'yes';
 end
 
 
 % find the number of mesh cells
 Ncells_ind = find_position_in_cell_lst(strfind(data,'Cell-Numbers'));
-log.Ncells = str2num(regexprep(data{Ncells_ind},'.*= ',''));
+lg.Ncells = str2double(regexprep(data{Ncells_ind},'.*= ',''));
 
 % find the timestep
 Timestep_ind = find_position_in_cell_lst(strfind(data,'The paranoid Timestep'));
 Timestep = regexprep(data{Timestep_ind},'.*:','');
-log.Timestep = str2num(regexprep(Timestep, '\[s\]',''));
-% convert to ns
-% Timestep = Timestep *1e9;
+lg.Timestep = str2double(regexprep(Timestep, '\[s\]',''));
 
 % find the solver time
- wall_time_ind = find_position_in_cell_lst(strfind(data,'Wall Clock Time:'));
- if isempty(wall_time_ind)
-     wall_time = 0;
-     wall_rate = 0;
- else
-wall_time = regexp(data{wall_time_ind(end)},'.*Wall Clock Time\s*:\s*(\d+)\s*Seconds\s*,\s+diff:\s+[0-9]+\s*,\s*[A-Z]Flop/s\s*:\s+\d+.*\d+', 'tokens');
-wall_time = find_val_in_cell_nest(wall_time);
-log.wall_time = str2num(wall_time);
-for hse = 1:length(wall_time_ind)
-wall_rate = regexp(data{wall_time_ind(hse)},'.*Wall Clock Time\s*:\s*\d+\s*Seconds\s*,\s+diff:\s+[0-9]+\s*,\s*([A-Z])Flop/s\s*:\s+(\d+.*\d+)', 'tokens');
-wall_rate = wall_rate{1};
-wall_multiplier = wall_rate{1};
-wall_rate = str2num(wall_rate{2});
-if strcmp(wall_multiplier, 'M')
-    wall_rate(hse) = wall_rate .* 1E6;
-elseif strcmp(wall_multiplier, 'G')
- wall_rate(hse) = wall_rate .* 1E9;
+wall_time_ind = find_position_in_cell_lst(strfind(data,'Wall Clock Time:'));
+%wall_time = 0;
+wall_rate = 0;
+if ~isempty(wall_time_ind)
+    wall_time = regexp(data{wall_time_ind(end)},'.*Wall Clock Time\s*:\s*(\d+)\s*Seconds\s*,\s+diff:\s+[0-9]+\s*,\s*[A-Z]Flop/s\s*:\s+\d+.*\d+', 'tokens');
+    wall_time = find_val_in_cell_nest(wall_time);
+    lg.wall_time = str2double(wall_time);
+    for hse = 1:length(wall_time_ind)
+        wall_rate = regexp(data{wall_time_ind(hse)},'.*Wall Clock Time\s*:\s*\d+\s*Seconds\s*,\s+diff:\s+[0-9]+\s*,\s*([A-Z])Flop/s\s*:\s+(\d+.*\d+)', 'tokens');
+        wall_rate = wall_rate{1};
+        wall_multiplier = wall_rate{1};
+        wall_rate = str2double(wall_rate{2});
+        if strcmp(wall_multiplier, 'M')
+            wall_rate(hse) = wall_rate .* 1E6;
+        elseif strcmp(wall_multiplier, 'G')
+            wall_rate(hse) = wall_rate .* 1E9;
+        end
+    end
+    lg.wall_rate = mean(wall_rate(3:end));
 end
-end
-log.wall_rate = mean(wall_rate(3:end));
- end
 % find the lines containing info CPU time
 solver_time_ind = find_position_in_cell_lst(strfind(data,'CPU-Seconds for FDTD'));
 solver_time = regexp(data{solver_time_ind},'.*:\s*(\d+)', 'tokens');
 if isempty(solver_time_ind)
-%     If the simulation has not yet finished that will not be available. In this
-%     case find the latest time output.
-solver_time_ind = find_position_in_cell_lst(strfind(data,'CPU Time'));
-solver_time = regexp(data{solver_time_ind(end)},'.*CPU[_\s][tT]ime\s*:\s*(\d+)\s*Seconds', 'tokens');
+    %     If the simulation has not yet finished that will not be available. In this
+    %     case find the latest time output.
+    solver_time_ind = find_position_in_cell_lst(strfind(data,'CPU Time'));
+    solver_time = regexp(data{solver_time_ind(end)},'.*CPU[_\s][tT]ime\s*:\s*(\d+)\s*Seconds', 'tokens');
 end
-log.CPU_time = str2num(char(solver_time{1}));
+lg.CPU_time = str2double(char(solver_time{1}));
 
 % find the mesher time
 mesher_time_ind = find_position_in_cell_lst(strfind(data,'Mesher: total CPU Seconds:'));
-log.mesher_time = str2num(regexprep(data{mesher_time_ind},'.*:',''));
+lg.mesher_time = str2double(regexprep(data{mesher_time_ind},'.*:',''));
 
 % find the port names
 port_name_ind = find_position_in_cell_lst(regexp(data,'-ports>\W*name = '));
@@ -320,18 +319,18 @@ for hs = 1:length(port_name)
     [toks, ~] = regexp(port_data_sec,'.*\(\s*(.*),\s*(.*)\s*\).*cutoff=\s*(.*) \[Hz\]', 'tokens');
     tmp = reduce_cell_depth(reduce_cell_depth(toks));
     tmp = cellfun(@str2num, tmp);
-        % anything below 1E-12 is considered numerical noise and set to zero.
+    % anything below 1E-12 is considered numerical noise and set to zero.
     tmp(abs(tmp) < 1E-12) = 0;
     % using the definition e^(yx) where y= alpha + ibeta.
     % alpha is the attenuation constant
     % beta is the phase constant or propagation constant.
-    log.alpha{hs} = tmp(:,2);
-    log.beta{hs} = tmp(:,1);
-    log.cutoff{hs} = tmp(:,3);
+    lg.alpha{hs} = tmp(:,2);
+    lg.beta{hs} = tmp(:,1);
+    lg.cutoff{hs} = tmp(:,3);
 end
-log.port_name = port_name;
+lg.port_name = port_name;
 
 % find the wake length
 wake_length_ind = find_position_in_cell_lst(regexp(data,'lcharges>\s*shigh\s*=\s*\d+'));
 wake_length = regexp(data(wake_length_ind),'lcharges>\s*shigh\s*=\s*(\d+)','tokens');
-log.wake_length = str2num(wake_length{1}{1}{1});
+lg.wake_length = str2double(wake_length{1}{1}{1});

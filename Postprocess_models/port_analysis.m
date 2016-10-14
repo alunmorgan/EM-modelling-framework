@@ -16,7 +16,7 @@ t_step = port_data.timebase(2) - port_data.timebase(1); % time step in s
 % points with a certain separation. In order to get a truthful
 % value of the integral one needs to multiply each point by the
 % separation (effectively turning the point into areas).
-for es =1:length(port_data.data)
+for es =length(port_data.data):-1:1
     port_mode_energy{es} = sum(port_data.data{es} .^2, 1)  .* t_step;
     port_mode_energy_cumsum{es} = cumsum(port_data.data{es} .^2) * t_step;
     port_energy_cumsum(:,es) = squeeze(sum(port_mode_energy_cumsum{es},2));

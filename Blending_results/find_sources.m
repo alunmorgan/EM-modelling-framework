@@ -17,7 +17,7 @@ names =names(find_position_in_cell_lst(regexp(names, '^[0-9]*T[0-9]')));
 if iscell(date_range)
     start_date  = datenum(date_range(1),'yyyymmddTHHMMSS');
     end_date = datenum(date_range(2),'yyyymmddTHHMMSS');
-    for se = 1:length(names)
+    for se = length(names):-1:1
         if datenum(names{se},'yyyymmddTHHMMSS') > start_date & ...
                 datenum(names{se},'yyyymmddTHHMMSS') < end_date
             good_date(se) = 1;
@@ -30,7 +30,7 @@ end
     
 param_names = cell(length(names),1);
 param_vals = cell(length(names),1);
-for jw = 1:length(names)
+for jw = length(names):-1:1
     if (exist([dirs, names{jw},'/parameters.mat'],'file')) == 2
         set_name = ['set',names{jw}];
         data.(set_name) = load([dirs, names{jw},'/parameters.mat']);
@@ -95,7 +95,7 @@ if iscell(defaults)
         end
     end
     if sum(sum(cellfun(@isempty, param_val_list))) ~= 0;
-        missing = param_name_list(find(sum(cellfun(@isempty, param_val_list))>0));
+        missing = param_name_list(sum(cellfun(@isempty, param_val_list))>0);
         mis = '';
         for js = 1:length(missing)
             mis = [mis, ': ', missing{js}];
@@ -105,7 +105,7 @@ if iscell(defaults)
 end
 % identify the variables which are to be ignored.
 if ~isempty(ignore_list{1})
-    for ms = 1:length(ignore_list)
+    for ms = length(ignore_list):-1:1
         ig(ms) = strmatch(ignore_list{ms}, param_name_list);
     end
     % remove them from the lists.
@@ -113,7 +113,7 @@ if ~isempty(ignore_list{1})
     param_val_list(:,ig) = [];
 end
 % separate into varying and non varying
-for ne = 1:length(param_name_list)
+for ne = length(param_name_list):-1:1
     if length(unique(param_val_list(:,ne))) == 1
         nonvar(ne) = 1;
         vary(ne) = 0;
@@ -140,7 +140,7 @@ varying_pars(:,req_ind) = [];
 % if there is any data left then run the code to group things together.
 if size(varying_pars,2) > 0
     sweep_vals = unique(req_vals);
-    for hs = 1:length(sweep_vals)
+    for hs = length(sweep_vals):-1:1
         % for each unique value of the sweep find the runs which have that
         % value.
         sweep_ind = find(strcmp(req_vals, sweep_vals{hs}));
@@ -148,7 +148,7 @@ if size(varying_pars,2) > 0
         sweep_refs{hs} = sweep_ind;
     end
     % first find any cells which only have one run in them.
-    for naw = 1:length(sweeps)
+    for naw = length(sweeps):-1:1
         if size(sweeps{naw},1) == 1
             single_run(naw) = 1;
         else
@@ -157,7 +157,7 @@ if size(varying_pars,2) > 0
     end
     % Check that all such cells agree on the other parameters.
     % Then select matching parameter sets from the other cells.
-    test = {};
+    test = {legth(find(single_run == 1)),1};
     se = 1;
     for js = find(single_run == 1)
         test(se,1:length(sweeps{js}(1,:))) = sweeps{js}(1,:);
@@ -208,9 +208,9 @@ if size(varying_pars,2) > 0
         error('find_sources: No common parameter set found')
     end
     % loop over each base set.
-    for pse = 1:length(inds)
+    for pse = length(inds):-1:1
         % generate the source name list.
-        for esj = 1:size(inds{pse},1)
+        for esj = size(inds{pse},1):-1:1
             sources{pse}{esj} = names{sweep_refs{inds{pse}(esj,1)}(inds{pse}(esj,2))};
         end
     end

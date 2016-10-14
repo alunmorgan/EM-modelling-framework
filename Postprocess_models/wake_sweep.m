@@ -9,7 +9,7 @@ dsd = length(time_domain_data.timebase);
 
 raw_port_data = put_on_reference_timebase(time_domain_data.timebase, port_data);
 n_points = 20;
-for se = 1:n_points
+for se = n_points:-1:1
     % find the data length required.
     trimed = round((dsd/n_points)*se);
     % Construct a replacement structure containing the truncated datasets.

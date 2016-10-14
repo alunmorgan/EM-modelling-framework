@@ -122,7 +122,7 @@ if isfield(log.mat_losses, 'total_loss')
     % Also I have to split the energy equally between ceramics for lack of
     % any better information.
     % first find out how many different ceramics are used.
-    for ern = 1:size(log.mat_losses.single_mat_data,1)
+    for ern = size(log.mat_losses.single_mat_data,1):-1:1
         cer_count(ern) = isempty(log.mat_losses.single_mat_data{ern,3});
     end
     cer_count = sum(cer_count);
