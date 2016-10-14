@@ -1,4 +1,4 @@
-function varargout = Blend_figs(report_input, fig_nme, out_name, lg, lw, line_select)
+function state = Blend_figs(report_input, fig_nme, out_name, lg, lw, line_select, udcp)
 % Take existing fig files and combine them.
 % lg specifes if a log or linear scale it to be used (0 = linear, 1 = log)
 % lw specifies the linewidth.
@@ -7,10 +7,11 @@ function varargout = Blend_figs(report_input, fig_nme, out_name, lg, lw, line_se
 %
 % Example: state = Blend_figs(report_input, ['s_parameters_S',num2str(hs),num2str(ha)], 0, 2, '\s*S\d\d\(1\)\s*');
 
+state = 1;
 if ispc == 0
-      slh = '/';
+    slh = '/';
 else
-       slh = '\';
+    slh = '\';
 end
 
 if nargin <6
@@ -20,250 +21,135 @@ cols = {'b','k','m','c','g',[1, 0.5, 0],[0.5, 1, 0],[0.5, 0, 1],[1, 0, 0.5],[0.5
 l_st ={'--',':','-.','--',':','-.','--',':','-.'};
 doc_root = report_input.doc_root;
 source_reps =report_input.sources;
-rep_title = report_input.report_name;
+sub_folder = report_input.loc;
 
-if length(report_input.param_names_varying) == 1
-    swept_name = report_input.param_names_varying{1};
-    swept_vals = report_input.param_vals_varying(1,:);
-else
-    swept_name = 'Model';
-    for sn = 1:length(report_input.param_names_varying)
-        swept_vals{sn} = num2str(sn);
-    end
-end
-
-h1 = figure('Position', [ 0 0 1000 400]);
-h2 = figure('Position', [ 0 0 1000 1000]);
-h3 = figure('Position', [ 0 0 1000 400]);
-h4 = figure('Position', [ 0 0 1000 400]);
 hold on
-ke =1;
-bad_data = [];
-zlims = [1;length(source_reps)];
-ylev = 0;
-ylev2 = 0;
-ylev_diff = 0;
-ylev2_diff = 0;
-for hse = 1:length(source_reps)
-    if exist([doc_root, slh, source_reps{hse}, slh, 'wake', slh, fig_nme, '.fig'],'file')
-        hn = open([doc_root, slh, source_reps{hse}, slh, 'wake', slh,fig_nme, '.fig']);
-        % find the graph limits
-        axis_handle = findobj(hn,'Type', 'axes');
-        axis_handle = axis_handle(end);
-        xlims(:,hse) = get(axis_handle,'XLim');
-        ylims(:,hse) = get(axis_handle,'YLim');
-        
-        % find the handle of the axis
-        h_ax = findobj(hn,'XTickLabelMode', 'auto');
-        
-        % find all the lines in the graph
-        a = findobj(hn,'Type', 'line');
-        for ove = 1:length(a)
-            display_names{ove} = get(a(ove), 'DisplayName');
-            data_length(ove) = length(get(a(ove), 'XData'));
-            parent(ove) = get(a(ove), 'Parent');
-        end
-        %          Select only the lines on the main axis.
-        s1 = parent == h_ax;
-        % Only select lines with 2 datapoints or more
-        s2 = data_length > 1;
-        
-        selection = s1 & s2;
-        a = a(selection);
-        display_names = display_names(selection);
-        % If used then select the requested line using the display
-        % name.
-        if ~strcmp(line_select, 'all')
-            locs = find_position_in_cell_lst(regexp(display_names, line_select));
-            a = a(locs);
-        end
-        
-        ck = 1;
-        for aww = 1:length(a)
-            % Check that the line .... and belongs to the current axis.
-            if length(get(a(aww),'XData')) > 1
-                b(ck) = a(aww);
-                ck = ck +1;
-            end
-        end
-        if hse ==1
-            Xlab = get(get(gca,'Xlabel'), 'String');
-            Ylab = get(get(gca,'Ylabel'), 'String');
-            Zlab = report_input.swept_name;
-        end
-        %% extract the data from the graphs
-        if ~exist('b', 'var')
-            varargout{1} = 1;
-            return
-        end
-        len_b = length(b);
-        for en = 1:len_b
-            xdata{en} = get(b(en),'XData');
-            ydata{en} = get(b(en),'YData');
-            zdata{en} = ones(length(xdata{en}),1) .* hse;
-        end
-        close(hn)
-        clear a b h_ax
-        if hse == 1
-            ref_data = ydata;
-        end
-        %% Plot graphs
-        %         Generate 2D graph with legend
-        figure(h1)
-        figure_setup_bounding_box
-        for en = 1:len_b
-            hold on
-            if en ==1
-                plot(xdata{en}, ydata{en},'linestyle',l_st{rem(en-1,9)+1},...
-                    'Color',cols{rem(hse-1,10)+1}, 'linewidth',lw);
-            else
-                plot(xdata{en}, ydata{en},'linestyle',l_st{rem(en-1,9)+1},...
-                    'Color',cols{rem(hse-1,10)+1}, 'linewidth',lw,'HandleVisibility','off');
-            end
-            hold off
-            
-        end
-        
-        if strfind(Xlab, 'Frequency')
-            % Generate 2D graph with legend fixed 0 - 9GHz frequency scale
-            figure(h3)
-            figure_setup_bounding_box
-            for en = 1:len_b
-                hold on
-                cut_point = find(xdata{en}>9,1, 'first');
-                ylev = min(ylev, min(ydata{en}(1:cut_point)));
-                ylev2 = max(ylev2, max(ydata{en}(1:cut_point)));
-                if en ==1
-                    plot(xdata{en}(1:cut_point), ydata{en}(1:cut_point),'linestyle',l_st{rem(en-1,9)+1},...
-                        'Color',cols{rem(hse-1,10)+1}, 'linewidth',lw);
-                else
-                    plot(xdata{en}(1:cut_point), ydata{en}(1:cut_point),'linestyle',l_st{rem(en-1,9)+1},...
-                        'Color',cols{rem(hse-1,10)+1}, 'linewidth',lw,'HandleVisibility','off');
-                end
-                hold off
-            end
-            % Generate 2D graph showing the difference to the first trace.
-            if hse >1
-                figure(h4)
-                figure_setup_bounding_box
-                for en = 1:len_b
-                    % TEMP truncating the ref data or the ydata as matlab seems to loose
-                    % a data point depending on whether it is running on
-                    % linux or windows.
-                    ydata2  = ydata{en};
-                    xdata2 = xdata{en};
-                    if length(ref_data{en}) > length(ydata2)
-                        df = length(ref_data{en}) - length(ydata2);
-                        sz = size(ydata2);
-                        if sz(1) == 1
-                            ydata2 = cat(2,ydata2,NaN(1,df));
-                            xdata2 = cat(2,xdata2,NaN(1,df));
-                        elseif sz(2) == 1
-                            ydata2 = cat(1,ydata2,NaN(df,1));
-                            xdata2 = cat(1,xdata2,NaN(df,1));
-                        end
-                    elseif length(ref_data{en}) < length(ydata2)
-                        ydata2 = ydata2(1:length(ref_data));
-                        xdata2 = xdata2(1:length(ref_data));
-                    end
-                    plot_data = ydata2 - ref_data{en};
-                    ylev_diff = min(ylev_diff, min(plot_data));
-                    ylev2_diff = max(ylev2_diff, max(plot_data));
-                    hold on
-                    if en ==1
-                        plot(xdata2, plot_data,'linestyle',l_st{rem(en-1,9)+1},...
-                            'Color',cols{rem(hse-1,10)+1}, 'linewidth',lw);
-                    else
-                        plot(xdata2, plot_data,'linestyle',l_st{rem(en-1,9)+1},...
-                            'Color',cols{rem(hse-1,10)+1}, 'linewidth',lw,'HandleVisibility','off');
-                    end
-                    hold off
-                end
-            end
-        end
-        %         Generate 3D graph with no legend
-        figure(h2)
-        figure_setup_bounding_box
-        for en = 1:len_b
-            hold on
-            plot3(xdata{en}, zdata{en}, ydata{en},'linestyle',l_st{rem(en-1,9)+1},...
-                'Color',cols{rem(hse-1,10)+1}, 'linewidth',lw,'HandleVisibility','off');
-            hold off
-        end
-    else
-        bad_data(ke) = hse;
-        ke = ke +1;
-    end
+any_data = 0;
+for hse = length(source_reps):-1 :1
+    graph_name = [doc_root, source_reps{hse}, slh, sub_folder, slh, fig_nme, '.fig'];
+    if exist(graph_name,'file')
+        data_out(hse) = extract_from_graph(graph_name, line_select);
+        if data_out(hse).state == 1
+            any_data = 1;
+            %             zdata{hse} = ones(length(data_out(1).xdata{1}),1) .* hse;
+        end %if
+    end %if
+end %for
+if any_data == 0
+    state = 0;
+    return
+end
+Zlab = report_input.swept_name;
+xlims = data_out(1).xlims;
+ylims = data_out(1).ylims;
+for ew = 2:length(data_out);
+    xlims = cat(1, xlims, data_out(ew).xlims);
+    ylims = cat(1, ylims, data_out(ew).ylims);
 end
 
-if length(bad_data) == length(source_reps)
-    % there is no data so mark the output as empty and do not plot the
-    % graph.
-    varargout{1} = 1;
-    close(h1)
-    close(h2)
-    close(h3)
-else
-    varargout{1} = 0;
-    % add legend to 2D graph
-    figure(h1)
-    setup_graph_for_display(xlims, ylims, [-1;0], [0,lg,0], ...
-        Xlab, Ylab, '', report_input.model_name);
-    vals = report_input.swept_vals;
-    for whs = 1:length(vals)
-        leg{whs} = [report_input.swept_name,' = ',vals{whs}];
-    end
-    vals(bad_data) = [];
-    leg(bad_data) = [];
-    legend(leg, 'Location', 'EastOutside')
-    legend('boxoff')
-    % save 2D graph
-    savemfmt(report_input.output_loc, out_name)
-    close(h1)
-    
-    % save 3D graph.
-    figure(h2)
-    setup_graph_for_display(xlims, zlims, ylims, [0,0,lg], ...
-        Xlab, Zlab, Ylab, '');
-    set(gca, 'YTick',1:length(source_reps))
-    set(gca, 'YTickLabel',report_input.swept_vals)
-    view(45,45)
-    grid on
-    savemfmt(report_input.output_loc, [out_name, '_3D'])
-    close(h2)
-    
-    % Save zoomed in frequency graph.
-    if strfind(Xlab, 'Frequency')
-        figure(h3)
-        setup_graph_for_display([0;9], [ylev;ylev2], [-1;0], [0,lg,0],...
-            Xlab, Ylab, '', report_input.model_name);
-        vals = report_input.swept_vals;
-        for whs = 1:length(vals)
-            leg{whs} = [report_input.swept_name,' = ',vals{whs}];
-        end
-        vals(bad_data) = [];
-        leg(bad_data) = [];
-        legend(leg, 'Location', 'EastOutside')
-        legend('boxoff')
-        % save 2D graph
-        savemfmt(report_input.output_loc, [out_name, '_zoom'])
-        close(h3)
-        
-        figure(h4)
-        setup_graph_for_display(xlims, [ylev_diff;ylev2_diff], [-1;0], [0,lg,0],...
-            Xlab, Ylab, '', report_input.model_name);
-        vals = report_input.swept_vals;
-        for whs = 1:length(vals)
-            leg{whs} = [report_input.swept_name,' = ',vals{whs}];
-        end
-        vals(bad_data) = [];
-        leg(bad_data) = [];
-        legend(leg, 'Location', 'EastOutside')
-        legend('boxoff')
-        % save 2D graph
-        savemfmt(report_input.output_loc, [out_name, '_diff'])
-        close(h4)
-    end
-    drawnow
-end
+% This section is to remove the levels and other straight line which may be
+% on the graphs.
+for hwc = length(data_out):-1:1
+    if ~isempty(data_out(hwc).xdata)
+        for wah = length(data_out(hwc).xdata):-1:1
+            if ~isempty(data_out(hwc).xdata{wah})
+                d_len(hwc, wah) = length(data_out(hwc).xdata{wah});
+            else
+                d_len(hwc, wah) = 0 ;
+            end %if
+        end %for
+    else
+        d_len(hwc,:) = 0;
+    end %if
+end %for
+
+unwanted_lines = all(d_len <3, 1);
+% Find first wanted line
+fwl = find(unwanted_lines == 0,1, 'first');
+
+%% Plot graphs
+%         Generate 2D graph with legend
+h1 = figure('Position', [ 0 0 1000 400]);
+ax1 = axes('Parent', h1);
+hold(ax1, 'on')
+for en = length(data_out):-1:1
+    if isempty(data_out(en).xdata)
+        plot(NaN, NaN,'linestyle',l_st{1},...
+            'Color',cols{rem(en-1,10)+1}, 'linewidth',lw, 'Parent', ax1);
+    else
+        plot(data_out(en).xdata{fwl}, data_out(en).ydata{fwl},'linestyle',l_st{1},...
+            'Color',cols{rem(en-1,10)+1}, 'linewidth',lw, 'Parent', ax1);
+    end %if
+    leg{en} = [report_input.swept_name,' = ',report_input.swept_vals{en}];
+end %for
+hold(ax1, 'off')
+% add legend to 2D graph
+setup_graph_for_display(ax1, xlims, ylims, [-1;0], [0,lg,0], ...
+    data_out(1).Xlab, data_out(1).Ylab, '', report_input.model_name);
+legend(ax1, leg, 'Location', 'EastOutside', 'Box', 'off')
+% save 2D graph
+savemfmt(h1, report_input.output_loc, out_name)
+
+if exist('udcp', 'var')
+    xlim_old = get(gca,'XLim');
+    xlim([xlim_old(1) udcp]);
+    savemfmt(h1, report_input.output_loc, [out_name, '_zoom'])
+end % if
+close(h1)
+
+% Generate 2D graph showing the difference to the first trace.
+h4 = figure('Position', [ 0 0 1000 400]);
+ax4 = axes('Parent', h4);
+hold(ax4, 'on')
+for en = 1:length(data_out)
+    if isempty(data_out(en).xdata)
+        plot(NaN, NaN,'linestyle',l_st{1},...
+            'Color',cols{rem(en-1,10)+1}, 'linewidth',lw, 'Parent', ax4);
+    else
+        if ~isnan(data_out(en).ydata{fwl})
+            new_y = interp1(data_out(en).xdata{fwl}, data_out(en).ydata{fwl},data_out(1).xdata{fwl});
+            plot(data_out(1).xdata{fwl}, new_y - data_out(1).ydata{fwl},'linestyle',l_st{1},...
+                'Color',cols{rem(en-1,10)+1}, 'linewidth',lw, 'Parent', ax4);
+        else
+            plot(NaN, NaN,'linestyle',l_st{1},...
+                'Color',cols{rem(en-1,10)+1}, 'linewidth',lw, 'Parent', ax4);
+        end %if
+    end %if
+    leg{en} = [report_input.swept_name,' = ',report_input.swept_vals{en}]; 
+end %for
+hold(ax4, 'off')
+setup_graph_for_display(ax4, xlims, [-inf;inf], [-1;0], [0,lg,0],...
+    data_out(1).Xlab, data_out(1).Ylab, '', report_input.model_name);
+legend(ax4, leg, 'Location', 'EastOutside', 'Box', 'off')
+% save 2D graph
+savemfmt(h4, report_input.output_loc, [out_name, '_diff'])
+close(h4)
+
+
+%         Generate 3D graph with no legend
+h2 = figure('Position', [ 0 0 1000 1000]);
+ax2 = axes('Parent', h2);
+hold(ax2, 'on')
+for en = 1:length(data_out)
+    if isempty(data_out(en).xdata)
+        plot3(NaN, NaN, NaN, 'linestyle',l_st{1},...
+            'Color',cols{rem(en-1,10)+1}, 'linewidth',lw,...
+            'HandleVisibility','off', 'Parent', ax2);
+    else
+        plot3(data_out(en).xdata{fwl}, ...
+            ones(length(data_out(en).xdata{fwl}),1) * en, ...
+            data_out(en).ydata{fwl},'linestyle',l_st{1},...
+            'Color',cols{rem(en-1,10)+1}, 'linewidth',lw,...
+            'HandleVisibility','off', 'Parent', ax2);
+    end %if
+end %for
+hold(ax2, 'off')
+setup_graph_for_display(ax2, xlims, [1;length(data_out)], ylims, [0,0,lg], ...
+    data_out(1).Xlab, Zlab, data_out(1).Ylab, '');
+set(ax2, 'YTick',1:length(source_reps))
+set(ax2, 'YTickLabel',report_input.swept_vals)
+view(45,45)
+grid on
+savemfmt(h2, report_input.output_loc, [out_name, '_3D'])
+close(h2)
 close all

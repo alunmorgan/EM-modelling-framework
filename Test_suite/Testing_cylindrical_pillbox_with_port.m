@@ -41,7 +41,7 @@ run_inputs.storage_path = data_loc;
 run_inputs.model_name = 'cylindrical_pillbox_with_port';
 run_inputs.beam_sigma = '5E-3'; %in m
 run_inputs.mesh_stepsize = '750E-6'; %in m
-run_inputs.wakelength = '2';
+run_inputs.wakelength = '200';
 run_inputs.mat_list = mat_list;
 run_inputs.additional_defs = additional_defs;
 
@@ -54,7 +54,7 @@ run_inputs.n_cores = 25;
 % sim select - chooses which simulations to run
 % (Wake/S-parameter/Eigenmode). Uses a string as input 'esw' will select
 % all three.
-run_inputs.sim_select = 'w';
+run_inputs.sim_select = 'ws';
 
 % specifies if there is an electron beam passing throug the structure.
 % if there is it is assumed to be passing between ports 1 and 2.

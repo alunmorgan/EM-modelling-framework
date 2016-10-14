@@ -12,9 +12,9 @@ else
 end
 
 
-dr = datevec(date_range{2}, 'yyyymmddTHHMMSS')-datevec(date_range{1}, 'yyyymmddTHHMMSS');
-lookup = [16,14,10,9,6,4];
-dr2=find(dr>0)-1;
+% dr = datevec(date_range{2}, 'yyyymmddTHHMMSS')-datevec(date_range{1}, 'yyyymmddTHHMMSS');
+% lookup = [16,14,10,9,6,4];
+% dr2=find(dr>0)-1;
 % if dr2(1) == 0
 % s = num2str(date_range{1});
 % else

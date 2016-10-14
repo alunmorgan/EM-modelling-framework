@@ -41,7 +41,7 @@ run_inputs.storage_path = data_loc;
 run_inputs.model_name = 'cylindrical_pillbox';
 run_inputs.beam_sigma = '5E-3'; %in m
 run_inputs.mesh_stepsize = '2000E-6'; %in m
-run_inputs.wakelength = '2';
+run_inputs.wakelength = '400';
 run_inputs.mat_list = mat_list;
 run_inputs.additional_defs = additional_defs;
 

@@ -24,11 +24,16 @@ pause(5)
 % Load in the data for the requested model sets.
 % Extract the parameter data.
 names = source_reps;
-for psw = 1:length(names)
-    load([doc_root,names{psw},slh,'/wake/run_inputs.mat'])
-     load([doc_root,names{psw},slh,'/data_from_run_logs.mat'])
+for psw = length(names):-1:1
+    load([doc_root,names{psw},'/data_from_run_logs.mat'])
+    try
+        load([doc_root,names{psw},'/wake/run_inputs.mat'])
+        [param_names_tmp, param_vals_tmp] = extract_parameters(mi, run_logs, 'w');
+    catch
+        load([doc_root,names{psw},'/s_parameter/run_inputs.mat'])
+        [param_names_tmp, param_vals_tmp] = extract_parameters(mi, run_logs,'s');
+    end
     model_names{psw} =  regexprep(mi.('model_name'),'_',' ');
-    [param_names_tmp, param_vals_tmp] = extract_parameters(mi, run_logs);
     param_names(psw,1:length(param_names_tmp)) = regexprep(param_names_tmp,'_',' ');
     for ns = 1:length(param_vals_tmp)
         if ~ischar(param_vals_tmp{ns})
@@ -60,7 +65,7 @@ for iaw = 1:length(param_name_list)
 end
 
 % Identify which parameters vary.
-for sha = 1:size(param_val_list,2)
+for sha = size(param_val_list,2):-1:1
     vary(sha) = all(strcmp(param_val_list{1,sha},param_val_list(:,sha)));
 end
 
@@ -118,7 +123,9 @@ ov = cat(1,ov,['Before a comparison can be usefully made all the models ',...
 ov = cat(1,ov,'');
 ov = cat(1,ov,['To start with, here are the modelling setups and run times ',...
     'for all the models used in this comparison.']);
+%%%%%%%%%%%%%%%%%%%% Wake section %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if isfield(run_logs, 'wake')
+    report_input.loc = 'wake';
     summary = Blend_summaries(doc_root, slh, source_reps);
     if length(report_input.param_names_varying) == 1
         out_T = add_blend_table(model_name,...
@@ -135,11 +142,13 @@ if isfield(run_logs, 'wake')
         'of the graph, then the models have run for long enough for the ',...
         'energy to be fully accounted for.']);
     ov = cat(1,ov,'\clearpage');
-    Blend_figs(report_input, 'cumulative_total_energy', 'cumulative_total_energy', 0, 1)
-    ov1 = latex_top_bottom_images('cumulative_total_energy.eps', 'cumulative_total_energy_3D.eps',...
-        'Energy loss stabilisation','Energy loss stabilisation', ...
-        'cumulative_total_energy', 'cumulative_total_energy_3D', 1, 0.8);
-    ov = cat(1,ov,ov1);
+    state = Blend_figs(report_input, 'cumulative_total_energy', 'cumulative_total_energy', 0, 1);
+    if state == 1
+        ov1 = latex_top_bottom_images('cumulative_total_energy.eps', 'cumulative_total_energy_3D.eps',...
+            'Energy loss stabilisation','Energy loss stabilisation', ...
+            'cumulative_total_energy', 'cumulative_total_energy_3D', 1, 0.8);
+        ov = cat(1,ov,ov1);
+    end %if
     ov = cat(1,ov,'\clearpage');
     
     ov = cat(1,ov,'\chapter{Material losses}');
@@ -200,39 +209,46 @@ if isfield(run_logs, 'wake')
     lw = [1,2,2];
     for awn = 1:length(fig_names)
         Blend_figs(report_input, fig_names{awn}, fig_names{awn}, lgolin(awn), lw(awn))
-        g_name = [fig_names{awn}, '.eps'];
-        g_name2 = [fig_names{awn}, '_3D.eps'];
-        ov1 = latex_top_bottom_images(g_name, g_name2,caps{awn},caps{awn}, labs{awn}, [labs{awn},'_3D'], 1, 0.8);
+        ov1 = latex_top_bottom_images([fig_names{awn}, '.eps'], ...
+            [fig_names{awn}, '_3D.eps'], ...
+            caps{awn},caps{awn}, ...
+            labs{awn}, [labs{awn},'_3D'], 1, 0.8);
         ov = cat(1,ov,ov1);
         ov = cat(1,ov,'\clearpage');
     end
 end
-% S Parameter graphs
+%%%%%%%%%%%%%%%% S Parameter graphs %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+report_input.loc = 's_parameter';
 ov = cat(1,ov,'\chapter{S parameters}');
 num_ports = length(mi.port_multiple);
-for hs = 1:num_ports
-    for ha = 1:num_ports
+overall_state = 0;
+for hs = 3:num_ports
+    for ha = 3:num_ports
         for ks = 1:2 % number of modes desired
             fig_name = ['s_parameters_S',num2str(hs),num2str(ha)];
             out_name = [fig_name, '_mode_', num2str(ks)];
-            state = Blend_figs(report_input, fig_name, out_name, 0, 1, ['\s*S\d\d\(',num2str(ks),'\)\s*']);
-            if state == 0
-                g_name = [out_name, '.eps'];
-                g_name2 = [out_name, '_3D.eps'];
+            state = Blend_figs(report_input, fig_name, out_name, ...
+                0, 1, ['\s*S\d\d\(',num2str(ks),'\)\s*'], 9);
+            if state == 1
+                overall_state = 1;
                 lab = ['S',num2str(hs),num2str(ha) '(', num2str(ks), ')'];
-                ov1 = latex_top_bottom_images(g_name, g_name2,lab,[lab,' 3D'], lab, [lab,'_3D'], 1, 0.8);
+                ov1 = latex_top_bottom_images([out_name, '.eps'], ...
+                    [out_name, '_3D.eps'],lab,[lab,' 3D'], ...
+                    lab, [lab,'_3D'], 1, 0.8);
                 ov = cat(1,ov,ov1);
                 ov = cat(1,ov,'\clearpage');
-                g_name3 = [out_name, '_zoom.eps'];
-                g_name4 = [out_name, '_diff.eps'];
-                ov1 = latex_top_bottom_images(g_name3, g_name4,[lab 'zoom'],[lab,' 3D'], [lab, '_zoom'], [lab,'_diff'], 1, 1);
+                ov1 = latex_top_bottom_images([out_name, '_zoom.eps'], ...
+                    [out_name, '_diff.eps'],[lab 'zoom'],[lab,' diff'],...
+                    [lab, '_zoom'], [lab,'_diff'], 1, 1);
                 ov = cat(1,ov,ov1);
                 ov = cat(1,ov,'\clearpage');
-            end
-        end
-    end
+            end %if
+        end %for
+    end %for
+end %for
+if overall_state == 0
+    ov(end-1:end) = [];
 end
-
 ov = cat(1,ov, '\end{document}');
 tex_f_name = strcat(output_path, '/', 'Report');
 
