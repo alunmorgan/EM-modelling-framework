@@ -62,11 +62,10 @@ for l1 = 1:length(ppi.current)
     end
 end
 
-figure('units','centimeters','pos',[100,0,29,10])
-set(gcf,'PaperPositionMode', 'auto')
-axes('Units','centimeters','Position', [0,0,30,24])
-set(gca,'Visible' ,'off')
-figure_setup_bounding_box
+h(1) = figure('units','centimeters','pos',[100,0,29,10]);
+set(h(1),'PaperPositionMode', 'auto')
+ax(1) = axes('Units','centimeters','Position', [0,0,30,24],'Parent', h(1));
+set(ax(1),'Visible' ,'off')
 
 % run parameters
 machine_params_spacing = 0.8;
@@ -196,15 +195,14 @@ if port_data.total_energy ~= 0
 %         text(label_loc_x + 4 * spacing_x,num_loc, num2str(round(wlf_f*10)/10),'Units','centimeters', 'HorizontalAlignment', 'center')
     end
 end
-savemfmt(pth,'summary')
-close(gcf)
+savemfmt(h(1), pth,'summary')
+close(h(1))
 
 
-figure('units','centimeters','pos',[100,0,29,12])
-set(gcf,'PaperPositionMode', 'auto')
-axes('Units','centimeters','Position', [0,0,30,24])
-set(gca,'Visible' ,'off')
-figure_setup_bounding_box
+h(2) = figure('units','centimeters','pos',[100,0,29,12]);
+set(h(2),'PaperPositionMode', 'auto')
+ax(2) = axes('Units','centimeters','Position', [0,0,30,24], 'Parent', h(2));
+set(ax(2),'Visible' ,'off')
 
 label_loc_y = 11;
 num_loc = label_loc_y -1.5;
@@ -270,5 +268,5 @@ if port_data.total_energy ~= 0
         clk = clk +0.5;
     end
 end
-savemfmt(pth,'summary_multibunch')
-close(gcf)
+savemfmt(h(2), pth,'summary_multibunch')
+close(h(2))

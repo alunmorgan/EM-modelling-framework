@@ -12,21 +12,19 @@ for aw = 1:size(shunt_data.fields,1);
     p(aw) = complex(shunt_data.fields(aw,2),shunt_data.fields(aw,3));
 end
 
-figure('Position',fig_pos)
-figure_setup_bounding_box
+h(1) = figure('Position',fig_pos);
 plot(shunt_data.freq*1e-9,abs(p),':b*');
 xlabel('Frequency (GHz)')
 ylabel('Impedance (\Omega)')
 title('Shunt impedance')
-savemfmt(pth,'/Shunt_impedance')
-close(gcf)
+savemfmt(h(1), pth,'/Shunt_impedance')
+close(h(1))
 
-figure('Position',fig_pos)
-figure_setup_bounding_box
+h(2) = figure('Position',fig_pos);
 plot(shunt_data.freq*1e-9,angle(p)*180/pi,':b*')
 xlabel('Frequency (GHz)')
 ylabel('Phase (degrees)')
 title('Phase_linearity')
-savemfmt(pth,'/Phase_linearity')
-close(gcf)
+savemfmt(h(2), pth,'/Phase_linearity')
+close(h(2))
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

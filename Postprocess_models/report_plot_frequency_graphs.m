@@ -45,8 +45,7 @@ function report_frequency_graphs_core(fig_pos, pth, y_lev, x_axis, y_data,...
 % Example: report_frequency_graphs_core(fig_pos, pth, y_lev, x_axis, y_data,...
 %     cut_ind, cut_off_freqs, lw, name, graph_freq_lim, cols, leg)
 
-figure('Position',fig_pos)
-figure_setup_bounding_box
+h(1) = figure('Position',fig_pos);
 if iscell(y_data)
     hold on
     for ues = 1:length(y_data)
@@ -69,11 +68,10 @@ if isempty(leg) == 0
     legend(leg, 'Location', 'Best')
 end
 name = regexprep(name,' |,','_');
-savemfmt(pth, name)
-close(gcf)
+savemfmt(h(1), pth, name)
+close(h(1))
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-figure('Position',fig_pos)
-figure_setup_bounding_box
+h(2) = figure('Position',fig_pos);
 if iscell(y_data)
     hold on
     for ues = 1:length(y_data)
@@ -97,5 +95,5 @@ if isempty(leg) == 0
     legend(leg, 'Location', 'SouthEast')
 end
 name = regexprep(name,' |,','_');
-savemfmt(pth,['cumulative_',name])
-close(gcf)
+savemfmt(h(2), pth,['cumulative_',name])
+close(h(2))

@@ -20,8 +20,7 @@ lw = 2;
 % select the lowest mode to display. Some times the first mode is not real.
 mode_start =1;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-figure('Position',fig_pos)
-figure_setup_bounding_box
+h(1) = figure('Position',fig_pos);
 if ~isempty(eigenmode_data.z_fields)
     leg = {};
     hold on
@@ -55,6 +54,6 @@ end
 xlabel('Distance (m)')
 ylabel('Electric field (V/m)')
 title('Electric field in beam direction')
-savemfmt(pth,'/Electric_field_in_beam_direction')
-close(gcf)
+savemfmt(h(1), pth,'/Electric_field_in_beam_direction')
+close(h(1))
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

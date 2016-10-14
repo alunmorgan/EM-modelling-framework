@@ -55,7 +55,11 @@ try
             save('pp_link/data_from_run_logs.mat', 'run_logs')
             disp('GdfidL_post_process_models: Post processing wake data.')
             % Running postprocessor
+            orig_ver = getenv('GDFIDL_VERSION');
+            setenv('GDFIDL_VERSION',run_logs.wake.ver);
             pp_data.wake_data = postprocess_wakes(ppi, mi, modelling_inputs, run_logs.wake);
+            % restoring the original version.
+            setenv('GDFIDL_VERSION',orig_ver)
             save('pp_link/data_postprocessed.mat', 'pp_data','-v7.3')
             % Generate the plots.
             GdfidL_plot_wake(pp_data.wake_data, ppi, mi, run_logs.wake,'pp_link/wake/', 1E7)
@@ -88,7 +92,11 @@ try
             save('pp_link/data_from_run_logs.mat', 'run_logs')
             disp('GdfidL_post_process_models: Post processing S parameter data.')
             % Running postprocessor
+            orig_ver = getenv('GDFIDL_VERSION');
+            setenv('GDFIDL_VERSION',run_logs.s_parameter.(d_list{1}).ver);
             pp_data.s_parameter_data = postprocess_s_parameters;
+            % restoring the original version.
+            setenv('GDFIDL_VERSION',orig_ver)
             save('pp_link/data_postprocessed.mat', 'pp_data')
             % location and size of the default figures.
             fig_pos = [10000 678 560 420];
@@ -112,7 +120,12 @@ try
         save('pp_link/data_from_run_logs.mat', 'run_logs')
         % Running postprocessor
         disp('GdfidL_post_process_models: Post processing eigenmode data.')
+        orig_ver = getenv('GDFIDL_VERSION');
+        % FIXME input correct version information location
+        setenv('GDFIDL_VERSION',version{1});
         pp_data.eigenmode_data = postprocess_eigenmode(ppi);
+        % restoring the original version.
+        setenv('GDFIDL_VERSION',orig_ver)
         save('pp_link/data_postprocessed.mat', 'pp_data')
         GdfidL_plot_eigenmode(pp_data.eigenmode_data, 'pp_link/eigenmode/')
     end
@@ -130,7 +143,12 @@ try
         save('pp_link/data_from_run_logs.mat', 'run_logs')
         disp('GdfidL_post_process_models: Post processing lossy eigenmode data.')
         % Running postprocessor
+        orig_ver = getenv('GDFIDL_VERSION');
+        % FIXME input correct version information location
+        setenv('GDFIDL_VERSION',version{1});
         pp_data.eigenmode_lossy_data = postprocess_eigenmode_lossy(ppi);
+        % restoring the original version.
+        setenv('GDFIDL_VERSION',orig_ver)
         save('pp_link/data_postprocessed.mat', 'pp_data')
         GdfidL_plot_eigenmode_lossy(pp_data.eigenmode_lossy_data, 'pp_link/lossy_eigenmode/')
     end

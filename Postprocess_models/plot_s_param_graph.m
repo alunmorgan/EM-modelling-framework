@@ -3,8 +3,7 @@ function plot_s_param_graph(n, es, s, cols_sep, fig_pos, pth)
 %
 % Example: plot_s_param_graph(n, es, s, cols_sep, fig_pos, pth)
 
-figure('Position',fig_pos)
-figure_setup_bounding_box
+h(1) = figure('Position',fig_pos);
 np = 1;
 leg = {};
 
@@ -27,5 +26,5 @@ xlim([0 25])
 xlabel('Frequency (GHz)')
 ylabel('S parameters (dB)')
 title(['S parameters ', t_string1])
-savemfmt(pth,['s_parameters_S',num2str(s_in),num2str(n)])
-close(gcf)
+savemfmt(h(1), pth,['s_parameters_S',num2str(s_in),num2str(n)])
+close(h(1))
