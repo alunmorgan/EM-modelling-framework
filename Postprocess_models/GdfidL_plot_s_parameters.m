@@ -10,7 +10,7 @@ for es=1:size(s.data,1);
     for n=1:size(s.data,2);
         if n ~= 1 && n ~=2 % dont do the beam ports
             h(1) = figure('Position',fig_pos);
-            ax(1) = axes('Parent', ax(1));
+            ax(1) = axes('Parent', h(1));
             np = 1;
             leg = {};
             
