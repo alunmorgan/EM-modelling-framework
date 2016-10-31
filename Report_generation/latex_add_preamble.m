@@ -3,7 +3,7 @@ function ov = latex_add_preamble(report_input)
 % for a sharepoint style report.
 %
 % ov is latex code which can be concatinated with model specific output.
-% report_input is a structure containing the required stup parameters.
+% report_input is a structure containing the required setup parameters.
 %
 % Example: ov = latex_add_preamble(report_input)
 
@@ -23,9 +23,6 @@ dte =datestr(datenum(report_input.date, 'dd/mm/yyyy'),'dd mmmm yyyy');
 ov{1} = '\documentclass[a4paper]{report}';
 ov = cat(1,ov,'\setlength{\textwidth}{500pt}');
 ov = cat(1,ov,'\setlength{\oddsidemargin}{5pt}');
-ov = cat(1,ov,'\setlength{\topmargin}{0pt}');
-ov = cat(1,ov,'\setlength{\voffset}{-50pt}');
-ov = cat(1,ov,'\setlength{\textheight}{720pt}');
 ov = cat(1,ov,'\usepackage{graphicx}');
 ov = cat(1,ov,'\usepackage{color}');
 ov = cat(1,ov,'\usepackage[encoding, filenameencoding=utf8]{grffile}');
@@ -47,7 +44,7 @@ ov = cat(1,ov,'\pagestyle{fancy}');
 ov = cat(1,ov,'\lhead{Results for ',regexprep(regexprep(regexprep(name,'\','\\SJEDtextbackslash '),'_','\\_'),'SJED',''),'}');
 ov = cat(1,ov,'\chead{}');
 ov = cat(1,ov,'\rhead{\thepage}');
-ov = cat(1,ov,'\lfoot{}');
+ov = cat(1,ov,'\lfoot{', name, '}');
 ov = cat(1,ov,'\cfoot{}');
 ov = cat(1,ov,'\rfoot{',dte,'}');
 ov = cat(1,ov,'\begin{document}');
@@ -55,8 +52,10 @@ ov = cat(1,ov,'\begin{document}');
 ov = cat(1,ov,'\title{');
 ov = cat(1,ov,'\begin{tabular}{|p{4.5cm}|m{5cm}|c|}');
 ov = cat(1,ov,'\hline');
-ov = cat(1,ov,'\multirow{2}{*}{\textbf{TDI-DIA}} & ');
-ov = cat(1,ov,['\multirow{2}{*}{\includegraphics[scale=0.8]{',report_input.graphic,'}} & \multirow{2}{*}{\small{Doc No: ',report_input.doc_num,'}} \\']);
+ov = cat(1,ov,'\multirow{3}{*}{\textbf{TDI-DIA}} & ');
+ov = cat(1,ov,['\multirow{3}{*}{\includegraphics[scale=0.8]{',report_input.graphic,'}} &']);
+ov = cat(1,ov,['\multirow{3}{*}{\small{Doc No: ',report_input.doc_num,'}} \\']);
+ov = cat(1,ov,'&& \\');
 ov = cat(1,ov,'&& \\');
 ov = cat(1,ov,'\hline');
 ov = cat(1,ov,'\end{tabular} \\');
@@ -72,21 +71,29 @@ if exist('sub_title','var')
     ov = cat(1,ov,'\centering');
     ov = cat(1,ov,['(',sub_title,' )\\']);
 end
-ov = cat(1,ov,'\vspace{0.5cm}');
-ov = cat(1,ov,'\begin{tabular}{r@{\hspace{0.25cm}=\hspace{0.25cm}}l}');
-ov = cat(1,ov,'\centering');
+ov = cat(1, ov, '\vspace{0.5cm}');
+ov = cat(1, ov, '}');
+% Put the authors here
+ov = cat(1, ov, ['\author{',report_input.author,'}']);
+ov = cat(1, ov, ['\date{', dte,'}']);
+ov = cat(1, ov, '\maketitle');
+ov = cat(1, ov, '\tableofcontents');
+
+ov = cat(1, ov, '\chapter{Parameter list}');
+ov = cat(1,ov, '\begin{center}');
 if isfield(report_input, 'param_names_common')
+    ov = cat(1,ov,'\begin{tabular}{r@{\hspace{0.25cm}=\hspace{0.25cm}}l}');
+    ov = cat(1,ov,'\centering');
     for esk = 1:length(report_input.param_names_common)
         val_tmp = report_input.param_vals_common{esk};
         if ~ischar(val_tmp)
             val_tmp = num2str(val_tmp);
         end
-        % strip out the counter on the materials
-        val_tmp = regexprep(val_tmp,'\s*steel(\d+)_\d+\s*',' steel$1' );
-        val_tmp = regexprep(val_tmp,'\s*PEC_\d+\s*',' PEC' );
-        % catch to remove _
-        val_tmp = regexprep(val_tmp,'_',' ' );
-        ov = cat(1,ov,['\emph{',regexprep(report_input.param_names_common{esk},'_',' '),'} & ',val_tmp,'\\']);
+        op = remove_material_counter(val_tmp);
+        try
+            op = num2str(eval(op));
+        end
+        ov = cat(1,ov,['\emph{',regexprep(report_input.param_names_common{esk},'_',' '),'} & ',op,'\\']);
     end
     if length(report_input.param_names_varying) == 1
         ov = cat(1,ov,['\emph{',regexprep(report_input.param_names_varying{1},'_',' '),'} & Swept\\']);
@@ -96,9 +103,9 @@ if isfield(report_input, 'param_names_common')
             list_of_sweep = report_input.swept_vals{1};
             for hs = 2:length(report_input.swept_vals)
                 list_of_sweep = [list_of_sweep,', ',report_input.swept_vals{hs}];
-            end
+            end %for
             ov = cat(1,ov,['Sweep: \emph{', list_of_sweep,'}']);
-        end
+        end %if
     else
         ov = cat(1,ov,'\end{tabular} \\');
         ov = cat(1,ov,'\begin{tabular}{r@{\hspace{0.25cm}=\hspace{0.25cm}}l}');
@@ -107,40 +114,42 @@ if isfield(report_input, 'param_names_common')
             for pa = 1:length(val_tmp)
                 if ~ischar(val_tmp{pa})
                     val_tmp{pa} = num2str(val_tmp{pa});
-                end
-            end
-            % strip out the counter on the materials
-            val_tmp = regexprep(val_tmp,'\s*steel(\d+)_\d+\s*',' steel$1' );
-            val_tmp = regexprep(val_tmp,'\s*PEC_\d+\s*',' PEC' );
-            % catch to remove _
-            val_tmp = regexprep(val_tmp,'_',' ' );
-            op = val_tmp{1};
-            for ua = 2:length(val_tmp)
-                op  = strcat(op,',',val_tmp{ua});
+                end %if
+            end %for
+            op = remove_material_counter(val_tmp);
+            try
+                op = num2str(eval(op));
             end
             ov = cat(1,ov,['\emph{',regexprep(report_input.param_names_varying{esk},'_',' '),'} & ',op,'\\']);
-        end
+        end %for
         ov = cat(1,ov,'\end{tabular} \\');
-    end
+    end %if
 else
+    pl_length = 30; % length of list after which there is a page break.
     for esk = 1:length(report_input.param_list)
-          val_tmp = report_input.param_vals{esk};
-                if ~ischar(val_tmp)
-                    val_tmp = num2str(val_tmp);
-                end
-            % strip out the counter on the materials
-            val_tmp = regexprep(val_tmp,'\s*steel(\d+)_\d+\s*',' steel$1' );
-            val_tmp = regexprep(val_tmp,'\s*PEC_\d+\s*',' PEC' );
-            % catch to remove _
-            val_tmp = regexprep(val_tmp,'_',' ' );
-        ov = cat(1,ov,['\emph{',regexprep(report_input.param_list{esk},'_',' '),'} & ',val_tmp,'\\']);
-    end
+        if mod(esk,pl_length) == 1
+            ov = cat(1,ov,'\begin{tabular}{r@{\hspace{0.25cm}=\hspace{0.25cm}}l}');
+            ov = cat(1,ov,'\centering');
+        end %if
+        val_tmp = report_input.param_vals{esk};
+        if ~ischar(val_tmp)
+            val_tmp = num2str(val_tmp);
+        end %if
+        op = remove_material_counter(val_tmp);
+        try
+            op = num2str(eval(op));
+        end
+        ov = cat(1,ov,['\Large{\emph{',regexprep(report_input.param_list{esk},'_',' '),'}} & \Large{',op,'}\\']);
+        if mod(esk,pl_length) == 0
+            ov = cat(1,ov,'\end{tabular} \\');
+            ov = cat(1,ov,'\clearpage');
+        end %if
+    end %for
     ov = cat(1,ov,'\end{tabular} \\');
-end
+end %if
+ov = cat(1,ov, '\end{center}');
+%ov = cat(1,ov,'\setlength{\topmargin}{0pt}');
+%ov = cat(1,ov,'\setlength{\voffset}{-50pt}');
+%ov = cat(1,ov,'\setlength{\textheight}{720pt}');
 
-ov = cat(1,ov,'}');
-% Put the authors here
-ov = cat(1,ov,['\author{',report_input.author,'}']);
-ov = cat(1,ov,['\date{', dte,'}']);
-ov = cat(1,ov,'\maketitle');
-ov = cat(1,ov,'\tableofcontents');
+
