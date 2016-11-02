@@ -32,7 +32,7 @@ fl_sp = cell(length(ppi.current), length(ppi.bt_length), length(ppi.rf_volts));
 fl_st = cell(length(ppi.current), length(ppi.bt_length), length(ppi.rf_volts));
 mc_wlf = cell(length(ppi.current), length(ppi.bt_length), length(ppi.rf_volts));
 
-vals_sim = 'Simulated single bunch';
+vals_sim = 'Simulated single bunch loss';
 bc_sim = num2str(round(run_log.charge *1E9));
 bl_sim = num2str(round(str2num(mi.beam_sigma) ./3E8 * 1E12*10)/10);
 [wlf_f, wlf_scale] = rescale_value(frequency_domain_data.wlf * 1E-12,'');
@@ -62,27 +62,29 @@ for l1 = 1:length(ppi.current)
     end
 end
 
-h(1) = figure('units','centimeters','pos',[100,0,29,10]);
+h(1) = figure('units','centimeters','pos',[100,0,20,20]);
 set(h(1),'PaperPositionMode', 'auto')
 ax(1) = axes('Units','centimeters','Position', [0,0,30,24],'Parent', h(1));
 set(ax(1),'Visible' ,'off')
 
 % run parameters
 machine_params_spacing = 0.8;
+machine_params_hor = 4;
+machine_params_yloc = 19.5;
 
-text(10,9.5,{'Date and time of run', [run_log.dte, '  ', run_log.tme]},'Units','centimeters', 'HorizontalAlignment', 'center', 'Tag', 'Date')
-text(14,9.5,{'Software used', 'GdfidL'},'Units','centimeters', 'HorizontalAlignment', 'center', 'Tag', 'Software_type')
-text(18,9.5,{'Software version', num2str(run_log.ver)},'Units','centimeters', 'HorizontalAlignment', 'center', 'Tag', 'Software_version')
-text(22,9.5,{'Software precision', mi.precision},'Units','centimeters', 'HorizontalAlignment', 'center', 'Tag', 'Software_precision')
+text(2,machine_params_yloc,{'Date and time of run', [run_log.dte, '  ', run_log.tme]},'Units','centimeters', 'HorizontalAlignment', 'center', 'Tag', 'Date')
+text(6,machine_params_yloc,{'Software used', 'GdfidL'},'Units','centimeters', 'HorizontalAlignment', 'center', 'Tag', 'Software_type')
+text(10,machine_params_yloc,{'Software version', num2str(run_log.ver)},'Units','centimeters', 'HorizontalAlignment', 'center', 'Tag', 'Software_version')
+text(16,machine_params_yloc,{'Software precision', mi.precision},'Units','centimeters', 'HorizontalAlignment', 'center', 'Tag', 'Software_precision')
 
 [~, CPU_t] = convert_secs_to_hms(run_log.CPU_time);
 [~,wall_t] = convert_secs_to_hms(run_log.wall_time);
 
-text(26,8,{'Simulation time (CPU)', CPU_t},'Units','centimeters', 'HorizontalAlignment', 'center', 'Tag', 'CPU_time')
-text(26,8 -machine_params_spacing ,{['Number of cores used = ', num2str(mi.n_cores)]},'Units','centimeters', 'HorizontalAlignment', 'center', 'Tag', 'Num_cores')
+text(machine_params_hor,machine_params_yloc-1.5,{'Simulation time (CPU)', CPU_t},'Units','centimeters', 'HorizontalAlignment', 'center', 'Tag', 'CPU_time')
+text(machine_params_hor,machine_params_yloc -1.5 -machine_params_spacing ,{['Number of cores used = ', num2str(mi.n_cores)]},'Units','centimeters', 'HorizontalAlignment', 'center', 'Tag', 'Num_cores')
 
 
-text(26,8 - 2*machine_params_spacing,{'Simulation time (Wall clock)', wall_t},'Units','centimeters', 'HorizontalAlignment', 'center', 'Tag', 'Wall_time')
+text(machine_params_hor,machine_params_yloc -1.5 - 2*machine_params_spacing,{'Simulation time (Wall clock)', wall_t},'Units','centimeters', 'HorizontalAlignment', 'center', 'Tag', 'Wall_time')
 tmp = run_log.Ncells;
 tmp = num2str(tmp);
 ck = 1;
@@ -97,26 +99,26 @@ end;
 b = fliplr(b);
 
 if isempty(tmp) == 0
-    text(26,8 - 3*machine_params_spacing,['Number of mesh cells = ',b],'Units','centimeters', 'HorizontalAlignment', 'center', 'Tag', 'Num_mesh_cells')
+    text(machine_params_hor,machine_params_yloc -1.5 - 3*machine_params_spacing,['Number of mesh cells = ',b],'Units','centimeters', 'HorizontalAlignment', 'center', 'Tag', 'Num_mesh_cells')
 end
 clear tmp
 if isempty(run_log.memory) == 0
-    text(26,8 - 4*machine_params_spacing,['Memory used = ', num2str(run_log.memory), 'MB'],'Units','centimeters', 'HorizontalAlignment', 'center', 'Tag', 'Memory_used')
+    text(machine_params_hor, machine_params_yloc - 1.5 - 4*machine_params_spacing,['Memory used = ', num2str(run_log.memory), 'MB'],'Units','centimeters', 'HorizontalAlignment', 'center', 'Tag', 'Memory_used')
 end
 if isempty(run_log.mesh_step_size) == 0
-    text(26,8 - 5*machine_params_spacing,['Mesh spacing = ', num2str(run_log.mesh_step_size .* 1E6), '\mu{m}'],'Units','centimeters', 'HorizontalAlignment', 'center', 'Tag', 'Mesh_spacing')
+    text(machine_params_hor, machine_params_yloc - 1.5 - 5*machine_params_spacing,['Mesh spacing = ', num2str(run_log.mesh_step_size .* 1E6), '\mu{m}'],'Units','centimeters', 'HorizontalAlignment', 'center', 'Tag', 'Mesh_spacing')
 end
 tmp = run_log.Timestep;
 % t_scale = log.Units_settings.t_scale(1);% GdfidL always uses SI
 t_scale = ' ';
 if isempty(tmp) == 0 && isempty(t_scale) == 0
     [tmp, t_scale] = rescale_value(tmp,t_scale); 
-    text(26,8 - 6*machine_params_spacing,['Timestep = ', num2str(round(tmp)), ' ',t_scale, 's'],'Units','centimeters', 'HorizontalAlignment', 'center', 'Tag', 'Timestep')
+    text(machine_params_hor, machine_params_yloc - 1.5 - 6*machine_params_spacing,['Timestep = ', num2str(round(tmp)), ' ',t_scale, 's'],'Units','centimeters', 'HorizontalAlignment', 'center', 'Tag', 'Timestep')
 end
 clear tmp t_scale
 
-text(20,8,{'Machine settings', ['RF frequency = ',num2str(ppi.RF_freq * 1e-6), 'MHz'], ['Gap between bunches = ',num2str(1./ppi.RF_freq * 1e9), 'ns']},'Units','centimeters', 'HorizontalAlignment', 'center', 'Tag', 'Machine_settings')
-text(20,8 - 4*machine_params_spacing, {['Port multiplier = ', num2str(mi.port_multiple)],...
+text(machine_params_hor + 9, machine_params_yloc -1.5,{'Machine settings', ['RF frequency = ',num2str(ppi.RF_freq * 1e-6), 'MHz'], ['Gap between bunches = ',num2str(1./ppi.RF_freq * 1e9), 'ns']},'Units','centimeters', 'HorizontalAlignment', 'center', 'Tag', 'Machine_settings')
+text(machine_params_hor + 9, machine_params_yloc - 1.5 - 3*machine_params_spacing, {['Port multiplier = ', num2str(mi.port_multiple)],...
     ['Port fill factor = ',  regexprep(num2str(mi.port_fill_factor),' +', ' ')],...
     ['Volume fill factor = ', num2str(mi.volume_fill_factor)],...
     'Symetry planes used.',...
@@ -130,10 +132,10 @@ text(20,8 - 4*machine_params_spacing, {['Port multiplier = ', num2str(mi.port_mu
 % wakeloss function comparison section
 wlf_spacing_x = 1.8;
 wlf_spacing_y =0.5;
-wlf_loc_x = 1;
-wlf_loc_y = 8;
+wlf_loc_x = 7;
+wlf_loc_y = 11;
 
-text(wlf_loc_x - 0.4, wlf_loc_y +1,['Wakeloss factor (', wlf_scale, 'V/pC)'],'Units','centimeters')
+text(wlf_loc_x - 0.4, wlf_loc_y +1,['Wakeloss factor (', wlf_scale, 'V/pC)'], 'FontWeight','bold', 'Units','centimeters')
 text(wlf_loc_x + 0 * wlf_spacing_x, wlf_loc_y+0.2,{'Matlab','(time)'},'Units','centimeters')
 text(wlf_loc_x + 1 * wlf_spacing_x, wlf_loc_y+0.2,{'Matlab','(freq)'},'Units','centimeters')
 text(wlf_loc_x + 0 * wlf_spacing_x, wlf_loc_y - wlf_spacing_y, num2str(round(wlf_t*100)/100),'Units','centimeters')
@@ -142,28 +144,28 @@ text(wlf_loc_x + 1 * wlf_spacing_x, wlf_loc_y - wlf_spacing_y, num2str(round(wlf
 % bunch energy comparison section
 el_spacing_x = 3;
 el_spacing_y = 0.5;
-el_loc_x = 7.5;
-el_loc_y = 7;
+el_loc_x = 4;
+el_loc_y = 5;
     
 text(el_loc_x + 1.5 * el_spacing_x ,el_loc_y + 0.6,'Per bunch energy (nJ)','Units','centimeters')
 text(el_loc_x + 1 * el_spacing_x, el_loc_y, 'Frequency domain','Units','centimeters')
 text(el_loc_x + 2.25 * el_spacing_x, el_loc_y, 'Time domain','Units','centimeters')
 text(el_loc_x, el_loc_y - 1 * el_spacing_y,'Total bunch loss','Units','centimeters')
-text(el_loc_x + 1 * el_spacing_x, el_loc_y - 1 * el_spacing_y,num2str(round(frequency_domain_data.Total_bunch_energy_loss * 1e9*10)/10),'Units','centimeters')
-text(el_loc_x + 2.25 * el_spacing_x, el_loc_y - 1 * el_spacing_y,num2str(round(time_domain_data.loss_from_beam * 1e9*10)/10),'Units','centimeters')
+text(el_loc_x + 1.5 * el_spacing_x, el_loc_y - 1 * el_spacing_y,num2str(round(frequency_domain_data.Total_bunch_energy_loss * 1e9*10)/10),'Units','centimeters', 'HorizontalAlignment', 'center')
+text(el_loc_x + 2.5 * el_spacing_x, el_loc_y - 1 * el_spacing_y,num2str(round(time_domain_data.loss_from_beam * 1e9*10)/10),'Units','centimeters', 'HorizontalAlignment', 'center')
 text(el_loc_x-0.7, el_loc_y - 2 * el_spacing_y,'Total loss in materials','Units','centimeters')
-text(el_loc_x + 1.5 * el_spacing_x, el_loc_y - 2 * el_spacing_y,num2str(round(raw_data.mat_losses.total_loss(end) * 1e9*10)/10),'Units','centimeters')
+text(el_loc_x + 1.5 * el_spacing_x, el_loc_y - 2 * el_spacing_y,num2str(round(raw_data.mat_losses.total_loss(end) * 1e9*10)/10),'Units','centimeters', 'HorizontalAlignment', 'center')
 if port_data.total_energy ~= 0
     text(el_loc_x, el_loc_y - 3 * el_spacing_y,'Total port energy','Units','centimeters')
-    text(el_loc_x + 1 * el_spacing_x, el_loc_y - 3 * el_spacing_y,num2str(round(frequency_domain_data.Total_energy_from_ports * 1e9*10)/10),'Units','centimeters')
-    text(el_loc_x + 2.25 * el_spacing_x, el_loc_y - 3 * el_spacing_y,num2str(round(sum(port_data.port_energy) * 1e9*10)/10),'Units','centimeters') 
+    text(el_loc_x + 1.5 * el_spacing_x, el_loc_y - 3 * el_spacing_y,num2str(round(frequency_domain_data.Total_energy_from_ports * 1e9*10)/10),'Units','centimeters', 'HorizontalAlignment', 'center')
+    text(el_loc_x + 2.5 * el_spacing_x, el_loc_y - 3 * el_spacing_y,num2str(round(sum(port_data.port_energy) * 1e9*10)/10),'Units','centimeters', 'HorizontalAlignment', 'center') 
 end
 
 
 % Main section
-label_loc_y = wlf_loc_y - 8 * wlf_spacing_y;
+label_loc_y = 8.3;
 num_loc = label_loc_y -1.5;
-label_loc_x= 6;
+label_loc_x= 4;
 spacing_x = 2.1;
 
 
@@ -181,7 +183,7 @@ if port_data.total_energy ~= 0
     end
 end
 % printing raw simulated data.
-text(1.5,num_loc, vals_sim,'Units','centimeters')
+text(9,label_loc_y + 1.2, vals_sim,'Units','centimeters', 'HorizontalAlignment', 'center', 'FontWeight','bold')
 text(label_loc_x,num_loc - 0.02, bc_sim,'Units','centimeters', 'HorizontalAlignment', 'center')
 text(label_loc_x + 1 * spacing_x,num_loc, bl_sim,'Units','centimeters', 'HorizontalAlignment', 'center');
 if port_data.total_energy ~= 0
