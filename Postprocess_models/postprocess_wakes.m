@@ -1,4 +1,4 @@
-function wake_data = postprocess_wakes(ppi, mi,  modelling_inputs,log)
+function wake_data = postprocess_wakes(ppi, mi,  modelling_inputs, log)
 % Runs the GdfidL postprocessor on the selected data.
 % The model data has already been selected using soft links.
 %
@@ -12,7 +12,6 @@ function wake_data = postprocess_wakes(ppi, mi,  modelling_inputs,log)
 % find the pipe length
 pipe_length = get_pipe_length_from_defs(modelling_inputs.defs);
 tstart = GdfidL_write_pp_input_file(log, pipe_length);
-% [~] = GdfidL_read_pp_input_file('pp_link/model_wake_post_processing');
 
 %% run the wake postprocessor
 temp_files('make')

@@ -19,11 +19,10 @@ function tfirst = GdfidL_write_pp_input_file(log, pipe_length)
 tfirst(1) = log.beam_sigma*9 ./299792458; % beam entering the model.
 tfirst(2) = ( log.mesh_extent_zhigh - log.mesh_extent_zlow + log.beam_sigma .* 9) ./ 299792458; 
 for ek = 3:length(log.port_name)
-    % all other ports can start sampling from zero
     % HAVING ODD BEHAVIOR FOR DDBA BUTTONS WITH LARGE SIGNAL WHILE THE BEAM
     % IS PASSING THROUGH THE PORTS.
     % FOR NOW SET TO tfirst(2)
-    tfirst(ek) =tfirst(2);%0;
+    tfirst(ek) =tfirst(2);
 end
 
 ov{1} = '';
@@ -65,8 +64,8 @@ ov = cat(1,ov,strcat('    ports = ', log.port_name{lae}));
 ov = cat(1,ov,'    modes = all');
 ov = cat(1,ov,'    timedata = yes');
 ov = cat(1,ov,'    ignoreexc = yes');
-% ov = cat(1,ov,strcat('    tfirst = ',num2str(tfirst(lae))));
-ov = cat(1,ov,strcat('    tfirst = 0'));
+ov = cat(1,ov,strcat('    tfirst = ',num2str(tfirst(lae))));
+%ov = cat(1,ov,strcat('    tfirst = 0'));
 ov = cat(1,ov,'    tintpower = yes');
 ov = cat(1,ov,'    onlyplotfiles = yes');
 ov = cat(1,ov,'    doit');
