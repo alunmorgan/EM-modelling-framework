@@ -9,7 +9,7 @@ function shunt_data = postprocess_shunt(pp_inputs)
 %Example: shunt_data = postprocess_shunt(pp_inputs)
 
 
-[names ,~] = dir_list_gen('data_link/shunt', 'dirs');
+[names ,~] = dir_list_gen('data_link/shunt', 'dirs', 1);
 names = names(3:end);
 
 

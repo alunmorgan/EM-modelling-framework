@@ -78,7 +78,7 @@ try
             end
             % Move files to the post processing folder.
             copyfile('data_link/s_parameters/run_inputs.mat','pp_link/s_parameter/');
-            [d_list, pth] = dir_list_gen('data_link/s_parameters','dirs');
+            [d_list, pth] = dir_list_gen('data_link/s_parameters','dirs', 1);
             d_list = d_list(3:end);
             copyfile([pth, d_list{1},'/model.gdf'],'pp_link/s_parameter/model.gdf');
             if exist([pth, d_list{1},'/model_log'], 'file')
@@ -121,8 +121,6 @@ try
         % Running postprocessor
         disp('GdfidL_post_process_models: Post processing eigenmode data.')
         orig_ver = getenv('GDFIDL_VERSION');
-        % FIXME input correct version information location
-        setenv('GDFIDL_VERSION',version{1});
         pp_data.eigenmode_data = postprocess_eigenmode(ppi);
         % restoring the original version.
         setenv('GDFIDL_VERSION',orig_ver)
@@ -144,8 +142,6 @@ try
         disp('GdfidL_post_process_models: Post processing lossy eigenmode data.')
         % Running postprocessor
         orig_ver = getenv('GDFIDL_VERSION');
-        % FIXME input correct version information location
-        setenv('GDFIDL_VERSION',version{1});
         pp_data.eigenmode_lossy_data = postprocess_eigenmode_lossy(ppi);
         % restoring the original version.
         setenv('GDFIDL_VERSION',orig_ver)
@@ -158,13 +154,13 @@ try
         if ~isempty(strfind(ppi.sim_select, 'r')) && ~exist('pp_link/shunt', 'dir')
             [~] = system('mkdir pp_link/shunt');
         end
-        [name_list, ~] =  dir_list_gen( 'data_link/shunt','dirs');
+        [name_list, ~] =  dir_list_gen( 'data_link/shunt','dirs', 1);
         name_list = name_list(3:end);
         for ufs = 1:length(name_list)
             copyfile(['data_link/shunt/', num2str(name_list{ufs}),'/model_log'],['pp_link/shunt/',num2str(name_list{ufs}),'_model_log']);
         end
         % Reading logs
-        [out, ~] = dir_list_gen('pp_link/shunt', '');
+        [out, ~] = dir_list_gen('pp_link/shunt', '', 1);
         out = out(3:end);
         for ief = 1:length(out)
             if  ~isempty(strfind(out{ief},'model_log')) && ~isempty(strfind(ppi.solvers, 'r'))
@@ -175,7 +171,7 @@ try
     end
     save('pp_link/data_from_run_logs.mat', 'run_logs')
     % Running postprocessor
-    [out, ~] = dir_list_gen('pp_link','');
+    [out, ~] = dir_list_gen('pp_link','', 1);
     tst = 0;
     if  ~isempty(strfind(ppi.sim_select, 'r'))
         for psw = 1:length(out)

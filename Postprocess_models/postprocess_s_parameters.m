@@ -8,12 +8,12 @@ function s_parameter_data = postprocess_s_parameters
 
 %% S PARAMETER POSTPROCESSING
 % run the s parameter postprocessor
-[s_names, pth] = dir_list_gen('data_link/s_parameters/', 'dirs');
+[s_names, pth] = dir_list_gen('data_link/s_parameters/', 'dirs', 1);
 ind_tmp = find_position_in_cell_lst(strfind(s_names,'.'));
 s_names(ind_tmp) = [];
 s_port = cell(length(s_names),1);
 % finding the names of all the ports.
-[temp, ~]  = dir_list_gen([pth, s_names{1}], '');
+[temp, ~]  = dir_list_gen([pth, s_names{1}], '', 1);
 temp = temp( find_position_in_cell_lst((strfind(temp, 'Port='))));
 all_ports = regexprep(temp, 'Port=','');
 
