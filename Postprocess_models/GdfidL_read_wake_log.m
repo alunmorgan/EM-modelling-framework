@@ -9,7 +9,7 @@ function lg  = GdfidL_read_wake_log( log_file )
 %% read in the file put the data into a cell array.
 data = read_in_text_file(log_file);
 if strcmp(data{end}, ' rc:  -1')
-    warning('error in wake simulation')
+    warning('Wake simulation did not exit cleanly')
     lg = data;
     return
 end
@@ -66,7 +66,7 @@ clear nse temp
 metal_loss_inds = find_position_in_cell_lst(strfind(data,'IntegratedSumPowerMat'));
 metals = data(metal_loss_inds);
 for jse = length(metals):-1:1
-    tmp = regexp(metals{jse},'IntegratedSumPowerMat(.*)','tokens');
+    tmp = regexp(metals{jse},'IntegratedSumPowerMat(.*) [\[J\]]{0,1}','tokens');
     metal_num(jse) = str2double(tmp{1}{1});
 end
 clear tmp jse
