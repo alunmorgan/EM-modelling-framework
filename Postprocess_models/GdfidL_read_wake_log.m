@@ -66,7 +66,7 @@ clear nse temp
 metal_loss_inds = find_position_in_cell_lst(strfind(data,'IntegratedSumPowerMat'));
 metals = data(metal_loss_inds);
 for jse = length(metals):-1:1
-    tmp = regexp(metals{jse},'IntegratedSumPowerMat(.*) [\[J\]]{0,1}','tokens');
+    tmp = regexp(metals{jse},'IntegratedSumPowerMat(\d\d\d)\s*[\[J\]]{0,1}','tokens');
     metal_num(jse) = str2double(tmp{1}{1});
 end
 clear tmp jse
