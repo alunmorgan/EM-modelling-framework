@@ -43,7 +43,7 @@ end
 cols = {'y','k','r','b','c','m'};
 
 
-if size(s.data,1) > 3 || size(s.data,2)
+if size(s.all_ports,1) > 3
     % Only generate the transmission graphs if there is more than 1 signal port.
     h(2) = figure('Position',fig_pos);
     ax(2) = axes('Parent', h(2));
@@ -81,7 +81,7 @@ if size(s.data,1) > 3 || size(s.data,2)
     close(h(2))
 end %if
 
-if size(s.data,1) > 3 || size(s.data,2)
+if size(s.all_ports,1) > 3
     % Only generate the transmission graphs if there is more than 1 signal port.
     for es=1:size(s.data,1);
         s_in  = find_position_in_cell_lst(strfind(s.all_ports,s.port_list{es}));

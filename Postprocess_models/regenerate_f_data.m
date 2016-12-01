@@ -12,7 +12,7 @@ function [f_raw,bunch_spectra,...
 % wakepotential is the wake potential.
 % port_data is the time signals from the ports.
 % cut_off_freqs
-% timescale is the timescale all teh time domain data is based on.
+% timescale is the timescale all the time domain data is based on.
 % hfoi is the highest frequency of interest
 %
 % OUTPUTS
@@ -46,20 +46,21 @@ fft_wp = fft(wakepotential)/n_freq_points;
 wakeimpedance =  - real(fft_wp ./ bunch_spectra);
 wakeimpedance_IM =  - imag(fft_wp ./ bunch_spectra);
 
-try isnan(port_data)
-    port_impedances = NaN;
-    %     port_mode_fft = NaN;
-catch
-    for nsf = 1:length(port_data)% number of ports
-    port_data{nsf} = cat(1,port_data{nsf},zeros(length(timescale) - ...
-        size(port_data{nsf},1), size(port_data{nsf},2)));
+
+for nsf = length(port_data):-1:1% number of ports
+    if sum(isnan(port_data{nsf})) > 0
+        port_impedances = NaN;
+        port_mode_fft{nsf} = NaN;
+    else
+        port_data{nsf} = cat(1,port_data{nsf},zeros(length(timescale) - ...
+            size(port_data{nsf},1), size(port_data{nsf},2)));
     % Calculating the fft of the port signals
     port_mode_fft{nsf} = fft(port_data{nsf},[],1)./length(timescale);
 
     if isempty(cut_off_freqs) == 0
         % setting all values below the cutoff frequency for each port and mode to
         % zero.
-            for esns = 1:length(cut_off_freqs{nsf}) % number of modes
+            for esns = length(cut_off_freqs{nsf}):-1:1 % number of modes
                 tmp_ind = find(f_raw < cut_off_freqs{nsf}(esns),1,'last');
                 % TEST
                 % move the index n samples above cutoff to reduce the effect of
@@ -74,10 +75,10 @@ catch
                     end_ind = length(f_raw);
                     port_mode_fft{nsf}(1:tmp_ind,  esns) = 0;
                     port_mode_fft{nsf}(end_ind - tmp_ind+2:end_ind,  esns) = 0;
-                end
-            end
+                end %if
+            end %for
             clear esns n
-    end
+    end %if
     % The transfer impedance at the ports is found using P = I^2 * Z. So the
     % impedance is the power seen at the ports divided by the bunch spectra squared.
     %     We take the real part as this corresponds to resistive losses.
@@ -85,8 +86,8 @@ catch
     % port impedance is oscillating around 0 otherwise.????
     port_impedances(:,nsf) = real(sum(abs(port_mode_fft{nsf}).^2,2)) ./...
         abs(bunch_spectra).^2;
-    end
-end
+    end %if
+end %for
 
 % Remove all data above the highest frequency of interest (hfoi).
 % Could either take the appropriate section from both the upper and lowver

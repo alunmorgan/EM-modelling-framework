@@ -674,7 +674,7 @@ ax(27) = axes('Parent', h(27));
 plot(wake_data.frequency_domain_data.time_slices.fscale*1e-9,...
     abs(wake_data.frequency_domain_data.time_slices.ffts(:,end)))
 legs = {'Data'};
-hold(ax(27), 'off')
+hold(ax(27), 'on')
 for mers = 1:size(wake_data.frequency_domain_data.time_slices.peaks,1)
     plot(wake_data.frequency_domain_data.time_slices.peaks(mers,1)*1e-9,...
         wake_data.frequency_domain_data.time_slices.peaks(mers,2),'*r','LineWidth',lw)

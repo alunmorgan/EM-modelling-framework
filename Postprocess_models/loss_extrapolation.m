@@ -146,8 +146,6 @@ for cur_ind = 1:length(ppi.current)
 end
 extrap_data.diff_machine_conds.f_raw = f_raw_bc;
 extrap_data.diff_machine_conds.wake_impedance = wakeimpedance_bc;
-try
-isnan(port_data);
-catch
+if port_data.total_energy >0
     extrap_data.diff_machine_conds.port_impedances = port_impedances_bc;
 end
