@@ -5,6 +5,8 @@ function state = Blend_figs(report_input, fig_nme, out_name, lg, lw, line_select
 % line_select is a regular expression search based on the display name of
 % the line.
 %
+% If there is no data returns state == 0 otherwise state ==1
+%
 % Example: state = Blend_figs(report_input, ['s_parameters_S',num2str(hs),num2str(ha)], 0, 2, '\s*S\d\d\(1\)\s*');
 
 state = 1;
@@ -23,7 +25,6 @@ doc_root = report_input.doc_root;
 source_reps =report_input.sources;
 sub_folder = report_input.loc;
 
-hold on
 any_data = 0;
 for hse = length(source_reps):-1 :1
     graph_name = [doc_root, source_reps{hse}, slh, sub_folder, slh, fig_nme, '.fig'];
@@ -45,7 +46,7 @@ ylims = data_out(1).ylims;
 for ew = 2:length(data_out);
     xlims = cat(1, xlims, data_out(ew).xlims);
     ylims = cat(1, ylims, data_out(ew).ylims);
-end
+end %for
 
 % This section is to remove the levels and other straight line which may be
 % on the graphs.
@@ -152,4 +153,3 @@ view(45,45)
 grid on
 savemfmt(h2, report_input.output_loc, [out_name, '_3D'])
 close(h2)
-close all

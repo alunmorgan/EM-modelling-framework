@@ -198,7 +198,7 @@ if isfield(run_logs, 'wake')
     capE = ['An overlay of the energy lost from the beam (solid line), ',...
         'the energy in the fields of the model (dashed line), ',...
         'and the cumulative energy seen at the ports (dotted line).'];
-    Blend_figs(report_input, 'Energy', 'Energy', 1, 1)
+    [~] = Blend_figs(report_input, 'Energy', 'Energy', 1, 1);
     ov1 = latex_top_bottom_images('Energy.eps', 'Energy_3D.eps', capE,...
         'Energy in structure and seen at ports', 'Energy', 'Energy_3D', 1, 0.8);
     ov = cat(1,ov,ov1);
@@ -208,7 +208,7 @@ if isfield(run_logs, 'wake')
     lgolin = [0,0,0];
     lw = [1,2,2];
     for awn = 1:length(fig_names)
-        Blend_figs(report_input, fig_names{awn}, fig_names{awn}, lgolin(awn), lw(awn))
+        [~] = Blend_figs(report_input, fig_names{awn}, fig_names{awn}, lgolin(awn), lw(awn));
         ov1 = latex_top_bottom_images([fig_names{awn}, '.eps'], ...
             [fig_names{awn}, '_3D.eps'], ...
             caps{awn},caps{awn}, ...
@@ -229,6 +229,8 @@ for hs = 3:num_ports
             out_name = [fig_name, '_mode_', num2str(ks)];
             state = Blend_figs(report_input, fig_name, out_name, ...
                 0, 1, ['\s*S\d\d\(',num2str(ks),'\)\s*'], 9);
+            % FIXME
+            close all % This should not be required
             if state == 1
                 overall_state = 1;
                 lab = ['S',num2str(hs),num2str(ha) '(', num2str(ks), ')'];

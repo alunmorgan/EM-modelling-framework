@@ -37,14 +37,6 @@ if ~strcmp(line_select, 'all')
     a = a(locs);
 end
 
-% ck = 1;
-% for aww = 1:length(a)
-%     % Check that the line .... and belongs to the current axis.
-%     if length(get(a(aww),'XData')) > 1
-%         b(ck) = a(aww);
-%         ck = ck +1;
-%     end
-% end
 %% extract the data from the graphs
 if isempty(a)
     data_out.state = 0;

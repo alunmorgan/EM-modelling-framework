@@ -54,7 +54,7 @@ ov = cat(1,ov,'\begin{tabular}{|p{4.5cm}|m{5cm}|c|}');
 ov = cat(1,ov,'\hline');
 ov = cat(1,ov,'\multirow{3}{*}{\textbf{TDI-DIA}} & ');
 ov = cat(1,ov,['\multirow{3}{*}{\includegraphics[scale=0.8]{',report_input.graphic,'}} &']);
-ov = cat(1,ov,['\multirow{3}{*}{\small{Doc No: ',report_input.doc_num,'}} \\']);
+ov = cat(1,ov,['\multirow{3}{*}{\parbox{5cm}{\small{', report_input.doc_num, '}}} \\']);
 ov = cat(1,ov,'&& \\');
 ov = cat(1,ov,'&& \\');
 ov = cat(1,ov,'\hline');
