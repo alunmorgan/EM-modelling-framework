@@ -65,6 +65,15 @@ run_inputs.beam = 'yes';
 % tried).
 run_inputs.s_param_ports = {'port_signal_out'};
 
+% Describes the S parameter port excitation.
+% There needs to be very little power at 0Hz as this gives a DC component
+% which is undesirable.
+run_inputs.s_param_excitation_f = 2.500E9;
+run_inputs.s_param_excitation_bw = 5E9;
+
+% Determines the length of time the S parameter monitor is run for.
+run_inputs.s_param_tmax = 80E-9;
+
 % When using symetry planes some ports are not within the mesh and are thus not
 % counted. The port multiple is a way of taking these "hidden" ports into
 % account when it come to calculating the losses.
