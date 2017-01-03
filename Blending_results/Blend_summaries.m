@@ -4,9 +4,23 @@ function summary = Blend_summaries(doc_root, slh, source_reps)
 % Example: summary = Blend_summaries(doc_root, slh, source_reps)
 for hse = 1:length(source_reps)
     try
-    hn = open([doc_root, slh, source_reps{hse}, slh, 'wake', slh, 'summary.fig']);
+        hn = open([doc_root, slh, source_reps{hse}, slh, 'wake', slh, 'summary.fig']);
     catch
         warning(['Summary not available for ', num2str(source_reps{hse})])
+        summary.wlf{hse} = [];
+        summary.date{hse} = [];
+        summary.soft_ver{hse} = [];
+        summary.soft_type{hse} = [];
+        summary.CPU_time{hse} = [];
+        summary.num_cores{hse} = [];
+        summary.wall_time{hse} = [];
+        summary.num_mesh_cells{hse} = [];
+        summary.mem_used{hse} = [];
+        summary.mesh_spacing{hse} = [];
+        summary.timestep{hse} = [];
+        summary.machine_settings{hse} = [];
+        summary.multipliers{hse} = [];
+        summary.name{hse} = [];
         continue
     end
     a=get(gca,'Children');

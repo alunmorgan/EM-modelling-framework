@@ -14,6 +14,7 @@ for hse = length(source_reps):-1:1
     copyfile(source, dest)
     catch
         warning(['Thermal loss graph is not available for ', num2str(source_reps{hse})])
+        nme{hse} = [];
         continue
     end
     nme{hse} = [ mgnme,'_',num2str(hse), '.eps'];
