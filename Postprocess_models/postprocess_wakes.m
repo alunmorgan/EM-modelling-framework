@@ -3,8 +3,8 @@ function wake_data = postprocess_wakes(ppi, mi,  modelling_inputs, log)
 % The model data has already been selected using soft links.
 %
 % ppi is a structure containing all the information required for the postprocessor
-% modelling_inputs,log is 
-% wake_data is 
+% modelling_inputs,log is
+% wake_data is
 %
 %Example: wake_data = postprocess_wakes(ppi, modelling_inputs,log)
 
@@ -16,7 +16,7 @@ tstart = GdfidL_write_pp_input_file(log, pipe_length);
 %% run the wake postprocessor
 temp_files('make')
 [~]=system('gd1.pp < pp_link/wake/model_wake_post_processing > pp_link/wake/model_wake_post_processing_log');
-% Check that the post processor has completed 
+% Check that the post processor has completed
 data = read_file_full_line('pp_link/wake/model_wake_post_processing_log');
 for hwa = 1:length(data)
     se = strfind(data{hwa}, 'The End of File is reached');
@@ -39,19 +39,23 @@ end
 % get the Total energy in the structure
 [ total_energy_data ] = GdfidL_read_graph_datafile( Energy{1});
 
-% get the energy in the ceramics.
-[ energy_ceramics_data ] = GdfidL_read_graph_datafile( Energy_in_ceramics{1});
-% The original data is the energy sampled at a point in time. What I want
-% is the total energy over time. So I cumsum it and scale with the timestep
-loss_in_ceramics = cumsum(energy_ceramics_data.data(:,2)) .* ...
-    (energy_ceramics_data.data(2,1)-energy_ceramics_data.data(1,1));
-% In order to combine with the other material losses I can interpolate (as
-% I have already done the scaling with timestep.)
-loss_in_ceramics = interp1(energy_ceramics_data.data(:,1), ...
-    loss_in_ceramics, log.mat_losses.loss_time);
-% scale the loss values of the simulated volume to the full volume
-% of the structure.
-loss_in_ceramics = loss_in_ceramics ./ mi.volume_fill_factor;
+if isfield(log, 'mat_losses')
+    % get the energy in the ceramics.
+    [ energy_ceramics_data ] = GdfidL_read_graph_datafile( Energy_in_ceramics{1});
+    % The original data is the energy sampled at a point in time. What I want
+    % is the total energy over time. So I cumsum it and scale with the timestep
+    loss_in_ceramics = cumsum(energy_ceramics_data.data(:,2)) .* ...
+        (energy_ceramics_data.data(2,1)-energy_ceramics_data.data(1,1));
+    % In order to combine with the other material losses I can interpolate (as
+    % I have already done the scaling with timestep.)
+    loss_in_ceramics = interp1(energy_ceramics_data.data(:,1), ...
+        loss_in_ceramics, log.mat_losses.loss_time);
+    % scale the loss values of the simulated volume to the full volume
+    % of the structure.
+    loss_in_ceramics = loss_in_ceramics ./ mi.volume_fill_factor;
+else
+    loss_in_ceramics = 0;
+end
 
 if ~iscell(Port_mat)
     warning('postprocess_wakes:No ports to analyse')
@@ -64,28 +68,28 @@ if ~iscell(Port_mat)
     beta_all = NaN;
     cutoff = NaN;
 else
-[port_names, port_timebase,  port_data_all, ...
-    cutoff_all, alpha_all, beta_all,...
-    port_data, cutoff] = read_port_datafiles(Port_mat, log, ...
-    mi.port_fill_factor,mi.port_multiple, port_names_table);
+    [port_names, port_timebase,  port_data_all, ...
+        cutoff_all, alpha_all, beta_all,...
+        port_data, cutoff] = read_port_datafiles(Port_mat, log, ...
+        mi.port_fill_factor,mi.port_multiple, port_names_table);
 end
 % get the wake potentials
 if isempty(WP_l)
-%     If the model is simple enough that there is no wake potential (as it
-%     is zero) then GdfidL does not output a file.
-% use the total energy file to get the timescale and set all the data value
-% to zero.
-wpl_data = total_energy_data;
-wpl_data.data(:,2) = 0;
-wpl_data.title = 'Wake potential';
-wpl_data.ylabel = '';
- cd_data = wpl_data;
- cd_data.data(:,2) = 1;
-cd_data.title = 'Bunch charge distribution';
+    %     If the model is simple enough that there is no wake potential (as it
+    %     is zero) then GdfidL does not output a file.
+    % use the total energy file to get the timescale and set all the data value
+    % to zero.
+    wpl_data = total_energy_data;
+    wpl_data.data(:,2) = 0;
+    wpl_data.title = 'Wake potential';
+    wpl_data.ylabel = '';
+    cd_data = wpl_data;
+    cd_data.data(:,2) = 1;
+    cd_data.title = 'Bunch charge distribution';
 else
     % Returns the longitudinal wake potential
     % and the charge distribution with the integral scaled to 1C
-[ wpl_data, cd_data] = GdfidL_read_graph_datafile( WP_l{1} );
+    [ wpl_data, cd_data] = GdfidL_read_graph_datafile( WP_l{1} );
 end
 % Get the transverse wake potientials.
 if ~isempty(WP_2)
@@ -98,7 +102,7 @@ end
 if ~isempty(WI_s)
     % Returns the longitudinal wake impedance
     % and the charge distribution with the integral scaled to 1C
-[ wil_data] = GdfidL_read_graph_datafile( WI_s{1} );
+    [ wil_data] = GdfidL_read_graph_datafile( WI_s{1} );
 end
 % Get the transverse wake potientials.
 if ~isempty(WI_x)
@@ -113,55 +117,57 @@ delete('WHAT-PP-DID-SPIT-OUT');
 
 % scale the total energy values of the simulated volume to the full volume
 % of the structure.
-if isfield(log.mat_losses, 'total_loss')
-    % only do it if there are user defined materials in the model.
-    log.mat_losses.total_loss = (log.mat_losses.total_loss )./ mi.volume_fill_factor + loss_in_ceramics;
-    % assume all the empty values are due to the fact that ceramics are not
-    % output into the log.
-    % Also I have to split the energy equally between ceramics for lack of
-    % any better information.
-    % first find out how many different ceramics are used.
-    for ern = size(log.mat_losses.single_mat_data,1):-1:1
-        cer_count(ern) = isempty(log.mat_losses.single_mat_data{ern,3});
-    end
-    cer_count = sum(cer_count);
-    for ern = 1:size(log.mat_losses.single_mat_data,1)
-        if ~isempty(log.mat_losses.single_mat_data{ern,3})
-            log.mat_losses.single_mat_data{ern,3}(:,2) = log.mat_losses.single_mat_data{ern,3}(:,2) ./ mi.volume_fill_factor;
-        else
-            log.mat_losses.single_mat_data{ern,3} = loss_in_ceramics ./ cer_count;
+if isfield(log, 'mat_losses')
+    if isfield(log.mat_losses, 'total_loss')
+        % only do it if there are user defined materials in the model.
+        log.mat_losses.total_loss = (log.mat_losses.total_loss )./ mi.volume_fill_factor + loss_in_ceramics;
+        % assume all the empty values are due to the fact that ceramics are not
+        % output into the log.
+        % Also I have to split the energy equally between ceramics for lack of
+        % any better information.
+        % first find out how many different ceramics are used.
+        for ern = size(log.mat_losses.single_mat_data,1):-1:1
+            cer_count(ern) = isempty(log.mat_losses.single_mat_data{ern,3});
         end
-    end
-    
-else
-    log.mat_losses.total_loss = 0;
-end
+        cer_count = sum(cer_count);
+        for ern = 1:size(log.mat_losses.single_mat_data,1)
+            if ~isempty(log.mat_losses.single_mat_data{ern,3})
+                log.mat_losses.single_mat_data{ern,3}(:,2) = log.mat_losses.single_mat_data{ern,3}(:,2) ./ mi.volume_fill_factor;
+            else
+                log.mat_losses.single_mat_data{ern,3} = loss_in_ceramics ./ cer_count;
+            end
+        end
+        
+    else
+        log.mat_losses.total_loss = 0;
+    end %if
+end %if
 
 % Generate the data file which the analysis code is expecting.
 raw_data.Energy = total_energy_data.data ;
 raw_data.Wake_potential = wpl_data.data;
 if exist('wptx_data','var')
-raw_data.Wake_potential_trans_X = wptx_data.data;
+    raw_data.Wake_potential_trans_X = wptx_data.data;
 else
     % NASTY HACK
     raw_data.Wake_potential_trans_X = wpl_data.data;
 end
 if exist('wpty_data','var')
-raw_data.Wake_potential_trans_Y = wpty_data.data;
+    raw_data.Wake_potential_trans_Y = wpty_data.data;
 else
-     % NASTY HACK
+    % NASTY HACK
     raw_data.Wake_potential_trans_Y = wpl_data.data;
 end
 raw_data.Charge_distribution = cd_data.data;
 raw_data.Wake_impedance = wil_data.data;
 if exist('witx_data','var')
-raw_data.Wake_impedance_trans_X = witx_data.data;
+    raw_data.Wake_impedance_trans_X = witx_data.data;
 else
     % NASTY HACK
     raw_data.Wake_impedance_trans_X = wil_data.data;
 end
 if exist('wity_data','var')
-raw_data.Wake_impedance_trans_Y = wity_data.data;
+    raw_data.Wake_impedance_trans_Y = wity_data.data;
 else
     % NASTY HACK
     raw_data.Wake_impedance_trans_Y = wil_data.data;

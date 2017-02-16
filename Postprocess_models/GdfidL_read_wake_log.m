@@ -20,28 +20,29 @@ del_ind = find_position_in_cell_lst(regexp(data,'.. deleting: '));
 data(del_ind) = [];
 clear del_ind cmnt_ind
 %% Analyse the data
-
+lg = struct;
 % Find the user defines variables.
 define_ind = find_position_in_cell_lst(regexp(data,'\s*#\s*was:\s*"\s*define\(.*,.*\)'));
 sec_ind = find_position_in_cell_lst(regexp(data,'\s*material>.*'));
-define_ind(define_ind < sec_ind(1)) = [];
-define_ind(define_ind > sec_ind(end)) = [];
-defines = data(define_ind);
-ajs = 1;
-for aj = 1:length(defines)
-    tmd = regexp(defines{aj},'.*(define\(.*,([.\d -e+z]+|\s*steel.*|\s*carbon.*|\s*copper.*)?\).*)"', 'tokens');
-    if ~isempty(tmd)
-        tmd = tmd{1}{1};
-        lg.defs{ajs} = tmd;
-        ajs = ajs +1;
+if ~isempty(sec_ind)
+    define_ind(define_ind < sec_ind(1)) = [];
+    define_ind(define_ind > sec_ind(end)) = [];
+    defines = data(define_ind);
+    ajs = 1;
+    for aj = 1:length(defines)
+        tmd = regexp(defines{aj},'.*(define\(.*,([.\d -e+z]+|\s*steel.*|\s*carbon.*|\s*copper.*)?\).*)"', 'tokens');
+        if ~isempty(tmd)
+            tmd = tmd{1}{1};
+            lg.defs{ajs} = tmd;
+            ajs = ajs +1;
+        end
     end
 end
 
 %generate a look up between material names and numbers.
 mat_names_ind = find_position_in_cell_lst(regexp(data,'material>\s*material'));
 mat_type_inds = find_position_in_cell_lst(regexp(data,'material>\s*type='));
-% Explicit preallocation:
-% mat_index = zeros(1, length(mat_names_ind));
+
 % Implicitly preallocate by sweeping the loop backwards:
 for ng = length(mat_names_ind):-1:1
     temp = data{mat_names_ind(ng)};
@@ -56,93 +57,99 @@ end
 clear ng tokens temp mat_names_ind
 % find the total material loss.
 total_loss_inds = find_position_in_cell_lst(strfind(data,'IntegratedSumPowerAll'));
-for nse = 1:length(total_loss_inds)
+for nse = length(total_loss_inds):-1:1
     temp = sscanf(regexprep(data{total_loss_inds(nse)},'<=.*',''),'%f%f');
     lg.mat_losses.loss_time(nse) = temp(1);
     lg.mat_losses.total_loss(nse) = temp(2);
 end
 clear nse temp
-% find the loss for each metal.
-metal_loss_inds = find_position_in_cell_lst(strfind(data,'IntegratedSumPowerMat'));
-metals = data(metal_loss_inds);
-for jse = length(metals):-1:1
-    tmp = regexp(metals{jse},'IntegratedSumPowerMat(\d\d\d)\s*[\[J\]]{0,1}','tokens');
-    metal_num(jse) = str2double(tmp{1}{1});
-end
-clear tmp jse
-cer = strcmp(lg.mat_losses.single_mat_data(:,3), 'normal');
-% Find the number of ceramics in the model
-
-n_ceramics = sum(cer);
-num_ceramics = lg.mat_losses.single_mat_data((cer ==1),1);
-% find the total loss for each all ceramics.
-ceramic_loss_inds = find_position_in_cell_lst(strfind(data,'IntegratedSumPower-'));
-ceramics_tmp = data(ceramic_loss_inds);
-
-cer_ck = 0;
-n = length(ceramics_tmp) * n_ceramics;
-ceramic_num = zeros(1, n);
-ceramics = cell(n, 1);
-for jse = 1:length(ceramics_tmp)
-    for kw = 1:n_ceramics
-        cer_ck = cer_ck +1;
-        ceramic_num(cer_ck) = num_ceramics{kw};
-        ceramics{cer_ck,1} = ceramics_tmp{jse};
-    end
-end
-clear tmp jse
-
-% combine the metals and ceramic losses into a single list.
-if n_ceramics >0
-    mat_num = cat(2, metal_num, ceramic_num);
-    materials = cat(1, metals, ceramics);
-else
-    mat_num = metal_num;
-    materials = metals;
-end
-% find the numbers of the materials with losses.
-mats = unique(mat_num);
-% find the number of materials specified
-num_mats = length(mats);
-for wan = 1:num_mats
-    % find the losses for a specific material.
-    mat_loc = mat_num == mats(wan);
-    dat_loc = mat_index == mats(wan);
-    single_material = materials(mat_loc);
-    for anv = length(single_material):-1:1
-        tmp = sscanf(regexprep(single_material{anv},'<=.*',''),'%f%f');
-        tmp2(anv,1) = tmp(1);
-        tmp2(anv,2) = tmp(2);
-    end
-    % as the ceramics are not reported separately then split the energy
-    % equally.
-    indw = cell2mat(lg.mat_losses.single_mat_data(:,1)) ==mats(wan);
-    type_mat = lg.mat_losses.single_mat_data{indw,3};
-    if strcmp(type_mat, 'normal')
-        tmp2(:,2) = tmp2(:,2) ./ n_ceramics;
-    end
+% If no material losses have been recorded then there is no point doing
+% anything with ceramics or metals.
+if isfield(lg, 'mat_losses')
     
-    % Write the loss data to the structure.
-    lg.mat_losses.single_mat_data{dat_loc,4} = tmp2;
-    clear tmp tmp2
-    clear  mat_loc single_material dat_loc
-end
-% if any of the materials has an empty cell where the losses are normally.
-% It means that there were no losses recorded. However in order to stop
-% later code panicking I will replace the empty cell with zeros.
-dt = lg.mat_losses.single_mat_data(:,4);
-for sen = 1:length(dt)
-    if ~isempty(dt{sen})
-        z_data = dt{sen};
-        z_data = cat(2,z_data(:,1), zeros(size(z_data,1),1));
-        break
+    % find the loss for each metal.
+    metal_loss_inds = find_position_in_cell_lst(strfind(data,'IntegratedSumPowerMat'));
+    metals = data(metal_loss_inds);
+    for jse = length(metals):-1:1
+        tmp = regexp(metals{jse},'IntegratedSumPowerMat(\d\d\d)\s*[\[J\]]{0,1}','tokens');
+        metal_num(jse) = str2double(tmp{1}{1});
     end
-end
-for sen = 1:length(dt)
-    if isempty(dt{sen})
-        lg.mat_losses.single_mat_data{sen,4} = z_data;
+    clear tmp jse
+    
+    cer = strcmp(lg.mat_losses.single_mat_data(:,3), 'normal');
+    % Find the number of ceramics in the model
+    
+    n_ceramics = sum(cer);
+    num_ceramics = lg.mat_losses.single_mat_data((cer ==1),1);
+    % find the total loss for each all ceramics.
+    ceramic_loss_inds = find_position_in_cell_lst(strfind(data,'IntegratedSumPower-'));
+    ceramics_tmp = data(ceramic_loss_inds);
+    
+    cer_ck = 0;
+    n = length(ceramics_tmp) * n_ceramics;
+    ceramic_num = zeros(1, n);
+    ceramics = cell(n, 1);
+    for jse = 1:length(ceramics_tmp)
+        for kw = 1:n_ceramics
+            cer_ck = cer_ck +1;
+            ceramic_num(cer_ck) = num_ceramics{kw};
+            ceramics{cer_ck,1} = ceramics_tmp{jse};
+        end
     end
-end
+    clear tmp jse
+    
+    % combine the metals and ceramic losses into a single list.
+    if n_ceramics >0
+        mat_num = cat(2, metal_num, ceramic_num);
+        materials = cat(1, metals, ceramics);
+    else
+        mat_num = metal_num;
+        materials = metals;
+    end
+    % find the numbers of the materials with losses.
+    mats = unique(mat_num);
+    % find the number of materials specified
+    num_mats = length(mats);
+    for wan = 1:num_mats
+        % find the losses for a specific material.
+        mat_loc = mat_num == mats(wan);
+        dat_loc = mat_index == mats(wan);
+        single_material = materials(mat_loc);
+        for anv = length(single_material):-1:1
+            tmp = sscanf(regexprep(single_material{anv},'<=.*',''),'%f%f');
+            tmp2(anv,1) = tmp(1);
+            tmp2(anv,2) = tmp(2);
+        end
+        % as the ceramics are not reported separately then split the energy
+        % equally.
+        indw = cell2mat(lg.mat_losses.single_mat_data(:,1)) ==mats(wan);
+        type_mat = lg.mat_losses.single_mat_data{indw,3};
+        if strcmp(type_mat, 'normal')
+            tmp2(:,2) = tmp2(:,2) ./ n_ceramics;
+        end
+        
+        % Write the loss data to the structure.
+        lg.mat_losses.single_mat_data{dat_loc,4} = tmp2;
+        clear tmp tmp2
+        clear  mat_loc single_material dat_loc
+    end
+    % if any of the materials has an empty cell where the losses are normally.
+    % It means that there were no losses recorded. However in order to stop
+    % later code panicking I will replace the empty cell with zeros.
+    dt = lg.mat_losses.single_mat_data(:,4);
+    for sen = 1:length(dt)
+        if ~isempty(dt{sen})
+            z_data = dt{sen};
+            z_data = cat(2,z_data(:,1), zeros(size(z_data,1),1));
+            break
+        end
+    end
+    for sen = 1:length(dt)
+        if isempty(dt{sen})
+            lg.mat_losses.single_mat_data{sen,4} = z_data;
+        end
+    end
+end %if
 % find the date and time the simulation was run.
 dte_ind = find_position_in_cell_lst(strfind(data,'Start Date : '));
 dte = regexp(data{dte_ind},'.*Start\s+Date\s*:\s*(\d\d/\d\d/\d\d\d\d)', 'tokens');

@@ -1,8 +1,8 @@
 function fs = gdf_wake_header_construction(loc, name, num_threads, mesh, sigma,...
     wake_length, materials, material_labels)
-% Constructs the initial part of the gdf input file for GdfidL 
+% Constructs the initial part of the gdf input file for GdfidL
 %
-% fs is 
+% fs is
 % loc gives the location of the output files
 % name is the name of the model.
 % num threads determines now many CPU threads to use.
@@ -16,7 +16,7 @@ function fs = gdf_wake_header_construction(loc, name, num_threads, mesh, sigma,.
 
 
 % TEMP knock out PEC from the list as it is already dealt with.
-% there is probably a better place to put it. 
+% there is probably a better place to put it.
 ind = find(strcmp(materials, 'PEC')==1);
 materials(ind) = [];
 material_labels(ind) = [];
@@ -30,9 +30,11 @@ fs = cat(1,fs,['define(SIGMA, ',sigma,') # bunch length in mm']);
 fs = cat(1,fs,'define(CHARGE, 1e-9) # Bunch charge in C');
 fs = cat(1,fs,'define(vacuum, 0)');
 fs = cat(1,fs,'define(PEC, 1)');
-for ks = 1:length(materials)
-    if ~strcmp(materials{ks}, 'PEC') && ~strcmp(materials{ks}, 'vacuum')
-   fs = cat(1,fs,['define(',materials{ks},',',num2str(ks+2),')']) ;
+if ~isempty(materials)
+    for ks = 1:length(materials)
+        if ~strcmp(materials{ks}, 'PEC') && ~strcmp(materials{ks}, 'vacuum')
+            fs = cat(1,fs,['define(',materials{ks},',',num2str(ks+2),')']) ;
+        end
     end
 end
 fs = cat(1,fs,'define(beam_dir, +z)');
@@ -61,7 +63,9 @@ fs = cat(1,fs,['shigh=',wake_length]);
 fs = cat(1,fs,'showdata= no');
 fs = cat(1,fs,'###################################################');
 fs = cat(1,fs,'#Material definitions');
-for ne = 1:length(materials)
-fs = cat(1,fs,generate_material_definitions_for_gdf(materials{ne}, material_labels{ne}));
+if ~isempty(materials)
+    for ne = 1:length(materials)
+        fs = cat(1,fs,generate_material_definitions_for_gdf(materials{ne}, material_labels{ne}));
+    end
 end
 fs = cat(1,fs,'###################################################');

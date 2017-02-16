@@ -10,15 +10,19 @@ function construct_wake_gdf_file(mi, modelling_inputs)
 sigma =  mi.beam_sigma;
 mesh = mi.mesh_stepsize;
 wake_length = mi.wakelength;
-materials = mi.mat_list(:,1);
-material_labels = mi.mat_list(:,2);
+
 in_path = mi.input_file_path;
 model_name = mi.model_name;
 add_defs = modelling_inputs.defs;
 num_threads = modelling_inputs.n_cores;
-
-material_override = find_material_overrides(materials,  add_defs);
-
+if ~isempty(mi.mat_list)
+    materials = mi.mat_list(:,1);
+    material_labels = mi.mat_list(:,2);
+    material_override = find_material_overrides(materials,  add_defs);
+else
+    material_labels = [];
+    material_override = [];
+end
 model_file = [in_path, model_name, '_model_data'];
 data = read_file_full_line(model_file);
 fs = gdf_wake_header_construction('', 'temp', num_threads, mesh, sigma, ...
