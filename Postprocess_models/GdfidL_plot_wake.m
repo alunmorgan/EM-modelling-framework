@@ -84,19 +84,20 @@ if wake_data.frequency_domain_data.Total_energy_from_signal_ports >0
     leg{2} = ['Signal ports (',num2str(py(2,3)) ,'nJ)'];
 end %if
 
-
-pyl = size(py,2);
-for ka = size(wake_data.raw_data.mat_losses.single_mat_data,1):-1:1
-    py(1,pyl + ka) = 0;
-    if isempty(wake_data.raw_data.mat_losses.single_mat_data{ka,4})
-        py(2,pyl + ka) = 0;
-        leg{pyl-1 + ka} = [wake_data.raw_data.mat_losses.single_mat_data{ka,2}, ' (0nJ)'];
-    else
-        py(2,pyl + ka) =  wake_data.raw_data.mat_losses.single_mat_data{ka,4}(end,2) .* 1E9;
-        leg{pyl-1 + ka} = [wake_data.raw_data.mat_losses.single_mat_data{ka,2}, ' (',...
-            num2str(wake_data.raw_data.mat_losses.single_mat_data{ka,4}(end,2).* 1E9),'nJ)'];
-    end %if
-end %for
+if isfield(wake_data.raw_data, 'mat_losses')
+    pyl = size(py,2);
+    for ka = size(wake_data.raw_data.mat_losses.single_mat_data,1):-1:1
+        py(1,pyl + ka) = 0;
+        if isempty(wake_data.raw_data.mat_losses.single_mat_data{ka,4})
+            py(2,pyl + ka) = 0;
+            leg{pyl-1 + ka} = [wake_data.raw_data.mat_losses.single_mat_data{ka,2}, ' (0nJ)'];
+        else
+            py(2,pyl + ka) =  wake_data.raw_data.mat_losses.single_mat_data{ka,4}(end,2) .* 1E9;
+            leg{pyl-1 + ka} = [wake_data.raw_data.mat_losses.single_mat_data{ka,2}, ' (',...
+                num2str(wake_data.raw_data.mat_losses.single_mat_data{ka,4}(end,2).* 1E9),'nJ)'];
+        end %if
+    end %for
+end %if
 
 h(1) = figure('Position',fig_pos);
 ax(1) = axes('Parent', h(1));
@@ -117,44 +118,46 @@ clear leg
 
 h(2) = figure('Position',fig_pos);
 ax(2) = axes('Parent', h(2));
-if ~isempty(wake_data.raw_data.mat_losses.loss_time)
-    for hsa = size(wake_data.raw_data.mat_losses.single_mat_data,1):-1:1
-        tmp = strcmp(mi.extension_names, wake_data.raw_data.mat_losses.single_mat_data{hsa,2});
-        if sum(tmp) == 0
-            % material is part of the model.
-            model_mat_index(hsa) = 1;
-        else
-            % material is part of the port extensions.
-            model_mat_index(hsa) = 0;
+if isfield(wake_data.raw_data, 'mat_losses')
+    if ~isempty(wake_data.raw_data.mat_losses.loss_time)
+        for hsa = size(wake_data.raw_data.mat_losses.single_mat_data,1):-1:1
+            tmp = strcmp(mi.extension_names, wake_data.raw_data.mat_losses.single_mat_data{hsa,2});
+            if sum(tmp) == 0
+                % material is part of the model.
+                model_mat_index(hsa) = 1;
+            else
+                % material is part of the port extensions.
+                model_mat_index(hsa) = 0;
+            end %if
+        end %for
+        %select on only those materials which are in the model proper.
+        model_mat_data = wake_data.raw_data.mat_losses.single_mat_data(model_mat_index == 1,:);
+        if ~isempty(model_mat_data)
+            for mes = size(model_mat_data,1):-1:1;
+                mat_loss(mes) = model_mat_data{mes,4}(end,2);
+            end %for
+            plot_data = mat_loss/sum(mat_loss) *100;
+            
+            % add numerical value to label
+            leg = {};
+            for ena = length(plot_data):-1:1
+                leg{ena} = strcat(model_mat_data{ena,2}, ' (',num2str(round(plot_data(ena)*100)/100),'%)');
+            end %for
+            % matlab will ignore any values of zero which messes up the maping of the
+            % lables. This just makes any zero values a very small  positive value to avoid
+            % this.
+            plot_data(plot_data == 0) = 1e-12;
+            p = pie(ax(2), plot_data, ones(length(plot_data),1));
+            % setting the colours on the pie chart.
+            pp = findobj(p, 'Type', 'patch');
+            % check if both beam ports and signal ports are used.
+            col_ofst = size(py,2) -1 - length(plot_data);
+            for sh = 1:length(pp)
+                set(pp(sh), 'FaceColor',cols{sh+col_ofst});
+            end %for
+            legend(ax(2), leg,'Location','EastOutside', 'Interpreter', 'none')
+            clear leg
         end %if
-    end %for
-    %select on only those materials which are in the model proper.
-    model_mat_data = wake_data.raw_data.mat_losses.single_mat_data(model_mat_index == 1,:);
-    if ~isempty(model_mat_data)
-        for mes = size(model_mat_data,1):-1:1;
-            mat_loss(mes) = model_mat_data{mes,4}(end,2);
-        end %for
-        plot_data = mat_loss/sum(mat_loss) *100;
-        
-        % add numerical value to label
-        leg = {};
-        for ena = length(plot_data):-1:1
-            leg{ena} = strcat(model_mat_data{ena,2}, ' (',num2str(round(plot_data(ena)*100)/100),'%)');
-        end %for
-        % matlab will ignore any values of zero which messes up the maping of the
-        % lables. This just makes any zero values a very small  positive value to avoid
-        % this.
-        plot_data(plot_data == 0) = 1e-12;
-        p = pie(ax(2), plot_data, ones(length(plot_data),1));
-        % setting the colours on the pie chart.
-        pp = findobj(p, 'Type', 'patch');
-        % check if both beam ports and signal ports are used.
-        col_ofst = size(py,2) -1 - length(plot_data);
-        for sh = 1:length(pp)
-            set(pp(sh), 'FaceColor',cols{sh+col_ofst});
-        end %for
-        legend(ax(2), leg,'Location','EastOutside', 'Interpreter', 'none')
-        clear leg
     end %if
 end %if
 title('Losses distribution within the structure', 'Parent', ax(2))
@@ -163,23 +166,25 @@ close(h(2))
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 h(3) = figure('Position',fig_pos);
 ax(3) = axes('Parent', h(3));
-if isempty(wake_data.raw_data.mat_losses.loss_time) == 0
-    leg = {};
-    hold on
-    for na = size(model_mat_data,1):-1:1
-        if isempty(model_mat_data{na,4})
-            m_time = 0;
-            m_data = 0;
-        else
-            m_time = model_mat_data{na,4}(:,1).*1e9;
-            m_data = model_mat_data{na,4}(:,2).* 1e9;
-        end
-        plot(ax(3), m_time ,m_data, 'Color', cols{na+col_ofst},'LineWidth',lw)
-        leg{na} = model_mat_data{na,2};
-    end
-    hold off
-    legend(ax(3), leg, 'Location', 'SouthEast')
-end
+if isfield(wake_data.raw_data, 'mat_losses')
+    if isempty(wake_data.raw_data.mat_losses.loss_time) == 0
+        leg = {};
+        hold on
+        for na = size(model_mat_data,1):-1:1
+            if isempty(model_mat_data{na,4})
+                m_time = 0;
+                m_data = 0;
+            else
+                m_time = model_mat_data{na,4}(:,1).*1e9;
+                m_data = model_mat_data{na,4}(:,2).* 1e9;
+            end %if
+            plot(ax(3), m_time ,m_data, 'Color', cols{na+col_ofst},'LineWidth',lw)
+            leg{na} = model_mat_data{na,2};
+        end %for
+        hold off
+        legend(ax(3), leg, 'Location', 'SouthEast')
+    end %if
+end %if
 xlabel(ax(3), 'Time (ns)')
 ylabel(ax(3), 'Energy (nJ)')
 title('Material loss over time', 'Parent', ax(3))
@@ -719,7 +724,7 @@ close(h(28))
 %% Show the energy in the port modes.
 % This is to make sure that enough modes were used in the simulation.
 if isfield(wake_data.raw_data.port, 'timebase') && ...
-   isfield(wake_data.port_time_data, 'port_mode_energy')
+        isfield(wake_data.port_time_data, 'port_mode_energy')
     h(29) = figure('Position',fig_pos);
     ax(29) = axes('Parent', h(29));
     [hwn, ksn] = num_subplots(length(lab_ind));

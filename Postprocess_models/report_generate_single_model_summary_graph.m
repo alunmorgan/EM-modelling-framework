@@ -9,7 +9,7 @@ function report_generate_single_model_summary_graph(pth, ppi, mi, wake_data, run
 % postprocessing.
 % run_log is a structure contining the infromation extracted from the run
 % log.
-% bp_only_flag is a flag to selectivly plot elements 
+% bp_only_flag is a flag to selectivly plot elements
 %
 % Example: report_generate_single_model_summary_graph(pth, ppi, mi, wake_data, run_log, bp_only_flag)
 
@@ -40,7 +40,9 @@ bl_sim = num2str(round(str2num(mi.beam_sigma) ./3E8 * 1E12*10)/10);
 if isfield(raw_data.port, 'timebase')
     fl_bp_sim = [num2str(round(frequency_domain_data.fractional_loss_beam_ports * 100)),'%'];
     fl_sp_sim = [num2str(round(frequency_domain_data.fractional_loss_signal_ports * 100)),'%'];
-    fl_st_sim = [num2str(round(raw_data.mat_losses.total_loss(end)/frequency_domain_data.Total_bunch_energy_loss * 100)),'%'];
+    if isfield(raw_data, 'mat_losses')
+        fl_st_sim = [num2str(round(raw_data.mat_losses.total_loss(end)/frequency_domain_data.Total_bunch_energy_loss * 100)),'%'];
+    end %if
 end
 for l1 = 1:length(ppi.current)
     for l2 = 1:length(ppi.bt_length)
@@ -112,7 +114,7 @@ tmp = run_log.Timestep;
 % t_scale = log.Units_settings.t_scale(1);% GdfidL always uses SI
 t_scale = ' ';
 if isempty(tmp) == 0 && isempty(t_scale) == 0
-    [tmp, t_scale] = rescale_value(tmp,t_scale); 
+    [tmp, t_scale] = rescale_value(tmp,t_scale);
     text(machine_params_hor, machine_params_yloc - 1.5 - 6*machine_params_spacing,['Timestep = ', num2str(round(tmp)), ' ',t_scale, 's'],'Units','centimeters', 'HorizontalAlignment', 'center', 'Tag', 'Timestep')
 end
 clear tmp t_scale
@@ -146,7 +148,7 @@ el_spacing_x = 3;
 el_spacing_y = 0.5;
 el_loc_x = 4;
 el_loc_y = 5;
-    
+
 text(el_loc_x + 1.5 * el_spacing_x ,el_loc_y + 0.6,'Per bunch energy (nJ)','Units','centimeters')
 text(el_loc_x + 1 * el_spacing_x, el_loc_y, 'Frequency domain','Units','centimeters')
 text(el_loc_x + 2.25 * el_spacing_x, el_loc_y, 'Time domain','Units','centimeters')
@@ -154,11 +156,13 @@ text(el_loc_x, el_loc_y - 1 * el_spacing_y,'Total bunch loss','Units','centimete
 text(el_loc_x + 1.5 * el_spacing_x, el_loc_y - 1 * el_spacing_y,num2str(round(frequency_domain_data.Total_bunch_energy_loss * 1e9*10)/10),'Units','centimeters', 'HorizontalAlignment', 'center')
 text(el_loc_x + 2.5 * el_spacing_x, el_loc_y - 1 * el_spacing_y,num2str(round(time_domain_data.loss_from_beam * 1e9*10)/10),'Units','centimeters', 'HorizontalAlignment', 'center')
 text(el_loc_x-0.7, el_loc_y - 2 * el_spacing_y,'Total loss in materials','Units','centimeters')
-text(el_loc_x + 1.5 * el_spacing_x, el_loc_y - 2 * el_spacing_y,num2str(round(raw_data.mat_losses.total_loss(end) * 1e9*10)/10),'Units','centimeters', 'HorizontalAlignment', 'center')
+if isfield(raw_data, 'mat_losses')
+    text(el_loc_x + 1.5 * el_spacing_x, el_loc_y - 2 * el_spacing_y,num2str(round(raw_data.mat_losses.total_loss(end) * 1e9*10)/10),'Units','centimeters', 'HorizontalAlignment', 'center')
+end %if
 if port_data.total_energy ~= 0
     text(el_loc_x, el_loc_y - 3 * el_spacing_y,'Total port energy','Units','centimeters')
     text(el_loc_x + 1.5 * el_spacing_x, el_loc_y - 3 * el_spacing_y,num2str(round(frequency_domain_data.Total_energy_from_ports * 1e9*10)/10),'Units','centimeters', 'HorizontalAlignment', 'center')
-    text(el_loc_x + 2.5 * el_spacing_x, el_loc_y - 3 * el_spacing_y,num2str(round(sum(port_data.port_energy) * 1e9*10)/10),'Units','centimeters', 'HorizontalAlignment', 'center') 
+    text(el_loc_x + 2.5 * el_spacing_x, el_loc_y - 3 * el_spacing_y,num2str(round(sum(port_data.port_energy) * 1e9*10)/10),'Units','centimeters', 'HorizontalAlignment', 'center')
 end
 
 
@@ -176,10 +180,10 @@ if port_data.total_energy ~= 0
     if bp_only_flag == 0
         text(label_loc_x + 3 * spacing_x,label_loc_y,{'Fraction lost','into ','ports','(%)'},'Units','centimeters', 'HorizontalAlignment', 'center')
         text(label_loc_x + 4 * spacing_x,label_loc_y,{'Fraction lost', 'into ','structure', '(%)'},'Units','centimeters', 'HorizontalAlignment', 'center')
-%         text(label_loc_x + 5 * spacing_x,label_loc_y,{'wake', 'loss ','factor', '(mV/pC)'},'Units','centimeters', 'HorizontalAlignment', 'center')
+        %         text(label_loc_x + 5 * spacing_x,label_loc_y,{'wake', 'loss ','factor', '(mV/pC)'},'Units','centimeters', 'HorizontalAlignment', 'center')
     else
         text(label_loc_x + 3 * spacing_x,label_loc_y,{'Fraction lost', 'into ','structure', '(%)'},'Units','centimeters', 'HorizontalAlignment', 'center')
-%         text(label_loc_x + 4 * spacing_x,label_loc_y,{'wake', 'loss ','factor', '(mV/pC)'},'Units','centimeters', 'HorizontalAlignment', 'center')
+        %         text(label_loc_x + 4 * spacing_x,label_loc_y,{'wake', 'loss ','factor', '(mV/pC)'},'Units','centimeters', 'HorizontalAlignment', 'center')
     end
 end
 % printing raw simulated data.
@@ -190,11 +194,15 @@ if port_data.total_energy ~= 0
     text(label_loc_x + 2 * spacing_x,num_loc, fl_bp_sim,'FontWeight','bold','Units','centimeters', 'HorizontalAlignment', 'center')
     if bp_only_flag == 0
         text(label_loc_x + 3 * spacing_x,num_loc, fl_sp_sim,'FontWeight','bold','Units','centimeters', 'HorizontalAlignment', 'center')
-        text(label_loc_x + 4 * spacing_x,num_loc, fl_st_sim,'FontWeight','bold','Units','centimeters', 'HorizontalAlignment', 'center')
-%         text(label_loc_x + 5 * spacing_x,num_loc, num2str(round(wlf_f*10)/10),'Units','centimeters', 'HorizontalAlignment', 'center')
+        if isfield(raw_data, 'mat_losses')
+            text(label_loc_x + 4 * spacing_x,num_loc, fl_st_sim,'FontWeight','bold','Units','centimeters', 'HorizontalAlignment', 'center')
+        end %if
+        %         text(label_loc_x + 5 * spacing_x,num_loc, num2str(round(wlf_f*10)/10),'Units','centimeters', 'HorizontalAlignment', 'center')
     else
-        text(label_loc_x + 3 * spacing_x,num_loc, fl_st_sim,'FontWeight','bold','Units','centimeters', 'HorizontalAlignment', 'center')
-%         text(label_loc_x + 4 * spacing_x,num_loc, num2str(round(wlf_f*10)/10),'Units','centimeters', 'HorizontalAlignment', 'center')
+        if isfield(raw_data, 'mat_losses')
+            text(label_loc_x + 3 * spacing_x,num_loc, fl_st_sim,'FontWeight','bold','Units','centimeters', 'HorizontalAlignment', 'center')
+        end %if
+        %         text(label_loc_x + 4 * spacing_x,num_loc, num2str(round(wlf_f*10)/10),'Units','centimeters', 'HorizontalAlignment', 'center')
     end
 end
 savemfmt(h(1), pth,'summary')
@@ -256,12 +264,12 @@ if port_data.total_energy ~= 0
                     text(label_loc_x + 6 * spacing_x, num_loc - num_spacing_y* clk, pl_bp{jsr, jsd, jsf},'Units','centimeters', 'HorizontalAlignment', 'center')
                     text(label_loc_x + 7 * spacing_x, num_loc - num_spacing_y* clk, pl_sp{jsr, jsd, jsf},'Units','centimeters', 'HorizontalAlignment', 'center')
                     text(label_loc_x + 8 * spacing_x, num_loc - num_spacing_y* clk, pl_st{jsr, jsd, jsf},'Units','centimeters', 'HorizontalAlignment', 'center')
-%                     text(label_loc_x + 9 * spacing_x, num_loc - num_spacing_y* clk, mc_wlf{jsr, jsd, jsf},'Units','centimeters', 'HorizontalAlignment', 'center')
+                    %                     text(label_loc_x + 9 * spacing_x, num_loc - num_spacing_y* clk, mc_wlf{jsr, jsd, jsf},'Units','centimeters', 'HorizontalAlignment', 'center')
                 else
                     text(label_loc_x + 4 * spacing_x,num_loc - num_spacing_y* clk, fl_st{jsr, jsd, jsf},'FontWeight','bold','Units','centimeters', 'HorizontalAlignment', 'center')
                     text(label_loc_x + 5 * spacing_x, num_loc - num_spacing_y* clk, pl_bp{jsr, jsd, jsf},'Units','centimeters', 'HorizontalAlignment', 'center')
                     text(label_loc_x + 6 * spacing_x, num_loc - num_spacing_y* clk, pl_st{jsr, jsd, jsf},'Units','centimeters', 'HorizontalAlignment', 'center')
-%                     text(label_loc_x + 7 * spacing_x, num_loc - num_spacing_y* clk, mc_wlf{jsr, jsd, jsf},'Units','centimeters', 'HorizontalAlignment', 'center')
+                    %                     text(label_loc_x + 7 * spacing_x, num_loc - num_spacing_y* clk, mc_wlf{jsr, jsd, jsf},'Units','centimeters', 'HorizontalAlignment', 'center')
                 end
                 clk = clk +1;
             end

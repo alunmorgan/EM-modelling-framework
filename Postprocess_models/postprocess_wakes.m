@@ -183,7 +183,9 @@ raw_data.port.alpha = alpha_all;
 raw_data.port.beta = beta_all;
 raw_data.port.t_start = tstart;
 raw_data.wake_setup.Wake_length = wpl_data.data(end,1) .* 2.99792458E8;
-raw_data.mat_losses = log.mat_losses;
+if isfield(log, 'mat_losses')
+    raw_data.mat_losses = log.mat_losses;
+end
 
 [port_time_data, time_domain_data, frequency_domain_data]= ...
     wake_analysis(raw_data, ppi, mi, log);
