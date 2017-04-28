@@ -1,4 +1,4 @@
-function postprocessor_setup(model_name, start, fin, scratch_loc, data_loc, results_loc)
+function postprocessor_setup(model_name, start, fin, scratch_loc, data_loc, results_loc, sim_selection)
 
 %% Postprocessing section.
     %%%%%%%%%%%%%% Setting up paths %%%%%%%%%%%%%%%%%%
@@ -15,7 +15,7 @@ function postprocessor_setup(model_name, start, fin, scratch_loc, data_loc, resu
     ppi.hfoi = 25E9;
         
     %%%%%%%%%%%%%%%%%%%%% What simluation types to post process. %%%%%%%%%%%
-    ppi.sim_select = 'sw';
+    ppi.sim_select = sim_selection;
     % if wake simulation and you want to investigate machine parameters these
     % can be set here.
     ppi.bt_length = [900, 686]; % number of bunches in train.

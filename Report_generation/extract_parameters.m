@@ -16,12 +16,14 @@ if isfield(run_logs, 'wake') && strcmp(run_type, 'w')
     param_vals{5} = run_logs.('wake').('ver');
     rt = 'wake';
     n_predefined = size(param_vals,2);
-    for ei = 1:length(run_logs.(rt).('defs'))
-        toks = regexp(run_logs.(rt).('defs')(ei), 'define\(\s*(.*)\s*,\s*(.*?)\s*\).*','tokens');
-        param_names{ei+n_predefined} = toks{1}{1}{1};
-        param_vals{ei+n_predefined} = toks{1}{1}{2};
-    end
-end
+    if isfield(run_logs.(rt), 'defs')
+        for ei = length(run_logs.(rt).('defs')):-1:1
+            toks = regexp(run_logs.(rt).('defs')(ei), 'define\(\s*(.*)\s*,\s*(.*?)\s*\).*','tokens');
+            param_names{ei+n_predefined} = toks{1}{1}{1};
+            param_vals{ei+n_predefined} = toks{1}{1}{2};
+        end %for
+    end %if
+end %if
 
 if isfield(run_logs, 's_parameter')  && strcmp(run_type, 's')
     %     Otherwise take it from the S-parameter simulation
@@ -32,12 +34,14 @@ if isfield(run_logs, 's_parameter')  && strcmp(run_type, 's')
     param_vals{3} = run_logs.('s_parameter').(first_name{1}).('ver');
     rt = 's_parameter';
     n_predefined = size(param_vals,2);
-    for ei = 1:length(run_logs.(rt).(first_name{1}).('defs'))
-        toks = regexp(run_logs.(rt).(first_name{1}).('defs')(ei), 'define\(\s*(.*)\s*,\s*(.*?)\s*\).*','tokens');
-        param_names{ei+n_predefined} = toks{1}{1}{1};
-        param_vals{ei+n_predefined} = toks{1}{1}{2};
-    end
-end
+    if isfield(run_logs.(rt).(first_name{1}), 'defs')
+        for ei = length(run_logs.(rt).(first_name{1}).('defs')):-1:1
+            toks = regexp(run_logs.(rt).(first_name{1}).('defs')(ei), 'define\(\s*(.*)\s*,\s*(.*?)\s*\).*','tokens');
+            param_names{ei+n_predefined} = toks{1}{1}{1};
+            param_vals{ei+n_predefined} = toks{1}{1}{2};
+        end %for
+    end %if
+end %if
 
 if isfield(run_logs, 'eigenmode')  && strcmp(run_type, 'e')
     %     Otherwise take it from the S-parameter simulation
@@ -47,12 +51,14 @@ if isfield(run_logs, 'eigenmode')  && strcmp(run_type, 'e')
     param_vals{3} = run_logs.('eigenmode').('ver');
     rt = 'eigenmode';
     n_predefined = size(param_vals,2);
-    for ei = 1:length(run_logs.(rt).('defs'))
-        toks = regexp(run_logs.(rt).('defs')(ei), 'define\(\s*(.*)\s*,\s*(.*?)\s*\).*','tokens');
-        param_names{ei+n_predefined} = toks{1}{1}{1};
-        param_vals{ei+n_predefined} = toks{1}{1}{2};
-    end
-end
+    if isfield(run_logs.(rt), 'defs')
+        for ei = length(run_logs.(rt).('defs')):-1:1
+            toks = regexp(run_logs.(rt).('defs')(ei), 'define\(\s*(.*)\s*,\s*(.*?)\s*\).*','tokens');
+            param_names{ei+n_predefined} = toks{1}{1}{1};
+            param_vals{ei+n_predefined} = toks{1}{1}{2};
+        end %for
+    end %if
+end %if
 
 if isfield(run_logs, 'shunt') && strcmp(run_type, 'l')
     %     Otherwise take it from the S-parameter simulation
@@ -62,9 +68,11 @@ if isfield(run_logs, 'shunt') && strcmp(run_type, 'l')
     param_vals{3} = run_logs.('shunt').('ver');
     rt = 'shunt';
     n_predefined = size(param_vals,2);
-    for ei = 1:length(run_logs.(rt).('defs'))
-        toks = regexp(run_logs.(rt).('defs')(ei), 'define\(\s*(.*)\s*,\s*(.*?)\s*\).*','tokens');
-        param_names{ei+n_predefined} = toks{1}{1}{1};
-        param_vals{ei+n_predefined} = toks{1}{1}{2};
-    end
-end
+    if isfield(run_logs.(rt), 'defs')
+        for ei = length(run_logs.(rt).('defs')):-1:1
+            toks = regexp(run_logs.(rt).('defs')(ei), 'define\(\s*(.*)\s*,\s*(.*?)\s*\).*','tokens');
+            param_names{ei+n_predefined} = toks{1}{1}{1};
+            param_vals{ei+n_predefined} = toks{1}{1}{2};
+        end %for
+    end %if
+end %if
