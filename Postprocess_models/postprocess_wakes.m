@@ -1,4 +1,4 @@
-function wake_data = postprocess_wakes(ppi, mi,  modelling_inputs, log)
+function wake_data = postprocess_wakes(ppi, modelling_inputs, log)
 % Runs the GdfidL postprocessor on the selected data.
 % The model data has already been selected using soft links.
 %
@@ -52,7 +52,7 @@ if isfield(log, 'mat_losses')
         loss_in_ceramics, log.mat_losses.loss_time);
     % scale the loss values of the simulated volume to the full volume
     % of the structure.
-    loss_in_ceramics = loss_in_ceramics ./ mi.volume_fill_factor;
+    loss_in_ceramics = loss_in_ceramics ./ modelling_inputs.volume_fill_factor;
 else
     loss_in_ceramics = 0;
 end
@@ -71,7 +71,9 @@ else
     [port_names, port_timebase,  port_data_all, ...
         cutoff_all, alpha_all, beta_all,...
         port_data, cutoff] = read_port_datafiles(Port_mat, log, ...
-        mi.port_fill_factor,mi.port_multiple, port_names_table);
+        modelling_inputs.port_fill_factor,...
+        modelling_inputs.port_multiple,...
+        port_names_table);
 end
 % get the wake potentials
 if isempty(WP_l)
@@ -120,7 +122,8 @@ delete('WHAT-PP-DID-SPIT-OUT');
 if isfield(log, 'mat_losses')
     if isfield(log.mat_losses, 'total_loss')
         % only do it if there are user defined materials in the model.
-        log.mat_losses.total_loss = (log.mat_losses.total_loss )./ mi.volume_fill_factor + loss_in_ceramics;
+        log.mat_losses.total_loss = (log.mat_losses.total_loss )./ ...
+            modelling_inputs.volume_fill_factor + loss_in_ceramics;
         % assume all the empty values are due to the fact that ceramics are not
         % output into the log.
         % Also I have to split the energy equally between ceramics for lack of
@@ -132,7 +135,9 @@ if isfield(log, 'mat_losses')
         cer_count = sum(cer_count);
         for ern = 1:size(log.mat_losses.single_mat_data,1)
             if ~isempty(log.mat_losses.single_mat_data{ern,3})
-                log.mat_losses.single_mat_data{ern,3}(:,2) = log.mat_losses.single_mat_data{ern,3}(:,2) ./ mi.volume_fill_factor;
+                log.mat_losses.single_mat_data{ern,3}(:,2) = ...
+                    log.mat_losses.single_mat_data{ern,3}(:,2) ./ ...
+                    modelling_inputs.volume_fill_factor;
             else
                 log.mat_losses.single_mat_data{ern,3} = loss_in_ceramics ./ cer_count;
             end
@@ -188,7 +193,7 @@ if isfield(log, 'mat_losses')
 end
 
 [port_time_data, time_domain_data, frequency_domain_data]= ...
-    wake_analysis(raw_data, ppi, mi, log);
+    wake_analysis(raw_data, ppi, modelling_inputs, log);
 
 wake_data.port_time_data = port_time_data;
 wake_data.time_domain_data = time_domain_data;

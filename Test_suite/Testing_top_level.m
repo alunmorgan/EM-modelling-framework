@@ -25,34 +25,30 @@
 
 
 load_local_paths
-%  start = datenum('20161010T120000', 'yyyymmddTHHMMSS');
-%  fin = now;
-%% Setting up which versions of GdfidL to use.
-%  versions = {'150717g','150719g', '150923g', '151128g', '160410g',...
-%              '160429g','160517g', '161003g', '161108g', '161207g'};
-versions = {'161207g'};
+
 log = {'Log of problems'};
-model_names = {...
-    'cylindrical_pillbox', ...
-    'cylindrical_pillbox_with_port',...
-    'cylindrical_pillbox_with_4ports',...
-    'cylindrical_pillbox_with_racetrack',...
-    'cylindrical_pillbox_with_racetrack_with_port',...
-    'cylindrical_pillbox_with_racetrack_with_4ports'};
+model_names = {'cylindrical_pillbox_with_port'};
+% model_names = {...
+%     'cylindrical_pillbox', ...
+%     'cylindrical_pillbox_with_port',...
+%     'cylindrical_pillbox_with_4ports',...
+%     'cylindrical_pillbox_with_racetrack',...
+%     'cylindrical_pillbox_with_racetrack_with_port',...
+%     'cylindrical_pillbox_with_racetrack_with_4ports'...
+%     };
 
 %% Running the tests
 start = now;
 for ha = 1:length(model_names)
-    for kse = 1:length(versions)
-        try
-            Testing_function = str2func(['Testing_', model_names{ha}]);
-            Testing_function(input_file_loc, scratch_loc,...
-                data_loc, versions{kse})
-        catch
-            log{end+1} = ['Running model ',model_names{ha}, ' failed on version ', versions{kse}];
-            warning(['Running model ', model_names{ha}, ' failed'])
-        end
+    try
+        Testing_function = str2func(['Testing_', model_names{ha}]);
+        Testing_function(input_file_loc, scratch_loc,...
+            data_loc)
+    catch
+        log{end+1} = ['Running model ',model_names{ha}, ' failed'];
+        warning(['Running model ', model_names{ha}, ' failed'])
     end
+    
     
     fin = now;
     try
@@ -60,27 +56,27 @@ for ha = 1:length(model_names)
             scratch_loc, data_loc, results_loc)
     catch
         log{end+1} = ['Postprocessing ', model_names{ha}, 'failed'];
-        warning(['Postprocessing ', model_names{ha}, 'failed'])
+        warning(['Postprocessing ', model_names{ha}, ' failed'])
     end
 end
 
 disp('Generating the individual reports')
 % Generate all the new reports
 for md = 1:length(model_names)
-    output_loc = [results_loc,model_names{md}];
+    output_loc = fullfile(results_loc, model_names{md});
     model_name_for_report = regexprep(model_names{md}, '_', ' ');
     Report_setup(Author, ['Test suite ', model_name_for_report ], graphic_loc, output_loc, start, fin)
 end
 
-disp('Generating the combined reports') 
-% Generate all the blended reports using all available data.
-start= datenum('20150101T180000', 'yyyymmddTHHMMSS');
-for md = 1:length(model_names)
-    output_loc = [results_loc,model_names{md}];
-    arc_names = GdfidL_find_selected_models(output_loc, {start, fin});
-    model_name_for_report = regexprep(model_names{md}, '_', ' ');
-    Blend_reports( 'Test comparison report', [output_loc,'/'], ...
-        arc_names , Author, ...
-        ['Test suite:\\\textbf{ ', model_name_for_report, '}\\ core behaviour check' ],...
-        graphic_loc)
-end
+% disp('Generating the combined reports')
+% % Generate all the blended reports using all available data.
+% start= datenum('20150101T180000', 'yyyymmddTHHMMSS');
+% for md = 1:length(model_names)
+%     output_loc = [results_loc,model_names{md}];
+%     arc_names = GdfidL_find_selected_models(output_loc, {start, fin});
+%     model_name_for_report = regexprep(model_names{md}, '_', ' ');
+%     Blend_reports( 'Test comparison report', [output_loc,'/'], ...
+%         arc_names , Author, ...
+%         ['Test suite:\\\textbf{ ', model_name_for_report, '}\\ core behaviour check' ],...
+%         graphic_loc)
+% end

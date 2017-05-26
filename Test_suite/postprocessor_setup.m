@@ -1,4 +1,4 @@
-function postprocessor_setup(model_name, start, fin, scratch_loc, data_loc, results_loc, sim_selection)
+function postprocessor_setup(model_name, start, fin, scratch_loc, data_loc, results_loc)
 
 %% Postprocessing section.
     %%%%%%%%%%%%%% Setting up paths %%%%%%%%%%%%%%%%%%
@@ -13,9 +13,7 @@ function postprocessor_setup(model_name, start, fin, scratch_loc, data_loc, resu
     ppi.model_name = model_name;
     %%%%%%%%%%%%%% set the highest frequency of interest. %%%%%%%%%%%%%%%%%
     ppi.hfoi = 25E9;
-        
-    %%%%%%%%%%%%%%%%%%%%% What simluation types to post process. %%%%%%%%%%%
-    ppi.sim_select = sim_selection;
+
     % if wake simulation and you want to investigate machine parameters these
     % can be set here.
     ppi.bt_length = [900, 686]; % number of bunches in train.
@@ -23,12 +21,12 @@ function postprocessor_setup(model_name, start, fin, scratch_loc, data_loc, resu
     ppi.rf_volts = [2.5, 3.3, 4.5]; % MV
     ppi.RF_freq = 499.654E6; % Machine RF frequency (Hz).
             
-    % Sets the frequency range to plot the sparamter graphs over (GHz)
+    % Sets the frequency range to plot the S-parameter graphs over (GHz)
     ppi.display_range = [0, 5];
     
     %%%%%%%%%%%%%%%%%%%%%%%%% Postprocessing the models. %%%%%%%%%%%%%%%%
         
-    arc_names = GdfidL_find_selected_models([ppi.storage_path, ppi.model_name], {start, fin});
+    arc_names = GdfidL_find_selected_models(fullfile(ppi.storage_path, ppi.model_name), {start, fin});
     for awh = 1:length(arc_names)
         ppi.arc_date = arc_names{awh};
         GdfidL_post_process_models(ppi);

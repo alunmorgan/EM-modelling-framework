@@ -1,4 +1,4 @@
-function run_wake_simulation(mi, modelling_inputs, arch_date)
+function run_wake_simulation(paths, modelling_inputs, arch_date)
 % Takes the geometry specification, adds the setup for a wake simulation and
 % runs a wake field simulation with the desired calculational precision.
 %
@@ -12,16 +12,18 @@ function run_wake_simulation(mi, modelling_inputs, arch_date)
 old_loc = pwd;
 tmp_name = tempname;
 tmp_name = tmp_name(6:12);
-mkdir(mi.scratch_path,tmp_name)
-cd([mi.scratch_path,tmp_name])
+mkdir(paths.scratch_path,tmp_name)
+cd(fullfile(paths.scratch_path,tmp_name))
 temp_files('make')
-construct_wake_gdf_file(mi, modelling_inputs)
-if strcmp(mi.precision, 'single')
-    [~] = system('single.gd1 < temp_data/model.gdf > temp_data/model_log');
-elseif strcmp(mi.precision, 'double')
-    [~] = system('gd1 < temp_data/model.gdf > temp_data/model_log');
+construct_wake_gdf_file(paths.input_file_path, modelling_inputs)
+if strcmp(modelling_inputs.precision, 'single')
+    [status, ~] = system('single.gd1 < temp_data/model.gdf > temp_data/model_log');
+elseif strcmp(modelling_inputs.precision, 'double')
+    [status, ~] = system('gd1 < temp_data/model.gdf > temp_data/model_log');
 end
-
+if status ~= 0 
+    disp('Look at model log')
+end
 % Move the data to the storage area.
 % The code does not write directly to the storage area as often you want to
 % have long term storage on a network drive, but during the modelling this
@@ -29,18 +31,19 @@ end
 % it.
 
 % create the required output directories.
-if ~exist([mi.storage_path, mi.model_name], 'dir')
-    mkdir(mi.storage_path, mi.model_name)
+if ~exist(fullfile(paths.storage_path, modelling_inputs.model_name), 'dir')
+    mkdir(paths.storage_path, modelling_inputs.model_name)
 end
-if ~exist([mi.storage_path, mi.model_name,'/',arch_date],'dir')
-    mkdir([mi.storage_path, mi.model_name],arch_date)
-    mkdir([mi.storage_path, mi.model_name,'/', arch_date], 'wake')
+if ~exist(fullfile(paths.storage_path, modelling_inputs.model_name, arch_date),'dir')
+    mkdir(fullfile(paths.storage_path, modelling_inputs.model_name), arch_date)
+    mkdir(fullfile(paths.storage_path, modelling_inputs.model_name, arch_date), 'wake')
 end
-save([mi.storage_path, mi.model_name,'/', arch_date,'/wake/run_inputs.mat'], 'mi', 'modelling_inputs')
-movefile('temp_data/*', [mi.storage_path, mi.model_name,'/',arch_date,'/wake/']);
-copyfile([mi.input_file_path, mi.model_name, '_model_data'], [mi.storage_path, mi.model_name,'/',arch_date,'/wake/']);
+save(fullfile(paths.storage_path, modelling_inputs.model_name, arch_date,'wake', 'run_inputs.mat'), 'modelling_inputs')
+movefile('temp_data/*', fullfile(paths.storage_path, modelling_inputs.model_name, arch_date, 'wake'));
+copyfile(fullfile(paths.input_file_path, [modelling_inputs.model_name, '_model_data']), ...
+    fullfile(paths.storage_path, modelling_inputs.model_name, arch_date, 'wake'));
 temp_files('remove')
 delete('SOLVER-LOGFILE');
 delete('WHAT-GDFIDL-DID-SPIT-OUT');
 cd(old_loc)
-rmdir([mi.scratch_path, tmp_name],'s');
+rmdir(fullfile(paths.scratch_path, tmp_name),'s');

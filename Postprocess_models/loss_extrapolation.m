@@ -15,10 +15,17 @@ function [extrap_data] = loss_extrapolation(time_domain_data, port_data, mi, ppi
 [ raw_port_data] = put_on_reference_timebase(time_domain_data.timebase, port_data);
 
 %% Pad the time domain data.
-[timescale_sig, Charge_distribution_sig, wakepotential_sig, port_data_sig] = ...
+
+[timescale_sig, Charge_distribution_sig, wakepotential_sig] = ...
     pad_data(time_domain_data.timebase, 14, 'points',...
     time_domain_data.charge_distribution, ...
-    time_domain_data.wakepotential, raw_port_data);
+    time_domain_data.wakepotential);
+if isnan(raw_port_data) ~= 1
+    [~, port_data_sig] = ...
+    pad_data(time_domain_data.timebase, 14, 'points', raw_port_data);
+else
+    port_data_sig = NaN;
+end %if
 
 %% Regenerate the frequency domain data.
 [~,~, wakeimpedance_sig,~, port_impedances_sig] = ...

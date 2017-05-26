@@ -1,4 +1,4 @@
-function fs = gdf_wake_header_construction(loc, name, num_threads, mesh, sigma,...
+function fs = gdf_wake_header_construction(loc, name, npmls, num_threads, mesh, sigma,...
     wake_length, materials, material_labels)
 % Constructs the initial part of the gdf input file for GdfidL
 %
@@ -21,13 +21,18 @@ ind = find(strcmp(materials, 'PEC')==1);
 materials(ind) = [];
 material_labels(ind) = [];
 
+% set bunch charge to 1E-9C. This couls be settable but I have a feeling
+% that some later analysis assumes it is 1nC. Needs further investigation
+% before changing it.
+charge = '1E-9';
 
 fs = {'###################################################'};
 fs = cat(1,fs,'define(INF, 10000)');
 fs = cat(1,fs,'define(LargeNumber, 1000)');
 fs = cat(1,fs,['define(STPSZE, ',mesh,') # Step size of mesh']);
 fs = cat(1,fs,['define(SIGMA, ',sigma,') # bunch length in mm']);
-fs = cat(1,fs,'define(CHARGE, 1e-9) # Bunch charge in C');
+fs = cat(1,fs,['define(NPMLs, ',npmls,') # number of perfect matching layers used']);
+fs = cat(1,fs,['define(CHARGE, ', charge,') # Bunch charge in C']);
 fs = cat(1,fs,'define(vacuum, 0)');
 fs = cat(1,fs,'define(PEC, 1)');
 if ~isempty(materials)
