@@ -23,16 +23,14 @@ for awh = 1:length(defs)
     [port_names] = gdf_extract_port_names(model_file);
     modelling_inputs.port_names = port_names;
     modelling_inputs.n_cores = num2str(mi.n_cores);
-
+    
     
     arc_date = datestr(now,30);
     if ~isempty(strfind(mi.sim_select, 'w'))
         try
             run_wake_simulation(mi, modelling_inputs, arc_date);
         catch ERR
-            disp('Gdfil_run_models: Problem with wake simulation.')
-            disp(['Error is :', ERR.message])
-            disp([ERR.stack(1).name, ' at line ', num2str(ERR.stack(1).line)])
+            display_modelling_error(ERR, 'wake')
         end
         
     end
@@ -40,18 +38,14 @@ for awh = 1:length(defs)
         try
             run_s_param_simulation(mi, modelling_inputs, arc_date);
         catch ERR
-             disp('Gdfil_run_models: Problem with s-parameter simulation.')
-            disp(['Error is :', ERR.message])
-            disp([ERR.stack(1).name, ' at line ', num2str(ERR.stack(1).line)])
+            display_modelling_error(ERR, 'S-parameter')
         end
     end
     if ~isempty(strfind(mi.sim_select, 'e'))
         try
             run_eigenmode_simulation(mi, modelling_inputs, arc_date);
         catch ERR
-             disp('Gdfil_run_models: Problem with eigenmode simulation.')
-            disp(['Error is :', ERR.message])
-            disp([ERR.stack(1).name, ' at line ', num2str(ERR.stack(1).line)])
+            display_modelling_error(ERR, 'eigenmode')
         end
         
     end
@@ -59,9 +53,7 @@ for awh = 1:length(defs)
         try
             run_eigenmode_lossy_simulation(mi, modelling_inputs, arc_date);
         catch ERR
-             disp('Gdfil_run_models: Problem with lossy eigenmode simulation.')
-            disp(['Error is :', ERR.message])
-            disp([ERR.stack(1).name, ' at line ', num2str(ERR.stack(1).line)])
+            display_modelling_error(ERR, 'lossy eigenmode')
         end
         
     end
@@ -69,9 +61,7 @@ for awh = 1:length(defs)
         try
             run_shunt_simulation(mi, modelling_inputs, arc_date);
         catch ERR
-             disp('Gdfil_run_models: Problem with shunt simulation.')
-            disp(['Error is :', ERR.message])
-            disp([ERR.stack(1).name, ' at line ', num2str(ERR.stack(1).line)])
+            display_modelling_error(ERR, 'shunt')
         end
         
     end
