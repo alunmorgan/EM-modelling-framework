@@ -57,7 +57,7 @@ wakeimpedance = wakeimpedance(1:hf_ind);
 wakeimpedance_IM = wakeimpedance_IM(1:hf_ind);
 
 
-if isnan(port_data) ~= 1
+if iscell(port_data)
     for nsf = length(port_data):-1:1% number of ports
         if sum(isnan(port_data{nsf})) > 0
             port_impedances = NaN;
@@ -66,8 +66,10 @@ if isnan(port_data) ~= 1
             port_data{nsf} = cat(1,port_data{nsf},zeros(length(timescale) - ...
                 size(port_data{nsf},1), size(port_data{nsf},2)));
             % Calculating the fft of the port signals
-            port_mode_fft{nsf} = fft(port_data{nsf},[],1)./length(timescale);
-            
+            port_mode_fft_temp = fft(port_data{nsf},[],1)./n_freq_points;
+            % truncating to below the higest frequency of interest.
+            port_mode_fft{nsf} = port_mode_fft_temp(1:hf_ind);
+            clear port_mode_fft_temp
             if isempty(cut_off_freqs) == 0
                 % setting all values below the cutoff frequency for each port and mode to
                 % zero.
