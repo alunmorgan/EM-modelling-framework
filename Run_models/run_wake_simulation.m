@@ -27,11 +27,6 @@ end
 if status ~= 0 
     disp('Look at model log')
 end
-% Move the data to the storage area.
-% The code does not write directly to the storage area as often you want to
-% have long term storage on a network drive, but during the modelling this
-% will kill performance. So initially write to a local drive and then move
-% it.
 
 % create the required output directories.
 if ~exist(fullfile(paths.storage_path, modelling_inputs.model_name), 'dir')
@@ -41,6 +36,8 @@ if ~exist(fullfile(paths.storage_path, modelling_inputs.model_name, arch_date),'
     mkdir(fullfile(paths.storage_path, modelling_inputs.model_name), arch_date)
     mkdir(fullfile(paths.storage_path, modelling_inputs.model_name, arch_date), 'wake')
 end
+
+% Move the data to the storage area.
 save(fullfile(paths.storage_path, modelling_inputs.model_name, arch_date,'wake', 'run_inputs.mat'), 'modelling_inputs')
 movefile('temp_data/*', fullfile(paths.storage_path, modelling_inputs.model_name, arch_date, 'wake'));
 copyfile(fullfile(paths.input_file_path, [modelling_inputs.model_name, '_model_data']), ...
@@ -49,4 +46,4 @@ temp_files('remove')
 delete('SOLVER-LOGFILE');
 delete('WHAT-GDFIDL-DID-SPIT-OUT');
 cd(old_loc)
-rmdir(fullfile(paths.scratch_path, tmp_name),'s');
+rmdir(tmp_location,'s');

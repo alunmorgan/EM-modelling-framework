@@ -1,68 +1,67 @@
-function arch_date = run_s_param_simulation(mi, modelling_inputs, arch_date)
+function arch_date = run_s_param_simulation(paths, modelling_inputs, arch_date)
 % Takes the geometry specification, adds the setup for a wake simulation and
 % runs a wake field simulation with the desired calculational precision.
 %
-% arch_date is
-% mi is
-% modelling_inputs is
+% arch_date (str) :
+% paths (structure) : Contains all the paths and file locations.
+% modelling_inputs (structure): Contains the setting for a specific modelling run.
 %
 % Example: arch_date = run_s_param_simulation(mi, modelling_inputs, arch_date)
 
-storage_path = mi.storage_path;
-output_name_base = mi.model_name;
-port_select = mi.s_param_ports;
-
+% The code does not write directly to the storage area as often you want to
+% have long term storage on a network drive, but during the modelling this
+% will kill performance. So initially write to a local drive and then move
+% it.
 
 % Move into the temporary folder.
 old_loc = pwd;
-tmp_name = tempname;
-tmp_name = tmp_name(6:12);
-mkdir(mi.scratch_path,tmp_name)
-cd([mi.scratch_path,tmp_name])
+tmp_location = move_into_tempororary_folder(paths.scratch_path);
 
-% if strcmp(mi.beam, 'no')
-%     strt = 1;
-% else
-%     strt = 3;
-%     % If beam is present.
-%     % assumes that the first 2 ports are beam pipe ports and thus we do not
-%     % want to excite at those ports (due to odd behaviour around cut off).
-% end
-
-
-% for nes = strt:length(port_names)
-for nes = 1:length(port_select)
-    port_name = port_select{nes};
+for nes = 1:length(modelling_inputs.s_param_ports)
+    port_name = modelling_inputs.s_param_ports{nes};
     temp_files('make')
-    construct_s_param_gdf_file(mi, modelling_inputs, port_name)
-    if strcmp(mi.precision, 'single')
-        [~] = system('single.gd1 < temp_data/model.gdf > temp_data/model_log');
-    elseif strcmp(mi.precision, 'double')
-        [~] = system('gd1 < temp_data/model.gdf > temp_data/model_log');
+    construct_s_param_gdf_file(paths.input_file_path, modelling_inputs, port_name)
+    % setting the GdfidL version to test
+    orig_ver = getenv('GDFIDL_VERSION');
+    setenv('GDFIDL_VERSION',modelling_inputs.version);
+    if strcmp(modelling_inputs.precision, 'single')
+        [status, ~] = system('single.gd1 < temp_data/model.gdf > temp_data/model_log');
+    elseif strcmp(modelling_inputs.precision, 'double')
+        [status, ~] = system('gd1 < temp_data/model.gdf > temp_data/model_log');
     end
-    [log] = GdfidL_get_log_date( 'temp_data/model_log' );
-    % Move the data to the storage area.
+    % restoring the original version.
+    setenv('GDFIDL_VERSION',orig_ver);
+    if status ~= 0
+        disp('Look at model log')
+    end
+    
+    % Create the required output directories.
     if nargin ==1 && nes ==1
-        %         No date given, so get it from the log
+        % No date given, so get it from the log
+        [log] = GdfidL_get_log_date( 'temp_data/model_log' );
         arch_date = datestr(datenum([log.dte,'-',log.tme],'dd/mm/yyyy-HH:MM:SS]'),30);
     end
-    if ~exist([storage_path, output_name_base], 'dir')
-        mkdir(storage_path, output_name_base)
+    if ~exist(fullfile(paths.storage_path, modelling_inputs.model_name), 'dir')
+        mkdir(paths.storage_path, modelling_inputs.model_name)
     end
-    if ~exist([storage_path, output_name_base,'/',arch_date],'dir')
-        mkdir([storage_path, output_name_base],arch_date)
+    if ~exist(fullfile(paths.storage_path, modelling_inputs.model_name, arch_date),'dir')
+        mkdir(fullfile(paths.storage_path, modelling_inputs.model_name), arch_date)
     end
-    if ~exist([storage_path, output_name_base,'/',arch_date,'/s_parameters'],'dir')
-        mkdir([storage_path, output_name_base, '/',arch_date], 's_parameters')
+    if ~exist(fullfile(paths.storage_path, modelling_inputs.model_name, arch_date, 's_parameters'),'dir')
+        mkdir(fullfile(paths.storage_path, modelling_inputs.model_name, arch_date), 's_parameters')
     end
-    arch_out = [storage_path, output_name_base,'/',arch_date,'/s_parameters/port_',port_name, '_excitation/'];
+    arch_out = fullfile(paths.storage_path, modelling_inputs.model_name, arch_date,'s_parameters',['port_',port_name, '_excitation']);
     if ~exist(arch_out,'dir')
-        mkdir([storage_path, output_name_base, '/',arch_date, '/s_parameters'], ['port_',port_name, '_excitation'])
+        mkdir(fullfile(paths.storage_path, modelling_inputs.model_name, arch_date, 's_parameters'), ['port_',port_name, '_excitation'])
     end
-    save([mi.storage_path, mi.model_name,'/', arch_date,'/s_parameters/run_inputs.mat'], 'mi', 'modelling_inputs')
+    
+    % Move the data to the storage area.
+    save(fullfile(paths.storage_path, modelling_inputs.model_name, arch_date,'s_parameters', 'run_inputs.mat'), 'paths', 'modelling_inputs')
     movefile('temp_data/*', arch_out);
-    copyfile([mi.input_file_path, mi.model_name, '_model_data'], arch_out);
+    copyfile(fullfile(paths.input_file_path, [modelling_inputs.model_name, '_model_data']), arch_out);
     temp_files('remove')
+    delete('SOLVER-LOGFILE');
+    delete('WHAT-GDFIDL-DID-SPIT-OUT');
 end
 cd(old_loc)
-rmdir([mi.scratch_path, tmp_name],'s');
+rmdir(tmp_location,'s');

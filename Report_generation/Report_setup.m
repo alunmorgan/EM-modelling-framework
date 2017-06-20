@@ -26,7 +26,7 @@ for ks = 1:length(arc_names)
         s_in = load([data_path, '/s_parameter/run_inputs.mat']);
         first_name = fieldnames(run_logs.('s_parameter'));
         report_input.date = run_logs.('s_parameter').(first_name{1}).dte;
-        [param_list, param_vals] = extract_parameters(s_in.mi, run_logs, 's');
+        [param_list, param_vals] = extract_parameters(s_in.modelling_inputs, run_logs, 's');
         param_list = regexprep(param_list,'_',' ');
         [s_ltx, s_appnd] = Generate_s_parameter_report(data_path);
     end
@@ -34,7 +34,7 @@ for ks = 1:length(arc_names)
     if isfield(run_logs, 'wake')
         w_in = load([data_path, '/wake/run_inputs.mat']);
         report_input.date = run_logs.wake.dte;
-        [param_list, param_vals] = extract_parameters(w_in.mi, run_logs, 'w');
+        [param_list, param_vals] = extract_parameters(w_in.modelling_inputs, run_logs, 'w');
         param_list = regexprep(param_list,'_',' ');
         [w_ltx, w_appnd] = Generate_wake_report(data_path, pp_data);
     end

@@ -17,7 +17,7 @@ tstart = GdfidL_write_pp_input_file(log, pipe_length);
 temp_files('make')
 [~]=system('gd1.pp < pp_link/wake/model_wake_post_processing > pp_link/wake/model_wake_post_processing_log');
 % Check that the post processor has completed
-data = read_file_full_line('pp_link/wake/model_wake_post_processing_log');
+data = read_file_full_line(fullfile('pp_link', 'wake', 'model_wake_post_processing_log'));
 for hwa = 1:length(data)
     se = strfind(data{hwa}, 'The End of File is reached');
     se = isempty(se{1});
@@ -43,7 +43,7 @@ if isfield(log, 'mat_losses')
     % get the energy in the ceramics.
     [ energy_ceramics_data ] = GdfidL_read_graph_datafile( Energy_in_ceramics{1});
     % The original data is the energy sampled at a point in time. What I want
-    % is the total energy over time. So I cumsum it and scale with the timestep
+    % is the total energy over time. So cumsum it and scale with the timestep
     loss_in_ceramics = cumsum(energy_ceramics_data.data(:,2)) .* ...
         (energy_ceramics_data.data(2,1)-energy_ceramics_data.data(1,1));
     % In order to combine with the other material losses I can interpolate (as
