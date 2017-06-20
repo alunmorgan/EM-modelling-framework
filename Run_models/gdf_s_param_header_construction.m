@@ -1,4 +1,4 @@
-function fs = gdf_s_param_header_construction(loc, name, num_threads, mesh, materials, material_labels)
+function fs = gdf_s_param_header_construction(loc, name, npmls, num_threads, mesh, materials, material_labels)
 % Constructs the initial part of the gdf input file for GdfidL 
 %
 % fs is
@@ -16,6 +16,7 @@ fs = {'###################################################'};
 fs = cat(1,fs,'define(INF, 10000)');
 fs = cat(1,fs,'define(LargeNumber, 1000)');
 fs = cat(1,fs,['define(STPSZE, ',mesh,') # Step size of mesh']);
+fs = cat(1,fs,['define(NPMLs, ',npmls,') # number of perfectly matching layers']);
 fs = cat(1,fs,'define(vacuum, 0)');
 fs = cat(1,fs,'define(PEC, 1)');
 for ks = 1:length(materials)
