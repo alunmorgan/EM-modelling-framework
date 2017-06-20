@@ -9,79 +9,70 @@ function Gdfidl_run_models(mi)
 if ispc ==1
     error('This needs to be run on the linux modelling machine')
 end
-orig_ver = getenv('GDFIDL_VERSION');
 
 model_num = 0;
 [defs, ~] = construct_defs(cat(2,mi.material_defs, mi.geometry_defs));
 
-
-for bms = 1:length(mi.simulation_defs.beam_sigma)
-    for mss = 1:length(mi.simulation_defs.mesh_stepsize)
-        for wkl = 1:length(mi.simulation_defs.wakelength)
-            for pml = 1:length(mi.simulation_defs.NPMLs)
-                for psn = 1:length(mi.simulation_defs.precision)
-                    for vsn = 1:length(mi.simulation_defs.versions)
-                        % setting the GdfidL version to test
-                        setenv('GDFIDL_VERSION',mi.simulation_defs.versions{vsn});
-                        for fdhs = 1:length(mi.model_names)
-                            for awh = 1:length(defs)
-                                model_num = model_num +1;
-                                % Creating input data structure for a single simulation run.
-                                
-                                modelling_inputs(model_num).mat_list =...
-                                    mi.mat_list;
-                                modelling_inputs(model_num).n_cores =...
-                                    mi.simulation_defs.n_cores;
-                                modelling_inputs(model_num).sim_select =...
-                                    mi.simulation_defs.sim_select;
-                                modelling_inputs(model_num).beam =...
-                                    mi.simulation_defs.beam;
-                                modelling_inputs(model_num).s_param_ports =...
-                                    mi.simulation_defs.s_param_ports;
-                                modelling_inputs(model_num).port_multiple =...
-                                    mi.simulation_defs.port_multiple;
-                                modelling_inputs(model_num).port_fill_factor =...
-                                    mi.simulation_defs.port_fill_factor;
-                                modelling_inputs(model_num).volume_fill_factor =...
-                                    mi.simulation_defs.volume_fill_factor;
-                                modelling_inputs(model_num).extension_names =...
-                                    mi.simulation_defs.extension_names;
-                                
-                                
-                                % Setting up the inputs which change in each model iteration.
-                                modelling_inputs(model_num).model_name = mi.model_names{fdhs};
-                                model_file = fullfile(mi.paths.input_file_path, ...
-                                    [modelling_inputs(model_num).model_name, '_model_data']);
-                                % Find the names of the ports used in the current model.
-                                modelling_inputs(model_num).port_names = ...
-                                    gdf_extract_port_names(model_file);
-                                modelling_inputs(model_num).version = ...
-                                    mi.simulation_defs.versions{vsn};
-                                modelling_inputs(model_num).defs = ...
-                                    defs{awh};
-                                modelling_inputs(model_num).beam_sigma =...
-                                    mi.simulation_defs.beam_sigma{bms};
-                                modelling_inputs(model_num).mesh_stepsize =...
-                                    mi.simulation_defs.mesh_stepsize{mss};
-                                modelling_inputs(model_num).wakelength =...
-                                    mi.simulation_defs.wakelength{wkl};
-                                modelling_inputs(model_num).NPMLs =...
-                                    mi.simulation_defs.NPMLs{pml};
-                                modelling_inputs(model_num).precision =...
-                                    mi.simulation_defs.precision{psn};
-                                
-                                
-                            end %for
-                        end %for
-                        % restoring the original version.
-                        setenv('GDFIDL_VERSION',orig_ver);
-                    end %for
-                end %for
-            end %for
+for fdhs = 1:length(mi.model_names)
+    for awh = 1:length(defs)
+        model_num = model_num +1;
+        modelling_inputs(model_num) = base_inputs(mi, defs, mi.model_names{fdhs});
+        
+        for bms = 2:length(mi.simulation_defs.beam_sigma)
+                    model_num = model_num +1;
+        modelling_inputs(model_num) = base_inputs(mi, defs, mi.model_names{fdhs});
+        modelling_inputs(model_num).beam_sigma = mi.simulation_defs.beam_sigma{bms};
+        modelling_inputs(model_num).model_name = [...
+            mi.model_names{fdhs}, '_beam_sigma_',...
+            num2str(modelling_inputs(model_num).beam_sigma)];
+        end %for
+        
+        for mss = 2:length(mi.simulation_defs.mesh_stepsize)
+                    model_num = model_num +1;
+        modelling_inputs(model_num) = base_inputs(mi, defs, mi.model_names{fdhs});
+        modelling_inputs(model_num).mesh_stepsize = mi.simulation_defs.mesh_stepsize{mss};
+        modelling_inputs(model_num).model_name = [...
+            mi.model_names{fdhs}, '_mesh_stepsize_', ...
+            num2str(modelling_inputs(model_num).mesh_stepsize)];
+        end %for
+        
+        for wkl = 2:length(mi.simulation_defs.wakelength)
+                    model_num = model_num +1;
+        modelling_inputs(model_num) = base_inputs(mi, defs, mi.model_names{fdhs});
+        modelling_inputs(model_num).wakelength = mi.simulation_defs.wakelength{wkl};
+        modelling_inputs(model_num).model_name = [...
+            mi.model_names{fdhs}, '_wakelength_', ...
+            num2str(modelling_inputs(model_num).wakelength)];
+        end %for
+        
+        for pml = 2:length(mi.simulation_defs.NPMLs)
+                    model_num = model_num +1;
+        modelling_inputs(model_num) = base_inputs(mi, defs, mi.model_names{fdhs});
+        modelling_inputs(model_num).NPMLs = mi.simulation_defs.NPMLs{pml};
+        modelling_inputs(model_num).model_name = [...
+            mi.model_names{fdhs}, '_NPML_',...
+            num2str(modelling_inputs(model_num).NPMLs)];
+        end %for
+        
+        for psn = 2:length(mi.simulation_defs.precision)
+                    model_num = model_num +1;
+        modelling_inputs(model_num) = base_inputs(mi, defs, mi.model_names{fdhs});
+        modelling_inputs(model_num).precision = mi.simulation_defs.precision{psn};
+        modelling_inputs(model_num).model_name = [...
+            mi.model_names{fdhs}, '_precision_',...
+            num2str(modelling_inputs(model_num).precision)];
+        end %for
+        
+        for vsn = 2:length(mi.simulation_defs.versions)
+                    model_num = model_num +1;
+        modelling_inputs(model_num) = base_inputs(mi, defs, mi.model_names{fdhs});
+        modelling_inputs(model_num).version = mi.simulation_defs.versions{vsn};
+        modelling_inputs(model_num).model_name = [...
+            mi.model_names{fdhs}, '_version_',...
+            num2str(modelling_inputs(model_num).version)];
         end %for
     end %for
 end %for
-
 
 for awh = 1:length(modelling_inputs)
     % Write update to the command line
@@ -99,31 +90,68 @@ for awh = 1:length(modelling_inputs)
     end %if
     if ~isempty(strfind(mi.simulation_defs.sim_select, 's'))
         try
-            run_s_param_simulation(mi, modelling_inputs, arc_date);
+            run_s_param_simulation(mi.paths, modelling_inputs, arc_date);
         catch ERR
             display_modelling_error(ERR, 'S-parameter')
         end %try
     end %if
     if ~isempty(strfind(mi.simulation_defs.sim_select, 'e'))
         try
-            run_eigenmode_simulation(mi, modelling_inputs, arc_date);
+            run_eigenmode_simulation(mi.paths, modelling_inputs, arc_date);
         catch ERR
             display_modelling_error(ERR, 'eigenmode')
         end %try
     end %if
     if ~isempty(strfind(mi.simulation_defs.sim_select, 'l'))
         try
-            run_eigenmode_lossy_simulation(mi, modelling_inputs, arc_date);
+            run_eigenmode_lossy_simulation(mi.paths, modelling_inputs, arc_date);
         catch ERR
             display_modelling_error(ERR, 'lossy eigenmode')
         end %try
     end %if
     if ~isempty(strfind(mi.simulation_defs.sim_select, 'r'))
         try
-            run_shunt_simulation(mi, modelling_inputs, arc_date);
+            run_shunt_simulation(mi.paths, modelling_inputs, arc_date);
         catch ERR
             display_modelling_error(ERR, 'shunt')
         end %try
     end %if
 end %for
+end % function
 
+function base = base_inputs(mi, defs, base_name)
+% get the setting for the original base model.
+base.mat_list = mi.mat_list;
+base.n_cores  = mi.simulation_defs.n_cores;
+base.sim_select = mi.simulation_defs.sim_select;
+base.beam = mi.simulation_defs.beam;
+base.s_param_ports = mi.simulation_defs.s_param_ports;
+base.port_multiple = mi.simulation_defs.port_multiple;
+base.port_fill_factor = mi.simulation_defs.port_fill_factor;
+base.volume_fill_factor = mi.simulation_defs.volume_fill_factor;
+base.extension_names = mi.simulation_defs.extension_names;
+base.base_model_name = base_name;
+base.model_name = base_name;
+
+% Find the names of the ports used in the current model.
+model_file = fullfile(mi.paths.input_file_path, ...
+   [base.base_model_name, '_model_data']);
+base.port_names = gdf_extract_port_names(model_file);
+base.version = mi.simulation_defs.versions{1};
+base.defs = defs{1};
+base.beam_sigma = mi.simulation_defs.beam_sigma{1};
+base.mesh_stepsize = mi.simulation_defs.mesh_stepsize{1};
+base.wakelength = mi.simulation_defs.wakelength{1};
+base.NPMLs = mi.simulation_defs.NPMLs{1};
+base.precision = mi.simulation_defs.precision{1};
+if isfield(mi.simulation_defs, 's_param_ports')
+    base.s_param_ports = mi.simulation_defs.s_param_ports;
+    base.s_param_excitation_f = mi.simulation_defs.s_param_excitation_f;
+    base.s_param_excitation_bw = mi.simulation_defs.s_param_excitation_bw;
+    base.s_param_tmax = mi.simulation_defs.s_param_tmax;
+    base.port_multiple = mi.simulation_defs.port_multiple;
+    base.port_fill_factor = mi.simulation_defs.port_fill_factor;
+    base.volume_fill_factor = mi.simulation_defs.volume_fill_factor;
+    base.extension_names = mi.simulation_defs.extension_names;
+end %if
+end %function
