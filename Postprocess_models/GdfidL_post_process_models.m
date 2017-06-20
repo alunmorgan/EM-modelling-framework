@@ -4,16 +4,9 @@ function GdfidL_post_process_models(ppi)
 %
 % Example: pp_log = GdfidL_post_process_models(ui, ppi.range, 'w');
 
-% storing the original location so that  we can retrun there at the end.
+% storing the original location so that  we can return there at the end.
 old_loc = pwd;
-% Move to the scratch folder.
-cd(ppi.scratch_path)
-% Generating a random name to reduce the risk of name clashes.
-tmp_name = tempname;
-tmp_name = tmp_name(6:12);
-% Make a directory with the temporary name and enter it.
-mkdir(ppi.scratch_path, tmp_name)
-cd(fullfile(ppi.scratch_path, tmp_name))
+move_into_tempororary_folder(ppi.scratch_path);
 
 if ~exist(fullfile(ppi.output_path, ppi.model_name, ppi.arc_date), 'dir')
     mkdir(fullfile(ppi.output_path, ppi.model_name, ppi.arc_date))

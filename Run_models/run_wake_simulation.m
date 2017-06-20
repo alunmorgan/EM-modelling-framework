@@ -2,18 +2,21 @@ function run_wake_simulation(paths, modelling_inputs, arch_date)
 % Takes the geometry specification, adds the setup for a wake simulation and
 % runs a wake field simulation with the desired calculational precision.
 %
-% arch_date is
-% mi is
-% modelling_inputs is
+% arch_date (str) : 
+% paths (structure) : Contains all the paths and file locations.
+% modelling_inputs (structure): Contains the setting for a specific modelling run.
 %
 % Example: arch_date = run_wake_simulation(mi, modelling_inputs, arch_date)
 
+% The code does not write directly to the storage area as often you want to
+% have long term storage on a network drive, but during the modelling this
+% will kill performance. So initially write to a local drive and then move
+% it.
+
 % Move into the temporary folder.
 old_loc = pwd;
-tmp_name = tempname;
-tmp_name = tmp_name(6:12);
-mkdir(paths.scratch_path,tmp_name)
-cd(fullfile(paths.scratch_path,tmp_name))
+tmp_location = move_into_tempororary_folder(paths.scratch_path);
+
 temp_files('make')
 construct_wake_gdf_file(paths.input_file_path, modelling_inputs)
 if strcmp(modelling_inputs.precision, 'single')
