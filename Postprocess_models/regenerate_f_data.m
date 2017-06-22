@@ -10,7 +10,8 @@ function [f_raw,bunch_spectra,...
 % INPUTS
 % Charge_distribution is the time domain distribution of the bunch.
 % wakepotential is the wake potential.
-% port_data is the time signals from the ports.
+% port_data is the time signals from the ports. each cell is a port
+% containing several modes.
 % cut_off_freqs
 % timescale is the timescale all the time domain data is based on.
 % hfoi is the highest frequency of interest
@@ -68,7 +69,7 @@ if iscell(port_data)
             % Calculating the fft of the port signals
             port_mode_fft_temp = fft(port_data{nsf},[],1)./n_freq_points;
             % truncating to below the higest frequency of interest.
-            port_mode_fft{nsf} = port_mode_fft_temp(1:hf_ind);
+            port_mode_fft{nsf} = port_mode_fft_temp(1:hf_ind,:);
             clear port_mode_fft_temp
             if isempty(cut_off_freqs) == 0
                 % setting all values below the cutoff frequency for each port and mode to
@@ -82,13 +83,14 @@ if iscell(port_data)
                     % remove. If it is a gibbs like phenomina then the integral will be
                     % correct so the energy losses and power will be correct even if
                     % the cumulative sum graphs show some drops.)
-                    n = 0;
-                    tmp_ind = tmp_ind +n;
-                    if tmp_ind < length(f_raw) +n;
-                        end_ind = length(f_raw);
+%                     n = 0;
+%                     tmp_ind = tmp_ind +n;
+                    if tmp_ind < length(f_raw);% +n;
+                        %end_ind = length(f_raw);
                         port_mode_fft{nsf}(1:tmp_ind,  esns) = 0;
-                        port_mode_fft{nsf}(end_ind - tmp_ind+2:end_ind,  esns) = 0;
+                        %port_mode_fft{nsf}(end_ind - tmp_ind+2:end_ind,  esns) = 0;
                     end %if
+                    clear tmp_ind
                 end %for
                 clear esns n
             end %if
@@ -101,9 +103,9 @@ if iscell(port_data)
                 abs(bunch_spectra).^2;
         end %if
     end %for
-    if sum(size(port_impedances) == [1, 1]) == 0
-        port_impedances = port_impedances(1:hf_ind,:);
-    end
+%     if sum(size(port_impedances) == [1, 1]) == 0
+%         port_impedances = port_impedances(1:hf_ind,:);
+%     end
 else
      port_impedances = NaN;
 end %if
