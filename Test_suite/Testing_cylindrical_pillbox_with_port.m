@@ -43,7 +43,7 @@ run_inputs.geometry_defs = {{'extension_length', {100e-3},'Length of the model e
 run_inputs.simulation_defs.versions = {'161003g'};
 run_inputs.simulation_defs.beam_sigma = {'5E-3'}; %in m
 run_inputs.simulation_defs.mesh_stepsize = {'750E-6'}; %in m
-run_inputs.simulation_defs.wakelength = {'200'};
+run_inputs.simulation_defs.wakelength = {'300'};
 %Number of perfectly matched layers used.
 run_inputs.simulation_defs.NPMLs = {'40'};
 % calculation precision (double/ single).

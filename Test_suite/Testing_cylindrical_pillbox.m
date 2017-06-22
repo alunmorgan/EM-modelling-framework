@@ -59,7 +59,7 @@ run_inputs.simulation_defs.beam = 'yes';
 % Specifies the ports which the sparameter simulation will excite
 % sequentially. (useful if symetry mean that not all ports need to be
 % tried).
-run_inputs.simulation_defs.s_param_ports = {};
+% run_inputs.simulation_defs.s_param_ports = {};
 % When using symetry planes some ports are not within the mesh and are thus not
 % counted. The port multiple is a way of taking these "hidden" ports into
 % account when it come to calculating the losses.
