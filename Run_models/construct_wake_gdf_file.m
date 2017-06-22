@@ -11,11 +11,12 @@ function construct_wake_gdf_file(input_file_path, modelling_inputs)
 if ~isempty(modelling_inputs.mat_list)
     materials = modelling_inputs.mat_list(:,1);
     material_labels = modelling_inputs.mat_list(:,2);
-    material_override = find_material_overrides(materials,  modelling_inputs.defs);
+    material_override = find_material_overrides(...
+        materials,  modelling_inputs.defs);
 else
     material_labels = [];
     material_override = [];
-end
+end %if
 
 fs = gdf_wake_header_construction('', 'temp', ...
     modelling_inputs.NPMLs,...
@@ -26,8 +27,8 @@ fs = gdf_wake_header_construction('', 'temp', ...
     material_override,...
     material_labels);
 
-model_name = modelling_inputs.model_name;
-model_file = fullfile(input_file_path, [model_name, '_model_data']);
+model_file = fullfile(input_file_path, ...
+    [modelling_inputs.model_name, '_model_data']);
 data = read_file_full_line(model_file);
 
 if isfield(modelling_inputs, 'geom_only')
