@@ -36,14 +36,14 @@ for ks = 1:length(arc_names)
         report_input.date = run_logs.wake.dte;
         [param_list, param_vals] = extract_parameters(w_in.modelling_inputs, run_logs, 'w');
         param_list = regexprep(param_list,'_',' ');
-        [w_ltx, w_appnd] = Generate_wake_report(data_path, pp_data);
+        [w_ltx, w_appnd] = Generate_wake_report(data_path, pp_data, w_in.modelling_inputs, ppi, run_logs.wake);
     end
     
     
     report_input.param_list = param_list;
     report_input.param_vals = param_vals;
     % This makes the preamble for the latex file.
-    preamble = latex_add_preamble(report_input);
+    preamble = latex_add_preamble(report_input, ppi, w_in.modelling_inputs, run_logs.wake);
     
     % Finish the latex document.
     combined = cat(1,preamble, '\clearpage');

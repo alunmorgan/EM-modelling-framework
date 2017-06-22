@@ -1,4 +1,4 @@
-function [w_ltx, w_appnd] = Generate_wake_report(data_path, pp_data)
+function [w_ltx, w_appnd] = Generate_wake_report(data_path, pp_data, mi, ppi, run_log)
 % Uses the pregenerated images resulting from the wake analysis
 % and generates the appropriate latex code to turn them
 % into a useable report.
@@ -8,11 +8,7 @@ function [w_ltx, w_appnd] = Generate_wake_report(data_path, pp_data)
 % Example: Generate_wake_report( data_path, pp_data)
 
 if isfield(pp_data, 'wake_data')
-    w_ltx = generate_latex_for_wake_analysis(...
-        pp_data.wake_data.raw_data.port.alpha,...
-        pp_data.wake_data.raw_data.port.beta,...
-        pp_data.wake_data.raw_data.port.frequency_cutoffs_all, ...
-        pp_data.wake_data.raw_data.port.labels_table);
+    w_ltx = generate_latex_for_wake_analysis(pp_data.wake_data, mi, ppi, run_log);
 else
     w_ltx = cell(1,1);
     w_ltx = cat(1,w_ltx,'\chapter{Wakefield analysis}');

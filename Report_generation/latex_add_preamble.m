@@ -1,4 +1,4 @@
-function ov = latex_add_preamble(report_input)
+function ov = latex_add_preamble(report_input, ppi, mi, run_log)
 % This sets up the inital latex environment and the inital front page
 % for a sharepoint style report.
 %
@@ -148,6 +148,9 @@ else
     ov = cat(1,ov,'\end{tabular} \\');
 end %if
 ov = cat(1,ov, '\end{center}');
+
+combined = latex_generate_summary( ppi, mi, run_log);
+ov = cat(1,ov, combined);
 %ov = cat(1,ov,'\setlength{\topmargin}{0pt}');
 %ov = cat(1,ov,'\setlength{\voffset}{-50pt}');
 %ov = cat(1,ov,'\setlength{\textheight}{720pt}');
