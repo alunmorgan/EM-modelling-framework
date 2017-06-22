@@ -6,7 +6,7 @@ function GdfidL_post_process_models(ppi)
 
 % storing the original location so that  we can return there at the end.
 old_loc = pwd;
-move_into_tempororary_folder(ppi.scratch_path);
+tmp_name =move_into_tempororary_folder(ppi.scratch_path);
 
 if ~exist(fullfile(ppi.output_path, ppi.model_name, ppi.arc_date), 'dir')
     mkdir(fullfile(ppi.output_path, ppi.model_name, ppi.arc_date))
@@ -216,4 +216,4 @@ end %if
 delete('pp_link')
 delete('data_link')
 cd(old_loc)
-rmdir(fullfile(ppi.scratch_path, tmp_name),'s');
+rmdir(fullfile(tmp_name),'s');
