@@ -28,7 +28,7 @@ fs = gdf_wake_header_construction('', 'temp', ...
     material_labels);
 
 model_file = fullfile(input_file_path, ...
-    [modelling_inputs.model_name, '_model_data']);
+    [modelling_inputs.base_model_name, '_model_data']);
 data = read_file_full_line(model_file);
 
 if isfield(modelling_inputs, 'geom_only')

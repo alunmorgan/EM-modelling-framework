@@ -43,23 +43,7 @@ else
     end
 end
 
-%% Getting intial list and adjusting for different OSes
-% If run on linux ls gives a different output (different line feeds etc)
-% This if loop changes the format to match the windows case.
-% if ispc == 0
-%     % Getting the list
-%     a = dir(directory_name);
-%     for wnf = 1:size(a,1)
-%         a_temp{wnf} = a(wnf).name;
-%     end
-%     x = strmatch('.', a_temp);
-%     a_temp(x) = [];
-%     a = a_temp';
-%     clear a_temp
-% else
-%     % Getting the list
-%     a = ls(directory_name);
-% end
+%% Getting intial list
 a = dir(directory_name);
 if isempty(a)
     disp('Directory does not exist')
@@ -89,17 +73,27 @@ names = cellstr(names);
 %% Finding the apropriate filetype in the list
 if strcmp(file_type,'dirs')
     dirs = names(dir_state == 1);
+    %Remove the . and .. directories from the list.
+    for kw = 1:length(dirs)
+        [~, ~, ext] = fileparts(dirs{kw});
+        if strcmp(ext, '.')
+            to_remove(kw) = 1;
+        else
+            to_remove(kw) = 0;
+        end %if
+    end %for
+    dirs(to_remove == 1) = [];
     if isempty(dirs)
         names = [];
         if quiet_flag ~= 1
             disp('No directories found');
-        end
+        end %if
     else
         names = dirs;
         if quiet_flag ~= 1
             disp([num2str(size(names,1)) ' directories found']);
-        end
-    end
+        end %if
+    end %if
 else
     if isempty(file_type)
         ind = regexpi(names,'.$');

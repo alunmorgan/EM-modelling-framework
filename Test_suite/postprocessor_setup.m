@@ -1,4 +1,4 @@
-function postprocessor_setup(model_name, start, fin, scratch_loc, data_loc, results_loc)
+function postprocessor_setup(base_model_name, scratch_loc, data_loc, results_loc)
 
 %% Postprocessing section.
     %%%%%%%%%%%%%% Setting up paths %%%%%%%%%%%%%%%%%%
@@ -10,7 +10,7 @@ function postprocessor_setup(model_name, start, fin, scratch_loc, data_loc, resu
     % Location to store the output from the post processing.
     ppi.output_path = results_loc;
     
-    ppi.model_name = model_name;
+    ppi.base_model_name = base_model_name;
     %%%%%%%%%%%%%% set the highest frequency of interest. %%%%%%%%%%%%%%%%%
     ppi.hfoi = 25E9;
 
@@ -26,9 +26,9 @@ function postprocessor_setup(model_name, start, fin, scratch_loc, data_loc, resu
     
     %%%%%%%%%%%%%%%%%%%%%%%%% Postprocessing the models. %%%%%%%%%%%%%%%%
         
-    arc_names = GdfidL_find_selected_models(fullfile(ppi.storage_path, ppi.model_name), {start, fin});
+    [arc_names, ~] = dir_list_gen(fullfile(ppi.storage_path, ppi.base_model_name), 'dirs', 1);
     for awh = 1:length(arc_names)
-        ppi.arc_date = arc_names{awh};
+        ppi.model_name = arc_names{awh};
         GdfidL_post_process_models(ppi);
     end
     

@@ -21,29 +21,29 @@ h_ax = findobj(hn,'XTickLabelMode', 'auto');
 
 % find all the lines in the graph
 a = findobj(hn,'Type', 'line');
-for ove = length(a):-1:1
-    display_names{ove} = get(a(ove), 'DisplayName');
-%     data_length(ove) = length(get(a(ove), 'XData'));
-    parent(ove) = get(a(ove), 'Parent');
-end
-%          Select only the lines on the main axis.
-s1 = parent == h_ax;
-a = a(s1);
-display_names = display_names(s1);
-% If used then select the requested line using the display
-% name.
-if ~strcmp(line_select, 'all')
-    locs = find_position_in_cell_lst(regexp(display_names, line_select));
-    a = a(locs);
-end
-
-%% extract the data from the graphs
 if isempty(a)
     data_out.state = 0;
-    data_out.xdata{1} = NaN;
-    data_out.ydata{1} = NaN;
-    return
+    data_out.xdata{1} = [];
+    data_out.ydata{1} = [];
 else
+    for ove = length(a):-1:1
+        display_names{ove} = get(a(ove), 'DisplayName');
+        %     data_length(ove) = length(get(a(ove), 'XData'));
+        parent(ove) = get(a(ove), 'Parent');
+    end
+    %          Select only the lines on the main axis.
+    s1 = parent == h_ax;
+    a = a(s1);
+    display_names = display_names(s1);
+    % If used then select the requested line using the display
+    % name.
+    if ~strcmp(line_select, 'all')
+        locs = find_position_in_cell_lst(regexp(display_names, line_select));
+        a = a(locs);
+    end
+    
+    %% extract the data from the graphs
+    
     data_out.state = 1;
     for en = 1:length(a)
         data_out.xdata{en} = get(a(en),'XData');

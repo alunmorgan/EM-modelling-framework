@@ -38,10 +38,12 @@ cd(output_path)
 else
     % if on linux use the system convert function as it is faster and more
     % robust.
-    saveas(fig_h,[output_path, name],'fig')
-    saveas(fig_h,[output_path, name], 'tif')
-    [~] = system(['convert ''',output_path, name,'.tif'' ', '''',output_path, name,'.png''']);
-    [~] = system(['convert ''',output_path, name,'.tif'' ', '''',output_path, name,'.eps''']);
-    [~] = system(['convert ''',output_path, name,'.tif'' ','''',output_path, name,'.pdf''']);
-    delete([output_path, name, '.tif']);
+    saveas(fig_h,fullfile(output_path, [name,'.fig']))
+    saveas(fig_h,fullfile(output_path, [name, '.tif']))
+    % convert from tif in order to get manageble file sizes.
+    f_types = {'png', 'eps', 'pdf'};
+    for nde = 1:length(f_types)
+    [~] = system(['convert ', '''',fullfile(output_path, [name,'.tif']),'''',' ', '''',fullfile(output_path, [name,'.',f_types{nde}]),'''']);
+    end %for
+    delete(fullfile(output_path, [name, '.tif']));
 end

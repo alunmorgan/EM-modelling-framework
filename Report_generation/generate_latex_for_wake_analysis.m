@@ -46,11 +46,16 @@ ov = cat(1,ov,'\clearpage');
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 ov = cat(1,ov,'\section{Wakes}');
 ov = cat(1,ov, 'If the model is of appropriate wake length, then the wake potential should decay to zero (or nearly so).');
-ov = cat(1,ov,'\begin{figure}[htb]');
-ov = cat(1,ov,'\centering');
-ov = cat(1,ov,'\caption{Wake potential over time.}');
-ov = cat(1,ov,'\includegraphics [width=0.48\textwidth]{wake/wake_potential.eps}');
-ov = cat(1,ov,'\end{figure}');
+% ov = cat(1,ov,'\begin{figure}[htb]');
+% ov = cat(1,ov,'\centering');
+% ov = cat(1,ov,'\caption{Wake potential over time.}');
+% ov = cat(1,ov,'\includegraphics [width=0.48\textwidth]{wake/wake_potential.eps}');
+% ov = cat(1,ov,'\end{figure}');
+ov1 = latex_side_by_side_images('wake/wake_potential.eps',...
+    'wake/Overlap_of_bunch_spectra_and_wake_impedance.eps',...
+    'Wake potential over time.',...
+    'The overlap of the wake impedance with the spectrum of a single bunch.');
+ov = cat(1,ov,ov1);
 ov1 = latex_side_by_side_images('wake/longditudinal_imaginary_wake_impedance.eps',...
     'wake/longditudinal_real_wake_impedance.eps',...
     'Longditudinal imaginary wake impedance.',...
@@ -143,28 +148,9 @@ ov = cat(1,ov,ov1);
         'Extrapolating the wake loss factor for longer bunches.',...
         'Power loss for various machine parameters.');
     ov = cat(1,ov,ov1);
-% ov = cat(1,ov,'\begin{figure}[htb]');
-% ov = cat(1,ov,'\centering');
-% ov = cat(1,ov,'\includegraphics [width=0.40\textwidth]{wake/wake_loss_factor_extrapolation_bunch_length.eps}');
-% ov = cat(1,ov,['\caption[Extrapolating the wake loss factor for longer bunches.]'...
-%     '{Extrapolating the wake loss factor for longer bunches.}']);
-% ov = cat(1,ov,'\end{figure}');
 ov = cat(1,ov,'\clearpage');
-ov = cat(1,ov,['In this case, the losses into the structure are infered from '...
-    'the fraction of energy accounted for from emmission from the ports. '...
-    'This will have a large error if the total energy accounted for in the '...
-    'single bunch case is far from 100\%.']);
-ov = cat(1,ov,'\begin{figure}[htb]');
-ov = cat(1,ov,'\centering');
-ov = cat(1,ov,'\includegraphics [width=0.95\textwidth]{wake/summary_multibunch.eps}');
-ov = cat(1,ov,'\caption{Changes in losses due to machine changes}');
-ov = cat(1,ov,'\end{figure}');
-% ov = cat(1,ov,'\begin{figure}[htb]');
-% ov = cat(1,ov,'\begin{center}');
-% ov = cat(1,ov,'\includegraphics [width=0.48\textwidth]{wake/power_loss_for_different_machine_conditions.eps}');
-% ov = cat(1,ov,'\caption{Power loss for various machine parameters.}');
-% ov = cat(1,ov,'\end{center}');
-% ov = cat(1,ov,'\end{figure}');
+combined = latex_generate_loss_table_for_machine_conditions(wake_data.frequency_domain_data.extrap_data, ppi);
+    ov = cat(1,ov,combined);
 ov = cat(1,ov,'\clearpage');
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 ov = cat(1,ov,'\section{Simulation stabilisation checks}');

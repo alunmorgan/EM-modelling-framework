@@ -7,17 +7,17 @@ function [w_ltx, w_appnd] = Generate_wake_report(data_path, pp_data, mi, ppi, ru
 %
 % Example: Generate_wake_report( data_path, pp_data)
 
-if isfield(pp_data, 'wake_data')
-    w_ltx = generate_latex_for_wake_analysis(pp_data.wake_data, mi, ppi, run_log);
-else
+try
+    w_ltx = generate_latex_for_wake_analysis(pp_data, mi, ppi, run_log);
+catch
     w_ltx = cell(1,1);
     w_ltx = cat(1,w_ltx,'\chapter{Wakefield analysis}');
     w_ltx = cat(1, w_ltx, 'There is no valid wake data. But a wake simulation was requested.');
     w_ltx = cat(1,w_ltx,'\clearpage');
-end %if
+end %try
 % This adds the input file to the document as an appendix.
-if exist([data_path,'/wake/model.gdf'],'file')
-    gdf_data = add_gdf_file_to_report([data_path,'/wake/model.gdf']);
+if exist(fullfile(data_path,'model.gdf'),'file') == 2
+    gdf_data = add_gdf_file_to_report(fullfile(data_path,'model.gdf'));
     w_appnd = cat(1,'\chapter{Wake input file}',gdf_data);
 end %if
 

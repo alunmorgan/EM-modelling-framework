@@ -1,4 +1,4 @@
-function ov = latex_add_preamble(report_input, ppi, mi, run_log)
+function ov = latex_add_preamble(report_input)
 % This sets up the inital latex environment and the inital front page
 % for a sharepoint style report.
 %
@@ -79,7 +79,7 @@ ov = cat(1, ov, ['\date{', dte,'}']);
 ov = cat(1, ov, '\maketitle');
 ov = cat(1, ov, '\tableofcontents');
 
-ov = cat(1, ov, '\chapter{Parameter list}');
+ov = cat(1, ov, '\chapter{Input parameters}');
 ov = cat(1,ov, '\begin{center}');
 if isfield(report_input, 'param_names_common')
     ov = cat(1,ov,'\begin{tabular}{r@{\hspace{0.25cm}=\hspace{0.25cm}}l}');
@@ -93,64 +93,71 @@ if isfield(report_input, 'param_names_common')
         try
             op = num2str(eval(op));
         end
+        op = regexprep(op, '\\mu{}', '$\\mu{}$');
         ov = cat(1,ov,['\emph{',regexprep(report_input.param_names_common{esk},'_',' '),'} & ',op,'\\']);
     end
-    if length(report_input.param_names_varying) == 1
-        ov = cat(1,ov,['\emph{',regexprep(report_input.param_names_varying{1},'_',' '),'} & Swept\\']);
-        ov = cat(1,ov,'\end{tabular} \\');
-        if isfield(report_input,'swept_vals')
-            ov = cat(1,ov,'\vspace{0.5cm}');
-            list_of_sweep = report_input.swept_vals{1};
-            for hs = 2:length(report_input.swept_vals)
-                list_of_sweep = [list_of_sweep,', ',report_input.swept_vals{hs}];
-            end %for
-            ov = cat(1,ov,['Sweep: \emph{', list_of_sweep,'}']);
-        end %if
-    else
-        ov = cat(1,ov,'\end{tabular} \\');
-        ov = cat(1,ov,'\begin{tabular}{r@{\hspace{0.25cm}=\hspace{0.25cm}}l}');
-        for esk = 1:length(report_input.param_names_varying)
-            val_tmp = report_input.param_vals_varying(:,esk);
-            for pa = 1:length(val_tmp)
-                if ~ischar(val_tmp{pa})
-                    val_tmp{pa} = num2str(val_tmp{pa});
-                end %if
-            end %for
-            op = remove_material_counter(val_tmp);
-            try
-                op = num2str(eval(op));
-            end
-            ov = cat(1,ov,['\emph{',regexprep(report_input.param_names_varying{esk},'_',' '),'} & ',op,'\\']);
+    %     if length(report_input.swept_name) == 1
+    ov = cat(1,ov,['\emph{',regexprep(report_input.swept_name{1},'_',' '),'} & Swept\\']);
+    ov = cat(1,ov,'\end{tabular} \\');
+    if isfield(report_input,'swept_vals')
+        ov = cat(1,ov,'\vspace{0.5cm}');
+        list_of_sweep = regexprep(report_input.swept_vals{1}, '\\mu{}', '$\\mu{}$');
+        for hs = 2:length(report_input.swept_vals)
+            % adding in the maths environment wrapping
+            swept_val = regexprep(report_input.swept_vals{hs}, '\\mu{}', '$\\mu{}$');
+            list_of_sweep = [list_of_sweep,', ',swept_val];
         end %for
-        ov = cat(1,ov,'\end{tabular} \\');
+        ov = cat(1,ov,['Sweep: \emph{', list_of_sweep,'}']);
     end %if
 else
-    pl_length = 30; % length of list after which there is a page break.
-    for esk = 1:length(report_input.param_list)
-        if mod(esk,pl_length) == 1
-            ov = cat(1,ov,'\begin{tabular}{r@{\hspace{0.25cm}=\hspace{0.25cm}}l}');
-            ov = cat(1,ov,'\centering');
-        end %if
-        val_tmp = report_input.param_vals{esk};
+    %     pl_length = 30; % length of list after which there is a page break.
+    ov = cat(1,ov, '\begin{table}[ht]');
+    ov = cat(1,ov, '\begin{tabular}{|p{0.4\textwidth}|p{0.4\textwidth}|}');
+    ov = cat(1,ov, '\hline');
+    ov = cat(1,ov, '\multicolumn{2}{|c|}{\textbf{Mesh and beam settings}}\\');
+    ov = cat(1,ov, '\hline');
+    for enaw = 1:length(report_input.mb_param_list)
+        vals_tmp = regexprep(report_input.mb_param_vals{enaw}, '\\mu{}', '$\\mu{}$');
+        ov = cat(1,ov, [report_input.mb_param_list{enaw},' & ', num2str(vals_tmp), '\\' ]);
+        ov = cat(1,ov, '\hline');
+    end %for
+    ov = cat(1,ov, '\end{tabular}');
+    ov = cat(1,ov, '\caption{Mesh and beam settings}');
+    ov = cat(1,ov, '\end{table}');
+    
+    ov = cat(1,ov, '\begin{table}[ht]');
+    ov = cat(1,ov, '\begin{tabular}{|p{0.4\textwidth}|p{0.4\textwidth}|}');
+    ov = cat(1,ov, '\hline');
+    ov = cat(1,ov, '\multicolumn{2}{|c|}{\textbf{Geometry settings}}\\');
+    ov = cat(1,ov, '\hline');
+    for enaw = 1:length(report_input.geometry_param_list)
+        val_tmp = report_input.geometry_param_vals{enaw};
         if ~ischar(val_tmp)
             val_tmp = num2str(val_tmp);
         end %if
         op = remove_material_counter(val_tmp);
-        try
-            op = num2str(eval(op));
-        end
-        ov = cat(1,ov,['\Large{\emph{',regexprep(report_input.param_list{esk},'_',' '),'}} & \Large{',op,'}\\']);
-        if mod(esk,pl_length) == 0
-            ov = cat(1,ov,'\end{tabular} \\');
-            ov = cat(1,ov,'\clearpage');
-        end %if
+        ov = cat(1,ov, [report_input.geometry_param_list{enaw},' & ', op, '\\' ]);
+        ov = cat(1,ov, '\hline');
     end %for
-    ov = cat(1,ov,'\end{tabular} \\');
+    ov = cat(1,ov, '\end{tabular}');
+    ov = cat(1,ov, '\caption{Geometry settings}');
+    ov = cat(1,ov, '\end{table}');
+    %     for esk = 1:length(report_input.mb_param_list)
+    %         if mod(esk,pl_length) == 1
+    %             ov = cat(1,ov,'\begin{tabular}{r@{\hspace{0.25cm}=\hspace{0.25cm}}l}');
+    %             ov = cat(1,ov,'\centering');
+    %         end %if
+    %
+    %         ov = cat(1,ov,['\Large{\emph{',regexprep(report_input.param_list{esk},'_',' '),'}} & \Large{',op,'}\\']);
+    %         if mod(esk,pl_length) == 0
+    %             ov = cat(1,ov,'\end{tabular} \\');
+    %             ov = cat(1,ov,'\clearpage');
+    %         end %if
+    %     end %for
+    %     ov = cat(1,ov,'\end{tabular} \\');
 end %if
 ov = cat(1,ov, '\end{center}');
 
-combined = latex_generate_summary( ppi, mi, run_log);
-ov = cat(1,ov, combined);
 %ov = cat(1,ov,'\setlength{\topmargin}{0pt}');
 %ov = cat(1,ov,'\setlength{\voffset}{-50pt}');
 %ov = cat(1,ov,'\setlength{\textheight}{720pt}');

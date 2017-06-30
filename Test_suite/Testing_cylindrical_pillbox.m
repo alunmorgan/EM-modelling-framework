@@ -39,9 +39,9 @@ run_inputs.geometry_defs = {...
     };
 
 %% This is for setting up the simulation parameters.
-run_inputs.simulation_defs.versions = {'161003g'};
+run_inputs.simulation_defs.versions = {'161207g', '160210g','160410g','160429g','160517g','161003g','161108g', '170509g'};%{'161003g'};
 run_inputs.simulation_defs.beam_sigma = {'5E-3'}; %in m
-run_inputs.simulation_defs.mesh_stepsize = {'2000E-6'}; %in m
+run_inputs.simulation_defs.mesh_stepsize = {'2000E-6', '3000E-6', '1000E-6', '500E-6'}; %in m
 run_inputs.simulation_defs.wakelength = {'400'};
 %Number of perfectly matched layers used.
 run_inputs.simulation_defs.NPMLs = {'40'}; 

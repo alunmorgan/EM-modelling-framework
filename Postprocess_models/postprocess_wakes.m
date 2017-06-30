@@ -37,9 +37,13 @@ end
 %% Extract the wake data
 
 % get the Total energy in the structure
+if iscell(Energy)
 [ total_energy_data ] = GdfidL_read_graph_datafile( Energy{1});
+else
+    total_energy_data.data = NaN;
+end %if
 
-if isfield(log, 'mat_losses')
+if isfield(log, 'mat_losses') && iscell(Energy_in_ceramics)
     % get the energy in the ceramics.
     [ energy_ceramics_data ] = GdfidL_read_graph_datafile( Energy_in_ceramics{1});
     % The original data is the energy sampled at a point in time. What I want

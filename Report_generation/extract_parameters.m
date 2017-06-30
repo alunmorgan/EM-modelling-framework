@@ -1,4 +1,5 @@
-function [param_names, param_vals] = extract_parameters(mi, run_logs, run_type)
+function [mb_param_names, mb_param_vals,...
+    geom_param_names, geom_param_vals] = extract_parameters(run_logs)
 % Reads the relavent log file and returns the simulation setup parameters.
 %
 % mi is the stored original simulation input parameters.
@@ -6,73 +7,48 @@ function [param_names, param_vals] = extract_parameters(mi, run_logs, run_type)
 %
 % Example: [param_names, param_vals] = extract_parameters(mi, run_logs)
 
+mb_param_names(1:2) = {'mesh', 'version'};
+if isfield(run_logs, 'mesh_step_size')
+    mb_param_vals{1} = [num2str(run_logs.('mesh_step_size')*1E6), ' \mu{}m'];
+    mb_param_vals{2} = num2str(run_logs.('ver'));
+else
+    % assume it is S-parameter data with an extra layer of structure
+    first_name = fieldnames(run_logs);
+    mb_param_vals{1} = [num2str(run_logs.(first_name{1}).('mesh_step_size')*1E6), ' \mu{}m'];
+    mb_param_vals{2} = num2str(run_logs.(first_name{1}).('ver'));
+end %if
+
 % Take the values from the wake simulation if it exists.
-if isfield(run_logs, 'wake') && strcmp(run_type, 'w')
-    param_names(1:5) = {'Precision', 'beam_sigma', 'mesh', 'wake', 'version'};
-    param_vals{1} = mi.('precision');
-    param_vals{2} = run_logs.('wake').('beam_sigma');
-    param_vals{3} = run_logs.('wake').('mesh_step_size');
-    param_vals{4} = run_logs.('wake').('wake_length');
-    param_vals{5} = run_logs.('wake').('ver');
-    rt = 'wake';
-    n_predefined = size(param_vals,2);
-    if isfield(run_logs.(rt), 'defs')
-        for ei = length(run_logs.(rt).('defs')):-1:1
-            toks = regexp(run_logs.(rt).('defs')(ei), 'define\(\s*(.*)\s*,\s*(.*?)\s*\).*','tokens');
-            param_names{ei+n_predefined} = toks{1}{1}{1};
-            param_vals{ei+n_predefined} = toks{1}{1}{2};
+if isfield(run_logs, 'beam_sigma')
+    mb_param_names(3:4) = {'beam_sigma', 'wake',};
+    mb_param_vals{3} = [num2str(run_logs.('beam_sigma')*1000), ' mm'];
+    mb_param_vals{4} = [num2str(run_logs.('wake_length')), ' m'];
+end %if
+
+if exist('first_name', 'var')
+    % for S-parameters.
+    if isfield(run_logs.(first_name{1}), 'defs')
+        for ei = length(run_logs.(first_name{1}).('defs')):-1:1
+            toks = regexp(run_logs.(first_name{1}).('defs')(ei), 'define\(\s*(.*)\s*,\s*(.*?)\s*\).*','tokens');
+            geom_param_names{ei} = toks{1}{1}{1};
+            geom_param_vals{ei} = toks{1}{1}{2};
         end %for
+    else
+        geom_param_names = NaN;
+        geom_param_vals = NaN;
+    end %if
+else
+    % for all other simulation types.
+    if isfield(run_logs, 'defs')
+        for ei = length(run_logs.('defs')):-1:1
+            toks = regexp(run_logs.('defs')(ei), 'define\(\s*(.*)\s*,\s*(.*?)\s*\).*','tokens');
+            geom_param_names{ei} = toks{1}{1}{1};
+            geom_param_vals{ei} = toks{1}{1}{2};
+        end %for
+    else
+        geom_param_names = NaN;
+        geom_param_vals = NaN;
     end %if
 end %if
 
-if isfield(run_logs, 's_parameter')  && strcmp(run_type, 's')
-    %     Otherwise take it from the S-parameter simulation
-    param_names(1:3) = {'Precision', 'mesh', 'version'};
-    param_vals{1} = mi.('precision');
-    first_name = fieldnames(run_logs.('s_parameter'));
-    param_vals{2} = run_logs.('s_parameter').(first_name{1}).('mesh_step_size');
-    param_vals{3} = run_logs.('s_parameter').(first_name{1}).('ver');
-    rt = 's_parameter';
-    n_predefined = size(param_vals,2);
-    if isfield(run_logs.(rt).(first_name{1}), 'defs')
-        for ei = length(run_logs.(rt).(first_name{1}).('defs')):-1:1
-            toks = regexp(run_logs.(rt).(first_name{1}).('defs')(ei), 'define\(\s*(.*)\s*,\s*(.*?)\s*\).*','tokens');
-            param_names{ei+n_predefined} = toks{1}{1}{1};
-            param_vals{ei+n_predefined} = toks{1}{1}{2};
-        end %for
-    end %if
-end %if
 
-if isfield(run_logs, 'eigenmode')  && strcmp(run_type, 'e')
-    %     Otherwise take it from the S-parameter simulation
-    param_names(1:3) = {'Precision', 'mesh', 'version'};
-    param_vals{1} = mi.('precision');
-    param_vals{2} = run_logs.('eigenmode').('mesh_step_size');
-    param_vals{3} = run_logs.('eigenmode').('ver');
-    rt = 'eigenmode';
-    n_predefined = size(param_vals,2);
-    if isfield(run_logs.(rt), 'defs')
-        for ei = length(run_logs.(rt).('defs')):-1:1
-            toks = regexp(run_logs.(rt).('defs')(ei), 'define\(\s*(.*)\s*,\s*(.*?)\s*\).*','tokens');
-            param_names{ei+n_predefined} = toks{1}{1}{1};
-            param_vals{ei+n_predefined} = toks{1}{1}{2};
-        end %for
-    end %if
-end %if
-
-if isfield(run_logs, 'shunt') && strcmp(run_type, 'l')
-    %     Otherwise take it from the S-parameter simulation
-    param_names(1:3) = {'Precision', 'mesh', 'version'};
-    param_vals{1} = mi.('precision');
-    param_vals{2} = run_logs.('shunt').('mesh_step_size');
-    param_vals{3} = run_logs.('shunt').('ver');
-    rt = 'shunt';
-    n_predefined = size(param_vals,2);
-    if isfield(run_logs.(rt), 'defs')
-        for ei = length(run_logs.(rt).('defs')):-1:1
-            toks = regexp(run_logs.(rt).('defs')(ei), 'define\(\s*(.*)\s*,\s*(.*?)\s*\).*','tokens');
-            param_names{ei+n_predefined} = toks{1}{1}{1};
-            param_vals{ei+n_predefined} = toks{1}{1}{2};
-        end %for
-    end %if
-end %if

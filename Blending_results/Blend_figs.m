@@ -1,4 +1,4 @@
-function state = Blend_figs(report_input, fig_nme, out_name, lg, lw, line_select, udcp)
+function state = Blend_figs(report_input, sub_folder ,fig_nme, out_name, lg, lw, line_select, udcp)
 % Take existing fig files and combine them.
 % lg specifes if a log or linear scale it to be used (0 = linear, 1 = log)
 % lw specifies the linewidth.
@@ -10,24 +10,16 @@ function state = Blend_figs(report_input, fig_nme, out_name, lg, lw, line_select
 % Example: state = Blend_figs(report_input, ['s_parameters_S',num2str(hs),num2str(ha)], 0, 2, '\s*S\d\d\(1\)\s*');
 
 state = 1;
-if ispc == 0
-    slh = '/';
-else
-    slh = '\';
-end
 
-if nargin <6
+if nargin <7
     line_select = 'all';
 end
 cols = {'b','k','m','c','g',[1, 0.5, 0],[0.5, 1, 0],[0.5, 0, 1],[1, 0, 0.5],[0.5, 1, 0] };
 l_st ={'--',':','-.','--',':','-.','--',':','-.'};
-doc_root = report_input.doc_root;
-source_reps =report_input.sources;
-sub_folder = report_input.loc;
 
 any_data = 0;
-for hse = length(source_reps):-1 :1
-    graph_name = [doc_root, source_reps{hse}, slh, sub_folder, slh, fig_nme, '.fig'];
+for hse = length(report_input.sources):-1 :1
+    graph_name = fullfile(report_input.source_path, report_input.sources{hse}, sub_folder, [fig_nme, '.fig']);
     if exist(graph_name,'file')
         data_out(hse) = extract_from_graph(graph_name, line_select);
         if data_out(hse).state == 1
@@ -74,19 +66,19 @@ h1 = figure('Position', [ 0 0 1000 400]);
 ax1 = axes('Parent', h1);
 hold(ax1, 'on')
 for en = length(data_out):-1:1
-    if isempty(data_out(en).xdata)
+    if isempty(data_out(en).xdata{1})
         plot(NaN, NaN,'linestyle',l_st{1},...
             'Color',cols{rem(en-1,10)+1}, 'linewidth',lw, 'Parent', ax1);
     else
         plot(data_out(en).xdata{fwl}, data_out(en).ydata{fwl},'linestyle',l_st{1},...
             'Color',cols{rem(en-1,10)+1}, 'linewidth',lw, 'Parent', ax1);
     end %if
-    leg{en} = [report_input.swept_name,' = ',report_input.swept_vals{en}];
+    leg{en} = [report_input.swept_name{1},' = ',report_input.swept_vals{en}];
 end %for
 hold(ax1, 'off')
 % add legend to 2D graph
 setup_graph_for_display(ax1, xlims, ylims, [-1;0], [0,lg,0], ...
-    data_out(1).Xlab, data_out(1).Ylab, '', report_input.model_name);
+    data_out(1).Xlab, data_out(1).Ylab, '', regexprep(report_input.base_name, '_', ' '));
 legend(ax1, leg, 'Location', 'EastOutside', 'Box', 'off')
 % save 2D graph
 savemfmt(h1, report_input.output_loc, out_name)
@@ -107,7 +99,7 @@ for en = 1:length(data_out)
         plot(NaN, NaN,'linestyle',l_st{1},...
             'Color',cols{rem(en-1,10)+1}, 'linewidth',lw, 'Parent', ax4);
     else
-        if ~isnan(data_out(en).ydata{fwl})
+        if ~isempty(data_out(en).ydata{1})
             new_y = interp1(data_out(en).xdata{fwl}, data_out(en).ydata{fwl},data_out(1).xdata{fwl});
             plot(data_out(1).xdata{fwl}, new_y - data_out(1).ydata{fwl},'linestyle',l_st{1},...
                 'Color',cols{rem(en-1,10)+1}, 'linewidth',lw, 'Parent', ax4);
@@ -116,11 +108,11 @@ for en = 1:length(data_out)
                 'Color',cols{rem(en-1,10)+1}, 'linewidth',lw, 'Parent', ax4);
         end %if
     end %if
-    leg{en} = [report_input.swept_name,' = ',report_input.swept_vals{en}]; 
+    leg{en} = [report_input.swept_name{1},' = ',report_input.swept_vals{en}]; 
 end %for
 hold(ax4, 'off')
 setup_graph_for_display(ax4, xlims, [-inf;inf], [-1;0], [0,lg,0],...
-    data_out(1).Xlab, data_out(1).Ylab, '', report_input.model_name);
+    data_out(1).Xlab, data_out(1).Ylab, '', regexprep(report_input.base_name, '_', ' '));
 legend(ax4, leg, 'Location', 'EastOutside', 'Box', 'off')
 % save 2D graph
 savemfmt(h4, report_input.output_loc, [out_name, '_diff'])
@@ -132,7 +124,7 @@ h2 = figure('Position', [ 0 0 1000 1000]);
 ax2 = axes('Parent', h2);
 hold(ax2, 'on')
 for en = 1:length(data_out)
-    if isempty(data_out(en).xdata)
+    if isempty(data_out(en).xdata{1})
         plot3(NaN, NaN, NaN, 'linestyle',l_st{1},...
             'Color',cols{rem(en-1,10)+1}, 'linewidth',lw,...
             'HandleVisibility','off', 'Parent', ax2);
@@ -147,7 +139,7 @@ end %for
 hold(ax2, 'off')
 setup_graph_for_display(ax2, xlims, [1;length(data_out)], ylims, [0,0,lg], ...
     data_out(1).Xlab, Zlab, data_out(1).Ylab, '');
-set(ax2, 'YTick',1:length(source_reps))
+set(ax2, 'YTick',1:length(report_input.sources))
 set(ax2, 'YTickLabel',report_input.swept_vals)
 view(45,45)
 grid on

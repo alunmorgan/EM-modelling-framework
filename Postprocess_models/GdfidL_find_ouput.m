@@ -47,6 +47,8 @@ if ~isempty(inds)
     Energy_in_ceramics = run_list(inds(2));
 else
     warning('No Energy graphs - This is a problem')
+    Energy = NaN;
+    Energy_in_ceramics = NaN;
 end
 
 % Find list of ports.

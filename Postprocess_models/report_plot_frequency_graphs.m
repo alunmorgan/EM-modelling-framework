@@ -22,8 +22,8 @@ report_frequency_graphs_core(fig_pos, pth, y_lev, x_axis, y_data,...
     cut_ind, cut_off_freqs, lw, name, graph_freq_lim, cols, leg)
 
 % reduced frequency range
-report_frequency_graphs_core(fig_pos, pth, y_lev, x_axis, y_data,...
-    power_dist_ind, cut_off_freqs, lw, [name,'_f_zoom'], 5, cols, leg)
+% report_frequency_graphs_core(fig_pos, pth, y_lev, x_axis, y_data,...
+%     power_dist_ind, cut_off_freqs, lw, [name,'_f_zoom'], 5, cols, leg)
 
 function report_frequency_graphs_core(fig_pos, pth, y_lev, x_axis, y_data,...
     cut_ind, cut_off_freqs, lw, name, graph_freq_lim, cols, leg)
@@ -67,8 +67,16 @@ xlim([0 graph_freq_lim])
 if isempty(leg) == 0
     legend(leg, 'Location', 'Best')
 end
-name = regexprep(name,' |,','_');
-savemfmt(h(1), pth, name)
+if iscell(name)
+    nme = '';
+    for aw = 1:length(name)
+        nme = cat(2, nme,regexprep(name{aw},' |,','_'));
+    end
+else
+    nme = name;
+end %if
+ylim([0 inf])
+savemfmt(h(1), pth, nme)
 close(h(1))
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 h(2) = figure('Position',fig_pos);
@@ -94,6 +102,14 @@ xlim([0 graph_freq_lim])
 if isempty(leg) == 0
     legend(leg, 'Location', 'SouthEast')
 end
-name = regexprep(name,' |,','_');
-savemfmt(h(2), pth,['cumulative_',name])
+if iscell(name)
+    nme = '';
+    for aw = 1:length(name)
+        nme = cat(2, nme,regexprep(name{aw},' |,','_'));
+    end %for
+else
+    nme = name;
+end %if
+ylim([0 inf])
+savemfmt(h(2), pth,['cumulative_',nme])
 close(h(2))

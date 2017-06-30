@@ -1,45 +1,42 @@
-function summary = Blend_summaries(doc_root, slh, source_reps)
+function summary = Blend_summaries(doc_root, names)
 % Extacts data from the summary graph fig files.
 %
-% Example: summary = Blend_summaries(doc_root, slh, source_reps)
-for hse = 1:length(source_reps)
+% Example: summary = Blend_summaries(doc_root, names)
+for hse = 1:length(names)
     try
-        hn = open([doc_root, slh, source_reps{hse}, slh, 'wake', slh, 'summary.fig']);
-    catch
-        warning(['Summary not available for ', num2str(source_reps{hse})])
-        summary.wlf{hse} = [];
-        summary.date{hse} = [];
-        summary.soft_ver{hse} = [];
-        summary.soft_type{hse} = [];
-        summary.CPU_time{hse} = [];
-        summary.num_cores{hse} = [];
-        summary.wall_time{hse} = [];
-        summary.num_mesh_cells{hse} = [];
-        summary.mem_used{hse} = [];
-        summary.mesh_spacing{hse} = [];
-        summary.timestep{hse} = [];
-        summary.machine_settings{hse} = [];
-        summary.multipliers{hse} = [];
+        load(fullfile(doc_root, names{hse}, 'wake', 'data_postprocessed.mat'));
+        load(fullfile(doc_root, names{hse}, 'wake', 'data_from_run_logs.mat'));
+        load(fullfile(doc_root, names{hse}, 'wake', 'run_inputs.mat'));
+        summary.wlf{hse} = [num2str(pp_data.time_domain_data.wake_loss_factor * 1e-12), '~V/pC' ];
+        summary.date{hse} = [run_logs.dte, '  ', run_logs.tme];
+        summary.soft_ver{hse} = num2str(run_logs.ver);
+        summary.soft_type{hse} = 'GdfidL';
+        [~, tmp] = convert_secs_to_hms(run_logs.CPU_time);
+        summary.CPU_time{hse} = tmp;
+        summary.num_cores{hse} = num2str(modelling_inputs.n_cores);
+        [~, tmp] = convert_secs_to_hms(run_logs.wall_time);
+        summary.wall_time{hse} = tmp;
+        summary.num_mesh_cells{hse} = num2str(run_logs.Ncells);
+        summary.mem_used{hse} = [num2str(run_logs.memory), 'MB'];
+        [tmp, t_scale] = rescale_value(run_logs.Timestep,' ');
+        summary.timestep{hse} =[ num2str(round(tmp)), ' ',t_scale, 's'];
+        summary.mesh_spacing{hse} = [num2str(run_logs.mesh_step_size * 1E6), '\mu{}m'];
         summary.name{hse} = [];
+    catch
+        warning(['Summary not available for ', num2str(names{hse})])
+        summary.wlf{hse} = '';
+        summary.date{hse} = '';
+        summary.soft_ver{hse} = '';
+        summary.soft_type{hse} = '';
+        summary.CPU_time{hse} = '';
+        summary.num_cores{hse} = '';
+        summary.wall_time{hse} = '';
+        summary.num_mesh_cells{hse} = '';
+        summary.mem_used{hse} = '';
+        summary.timestep{hse} = '';
+        summary.mesh_spacing{hse} = '';
+        summary.name{hse} = '';
         continue
-    end
-    a=get(gca,'Children');
-    b = get(a,'Tag');
-    summary.wlf{hse} = get(a(find_position_in_cell_lst(strfind(b,'wlf'))),'String');
-    summary.date{hse} = get(a(find_position_in_cell_lst(strfind(b,'Date'))),'String');
-    summary.soft_ver{hse} = get(a(find_position_in_cell_lst(strfind(b,'Software_version'))),'String');
-    summary.soft_type{hse} = get(a(find_position_in_cell_lst(strfind(b,'Software_type'))),'String');
-    temp_CPU = get(a(find_position_in_cell_lst(strfind(b,'CPU_time'))),'String');
-    summary.CPU_time{hse} = sort_summary_dates(temp_CPU{2});
-    summary.num_cores{hse} = get(a(find_position_in_cell_lst(strfind(b,'Num_cores'))),'String');
-    temp_wall =  get(a(find_position_in_cell_lst(strfind(b,'Wall_time'))),'String');
-    summary.wall_time{hse} = sort_summary_dates(temp_wall{2});
-    summary.num_mesh_cells{hse} = regexprep(get(a(find_position_in_cell_lst(strfind(b,'Num_mesh_cells'))),'String'),'Number of mesh cells = ','');
-    summary.mem_used{hse} = regexprep(get(a(find_position_in_cell_lst(strfind(b,'Memory_used'))),'String'), 'Memory used = ','');
-    summary.mesh_spacing{hse} = get(a(find_position_in_cell_lst(strfind(b,'Mesh_spacing'))),'String');
-    summary.timestep{hse} = regexprep(get(a(find_position_in_cell_lst(strfind(b,'Timestep'))),'String'), 'Timestep = ', '');
-    summary.machine_settings{hse} = get(a(find_position_in_cell_lst(strfind(b,'Machine_settings'))),'String');
-    summary.multipliers{hse} = get(a(find_position_in_cell_lst(strfind(b,'Multipliers'))),'String');
-    summary.name{hse} = regexprep(source_reps{hse},'_',' ');
-    close(hn)
-end
+    end %try
+    clear run_log modelling_inputs
+end %for

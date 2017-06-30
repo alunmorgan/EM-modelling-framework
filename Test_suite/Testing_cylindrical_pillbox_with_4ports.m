@@ -40,7 +40,7 @@ run_inputs.geometry_defs = {{'extension_length', {100e-3},'Length of the model e
     };
 
 %% This is for setting up the simulation parameters.
-run_inputs.simulation_defs.versions = {'161003g'};
+run_inputs.simulation_defs.versions = {'161207g', '160210g','160410g','160429g','160517g','161003g','161108g', '170509g'};%{'161003g'};
 run_inputs.simulation_defs.beam_sigma = {'5E-3'}; %in m
 run_inputs.simulation_defs.mesh_stepsize = {'750E-6'}; %in m
 run_inputs.simulation_defs.wakelength = {'300'};

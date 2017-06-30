@@ -6,34 +6,39 @@ function out = add_blend_table(model_name, subtitle, swept_vals, summary)
 
 out{1} = ' ';
 out = cat(1,out,'\vspace{0.25cm} ');
-out = cat(1,out, '\begin{tabular}{|m{1.2cm}| m{1.7cm} | m{1.7cm} | m{1.7cm} | m{1.7cm} | m{1.5cm} |}');
+out = cat(1,out, '\begin{tabular}{|m{1.2cm}| m{0.55cm} m{0.55cm} m{0.55cm} | m{0.55cm} m{0.55cm} | m{1.7cm} | m{1.7cm} | m{1.7cm} | m{1.5cm} |}');
 out = cat(1,out,'\hline');
-out = cat(1,out,['\multicolumn{6}{ |c| }{',model_name,' - ', subtitle,'}\\']);
+out = cat(1,out,['\multicolumn{9}{|c|}{\textbf{',model_name,' - ', subtitle,'}}\\']);
 out = cat(1,out,'\hline');
 out = cat(1,out,['Sweep value & ',...
-    'Calculation time (single CPU) & Calculation time (wall clock) & ',...
+    '\multicolumn{3}{|m{1.65cm}|}{Calculation time (single~CPU)} & \multicolumn{2}{|m{1.65cm}|}{Calculation time (wall~clock)} & ',...
     'Number of mesh cells & Memory used & Timestep\\' ]);
 out = cat(1,out,'\hline');
 for hea = 1:length(summary.wlf)
-    CPU_time = summary.CPU_time{hea};
-    wall_time = summary.wall_time{hea};
+    CPU_time = regexprep(summary.CPU_time{hea}, ',', ' & ');
+    if isempty(CPU_time)
+        CPU_time = ' & & & ';
+    end %if
+    wall_time = regexprep(summary.wall_time{hea}, ',', ' & ');
+    if isempty(wall_time)
+        wall_time = ' & & ';
+    end %if
     num_mesh_cells = summary.num_mesh_cells{hea};
     mem_used = summary.mem_used{hea};
     timestep = summary.timestep{hea};
-    if isempty(CPU_time)
-        CPU_time = {'','','',''};
+    % this is to cope with the fact that MATLAB tries to be clever and
+    % truncates the cell array if the last row is empty.
+    if length(swept_vals) == length(summary.wlf) -1 && hea == length(summary.wlf)
+        swept_vals_tmp =[];
+    else
+        swept_vals_tmp = swept_vals{hea};
+        % adding in the maths environment wrapping
+        swept_vals_tmp = regexprep(swept_vals_tmp, '\\mu{}', '$\\mu{}$');
     end
-    if isempty(wall_time)
-        wall_time = {'','','',''};
-    end
-    out = cat(1,out,['\multirow{4}{1.2cm}{',swept_vals{hea},'} & ',...
-        CPU_time{1},' & ',wall_time{1}, ' & ',...
-        '\multirow{4}{1.7cm}{',num_mesh_cells,...
-        '} & \multirow{4}{1.7cm}{',mem_used,...
-        '} & \multirow{4}{1.5cm}{',timestep, '} \\' ]);
-    out = cat(1,out,['& ',CPU_time{2},' & ',wall_time{2}, ' &&& \\']);
-    out = cat(1,out,['& ',CPU_time{3},' & ',wall_time{3}, ' &&& \\']);
-    out = cat(1,out,['& ',CPU_time{4},' & ',wall_time{4}, ' &&& \\']);
+    
+    out = cat(1,out,[swept_vals_tmp,' & ',...
+        CPU_time, wall_time,...
+        num_mesh_cells ' & ' ,mem_used, ' & ',timestep, '\\' ]);
     out = cat(1,out,'\hline ');
 end
 out = cat(1,out,'\end{tabular}');

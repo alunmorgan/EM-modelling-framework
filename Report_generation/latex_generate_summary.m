@@ -31,11 +31,9 @@ Settings_list{8} = 'Number of mesh cells';
 Values_list{8} = num2str(run_log.Ncells);
 Settings_list{9} = 'Memory used';
 Values_list{9} = [num2str(run_log.memory), 'MB'];
-Settings_list{10} = 'Mesh spacing';
-Values_list{10} = [num2str(run_log.mesh_step_size .* 1E6), '$\mu${m}'];
-Settings_list{11} = 'Timestep';
+Settings_list{10} = 'Timestep';
 [tmp, t_scale] = rescale_value(run_log.Timestep,' ');
-Values_list{11} =[ num2str(round(tmp)), ' ',t_scale, 's'];
+Values_list{10} =[ num2str(round(tmp)), ' ',t_scale, 's'];
 
 sp_Settings_list{1} = 'Port multiplier';
 sp_Values_list{1} = num2str(mi.port_multiple);

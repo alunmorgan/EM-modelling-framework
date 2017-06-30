@@ -60,12 +60,6 @@ else
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% Summary graph
-report_generate_single_model_summary_graph(pth, ppi, mi,  ...
-    wake_data, run_log, bp_only_flag);
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Thermal graphs
 leg = {};
 % make the array that the bar function understands.
@@ -109,7 +103,8 @@ set(f1(1), 'FaceColor', [0.5 0.5 0.5]);
 for eh = 2:size(py,2)
     set(f1(eh), 'FaceColor', cols{eh-1});
 end
-set(ax(1), 'XTickLabel',{'Energy lost from beam', 'Energy accounted for'})
+set(ax(1), 'XTickLabels',{'Energy lost from beam', 'Energy accounted for'})
+set(ax(1),'XTickLabelRotation',45)
 ylabel('Energy from 1 pulse (nJ)')
 legend(ax(1), leg, 'Location', 'EastOutside')
 savemfmt(h(1), pth,'Thermal_Losses_within_the_structure')
@@ -267,6 +262,7 @@ title('Longditudinal real wake impedance', 'Parent', ax(7))
 xlabel('Frequency (GHz)', 'Parent', ax(7))
 ylabel('Impedance (Ohms)', 'Parent', ax(7))
 xlim([0 graph_freq_lim])
+ylim([0 inf])
 savemfmt(h(7), pth,'longditudinal_real_wake_impedance')
 close(h(7))
 
@@ -292,6 +288,7 @@ title('Transverse X real wake impedance', 'Parent', ax(9))
 xlabel('Frequency (GHz)', 'Parent', ax(9))
 ylabel('Impedance (Ohms)', 'Parent', ax(9))
 xlim([0 graph_freq_lim])
+ylim([0 inf])
 savemfmt(h(9), pth, 'Transverse_X_real_wake_impedance')
 close(h(9))
 
@@ -305,6 +302,7 @@ title('Transverse Y real wake impedance', 'Parent', ax(10))
 xlabel('Frequency (GHz)', 'Parent', ax(10))
 ylabel('Impedance (Ohms)', 'Parent', ax(10))
 xlim([0 graph_freq_lim])
+ylim([0 inf])
 savemfmt(h(10), pth,'Transverse_Y_real_wake_impedance')
 close(h(10))
 
@@ -327,13 +325,13 @@ if sign(wake_data.frequency_domain_data.wlf) == 1
     ylim([0 1.1*wake_data.frequency_domain_data.wlf * 1e-12])
 end
 legend(ax(11), 'Calculated from data', 'Simulated beam size',  'Resistive wall (\sigma^{-3/2})')
-title('Extrapolating wake loss factor for longer bunch lengths', 'Parent', ax(11))
+title({'Extrapolating wake loss factor', ' for longer bunch lengths'}, 'Parent', ax(11))
 savemfmt(h(11), pth, 'wake_loss_factor_extrapolation_bunch_length')
 close(h(11))
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Extrapolating the wake loss factor for longer trains.
 h(12) = figure('Position',fig_pos);
-ax(12) = axes('Parent', h(12));
+ax(12) = axes('Parent', h(12), 'Position', [0.1300 0.1400 0.7750 0.7800]);
 for jes = size(wake_data.frequency_domain_data.extrap_data.diff_machine_conds.power_loss,3):-1:1
     loss_data = squeeze(wake_data.frequency_domain_data.extrap_data.diff_machine_conds.power_loss(:,:,jes));
     tmp =loss_data';
@@ -343,13 +341,13 @@ bar(loss', 'Parent', ax(12));
 set(gca,'XTickLabel',['','','',''])
 lims = ylim;
 lim_ext = lims(2) - lims(1);
-lab_loc = lims(1) - 0.05 * lim_ext;
+lab_loc = lims(1) - 0.09 * lim_ext;
 cur_tick = 1;
 bt_tick = 1;
 for naw = 1:length(ppi.current) * length(ppi.bt_length)
     text(naw,lab_loc,...
-        {[num2str(ppi.current(cur_tick)*1000),'mA']; [num2str(ppi.bt_length(bt_tick)),' bunches']},...
-        'HorizontalAlignment','Center', 'Parent', ax(12))
+        {[num2str(ppi.current(cur_tick)*1000),'mA']; num2str(ppi.bt_length(bt_tick));' bunch'; 'fill'},...
+        'HorizontalAlignment','Center', 'Parent', ax(12), 'FontSize', 9)
     if cur_tick >= length(ppi.current)
         cur_tick = 1;
         bt_tick = bt_tick +1;
@@ -358,7 +356,7 @@ for naw = 1:length(ppi.current) * length(ppi.bt_length)
     end
 end
 ylabel('Power loss (W)', 'Parent', ax(12))
-title('Power loss from beam for different machine conditions', 'Parent', ax(12))
+title({'Power loss from beam','for different machine conditions'}, 'Parent', ax(12))
 for rh = length(ppi.rf_volts):-1:1
     leg2{rh} = [num2str(ppi.rf_volts(1)),'MV RF'];
 end
@@ -396,7 +394,7 @@ if isfield(wake_data.raw_data.port, 'timebase') && ~isnan(wake_data.frequency_do
         end
     end
     ylabel('Power loss (W)', 'Parent', ax(13))
-    title('Comparison of power loss with scaled single bunch and full spectral analysis', 'Parent', ax(13))
+    title({'Comparison of power loss', 'with scaled single bunch', 'and full spectral analysis'}, 'Parent', ax(13))
     legend(ax(13), 'Single bunch', 'Full analysis', 'Location', 'NorthWest')
     savemfmt(h(13), pth,'power_loss_for_analysis')
     close(h(13))
@@ -453,14 +451,16 @@ else
     y_data = {(wake_data.frequency_domain_data.Bunch_loss_energy_spectrum)*1e9;...
         zeros(length(wake_data.frequency_domain_data.Bunch_loss_energy_spectrum),1)};
 end
-name = 'Energy loss distribution of bunch, and energy seen at ports';
+name = {'Energy loss distribution of bunch,', 'and energy seen at ports'};
 cols = {'m','c'};
 leg = {'Bunch loss', 'Port signal'};
 % Combining all the port cutoff freqencies into one list.
 cuts_temp = unique(cell2mat(cut_off_freqs));
 cuts_temp = cuts_temp(cuts_temp > 1E-10);
 report_plot_frequency_graphs(fig_pos, pth, y_lev, x_axis, y_data, ...
-    cut_ind, power_dist_ind, cuts_temp, lw, name, graph_freq_lim, cols, leg)
+    cut_ind, power_dist_ind, cuts_temp, lw, ...
+    name, ...
+    graph_freq_lim, cols, leg)
 clear leg
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Energy left in the structure on a per frequency basis.
@@ -612,7 +612,7 @@ ax(22) = axes('Parent', h(22));
 if isempty(Qs) == 0
     plot(wl,Qs, ':*','LineWidth',lw)
 end
-title('Change in Q over the sweep')
+title({'Change in Q',' over the sweep'})
 xlabel('Wake length (m)')
 ylabel('Q')
 if isempty(Qs) == 0
@@ -626,7 +626,7 @@ ax(23) = axes('Parent', h(23));
 if isempty(mags) == 0
     plot(wl,mags, ':*','LineWidth',lw)
 end
-title('Change in peak magnitude over the sweep')
+title({'Change in peak magnitude',' over the sweep'})
 xlabel('Wake length (m)')
 ylabel('Peak magnitude')
 if isempty(mags) == 0
@@ -640,7 +640,7 @@ ax(24) = axes('Parent', h(24));
 if isempty(bws) == 0
     plot(wl,bws, ':*','LineWidth',lw)
 end
-title('Change in bandwidth over the sweep')
+title({'Change in bandwidth',' over the sweep'})
 xlabel('Wake length (m)')
 ylabel('Bandwidth')
 if isempty(bws) == 0
@@ -654,7 +654,7 @@ ax(25) = axes('Parent', h(25));
 if isempty(freqs) == 0
     plot(wl,freqs * 1E-9, ':*','LineWidth',lw)
 end
-title('Change in peak frequency over the sweep')
+title({'Change in peak frequency',' over the sweep'})
 xlabel('Wake length (mm)')
 ylabel('Frequency (GHz)')
 if isempty(freqs) == 0
@@ -759,42 +759,42 @@ savemfmt(h(30), pth,'Overlap_of_bunch_spectra_and_wake_impedance')
 close(h(30))
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Bunch spectra wake impedance overlap
-% Make the figure twice the size as usual.
-fig_pos_2 = fig_pos;
-fig_pos_2(3) = 2*fig_pos_2(3);
-fig_pos_2(4) = 2*fig_pos_2(4);
-h(31) = figure('Position',fig_pos_2);
-ax(31) = axes('Parent', h(31));
-for sne = 1:size(wake_data.frequency_domain_data.extrap_data.diff_machine_conds.bunch_charge,1)
-    for ena = 1:size(wake_data.frequency_domain_data.extrap_data.diff_machine_conds.bunch_charge,2)
-        subplot(size(wake_data.frequency_domain_data.extrap_data.diff_machine_conds.bunch_charge,1),...
-            size(wake_data.frequency_domain_data.extrap_data.diff_machine_conds.bunch_charge,2),...
-            ena +(sne-1) * size(wake_data.frequency_domain_data.extrap_data.diff_machine_conds.bunch_charge,2))
-        plot(wake_data.frequency_domain_data.extrap_data.diff_machine_conds.f_raw*1E-9, ...
-            abs(wake_data.frequency_domain_data.extrap_data.diff_machine_conds.bunch_spec{sne, ena,3}).^2 ./...
-            max(abs(wake_data.frequency_domain_data.extrap_data.diff_machine_conds.bunch_spec{sne, ena,3}).^2),'r',...
-            wake_data.frequency_domain_data.extrap_data.diff_machine_conds.f_raw*1E-9, ...
-            abs(wake_data.frequency_domain_data.extrap_data.diff_machine_conds.bunch_spec{sne, ena,2}).^2 ./...
-            max(abs(wake_data.frequency_domain_data.extrap_data.diff_machine_conds.bunch_spec{sne, ena,2}).^2),'g',...
-            wake_data.frequency_domain_data.extrap_data.diff_machine_conds.f_raw*1E-9, ...
-            abs(wake_data.frequency_domain_data.extrap_data.diff_machine_conds.bunch_spec{sne, ena,1}).^2 ./...
-            max(abs(wake_data.frequency_domain_data.extrap_data.diff_machine_conds.bunch_spec{sne, ena,1}).^2),'k',...
-            wake_data.frequency_domain_data.f_raw*1E-9, ...
-            (wake_data.frequency_domain_data.Wake_Impedance_data) ./maxy,'b','LineWidth',1)
-        title([num2str(ppi.current(sne)*1000), 'mA ' ,num2str(ppi.bt_length(ena)), ' bunches'])
-        xlabel('Frequency (GHz)')
-        %        ylabel('Normalised units')
-        xlim([0 graph_freq_lim])
-        ylim([0 1])
-    end
-end
-axes('Position', [0 0 1 1])
-set(gca,'Visible' ,'off')
-text(0.05, 0.5, 'Normalised Units', 'Rotation',90,'HorizontalAlignment', 'center')
-text(0.5,0.98, 'Overlap of bunch spectra ^2 and wake impedance','HorizontalAlignment', 'center')
-text(0.95,0.5, '\color{black}{2.5MV}   \color{green}{3.5MV}   \color{red}{4.5MV}','Rotation',90,'HorizontalAlignment', 'center')
-savemfmt(h(31), pth,'wake_impedance_vs_bunch_spectra')
-close(h(31))
+% % Make the figure twice the size as usual.
+% fig_pos_2 = fig_pos;
+% fig_pos_2(3) = 2*fig_pos_2(3);
+% fig_pos_2(4) = 2*fig_pos_2(4);
+% h(31) = figure('Position',fig_pos_2);
+% ax(31) = axes('Parent', h(31));
+% for sne = 1:size(wake_data.frequency_domain_data.extrap_data.diff_machine_conds.bunch_charge,1)
+%     for ena = 1:size(wake_data.frequency_domain_data.extrap_data.diff_machine_conds.bunch_charge,2)
+%         subplot(size(wake_data.frequency_domain_data.extrap_data.diff_machine_conds.bunch_charge,1),...
+%             size(wake_data.frequency_domain_data.extrap_data.diff_machine_conds.bunch_charge,2),...
+%             ena +(sne-1) * size(wake_data.frequency_domain_data.extrap_data.diff_machine_conds.bunch_charge,2))
+%         plot(wake_data.frequency_domain_data.extrap_data.diff_machine_conds.f_raw*1E-9, ...
+%             abs(wake_data.frequency_domain_data.extrap_data.diff_machine_conds.bunch_spec{sne, ena,3}).^2 ./...
+%             max(abs(wake_data.frequency_domain_data.extrap_data.diff_machine_conds.bunch_spec{sne, ena,3}).^2),'r',...
+%             wake_data.frequency_domain_data.extrap_data.diff_machine_conds.f_raw*1E-9, ...
+%             abs(wake_data.frequency_domain_data.extrap_data.diff_machine_conds.bunch_spec{sne, ena,2}).^2 ./...
+%             max(abs(wake_data.frequency_domain_data.extrap_data.diff_machine_conds.bunch_spec{sne, ena,2}).^2),'g',...
+%             wake_data.frequency_domain_data.extrap_data.diff_machine_conds.f_raw*1E-9, ...
+%             abs(wake_data.frequency_domain_data.extrap_data.diff_machine_conds.bunch_spec{sne, ena,1}).^2 ./...
+%             max(abs(wake_data.frequency_domain_data.extrap_data.diff_machine_conds.bunch_spec{sne, ena,1}).^2),'k',...
+%             wake_data.frequency_domain_data.f_raw*1E-9, ...
+%             (wake_data.frequency_domain_data.Wake_Impedance_data) ./maxy,'b','LineWidth',1)
+%         title([num2str(ppi.current(sne)*1000), 'mA ' ,num2str(ppi.bt_length(ena)), ' bunches'])
+%         xlabel('Frequency (GHz)')
+%         %        ylabel('Normalised units')
+%         xlim([0 graph_freq_lim])
+%         ylim([0 1])
+%     end
+% end
+% axes('Position', [0 0 1 1])
+% set(gca,'Visible' ,'off')
+% text(0.05, 0.5, 'Normalised Units', 'Rotation',90,'HorizontalAlignment', 'center')
+% text(0.5,0.98, 'Overlap of bunch spectra ^2 and wake impedance','HorizontalAlignment', 'center')
+% text(0.95,0.5, '\color{black}{2.5MV}   \color{green}{3.5MV}   \color{red}{4.5MV}','Rotation',90,'HorizontalAlignment', 'center')
+% savemfmt(h(31), pth,'wake_impedance_vs_bunch_spectra')
+% close(h(31))
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 h(32) = figure('Position',fig_pos);
 ax(32) = axes('Parent', h(32));
@@ -814,37 +814,39 @@ close(h(32))
 %% Energy over time.
 h(33) = figure('Position',fig_pos);
 ax(33) = axes('Parent', h(33));
-minlim = wake_data.raw_data.Energy(end,2)*1e9;
-maxlim = max(wake_data.raw_data.Energy(:,2)*1e9);
-minxlim = wake_data.raw_data.Energy(1,1).*1E9;
-maxxlim = wake_data.raw_data.Energy(end,1).*1E9;
-if isnan(minlim) ==0
-    if minlim >0
-        semilogy(wake_data.raw_data.Energy(:,1).*1E9,wake_data.raw_data.Energy(:,2)*1e9,'b', 'LineWidth',lw)
-        if isfield(wake_data.port_time_data, 'timebase') && isfield(wake_data.port_time_data, 'total_energy_cumsum')
-            hold(ax(33), 'on')
-            semilogy(wake_data.port_time_data.timebase *1e9, squeeze(wake_data.port_time_data.total_energy_cumsum(:)) * 1e9,':k',...
-                'LineWidth',lw)
-            legend('Energy decay', 'Energy at ports')
-            hold(ax(33), 'off')
+if ~isnan(wake_data.raw_data.Energy)
+    minlim = wake_data.raw_data.Energy(end,2)*1e9;
+    maxlim = max(wake_data.raw_data.Energy(:,2)*1e9);
+    minxlim = wake_data.raw_data.Energy(1,1).*1E9;
+    maxxlim = wake_data.raw_data.Energy(end,1).*1E9;
+    if isnan(minlim) ==0
+        if minlim >0
+            semilogy(wake_data.raw_data.Energy(:,1).*1E9,wake_data.raw_data.Energy(:,2)*1e9,'b', 'LineWidth',lw)
+            if isfield(wake_data.port_time_data, 'timebase') && isfield(wake_data.port_time_data, 'total_energy_cumsum')
+                hold(ax(33), 'on')
+                semilogy(wake_data.port_time_data.timebase *1e9, squeeze(wake_data.port_time_data.total_energy_cumsum(:)) * 1e9,':k',...
+                    'LineWidth',lw)
+                legend('Energy decay', 'Energy at ports')
+                hold(ax(33), 'off')
+            end
+            if minlim < maxlim
+                ylim([minlim maxlim])
+            end
+            graph_add_horizontal_lines(y_lev)
+            ylabel('Energy (nJ)')
+        else
+            plot(wake_data.raw_data.Energy(:,1).*1E9,wake_data.raw_data.Energy(:,2)*1e9,'LineWidth',lw)
+            ylim([minlim 0])
+            ylabel('Energy (relative)')
         end
-        if minlim < maxlim
-            ylim([minlim maxlim])
-        end
-        graph_add_horizontal_lines(y_lev)
-        ylabel('Energy (nJ)')
-    else
-        plot(wake_data.raw_data.Energy(:,1).*1E9,wake_data.raw_data.Energy(:,2)*1e9,'LineWidth',lw)
-        ylim([minlim 0])
-        ylabel('Energy (relative)')
     end
-end
-xlim([minxlim maxxlim])
-title('Energy over time');
-xlabel('Time (ns)')
-for ies = 1:length(wake_data.raw_data.port.t_start)
-    graph_add_background_patch(wake_data.raw_data.port.t_start(ies) * 1E9)
-end
+    xlim([minxlim maxxlim])
+    title('Energy over time');
+    xlabel('Time (ns)')
+    for ies = 1:length(wake_data.raw_data.port.t_start)
+        graph_add_background_patch(wake_data.raw_data.port.t_start(ies) * 1E9)
+    end %for
+end %if
 savemfmt(h(33), pth,'Energy')
 if max(wake_data.raw_data.port.t_start) ~=0
     xlim([0 max(wake_data.raw_data.port.t_start) * 1E9 * 2])
@@ -877,14 +879,14 @@ end
 %from beam
 h(35) = figure('Position',fig_pos);
 ax(35) = axes('Parent', h(35));
-plot(wake_data.frequency_domain_data.f_raw .*1e-9,cumsum(wake_data.frequency_domain_data.Bunch_loss_energy_spectrum)*1e9,':k')
+plot(wake_data.frequency_domain_data.f_raw .*1e-9,cumsum(wake_data.frequency_domain_data.Bunch_loss_energy_spectrum)*1e9,':k','LineWidth',lw)
 hold(ax(35), 'on')
 plot([wake_data.frequency_domain_data.f_raw(1) .*1e-9,wake_data.frequency_domain_data.f_raw(end) .*1e-9],...
-    [wake_data.frequency_domain_data.Total_bunch_energy_loss .*1e9, wake_data.frequency_domain_data.Total_bunch_energy_loss .*1e9],'r')
+    [wake_data.frequency_domain_data.Total_bunch_energy_loss .*1e9, wake_data.frequency_domain_data.Total_bunch_energy_loss .*1e9],'r','LineWidth',lw)
 plot([wake_data.frequency_domain_data.f_raw(1) .*1e-9,wake_data.frequency_domain_data.f_raw(end) .*1e-9],...
-    [wake_data.time_domain_data.loss_from_beam .*1e9, wake_data.time_domain_data.loss_from_beam .*1e9],':g')
+    [wake_data.time_domain_data.loss_from_beam .*1e9, wake_data.time_domain_data.loss_from_beam .*1e9],':g','LineWidth',lw)
 plot([wake_data.frequency_domain_data.f_raw(floor(end/2)) .*1e-9,wake_data.frequency_domain_data.f_raw(floor(end/2)) .*1e-9],...
-    [0, wake_data.frequency_domain_data.Total_bunch_energy_loss .*1e9],':c')
+    [0, wake_data.frequency_domain_data.Total_bunch_energy_loss .*1e9],':c','LineWidth',lw)
 hold(ax(35), 'off')
 % ylim([0 max(wake_data.frequency_domain_data.Total_bunch_energy_loss, wake_data.time_domain_data.loss_from_beam) .*1e9 .*1.1])
 xlabel('Frequency (GHz)')
@@ -904,12 +906,13 @@ plot(wake_data.raw_data.Wake_potential(:,1)* 1E9,wake_data.raw_data.Wake_potenti
     'LineWidth',lw)
 hold(ax(36), 'on')
 [~,ind] =  max(wake_data.raw_data.Wake_potential(:,2));
-plot([wake_data.raw_data.Wake_potential(ind,1) wake_data.raw_data.Wake_potential(ind,1)], [-1.05 1.05], ':m')
+plot([wake_data.raw_data.Wake_potential(ind,1) wake_data.raw_data.Wake_potential(ind,1)], [-1.05 1.05], ':m','LineWidth',lw)
 hold(ax(36), 'off')
 xlim([-inf, 0.2])
 ylim([-1.05 1.05])
 xlabel('time (ns)')
 ylabel('a.u.')
+legend('Wake potential (raw)', 'Wake potential (pp)', 'Charge distrubution (raw)','Charge distribution (pp)','Location','SouthEast')
 title('Alignment check')
 savemfmt(h(36), pth,'input_signal_alignment_check')
 close(h(36))

@@ -27,8 +27,8 @@
 load_local_paths
 
 log = {'Log of problems'};
-% model_names = {'cylindrical_pillbox'};
-model_names = {...
+% base_model_names = {'cylindrical_pillbox'};
+base_model_names = {...
     'cylindrical_pillbox', ...
     'cylindrical_pillbox_with_port',...
     'cylindrical_pillbox_with_4ports',...
@@ -38,45 +38,35 @@ model_names = {...
     };
 
 %% Running the tests
-start = now;
-for ha = 1:length(model_names)
+for ha = 1:length(base_model_names)
     try
-        Testing_function = str2func(['Testing_', model_names{ha}]);
+        Testing_function = str2func(['Testing_', base_model_names{ha}]);
         Testing_function(input_file_loc, scratch_loc,...
             data_loc)
     catch
-        log{end+1} = ['Running model ',model_names{ha}, ' failed'];
-        warning(['Running model ', model_names{ha}, ' failed'])
+        log{end+1} = ['Running model ',base_model_names{ha}, ' failed'];
+        warning(['Running model ', base_model_names{ha}, ' failed'])
     end
-    
-    
-    fin = now;
+end
+
+for ha = 1:length(base_model_names)
     try
-        postprocessor_setup(model_names{ha}, start, fin, ...
+        postprocessor_setup(base_model_names{ha}, ...
             scratch_loc, data_loc, results_loc)
     catch
-        log{end+1} = ['Postprocessing ', model_names{ha}, 'failed'];
-        warning(['Postprocessing ', model_names{ha}, ' failed'])
+        log{end+1} = ['Postprocessing ', base_model_names{ha}, 'failed'];
+        warning(['Postprocessing ', base_model_names{ha}, ' failed'])
     end
 end
 
 disp('Generating the individual reports')
 % Generate all the new reports
-for md = 1:length(model_names)
-    output_loc = fullfile(results_loc, model_names{md});
-    model_name_for_report = regexprep(model_names{md}, '_', ' ');
-    Report_setup(Author, ['Test suite ', model_name_for_report ], graphic_loc, output_loc, start, fin)
+for md = 1:length(base_model_names)
+    generate_report_set(base_model_names{md}, Author, graphic_loc, results_loc)
 end
 
-% disp('Generating the combined reports')
-% % Generate all the blended reports using all available data.
-% start= datenum('20150101T180000', 'yyyymmddTHHMMSS');
-% for md = 1:length(model_names)
-%     output_loc = [results_loc,model_names{md}];
-%     arc_names = GdfidL_find_selected_models(output_loc, {start, fin});
-%     model_name_for_report = regexprep(model_names{md}, '_', ' ');
-%     Blend_reports( 'Test comparison report', [output_loc,'/'], ...
-%         arc_names , Author, ...
-%         ['Test suite:\\\textbf{ ', model_name_for_report, '}\\ core behaviour check' ],...
-%         graphic_loc)
-% end
+disp('Generating the combined reports')
+% Generate all the blended reports using all available data.
+for md = 1:length(base_model_names)
+       Blend_reports(results_loc, base_model_names{md}, Author, graphic_loc)
+end

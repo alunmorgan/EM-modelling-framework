@@ -13,7 +13,7 @@ end
 model_num = 0;
 [defs, ~] = construct_defs(cat(2,mi.material_defs, mi.geometry_defs));
 
-for fdhs = 1:length(mi.model_names)
+for fdhs = 1:length(mi.model_names)    
     for awh = 1:length(defs)
         model_num = model_num +1;
         modelling_inputs(model_num) = base_inputs(mi, defs, mi.model_names{fdhs});
@@ -75,43 +75,51 @@ for fdhs = 1:length(mi.model_names)
 end %for
 
 for awh = 1:length(modelling_inputs)
+    
+        % create the required output directories.
+if ~exist(fullfile(mi.paths.storage_path, modelling_inputs(awh).base_model_name), 'dir')
+    mkdir(mi.paths.storage_path, modelling_inputs(awh).base_model_name)
+end
+if ~exist(fullfile(mi.paths.storage_path, modelling_inputs(awh).base_model_name, modelling_inputs(awh).model_name),'dir')
+    mkdir(fullfile(mi.paths.storage_path, modelling_inputs(awh).base_model_name) ,modelling_inputs(awh).model_name)
+end
+    
     % Write update to the command line
     disp(datestr(now))
     disp(['Running ',num2str(awh), ' of ',...
         num2str(length(modelling_inputs)), ' simulations'])
     
-    arc_date = datestr(now,30);
     if ~isempty(strfind(mi.simulation_defs.sim_select, 'w'))
         try
-            run_wake_simulation(mi.paths, modelling_inputs, arc_date);
+            run_wake_simulation(mi.paths, modelling_inputs(awh));
         catch ERR
             display_modelling_error(ERR, 'wake')
         end %try
     end %if
     if ~isempty(strfind(mi.simulation_defs.sim_select, 's'))
         try
-            run_s_param_simulation(mi.paths, modelling_inputs, arc_date);
+            run_s_param_simulation(mi.paths, modelling_inputs(awh));
         catch ERR
             display_modelling_error(ERR, 'S-parameter')
         end %try
     end %if
     if ~isempty(strfind(mi.simulation_defs.sim_select, 'e'))
         try
-            run_eigenmode_simulation(mi.paths, modelling_inputs, arc_date);
+            run_eigenmode_simulation(mi.paths, modelling_inputs(awh));
         catch ERR
             display_modelling_error(ERR, 'eigenmode')
         end %try
     end %if
     if ~isempty(strfind(mi.simulation_defs.sim_select, 'l'))
         try
-            run_eigenmode_lossy_simulation(mi.paths, modelling_inputs, arc_date);
+            run_eigenmode_lossy_simulation(mi.paths, modelling_inputs(awh));
         catch ERR
             display_modelling_error(ERR, 'lossy eigenmode')
         end %try
     end %if
     if ~isempty(strfind(mi.simulation_defs.sim_select, 'r'))
         try
-            run_shunt_simulation(mi.paths, modelling_inputs, arc_date);
+            run_shunt_simulation(mi.paths, modelling_inputs(awh));
         catch ERR
             display_modelling_error(ERR, 'shunt')
         end %try
