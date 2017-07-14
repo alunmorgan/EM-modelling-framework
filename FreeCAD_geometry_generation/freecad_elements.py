@@ -17,7 +17,26 @@ class ModelException(Exception):
     pass
 
 
-def parameter_sweep(model_function, input_params, output_path, sweep_variable, start, stop, step):
+def base_model(model_function, input_params, output_path, accuracy=2):
+    """Takes the INPUT_PARAMETERS dictionary as a base. It generates a model based on those inputs.
+
+        Args:
+            model_function (function handle): The handle of the specific model being used.
+            input_params (dict): A dictionary containing the names and values of teh input parameters of the model.
+            output_path (str): The location all the output files will be written to.
+            accuracy (int): Represents the fineness of teh mesh. bigger number = finer mesh
+ 
+            """
+    inputs = copy.copy(input_params)   # To ensure the base settings are unchanged between sweeps.
+    output_loc = copy.copy(output_path)
+    try:
+        parts_list, model_name = model_function(inputs)
+        generate_output_files(output_loc, model_name, parts_list, inputs, tag='Base', mesh_resolution=accuracy)
+    except ModelException as e:
+        print 'Problem with base model ', '\n\t', e
+
+
+def parameter_sweep(model_function, input_params, output_path, sweep_variable, start, stop, step, accuracy=2):
     """Takes the INPUT_PARAMETERS dictionary as a base. Then changes the requested input variable in a sequence.
         For each iteration it generates a model.
 
@@ -29,6 +48,7 @@ def parameter_sweep(model_function, input_params, output_path, sweep_variable, s
             start (float): The starting value of the sweep.
             stop (float): The interval between sweep iterations.
             step (float): The end of the sweep. (Same behaviour as range)
+            accuracy (int): Represents the fineness of teh mesh. bigger number = finer mesh
 
             """
     if sweep_variable not in input_params:
@@ -39,7 +59,7 @@ def parameter_sweep(model_function, input_params, output_path, sweep_variable, s
         model_tag = ''.join([sweep_variable, '_sweep_value_', str(inputs[sweep_variable])])
         try:
             parts_list, model_name = model_function(inputs)
-            generate_output_files(output_loc, model_name, parts_list, inputs, model_tag)
+            generate_output_files(output_loc, model_name, parts_list, inputs, tag=model_tag, mesh_resolution=accuracy)
         except ModelException as e:
             print 'Problem with model ', sweep_variable, '_sweep_value_', str(inputs[sweep_variable]), '\n\t', e
 
@@ -155,8 +175,8 @@ def make_elliptical_aperture(aperture_height, aperture_width):
         aperture_height and aperture_width are the full height and width (the same as if it were a rectangle)
 
         Args:
-            aperture_height (float): Total height of the octagon.
-            aperture_width (float): Total width of the octagon.
+            aperture_height (float): Total height of the ellipse.
+            aperture_width (float): Total width of the ellipse.
 
         Returns:
             wire1 (FreeCAD wire definition): An outline description of the shape.
@@ -225,7 +245,24 @@ def make_taper(aperture1, aperture2, taper_length, loc=(0,0,0), rotation_angles=
     return taper
 
 
-def generate_output_files(output_loc, model_name, parts_list, input_parameters, tag):
+def rotate_at(shp, loc=(0, 0, 0), rotation_angles=(0, 0, 0)):
+    """ Rotates a shape around a point in space.
+    
+        Args:
+            shp (FreeCAD shape): The shape you are wanting to rotate.
+            loc (tuple): The co ordinates of the centre of rotation.
+            rotation_angles (tuple) : The angles to rotate about in the three cartesian directions.
+            
+        Returns:
+            shp (FreeCad shape): The rotated shape.
+    """
+    shp.rotate(Base.Vector(loc[0], loc[1], loc[2]), Base.Vector(0, 0, 1), rotation_angles[2])    # Rotate around Z
+    shp.rotate(Base.Vector(loc[0], loc[1], loc[2]), Base.Vector(1, 0, 0), rotation_angles[0])    # Rotate around X
+    shp.rotate(Base.Vector(loc[0], loc[1], loc[2]), Base.Vector(0, 1, 0), rotation_angles[1])    # Rotate around Y
+    return shp
+
+
+def generate_output_files(output_loc, model_name, parts_list, input_parameters, tag, mesh_resolution=2):
     """Takes the dictionary of parts, converts them to meshes.
     Saves the resulting meshes in both binary and ascii STL format. (ECHO needs binary, GdfidL needs ASCII).
      Also saves the Geometry in a freeCAD document.
@@ -236,6 +273,7 @@ def generate_output_files(output_loc, model_name, parts_list, input_parameters, 
             parts_list (dict): dictionary of shapes used to construct the model.
             input_parameters (dict): dictionary of input parameters used to make the model.
             tag (str): Unique identifier string for a particular model iteration.
+            mesh_resolution (int): the resolution of hte meshing (equivalent to the Fineness parameter in meshFromShape)
     """
     document_name = ''.join([model_name, '_model__', tag])
     doc = FreeCAD.newDocument(document_name)
@@ -248,7 +286,8 @@ def generate_output_files(output_loc, model_name, parts_list, input_parameters, 
         doc.saveAs(''.join([output_loc, model_name, '__', tag, '.FCStd']))
         # Generate a mesh from the shape.
         mesh_name = ''.join([part_name, ' (Meshed)'])
-        m1 = MeshPart.meshFromShape(Shape=parts_list[part], Fineness=2, SecondOrder=0, Optimize=1, AllowQuad=1)
+        m1 = MeshPart.meshFromShape(Shape=parts_list[part], Fineness=mesh_resolution, SecondOrder=1, Optimize=1,
+                                    AllowQuad=1)
         mymesh = doc.addObject("Mesh::Feature", "Mesh")
         mymesh.Mesh = m1
         mymesh.Label = mesh_name
