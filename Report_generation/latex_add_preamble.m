@@ -101,10 +101,14 @@ if isfield(report_input, 'param_names_common')
     ov = cat(1,ov,'\end{tabular} \\');
     if isfield(report_input,'swept_vals')
         ov = cat(1,ov,'\vspace{0.5cm}');
-        list_of_sweep = regexprep(report_input.swept_vals{1}, '\\mu{}', '$\\mu{}$');
-        for hs = 2:length(report_input.swept_vals)
+        list_of_sweep = '';
+        for hs = 1:length(report_input.swept_vals)
             % adding in the maths environment wrapping
-            swept_val = regexprep(report_input.swept_vals{hs}, '\\mu{}', '$\\mu{}$');
+            if ~isempty(report_input.swept_vals{hs})
+                swept_val = regexprep(report_input.swept_vals{hs}, '\\mu{}', '$\\mu{}$');
+            else
+                swept_val = ' ';
+            end %if
             list_of_sweep = [list_of_sweep,', ',swept_val];
         end %for
         ov = cat(1,ov,['Sweep: \emph{', list_of_sweep,'}']);
