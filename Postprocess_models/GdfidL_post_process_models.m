@@ -1,4 +1,4 @@
-function GdfidL_post_process_models(ppi)
+function GdfidL_post_process_models(ppi, ow_behaviour)
 % Takes the output of the GdfidL run and postprocesses it to generate
 % reports.
 %
@@ -29,92 +29,114 @@ disp(['GdfidL_post_process_models: Started analysis of ', ppi.model_name])
 pp_data = struct;
 %% Post processing wakes
 if exist(fullfile('data_link', 'wake/'), 'dir')
+    skip = 0;
     % Creating sub structure.
     try
-        if  ~exist(fullfile('pp_link', 'wake'), 'dir')
+        if  exist(fullfile('pp_link', 'wake'), 'dir')
+            if nargin ==3 && strcmp(ow_behaviour, 'no_skip')
+                old_store = ['old_data', datestr(now,30)];
+                mkdir('pp_link', old_store)
+                movefile(fullfile('pp_link', 'wake'), fullfile('pp_link', old_store))
+            else
+                disp(['Skipping wake postprocessing for ',ppi.model_name, ' data already exists'])
+                skip = 1;
+            end %if
+        end %if
+        if skip == 0;
             [~] = system(['mkdir ', fullfile('pp_link', 'wake')]);
-        end
-        % Save input structure
-        save(fullfile('pp_link', 'wake', 'pp_inputs.mat'), 'ppi');
-        % Move files to the post processing folder.
-        copyfile(fullfile('data_link', 'wake', 'model.gdf'),...
-            fullfile('pp_link', 'wake', 'model.gdf'));
-        copyfile(fullfile('data_link', 'wake', 'model_log'),...
-            fullfile('pp_link', 'wake', 'model_log'));
-        copyfile(fullfile('data_link', 'wake', 'run_inputs.mat'),...
-            fullfile('pp_link', 'wake/'));
-        
-        % Load up the original model input parameters.
-        % This contains modelling_inputs.
-        load(fullfile('pp_link', 'wake', 'run_inputs.mat'))
-        % Reading logs
-        run_logs = GdfidL_read_wake_log(...
-            fullfile('pp_link', 'wake', 'model_log'));
-        save(fullfile('pp_link', 'wake', 'data_from_run_logs.mat'), 'run_logs')
-        
-        disp('GdfidL_post_process_models: Post processing wake data.')
-        % Running postprocessor
-        orig_ver = getenv('GDFIDL_VERSION');
-        setenv('GDFIDL_VERSION',run_logs.ver);
-        pp_data = postprocess_wakes(ppi, modelling_inputs, run_logs);
-        % restoring the original version.
-        setenv('GDFIDL_VERSION',orig_ver)
-        save(fullfile('pp_link', 'wake', 'data_postprocessed.mat'), 'pp_data','-v7.3')
-        % Generate the plots.
-        GdfidL_plot_wake(pp_data, ppi, ...
-            modelling_inputs, run_logs,...
-            fullfile('pp_link', 'wake/'), 1E7)
+            % Save input structure
+            save(fullfile('pp_link', 'wake', 'pp_inputs.mat'), 'ppi');
+            % Move files to the post processing folder.
+            copyfile(fullfile('data_link', 'wake', 'model.gdf'),...
+                fullfile('pp_link', 'wake', 'model.gdf'));
+            copyfile(fullfile('data_link', 'wake', 'model_log'),...
+                fullfile('pp_link', 'wake', 'model_log'));
+            copyfile(fullfile('data_link', 'wake', 'run_inputs.mat'),...
+                fullfile('pp_link', 'wake/'));
+            
+            % Load up the original model input parameters.
+            % This contains modelling_inputs.
+            load(fullfile('pp_link', 'wake', 'run_inputs.mat'))
+            % Reading logs
+            run_logs = GdfidL_read_wake_log(...
+                fullfile('pp_link', 'wake', 'model_log'));
+            save(fullfile('pp_link', 'wake', 'data_from_run_logs.mat'), 'run_logs')
+            
+            disp('GdfidL_post_process_models: Post processing wake data.')
+            % Running postprocessor
+            orig_ver = getenv('GDFIDL_VERSION');
+            setenv('GDFIDL_VERSION',run_logs.ver);
+            pp_data = postprocess_wakes(ppi, modelling_inputs, run_logs);
+            % restoring the original version.
+            setenv('GDFIDL_VERSION',orig_ver)
+            save(fullfile('pp_link', 'wake', 'data_postprocessed.mat'), 'pp_data','-v7.3')
+            % Generate the plots.
+            GdfidL_plot_wake(pp_data, ppi, ...
+                modelling_inputs, run_logs,...
+                fullfile('pp_link', 'wake/'), 1E7)
+        end %if
     catch W_ERR
         display_postprocessing_error(W_ERR, 'wake')
-    end
+    end %try
 end %if
-clear run_logs orig_ver pp_data modelling_inputs 
+clear run_logs orig_ver pp_data modelling_inputs
 %% Post processing S-parameters
 if exist(fullfile('data_link', 's_parameters'), 'dir')
+    skip = 0;
     % Creating sub structure.
     try
-        if ~exist(fullfile('pp_link', 's_parameter'), 'dir')
-            [~] = system(['mkdir ', fullfile('pp_link', 's_parameter')]);
-        end
-        % Save input structure
-        save(fullfile('pp_link', 's_parameters', 'pp_inputs.mat'), 'ppi');
-        % Move files to the post processing folder.
-        copyfile(fullfile('data_link', 's_parameters', 'run_inputs.mat'),...
-            fullfile('pp_link', 's_parameter/'));
-        [d_list, pth] = dir_list_gen(fullfile('data_link', 's_parameters'),'dirs', 1);
-        d_list = d_list(3:end);
-        copyfile(fullfile(pth, d_list{1},'model.gdf'),...
-            fullfile('pp_link', 's_parameter', 'model.gdf'));
-        if exist(fullfile(pth, d_list{1},'model_log'), 'file')
-            copyfile(fullfile(pth, d_list{1},'model_log'), ...
-                fullfile('pp_link', 's_parameter', 'model_log'));
-        end
-        % Reading logs
-        for js = 1:length(d_list)
-            run_logs.(d_list{js}) = ...
-                GdfidL_read_s_parameter_log(...
-                fullfile('data_link', 's_parameters',d_list{js},'model_log'));
-        end
-        save(fullfile('pp_link', 's_parameters', 'data_from_run_logs.mat'), 'run_logs')
-        
-        disp('GdfidL_post_process_models: Post processing S parameter data.')
-        % Running postprocessor
-        orig_ver = getenv('GDFIDL_VERSION');
-        setenv('GDFIDL_VERSION',run_logs.(d_list{1}).ver);
-        pp_data = postprocess_s_parameters;
-        % restoring the original version.
-        setenv('GDFIDL_VERSION',orig_ver)
-        save(fullfile('pp_link', 's_parameters', 'data_postprocessed.mat'), 'pp_data','-v7.3')
-        % location and size of the default figures.
-        fig_pos = [10000 678 560 420];
-        % Generate the plots for the report.
-        GdfidL_plot_s_parameters(pp_data, ppi, fig_pos, ...
-            fullfile('pp_link', 's_parameter/'));
-     catch ERR
+        if exist(fullfile('pp_link', 's_parameters'), 'dir')
+            if nargin ==3 && strcmp(ow_behaviour, 'no_skip')
+                old_store = ['old_data', datestr(now,30)];
+                mkdir('pp_link', old_store)
+                movefile(fullfile('pp_link', 's_parameters'), fullfile('pp_link', old_store))
+            else
+                disp(['Skipping S-parameter postprocessing for ',ppi.model_name, ' data already exists'])
+                skip = 1;
+            end %if
+        end %if
+        if skip == 0
+            [~] = system(['mkdir ', fullfile('pp_link', 's_parameters')]);
+            % Save input structure
+            save(fullfile('pp_link', 's_parameters', 'pp_inputs.mat'), 'ppi');
+            % Move files to the post processing folder.
+            copyfile(fullfile('data_link', 's_parameters', 'run_inputs.mat'),...
+                fullfile('pp_link', 's_parameters/'));
+            [d_list, pth] = dir_list_gen(fullfile('data_link', 's_parameters'),'dirs', 1);
+%             d_list = d_list(3:end);
+            copyfile(fullfile(pth, d_list{1},'model.gdf'),...
+                fullfile('pp_link', 's_parameters', 'model.gdf'));
+            if exist(fullfile(pth, d_list{1},'model_log'), 'file')
+                copyfile(fullfile(pth, d_list{1},'model_log'), ...
+                    fullfile('pp_link', 's_parameters', 'model_log'));
+            end
+            % Reading logs
+            for js = 1:length(d_list)
+                run_logs.(d_list{js}) = ...
+                    GdfidL_read_s_parameter_log(...
+                    fullfile('data_link', 's_parameters',d_list{js},'model_log'));
+            end
+            save(fullfile('pp_link', 's_parameters', 'data_from_run_logs.mat'), 'run_logs')
+            
+            disp('GdfidL_post_process_models: Post processing S parameter data.')
+            % Running postprocessor
+            orig_ver = getenv('GDFIDL_VERSION');
+            setenv('GDFIDL_VERSION',run_logs.(d_list{1}).ver);
+            pp_data = postprocess_s_parameters;
+            % restoring the original version.
+            setenv('GDFIDL_VERSION',orig_ver)
+            save(fullfile('pp_link', 's_parameters', 'data_postprocessed.mat'), 'pp_data','-v7.3')
+            % location and size of the default figures.
+            fig_pos = [10000 678 560 420];
+            % Generate the plots for the report.
+            GdfidL_plot_s_parameters(pp_data, ppi, fig_pos, ...
+                fullfile('pp_link', 's_parameters/'));
+        end %if
+    catch ERR
         display_postprocessing_error(ERR, 'S-parameter')
-    end
+    end %try
 end %if
-clear run_logs orig_ver pp_data modelling_inputs 
+clear run_logs orig_ver pp_data modelling_inputs
 %% Post processing eigenmode
 if exist(fullfile('data_link', 'eigenmode/'), 'dir')
     % Creating sub structure.
@@ -142,7 +164,7 @@ if exist(fullfile('data_link', 'eigenmode/'), 'dir')
     save(fullfile('pp_link', 'eigenmode', 'data_postprocessed.mat'), 'pp_data','-v7.3')
     GdfidL_plot_eigenmode(pp_data, fullfile('pp_link', 'eigenmode/'))
 end %if
-clear run_logs orig_ver pp_data modelling_inputs 
+clear run_logs orig_ver pp_data modelling_inputs
 %% Post processing lossy eigenmode
 if exist(fullfile('data_link', 'lossy_eigenmode/'), 'dir')
     % Creating sub structure.
@@ -171,7 +193,7 @@ if exist(fullfile('data_link', 'lossy_eigenmode/'), 'dir')
     GdfidL_plot_eigenmode_lossy(pp_data, ...
         fullfile('pp_link', 'lossy_eigenmode/'))
 end %if
-clear run_logs orig_ver pp_data modelling_inputs 
+clear run_logs orig_ver pp_data modelling_inputs
 %% Post processing shunt
 if exist(fullfile('data_link', 'shunt'), 'dir')
     try
@@ -224,7 +246,7 @@ if exist(fullfile('data_link', 'shunt'), 'dir')
         display_postprocessing_error(ME, 'shunt')
     end %try
 end %if
-clear run_logs orig_ver pp_data modelling_inputs 
+clear run_logs orig_ver pp_data modelling_inputs
 %% Remove the links and move back to the original directory.
 delete('pp_link')
 delete('data_link')

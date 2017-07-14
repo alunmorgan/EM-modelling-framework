@@ -26,7 +26,7 @@ ov = cat(1,ov,'    wantdf = 1e6');
 ov = cat(1,ov,'    onlyplotfiles = yes');
 ov = cat(1,ov,'    doit');
 
-write_out_data( ov, strcat('pp_link/s_parameter/model_s_param_',excite,'_post_processing') )
+write_out_data( ov, fullfile('pp_link', 's_parameters', ['model_s_param_',excite,'_post_processing'] ,['model_s_param_',excite,'_post_processing_input_file']) )
 % fid = fopen(strcat('pp_link/model_s_param_',excite,'_post_processing'),'wt');
 % for be = 1:length(ov)
 %     mj = char(ov{be});
