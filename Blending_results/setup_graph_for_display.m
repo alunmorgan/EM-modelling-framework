@@ -1,7 +1,7 @@
 function setup_graph_for_display(axis_h, xlims, ylims, zlims,  lg, Xlab, Ylab, Zlab, name)
-xlim([min(xlims(1,:)), max(xlims(2,:))])
-ylim([min(ylims(1,:)), max(ylims(2,:))])
-zlim([min(zlims(1,:)), max(zlims(2,:))])
+xlim([min(xlims(:,1)), max(xlims(:,2))])
+ylim([min(ylims(:,1)), max(ylims(:,2))])
+zlim([min(zlims(:,1)), max(zlims(:,2))])
 if lg(1) == 1
     set(axis_h,'XScale','log')
 else

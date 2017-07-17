@@ -4,14 +4,31 @@ function out = add_blend_table(model_name, subtitle, swept_vals, summary)
 %
 % Example: out = add_blend_table(model_name, subtitle, swept_vals, summary)
 
+CPU_time_sections = length(strfind(summary.CPU_time{1},','));
+wall_time_sections = length(strfind(summary.wall_time{1},','));
+time_section_size = 0.55;
+tab1 = '\begin{tabular}{|m{1.2cm}|';
+for ne = 1:CPU_time_sections
+    tab1 = strcat(tab1, ' m{', num2str(time_section_size), 'cm}');
+end %if
+tab1 = strcat(tab1, ' | ');
+for nw = 1:wall_time_sections
+    tab1 = strcat(tab1, ' m{', num2str(time_section_size), 'cm}');
+end %if
+tab1 = strcat(tab1, ' | m{1.7cm} | m{1.7cm} | m{1.5cm} |}');
 out{1} = ' ';
 out = cat(1,out,'\vspace{0.25cm} ');
-out = cat(1,out, '\begin{tabular}{|m{1.2cm}| m{0.55cm} m{0.55cm} m{0.55cm} | m{0.55cm} m{0.55cm} | m{1.7cm} | m{1.7cm} | m{1.7cm} | m{1.5cm} |}');
+out = cat(1,out, tab1);
 out = cat(1,out,'\hline');
-out = cat(1,out,['\multicolumn{9}{|c|}{\textbf{',model_name,' - ', subtitle,'}}\\']);
+out = cat(1,out,['\multicolumn{'...
+    ,num2str(1 + CPU_time_sections + wall_time_sections + 3),...
+    '}{|c|}{\textbf{',model_name,' - ', subtitle,'}}\\']);
 out = cat(1,out,'\hline');
 out = cat(1,out,['Sweep value & ',...
-    '\multicolumn{3}{|m{1.65cm}|}{Calculation time (single~CPU)} & \multicolumn{2}{|m{1.65cm}|}{Calculation time (wall~clock)} & ',...
+    '\multicolumn{',num2str(CPU_time_sections),...
+    '}{|m{',num2str(time_section_size * CPU_time_sections),'cm}|}{Calculation~time (single~CPU)} & \multicolumn{', ...
+    num2str(wall_time_sections),...
+    '}{|m{',num2str(time_section_size * wall_time_sections),'cm}|}{Calculation~time (wall~clock)} & ',...
     'Number of mesh cells & Memory used & Timestep\\' ]);
 out = cat(1,out,'\hline');
 for hea = 1:length(summary.wlf)
