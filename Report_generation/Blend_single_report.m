@@ -88,7 +88,7 @@ if exist(fullfile(report_input.source_path, report_input.sources{1}, 'wake'), 'd
     end
     
     
-    capE = ['An overlay of the energy lost from the beam (solid line), ',...
+    capE = ['An overlay of ',...
         'the energy in the fields of the model (dashed line), ',...
         'and the cumulative energy seen at the ports (dotted line).'];
     [~] = Blend_figs(report_input, 'wake', 'Energy', 'Energy', 1, 1);
@@ -111,17 +111,16 @@ if exist(fullfile(report_input.source_path, report_input.sources{1}, 'wake'), 'd
     end %for
 end %if
 %%%%%%%%%%%%%%%% S Parameter graphs %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-if exist(fullfile(report_input.source_path, report_input.sources{1}, 's-parameter'), 'dir') == 7
-    
+if exist(fullfile(report_input.source_path, report_input.sources{1}, 's_parameters'), 'dir') == 7
     ov = cat(1,ov,'\chapter{S parameters}');
-    num_ports = length(modelling_inputs.port_multiple);
+    num_ports = length(report_input.port_multiple);
     overall_state = 0;
     for hs = 3:num_ports
         for ha = 3:num_ports
             for ks = 1:2 % number of modes desired
                 fig_name = ['s_parameters_S',num2str(hs),num2str(ha)];
                 out_name = [fig_name, '_mode_', num2str(ks)];
-                state = Blend_figs(report_input, 's-parameter', fig_name, out_name, ...
+                state = Blend_figs(report_input, 's_parameters', fig_name, out_name, ...
                     0, 1, ['\s*S\d\d\(',num2str(ks),'\)\s*'], 9);
                 % FIXME
                 close all % This should not be required
@@ -133,9 +132,8 @@ if exist(fullfile(report_input.source_path, report_input.sources{1}, 's-paramete
                         lab, [lab,'_3D'], 1, 0.8);
                     ov = cat(1,ov,ov1);
                     ov = cat(1,ov,'\clearpage');
-                    ov1 = latex_top_bottom_images([out_name, '_zoom.eps'], ...
-                        [out_name, '_diff.eps'],[lab 'zoom'],[lab,' diff'],...
-                        [lab, '_zoom'], [lab,'_diff'], 1, 1);
+                    ov1 = latex_single_image([out_name, '_diff.eps']...
+                        ,[lab,' diff'], [lab,'_diff'], 1);
                     ov = cat(1,ov,ov1);
                     ov = cat(1,ov,'\clearpage');
                 end %if

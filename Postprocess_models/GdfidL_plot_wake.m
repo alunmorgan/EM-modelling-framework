@@ -472,7 +472,7 @@ if isfield(wake_data.raw_data.port, 'timebase')
     end
     report_plot_frequency_graphs(fig_pos, pth, y_lev,...
         x_axis, power_diff, cut_ind, power_dist_ind, cuts_temp,...
-        lw, 'Energy left in structure', graph_freq_lim, 'b', [])
+        lw, 'Energy_left_in_structure', graph_freq_lim, 'b', [])
 end
 
 if wake_data.port_time_data.total_energy ~=0

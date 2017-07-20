@@ -25,12 +25,15 @@ for wah = length(t):-1:1;
 end % for
 n_ports = max(max(t2)) -2;
 ov = cat(1,ov,'\section{Reflection}');
-ov1 = latex_single_image(['s_parameter/',s_list{main_reflections}], 'Reflections for all signal ports', 1);
+ov1 = latex_single_image(['s_parameter/',s_list{main_reflections}],...
+    'Reflections for all signal ports', 'Reflections_all_signal_ports', 1);
 ov = cat(1,ov,ov1);
 ov = cat(1,ov,'\clearpage');
 if n_ports >2
     ov = cat(1,ov,'\section{Transmission}');
-    ov1 = latex_single_image(['s_parameter/',s_list{main_transmissions}], 'Transmission between all signal ports', 1);
+    ov1 = latex_single_image(['s_parameter/',s_list{main_transmissions}],...
+        'Transmission between all signal ports', ...
+        'Transmission_between_all_signal_ports',1);
     ov = cat(1,ov,ov1);
     ov = cat(1,ov,'\clearpage');
     
