@@ -34,7 +34,7 @@ for es=1:size(s.data,1);
             ylabel('S parameters (dB)')
             title(t_string1)
             xlim(ppi.display_range)
-            savemfmt(h(1), pth,['s_parameters_S',num2str(s_in),num2str(n)])
+            savemfmt(h(1), pth,['s_parameters_S',num2str(s_in),'_',num2str(n)])
             close(h(1))
         end
     end
