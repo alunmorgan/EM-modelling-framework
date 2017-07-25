@@ -14,9 +14,7 @@ data_path = dir_list_gen(fullfile(results_path),'dirs',1);
 
 for ks = 1:length(data_path)
     [~,folder_name,~] = fileparts(data_path{ks});
-    
-    if strcmp(folder_name, 's_parameter')
-        clear ppi pp_data run_logs modelling_inputs
+    clear ppi pp_data run_logs modelling_inputs
         % Load up the data extracted from the run log.
         load(fullfile(data_path{ks}, 'data_from_run_logs.mat'))
         % Load up post processing inputs
@@ -26,29 +24,20 @@ for ks = 1:length(data_path)
         % Load up the post precessed data.
         load(fullfile(data_path{ks}, 'data_postprocessed.mat'))
         % Load up the original model input parameters.
-        load(fullfile(data_path{ks}, 's_parameter', 'run_inputs.mat'));
+        load(fullfile(data_path{ks}, 'run_inputs.mat'));
         first_name = fieldnames(run_logs);
-        report_input.date = run_logs.(first_name{1}).dte;
         [mb_param_list, mb_param_vals, ...
             geom_param_list, geom_param_vals ] = extract_parameters(run_logs);
-        [s_ltx, s_appnd] = Generate_s_parameter_report(data_path);
+        
+    if strcmp(folder_name, 's_parameters')  
+        report_input.date = run_logs.(first_name{1}).dte;
+        [s_ltx, s_appnd] = Generate_s_parameter_report(data_path{ks});
     end %if
     
     if strcmp(folder_name, 'wake')
-        clear ppi pp_data run_logs modelling_inputs
-        % Load up the data extracted from the run log.
-        load(fullfile(data_path{ks}, 'data_from_run_logs.mat'))
-        % Load up post processing inputs
-        load(fullfile(data_path{ks}, 'pp_inputs.mat'))
-        report_input.model_name = regexprep(ppi.model_name,'_',' ');
-        report_input.doc_root = ppi.output_path;
-        % Load up the post precessed data.
-        load(fullfile(data_path{ks}, 'data_postprocessed.mat'))
-        load(fullfile(data_path{ks}, 'run_inputs.mat'));
         report_input.date = run_logs.dte;
-        [mb_param_list, mb_param_vals, ...
-            geom_param_list, geom_param_vals ] = extract_parameters(run_logs);
-        [w_ltx, w_appnd] = Generate_wake_report(data_path{ks}, pp_data, modelling_inputs, ppi, run_logs);
+        [w_ltx, w_appnd] = Generate_wake_report(data_path{ks}, ...
+            pp_data, modelling_inputs, ppi, run_logs);
     end %if
 end %for
 mb_param_list = regexprep(mb_param_list,'_',' ');
