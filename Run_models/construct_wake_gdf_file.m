@@ -1,4 +1,4 @@
-function construct_wake_gdf_file(input_file_path, modelling_inputs)
+function construct_wake_gdf_file(path_to_model_data_file, modelling_inputs)
 % Write the input gdf file for an wake simulation of the requested
 % model.
 %
@@ -27,9 +27,7 @@ fs = gdf_wake_header_construction('', 'temp', ...
     material_override,...
     material_labels);
 
-model_file = fullfile(input_file_path, ...
-    [modelling_inputs.base_model_name, '_model_data']);
-data = read_file_full_line(model_file);
+data = read_file_full_line(path_to_model_data_file);
 
 if isfield(modelling_inputs, 'geom_only')
     mon = {'-volumeplot'};

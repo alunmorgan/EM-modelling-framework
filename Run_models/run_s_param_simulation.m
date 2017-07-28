@@ -14,15 +14,27 @@ function run_s_param_simulation(paths, modelling_inputs, ow_behaviour)
 % have long term storage on a network drive, but during the modelling this
 % will kill performance. So initially write to a local drive and then move
 % it.
+if nargin == 3 && ~strcmp(ow_behaviour, 'STL')
+        stl_flag = '';
+end %if
+if nargin == 3 && strcmp(ow_behaviour, 'STL')
+    stl_flag = 'STL';
+end %if
+
 skip = 0;
 % Create the required top leveloutput directories.
-if exist(fullfile(paths.storage_path, modelling_inputs.base_model_name, modelling_inputs.model_name, 's_parameters'),'dir')
+% FIXME This will break if multiple model sets are used.
+results_storage_location = fullfile(paths.storage_path, modelling_inputs.set_name{1}, modelling_inputs.model_name);
+if exist(fullfile(results_storage_location, 's_parameters'),'dir')
     if nargin ==3 && strcmp(ow_behaviour, 'no_skip')
-        
         old_store = ['old_data', datestr(now,30)];
-        mkdir(fullfile(paths.storage_path, modelling_inputs.base_model_name, modelling_inputs.model_name), old_store)
-        movefile(fullfile(paths.storage_path, modelling_inputs.base_model_name, modelling_inputs.model_name, 's_parameters'),...
-            fullfile(paths.storage_path, modelling_inputs.base_model_name, modelling_inputs.model_name, old_store))
+        mkdir(results_storage_location, old_store)
+        movefile(fullfile(results_storage_location, 's_parameters'),...
+            fullfile(results_storage_location, old_store))
+        disp(['S-parameter data already exists for ',...
+            modelling_inputs.model_name, ...
+            '. However the overwrite flag is set so the simulation will be run anyway. Old data moved to ',...
+            fullfile(results_storage_location, old_store)])
     else
         disp(['Skipping ', modelling_inputs.model_name, '. S-parameter data already exists'])
         skip = 1;
@@ -30,7 +42,7 @@ if exist(fullfile(paths.storage_path, modelling_inputs.base_model_name, modellin
 end %if
 
 if skip == 0
-    mkdir(fullfile(paths.storage_path, modelling_inputs.base_model_name, modelling_inputs.model_name), 's_parameters')
+    mkdir(results_storage_location, 's_parameters')
     % Move into the temporary folder.
     old_loc = pwd;
     tmp_location = move_into_tempororary_folder(paths.scratch_path);
@@ -54,15 +66,15 @@ if skip == 0
         end %if
         
         % Create the required sub structure output directories.
-        arch_out = fullfile(paths.storage_path, modelling_inputs.base_model_name, modelling_inputs.model_name,'s_parameters',['port_',port_name, '_excitation']);
+        arch_out = fullfile(results_storage_location,'s_parameters',['port_',port_name, '_excitation']);
         if ~exist(arch_out,'dir')
             mkdir(arch_out)
         end %if
         
         % Move the data to the storage area.
-        save(fullfile(paths.storage_path, modelling_inputs.base_model_name, modelling_inputs.model_name, 's_parameters', 'run_inputs.mat'), 'paths', 'modelling_inputs')
+        save(fullfile(results_storage_location, 's_parameters', 'run_inputs.mat'), 'paths', 'modelling_inputs')
         movefile('temp_data/*', arch_out);
-        copyfile(fullfile(paths.input_file_path, [modelling_inputs.base_model_name, '_model_data']), arch_out);
+        copyfile(path_to_model_file, arch_out);
         temp_files('remove')
         delete('SOLVER-LOGFILE');
         delete('WHAT-GDFIDL-DID-SPIT-OUT');

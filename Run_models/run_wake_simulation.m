@@ -14,28 +14,55 @@ function run_wake_simulation(paths, modelling_inputs, ow_behaviour)
 % have long term storage on a network drive, but during the modelling this
 % will kill performance. So initially write to a local drive and then move
 % it.
+if nargin == 3 && ~strcmp(ow_behaviour, 'STL')
+    stl_flag = '';
+end %if
+if nargin == 3 && strcmp(ow_behaviour, 'STL')
+    stl_flag = 'STL';
+end %if
+
 skip = 0;
 % create the required output directories, and move any existing data out of
 % the way.
-if exist(fullfile(paths.storage_path, modelling_inputs.base_model_name, modelling_inputs.model_name, 'wake'),'dir')
+
+% FIXME This will break if multiple model sets are used.
+results_storage_location = fullfile(paths.storage_path, modelling_inputs.set_name{1}, modelling_inputs.model_name);
+if exist(fullfile(results_storage_location, 'wake'),'dir')
     if nargin ==3 && strcmp(ow_behaviour, 'no_skip')
         old_store = ['old_data', datestr(now,30)];
-        mkdir(fullfile(paths.storage_path, modelling_inputs.base_model_name, modelling_inputs.model_name), old_store)
-        movefile(fullfile(paths.storage_path, modelling_inputs.base_model_name, modelling_inputs.model_name, 'wake'),...
-            fullfile(paths.storage_path, modelling_inputs.base_model_name, modelling_inputs.model_name, old_store))
+        mkdir(results_storage_location, old_store)
+        movefile(fullfile(results_storage_location, 'wake'),...
+            fullfile(results_storage_location, old_store))
+        disp(['Wake data already exists for ',...
+            modelling_inputs.model_name, ...
+            '. However the overwrite flag is set so the simulation will be run anyway. Old data moved to ',...
+            fullfile(results_storage_location, old_store)])
     else
         disp(['Skipping ', modelling_inputs.model_name, '. Wake data already exists'])
         skip = 1;
+        
     end %if
 end %if
 if skip == 0;
-    mkdir(fullfile(paths.storage_path, modelling_inputs.base_model_name, modelling_inputs.model_name), 'wake')
+    mkdir(results_storage_location, 'wake')
     % Move into the temporary folder.
     old_loc = pwd;
     tmp_location = move_into_tempororary_folder(paths.scratch_path);
     
     temp_files('make')
-    construct_wake_gdf_file(paths.input_file_path, modelling_inputs)
+    
+    if strcmp(stl_flag, 'STL')
+        % FIXME This will break if multiple model sets are used.
+        path_to_model = fullfile(paths.input_file_path, ...
+            modelling_inputs.set_name{1},...
+            modelling_inputs.model_name,...
+            [modelling_inputs.model_name, '_model_data']);
+    else
+        path_to_model = fullfile(paths.input_file_path, ...
+            [modelling_inputs.base_model_name, '_model_data']);
+    end %if
+    construct_wake_gdf_file(path_to_model, modelling_inputs)
+    disp(['Running wake simulation for ', modelling_inputs.model_name, '.'])
     % setting the GdfidL version to test
     orig_ver = getenv('GDFIDL_VERSION');
     setenv('GDFIDL_VERSION',modelling_inputs.version);
@@ -51,10 +78,10 @@ if skip == 0;
     end
     
     % Move the data to the storage area.
-    save(fullfile(paths.storage_path, modelling_inputs.base_model_name, modelling_inputs.model_name, 'wake', 'run_inputs.mat'), 'modelling_inputs')
-    movefile('temp_data/*', fullfile(paths.storage_path, modelling_inputs.base_model_name, modelling_inputs.model_name, 'wake'));
-    copyfile(fullfile(paths.input_file_path, [modelling_inputs.base_model_name, '_model_data']), ...
-        fullfile(paths.storage_path, modelling_inputs.base_model_name, modelling_inputs.model_name, 'wake'));
+    save(fullfile(results_storage_location, 'wake', 'run_inputs.mat'), 'modelling_inputs')
+    movefile('temp_data/*', fullfile(results_storage_location, 'wake'));
+    copyfile(path_to_model, ...
+        fullfile(results_storage_location, 'wake'));
     temp_files('remove')
     delete('SOLVER-LOGFILE');
     delete('WHAT-GDFIDL-DID-SPIT-OUT');
