@@ -8,6 +8,7 @@ import Part, Mesh, MeshPart
 from FreeCAD import Base
 from math import pi
 import copy
+import os
 
 
 class ModelException(Exception):
@@ -36,7 +37,7 @@ def base_model(model_function, input_params, output_path, accuracy=2):
         print 'Problem with base model ', '\n\t', e
 
 
-def parameter_sweep(model_function, input_params, output_path, sweep_variable, start, stop, step, accuracy=2):
+def parameter_sweep(model_function, input_params, output_path, sweep_variable, sweep_vals, accuracy=2):
     """Takes the INPUT_PARAMETERS dictionary as a base. Then changes the requested input variable in a sequence.
         For each iteration it generates a model.
 
@@ -45,9 +46,7 @@ def parameter_sweep(model_function, input_params, output_path, sweep_variable, s
             input_params (dict): A dictionary containing the names and values of teh input parameters of the model.
             output_path (str): The location all the output files will be written to.
             sweep_variable (str): Name found in the input_params dictionary.
-            start (float): The starting value of the sweep.
-            stop (float): The interval between sweep iterations.
-            step (float): The end of the sweep. (Same behaviour as range)
+            sweep_vals (list): A list of valuse for the swept parameter to take.
             accuracy (int): Represents the fineness of teh mesh. bigger number = finer mesh
 
             """
@@ -55,8 +54,10 @@ def parameter_sweep(model_function, input_params, output_path, sweep_variable, s
         raise ValueError('The variable to be swept does not exist in the input parameters dictionary.')
     inputs = copy.copy(input_params)   # To ensure the base settings are unchanged between sweeps.
     output_loc = copy.copy(output_path)
-    for inputs[sweep_variable] in xrange(start, stop, step):
-        model_tag = ''.join([sweep_variable, '_sweep_value_', str(inputs[sweep_variable])])
+    for inputs[sweep_variable] in sweep_vals:
+        # Replacing . with p to prevent problems with filename parsing
+        value_string = str(inputs[sweep_variable]).replace('.', 'p')
+        model_tag = ''.join([sweep_variable, '_sweep_value_', value_string])
         try:
             parts_list, model_name = model_function(inputs)
             generate_output_files(output_loc, model_name, parts_list, inputs, tag=model_tag, mesh_resolution=accuracy)
@@ -262,13 +263,13 @@ def rotate_at(shp, loc=(0, 0, 0), rotation_angles=(0, 0, 0)):
     return shp
 
 
-def generate_output_files(output_loc, model_name, parts_list, input_parameters, tag, mesh_resolution=2):
+def generate_output_files(root_loc, model_name, parts_list, input_parameters, tag, mesh_resolution=2):
     """Takes the dictionary of parts, converts them to meshes.
     Saves the resulting meshes in both binary and ascii STL format. (ECHO needs binary, GdfidL needs ASCII).
      Also saves the Geometry in a freeCAD document.
 
      Args:
-            output_loc (str): location of the folder the results are writen to.
+            root_loc (str): location of the folder the results are writen to.
             model_name (str): name of the model.
             parts_list (dict): dictionary of shapes used to construct the model.
             input_parameters (dict): dictionary of input parameters used to make the model.
@@ -276,6 +277,14 @@ def generate_output_files(output_loc, model_name, parts_list, input_parameters, 
             mesh_resolution (int): the resolution of hte meshing (equivalent to the Fineness parameter in meshFromShape)
     """
     document_name = ''.join([model_name, '_model__', tag])
+    output_loc = os.path.join(root_loc, model_name, ''.join([model_name, '_', tag]))
+    if not os.path.exists(output_loc):
+        os.makedirs(output_loc)
+    if not os.path.exists(os.path.join(output_loc, 'binary')):
+        os.makedirs(os.path.join(output_loc, 'binary'))
+    if not os.path.exists(os.path.join(output_loc, 'ascii')):
+        os.makedirs(os.path.join(output_loc, 'ascii'))
+
     doc = FreeCAD.newDocument(document_name)
     part_labels = parts_list.keys()
     for part in part_labels:
@@ -283,7 +292,7 @@ def generate_output_files(output_loc, model_name, parts_list, input_parameters, 
         myObject = doc.addObject("Part::Feature", part_name)
         myObject.Shape = parts_list[part]
         doc.recompute()
-        doc.saveAs(''.join([output_loc, model_name, '__', tag, '.FCStd']))
+        doc.saveAs(os.path.join(output_loc, ''.join([model_name, '_', tag, '.FCStd'])))
         # Generate a mesh from the shape.
         mesh_name = ''.join([part_name, ' (Meshed)'])
         m1 = MeshPart.meshFromShape(Shape=parts_list[part], Fineness=mesh_resolution, SecondOrder=1, Optimize=1,
@@ -291,10 +300,10 @@ def generate_output_files(output_loc, model_name, parts_list, input_parameters, 
         mymesh = doc.addObject("Mesh::Feature", "Mesh")
         mymesh.Mesh = m1
         mymesh.Label = mesh_name
-        mymesh.Mesh.write(''.join([output_loc, part_name, '_binary__', tag, '.stl']), "STL", mesh_name)
-        mymesh.Mesh.write(''.join([output_loc, part_name, '_ascii__', tag, '.stl']), "AST", mesh_name)
-    parameter_file_name = ''.join([model_name, '_parameters'])
-    param_file = open(''.join([output_loc, parameter_file_name, '__', tag, '.txt']), 'w')
+        mymesh.Mesh.write(os.path.join(output_loc, 'binary', ''.join([part_name, '.stl'])), "STL", mesh_name)
+        mymesh.Mesh.write(os.path.join(output_loc, 'ascii', ''.join([part_name, '.stl'])), "AST", mesh_name)
+    parameter_file_name = ''.join([model_name, '_parameters.txt'])
+    param_file = open(os.path.join(output_loc, parameter_file_name), 'w')
     for name, value in input_parameters.items():
         param_file.write(''.join([name, ' : ', str(value), '\n']))
     param_file.close()
