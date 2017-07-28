@@ -1,8 +1,8 @@
 function [port_names] = gdf_extract_port_names(model_file)
-% What does it do???!!!
+% Find the names of the ports defined in the provided model file.
 %
-% port_names is
-% model_file is
+% port_names (cell): cells array of strings containign the port names.
+% model_file (string): full path to the model file
 %
 % Example: [port_names] = gdf_extract_port_names(model_file)
 fid = fopen(model_file);
