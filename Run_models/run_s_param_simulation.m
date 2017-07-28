@@ -1,4 +1,4 @@
-function run_s_param_simulation(paths, modelling_inputs, ow_behaviour)
+function run_s_param_simulation(paths, modelling_inputs, ow_behaviour, stl_flag)
 % Takes the geometry specification, adds the setup for a wake simulation and
 % runs a wake field simulation with the desired calculational precision.
 %
@@ -50,7 +50,17 @@ if skip == 0
     for nes = 1:length(modelling_inputs.s_param_ports)
         port_name = modelling_inputs.s_param_ports{nes};
         temp_files('make')
-        construct_s_param_gdf_file(paths.input_file_path, modelling_inputs, port_name)
+        if strcmp(stl_flag, 'STL')
+            path_to_model_file = fullfile(paths.input_file_path, ...
+                modelling_inputs.set_name{1},...
+                modelling_inputs.base_model_name,...
+                [modelling_inputs.base_model_name, '_model_data']);
+        else
+            path_to_model_file = fullfile(paths.input_file_path, ...
+                [modelling_inputs.base_model_name, '_model_data']);
+        end %if
+        construct_s_param_gdf_file(path_to_model_file, modelling_inputs, port_name)
+        disp(['Running S-parameter simulation for ', modelling_inputs.model_name, '.'])
         % setting the GdfidL version to test
         orig_ver = getenv('GDFIDL_VERSION');
         setenv('GDFIDL_VERSION',modelling_inputs.version);

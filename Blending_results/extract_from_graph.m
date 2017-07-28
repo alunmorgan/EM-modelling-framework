@@ -30,7 +30,7 @@ else
         display_names{ove} = get(a(ove), 'DisplayName');
         %     data_length(ove) = length(get(a(ove), 'XData'));
         parent(ove) = get(a(ove), 'Parent');
-    end
+    end %for
     %          Select only the lines on the main axis.
     s1 = parent == h_ax;
     a = a(s1);
@@ -39,16 +39,22 @@ else
     % name.
     if ~strcmp(line_select, 'all')
         locs = find_position_in_cell_lst(regexp(display_names, line_select));
+    else
+        locs = 1:length(display_names);
+    end %if
+    if isempty(locs)
+        data_out.state = 0;
+        data_out.xdata{1} = [];
+        data_out.ydata{1} = [];
+    else
         a = a(locs);
-    end
-    
-    %% extract the data from the graphs
-    
-    data_out.state = 1;
-    for en = 1:length(a)
-        data_out.xdata{en} = get(a(en),'XData');
-        data_out.ydata{en} = get(a(en),'YData');
-    end %for
+        % Extract the data from the graphs
+        data_out.state = 1;
+        for en = 1:length(a)
+            data_out.xdata{en} = get(a(en),'XData');
+            data_out.ydata{en} = get(a(en),'YData');
+        end %for
+    end %if
 end %if
 close(hn)
 

@@ -27,7 +27,7 @@
 load_local_paths
 
 log = {'Log of problems'};
-% base_model_names = {'cylindrical_pillbox'};
+% base_model_names = {'cylindrical_pillbox_with_port'};  
 base_model_names = {...
     'cylindrical_pillbox', ...
     'cylindrical_pillbox_with_port',...
@@ -49,6 +49,7 @@ for ha = 1:length(base_model_names)
     end
 end
 
+%% Post processing
 for ha = 1:length(base_model_names)
     try
         postprocessor_setup(base_model_names{ha}, ...
@@ -60,11 +61,12 @@ for ha = 1:length(base_model_names)
 end
 
 disp('Generating the individual reports')
-% Generate all the new reports
+%% Generate all the new reports
 for md = 1:length(base_model_names)
     generate_report_set(base_model_names{md}, Author, graphic_loc, results_loc)
 end
 
+%% Generate the overview reports
 disp('Generating the combined reports')
 % Generate all the blended reports using all available data.
 for md = 1:length(base_model_names)

@@ -43,7 +43,7 @@ end %for
 % This section is to remove the levels and other straight line which may be
 % on the graphs.
 for hwc = length(data_out):-1:1
-    if ~isempty(data_out(hwc).xdata)
+    if isfield(data_out(hwc), 'xdata') && ~isempty(data_out(hwc).xdata)
         for wah = length(data_out(hwc).xdata):-1:1
             if ~isempty(data_out(hwc).xdata{wah})
                 d_len(hwc, wah) = length(data_out(hwc).xdata{wah});
@@ -66,32 +66,46 @@ h1 = figure('Position', [ 0 0 1000 400]);
 ax1 = axes('Parent', h1);
 hold(ax1, 'on')
 for en = length(data_out):-1:1
-    if isempty(data_out(en).xdata{1})
-        plot(NaN, NaN,'linestyle',l_st{1},...
-            'Color',cols{rem(en-1,10)+1}, 'linewidth',lw, 'Parent', ax1);
-    else
-        plot(data_out(en).xdata{fwl}, data_out(en).ydata{fwl},'linestyle',l_st{1},...
-            'Color',cols{rem(en-1,10)+1}, 'linewidth',lw, 'Parent', ax1);
+    if isfield(data_out(hwc), 'xdata')
+        chk = 0;
+        ls_tk = 1;
+        for ewh = fwl:length(data_out(en).xdata)
+            if  ~isempty(data_out(en).xdata{ewh})
+                if chk == 1
+               h =  plot(data_out(en).xdata{ewh}, data_out(en).ydata{ewh},'linestyle',l_st{ls_tk},...
+                    'Color',cols{rem(en-1,10)+1}, 'linewidth',lw, 'Parent', ax1);
+                set(get(get(h,'Annotation'), 'LegendInformation'), 'IconDisplayStyle', 'off');
+                else
+                    plot(data_out(en).xdata{ewh}, data_out(en).ydata{ewh},'linestyle',l_st{ls_tk},...
+                    'Color',cols{rem(en-1,10)+1}, 'linewidth',lw, 'Parent', ax1);
+                chk = 1;  
+                end %if
+                ls_tk = ls_tk +1;
+            else
+                plot(NaN, NaN,'linestyle',l_st{1},...
+                    'Color',cols{rem(en-1,10)+1}, 'linewidth',lw, 'Parent', ax1);
+            end %if
+        end %for
     end %if
     leg{en} = [report_input.swept_name{1},' = ',report_input.swept_vals{en}];
 end %for
 hold(ax1, 'off')
 % add legend to 2D graph
 setup_graph_for_display(ax1, xlims,...
-                             ylims,...
-                             [-1,0], [0,lg,0], ...
-                             data_out(1).Xlab, data_out(1).Ylab,...
-                             '',...
-                             regexprep(report_input.base_name, '_', ' '));
+    ylims,...
+    [-1,0], [0,lg,0], ...
+    data_out(1).Xlab, data_out(1).Ylab,...
+    '',...
+    regexprep(report_input.base_name, '_', ' '));
 legend(ax1, leg, 'Location', 'EastOutside', 'Box', 'off')
 % save 2D graph
 savemfmt(h1, report_input.output_loc, out_name)
 
-if exist('udcp', 'var')
-    xlim_old = get(gca,'XLim');
-    xlim([xlim_old(1) udcp]);
-    savemfmt(h1, report_input.output_loc, [out_name, '_zoom'])
-end % if
+% if exist('udcp', 'var')
+%     xlim_old = get(gca,'XLim');
+%     xlim([xlim_old(1) udcp]);
+%     savemfmt(h1, report_input.output_loc, [out_name, '_zoom'])
+% end % if
 close(h1)
 
 % Generate 2D graph showing the difference to the first trace.
@@ -99,20 +113,23 @@ h4 = figure('Position', [ 0 0 1000 400]);
 ax4 = axes('Parent', h4);
 hold(ax4, 'on')
 for en = 1:length(data_out)
-    if isempty(data_out(en).xdata)
-        plot(NaN, NaN,'linestyle',l_st{1},...
-            'Color',cols{rem(en-1,10)+1}, 'linewidth',lw, 'Parent', ax4);
-    else
-        if ~isempty(data_out(en).ydata{1})
-            new_y = interp1(data_out(en).xdata{fwl}, data_out(en).ydata{fwl},data_out(1).xdata{fwl});
-            plot(data_out(1).xdata{fwl}, new_y - data_out(1).ydata{fwl},'linestyle',l_st{1},...
-                'Color',cols{rem(en-1,10)+1}, 'linewidth',lw, 'Parent', ax4);
-        else
-            plot(NaN, NaN,'linestyle',l_st{1},...
-                'Color',cols{rem(en-1,10)+1}, 'linewidth',lw, 'Parent', ax4);
-        end %if
+    if isfield(data_out(hwc), 'ydata')
+        for ewh = fwl:length(data_out(en).xdata)
+            if  ~isempty(data_out(en).ydata{ewh})
+                reference_data = data_out(1).xdata{ewh};
+                if isempty(reference_data)
+                    reference_data = zeros(1,length(data_out(en).xdata{ewh}));
+                end %if
+                new_y = interp1(data_out(en).xdata{ewh}, data_out(en).ydata{ewh}, reference_data);
+                plot(reference_data, new_y - data_out(1).ydata{ewh},'linestyle',l_st{1},...
+                    'Color',cols{rem(en-1,10)+1}, 'linewidth',lw, 'Parent', ax4);
+            else
+                plot(NaN, NaN,'linestyle',l_st{1},...
+                    'Color',cols{rem(en-1,10)+1}, 'linewidth',lw, 'Parent', ax4);
+            end %if
+        end %for
     end %if
-    leg{en} = [report_input.swept_name{1},' = ',report_input.swept_vals{en}]; 
+    leg{en} = [report_input.swept_name{1},' = ',report_input.swept_vals{en}];
 end %for
 hold(ax4, 'off')
 setup_graph_for_display(ax4, xlims, [-inf,inf], [-1,0], [0,lg,0],...
@@ -128,16 +145,20 @@ h2 = figure('Position', [ 0 0 1000 1000]);
 ax2 = axes('Parent', h2);
 hold(ax2, 'on')
 for en = 1:length(data_out)
-    if isempty(data_out(en).xdata{1})
-        plot3(NaN, NaN, NaN, 'linestyle',l_st{1},...
-            'Color',cols{rem(en-1,10)+1}, 'linewidth',lw,...
-            'HandleVisibility','off', 'Parent', ax2);
-    else
-        plot3(data_out(en).xdata{fwl}, ...
-            ones(length(data_out(en).xdata{fwl}),1) * en, ...
-            data_out(en).ydata{fwl},'linestyle',l_st{1},...
-            'Color',cols{rem(en-1,10)+1}, 'linewidth',lw,...
-            'HandleVisibility','off', 'Parent', ax2);
+    if isfield(data_out(hwc), 'xdata')
+        for ewh = fwl:length(data_out(en).xdata)
+            if  ~isempty(data_out(en).xdata{ewh})
+                plot3(data_out(en).xdata{ewh}, ...
+                    ones(length(data_out(en).xdata{ewh}),1) * en, ...
+                    data_out(en).ydata{ewh},'linestyle',l_st{1},...
+                    'Color',cols{rem(en-1,10)+1}, 'linewidth',lw,...
+                    'HandleVisibility','off', 'Parent', ax2);
+            else
+                plot3(NaN, NaN, NaN, 'linestyle',l_st{1},...
+                    'Color',cols{rem(en-1,10)+1}, 'linewidth',lw,...
+                    'HandleVisibility','off', 'Parent', ax2);
+            end %if
+        end %for
     end %if
 end %for
 hold(ax2, 'off')

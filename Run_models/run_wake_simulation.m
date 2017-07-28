@@ -1,4 +1,4 @@
-function run_wake_simulation(paths, modelling_inputs, ow_behaviour)
+function run_wake_simulation(paths, modelling_inputs, ow_behaviour, stl_flag)
 % Takes the geometry specification, adds the setup for a wake simulation and
 % runs a wake field simulation with the desired calculational precision.
 %

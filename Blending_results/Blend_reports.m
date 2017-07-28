@@ -2,13 +2,16 @@ function Blend_reports(results_loc,  base_name , Author, Graphic_path)
 %Blends some of the output from the individual thermal analysis reports to
 %generate a summary comparison report.
 %
-% Example: Blend_reports( rep_title, doc_root, output_path, source_reps , Author, Doc_num)
+% Example: Blend_reports( rep_title, base_name , Author, Graphic_path)
 
 source_path = fullfile(results_loc, base_name);
 [names,~] = dir_list_gen(source_path, 'dirs', 1);
 %select only those folders whos names start with the base name.
 names = names(strncmp(names, base_name, length(base_name)));
 base_name_ind = find(strcmp(names, base_name) == 1);
+if isempty(base_name_ind)
+    base_name_ind = find(strcmp(names, [base_name, '_Base']) == 1);
+end %if
 
 tmp=regexprep(names, base_name, '');
 tmp(base_name_ind) = [];
@@ -20,7 +23,11 @@ for awk = 1:length(tmp2)
         tmp3{awk} = tmp{awk}(tmp2{awk}(1) +1:tmp2{awk}(end) -1);
     end %if
 end %for
-sweeps = unique(tmp3);
+if length(tmp2) > 0
+    sweeps = unique(tmp3);
+else
+    sweeps = [];
+end %if
 
 
 for ewh = 1:length(sweeps)
@@ -107,7 +114,14 @@ for ewh = 1:length(sweeps)
     report_input.sources = names_in_sweep;
     report_input.swept_vals = param_val_list(:,~stable_tmp);
     
-            % replace all spaces with _ as latex has problems with spaces.
+    % add some values from the input file which do not show in the
+    % postprocessing log.
+    if isfield(modelling_inputs, 'port_multiple')
+        report_input.port_multiple = modelling_inputs.port_multiple;
+        report_input.port_fill_factor = modelling_inputs.port_fill_factor;
+        report_input.volume_fill_factor = modelling_inputs.volume_fill_factor;
+    end %if
+    % replace all spaces with _ as latex has problems with spaces.
     model_name_for_report = regexprep(base_name, '_', ' ');
     report_input.report_name = [model_name_for_report, ' - ',report_input.swept_name{isn},' sweep' ];
     report_input.rep_title = [report_input.swept_name{isn},'_sweep','-',base_name ];

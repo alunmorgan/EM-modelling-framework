@@ -1,151 +1,87 @@
+function Testing_rectangular_pillbox_with_ceramic(input_file_loc, scratch_loc, data_loc)
+% input_file_loc is the location of the model input files.
+% scratch_loc is the location of the temporary file space. Nothing is kept here.
+% data_loc is the location to store the data generated from the modelling run.
+%
+% Example: Testing_cylindrical_pillbox(input_file_loc, scratch_loc, data_loc)
 
-%% Modelling section.
-%%%%%%%%%%%%%% Setting up paths %%%%%%%%%%%%%%%%%%
-
+%% Adding locations to the data structure.
 % Location of the temporary file space. Nothing is kept here.
-%     mi.scratch_path = '/scratch/afdm76/';
-% using the ram disk as the file system is too small for eigenmode simulation.
-mi.scratch_path = '/dev/shm/';
+run_inputs.paths.scratch_path = scratch_loc;
 % Location of the model input files.
-mi.input_file_path = '/home/afdm76/Git/working/Gdfidl_input_files/';
+run_inputs.paths.input_file_path = input_file_loc ;
 % Location to store the data generated from the modelling run.
-mi.storage_path = '/dls/science/groups/b01/Alun/EM_tests/data/';
+run_inputs.paths.storage_path = data_loc;
+% The model set to associate each model to.
+run_inputs.model_set = {'rectangular_pillbox_with_ceramic'};
 
-mi.model_name = 'rectangular_pillbox_with_ceramic';
+%% Adding list of model names to run.
+run_inputs.model_names = {'rectangular_pillbox_with_ceramic'};
 
-%%%%%%%%%%%% Settings for the model %%%%%%%%%%%%%%%%%%%
+%% Material parameters for the model geometry
+% A lookup table of materials to component names
+run_inputs.mat_list = {'cav_mat','cavity';...
+    'bp_in', 'input beam pipe';...
+    'bp_out', 'output beam pipe'};
+% Material parameters sweeps can be defined here by
+% passing a cell array of >1 value.
+run_inputs.material_defs = {...
+    {'cav_mat', {'steel316'}, 'Material the cavity is made of.'},...
+    {'bp_in', {'steel316_2'}, 'Material for beam input pipe.'},...
+    {'bp_out', {'steel316_3'}, 'Material for beam output pipe.'},...
+    };
 
-% Port multiple
-% When using symetry planes some ports are not within the mesh and are thus not
-% counted. The port multiple is a way of taking these "hidden" ports into
-% account when it come to calculating the losses.
+%% This is where geometry sweeps can be set up.
+for shew = 1:length(run_inputs.model_names)
+    % Parameter sweeps can be set up here by passing a cell array of >1 value.
+    run_inputs.geometry_defs{shew} = {...
+        {'extension_length', {100e-3},'Length of the model extensions.'},...
+        {'pipe_width', {15e-3},'Radius of the beam pipe.'},...
+        {'pipe_height', {10e-3},'Radius of the beam pipe.'},...
+        {'cav_length', {42e-3}, 'Length of the cavity.'},...
+        {'cav_width', {100e-3}, 'Width of the cavity.'},...
+        {'cav_height', {65.1e-3}, 'Height of the cavity.'},...
+        };
+end %for
 
-% Port fill factor
-% in GdfidL if a port is cut by a symetry plane then only the section of the
-% port within the mesh returns any signal. In order to get the signal for the
-% full port one must divide by the fill factor.
-
-% volume_fill_factor
-% In order to get the total energy values correct you have to say what fraction
-% of the structure was simulated.
-
-% sigma
-% the beam sigma (m)
-
-% mesh stepsize (m)
-
-% The wake length (m)
-
-% mat list - a lookup table of materials to component names.
-
-% extension names - Identifies the materials used for the pipe extensions.
-% The losses from these will be combined witht he port losses rather than
-% the structure losses.
-
-% additional defs - parameters values to be passed in during gdf file
-% creation. This is where sweeps can be set up.
-
-% precision - calculation precision (double/ single).
-
-% n_cores - number of cores to use.
-
+%% This is for setting up the simulation parameters.
+run_inputs.simulation_defs.versions = {'170509g'};%{'161003g'};
+run_inputs.simulation_defs.beam_sigma = {'5E-3'}; %in m
+run_inputs.simulation_defs.mesh_stepsize = {'2000E-6'}; %in m
+run_inputs.simulation_defs.wakelength = {'400'};
+%Number of perfectly matched layers used.
+run_inputs.simulation_defs.NPMLs = {'40'};
+% calculation precision (double/ single).
+run_inputs.simulation_defs.precision = {'double'};
+% number of cores to use
+run_inputs.simulation_defs.n_cores = '25';
 % sim select - chooses which simulations to run
 % (Wake/S-parameter/Eigenmode). Uses a string as input 'esw' will select
 % all three.
-
-% The list of materials used and the labels used to identify them.
-rectangular_pillbox_mat_list = {'cav_mat','cavity';...
-    'ceramic_mat','ceramic';...
-    'bp_in', 'input beam pipe';...
-    'bp_out', 'output beam pipe'};
-%Additional defines. This allows lengths, materials and any other
-%muneric settings to be set.
-% Parameter sweeps can be set up here by passing a cell array of >1 value.
-add_defs = {{'extension_length', {100e-3},'Length of the model extensions.'},...
-    {'pipe_width', {40e-3},'Width of the beam pipe.'},...
-    {'pipe_height', {20e-3},'Height of the beam pipe.'},...
-    {'cav_length', {20e-3}, 'Length of the cavity.'},...
-    {'cav_width', {50e-3}, 'Width of the cavity.'},...
-    {'cav_height', {30e-3}, 'Height of the cavity.'},...
-    {'cav_mat', {'steel316'}, 'Material the cavity is made of.'},...
-    {'ceramic_mat', {'aluminium_oxide'}, 'Material for ceramic.'},...
-    {'bp_in', {'steel316_2'}, 'Material for beam input pipe.'},...
-    {'bp_out', {'steel316_3'}, 'Material for beam output pipe.'},...
-    {'NPMLs', {40}, 'Number of perfectly matched layers used.'},...
-    };
-
-% %%%%%%%%%
-mi.beam_sigma = '3E-3'; %in m
-mi.mesh_stepsize = '5E-4'; %in m
-mi.wakelength = '50';
-mi.mat_list = rectangular_pillbox_mat_list;
-mi.additional_defs = add_defs;
-mi.precision = 'double';
-% number of CPUs to use
-mi.n_cores = 25;
-mi.sim_select = 'w';
-mi.beam = 'yes';
+run_inputs.simulation_defs.sim_select = 'w';
+% specifies if there is an electron beam passing throug the structure.
+% if there is it is assumed to be passing between ports 1 and 2.
+run_inputs.simulation_defs.beam = 'yes';
+% Specifies the ports which the sparameter simulation will excite
+% sequentially. (useful if symetry mean that not all ports need to be
+% tried).
+% run_inputs.simulation_defs.s_param_ports = {};
+% When using symetry planes some ports are not within the mesh and are thus not
+% counted. The port multiple is a way of taking these "hidden" ports into
+% account when it come to calculating the losses.
+run_inputs.simulation_defs.port_multiple = [1,1];
+% in GdfidL if a port is cut by a symetry plane then only the section of the
+% port within the mesh returns any signal. In order to get the signal for the
+% full port one must divide by the fill factor.
+run_inputs.simulation_defs.port_fill_factor = [0.25,0.25];
+% In order to get the total energy values correct you have to say what fraction
+% of the structure was simulated.
+run_inputs.simulation_defs.volume_fill_factor =  0.25;
+% Identifies port extensions so that the energy loss accounting is done
+% correctly. The losses from these will be combined witht he port losses rather than
+% the structure losses.
+run_inputs.simulation_defs.extension_names = {'input beam pipe', 'output beam pipe'};
 
 % %%%%%%%%%%%%%%%%%%%%%%%%%% Running the models %%%%%%%%%%%%%%%%%%%
-% % Cycling through the different versions
-start = now;
-orig_ver = getenv('GDFIDL_VERSION');
-% versions = {'150719g', '150923g', '151128g', '160410g','160429g, '160517g'};
-versions = {'160517g'};
-for kse = 1:length(versions)
-    % setting the GdfidL version to test
-    setenv('GDFIDL_VERSION',versions{kse});
-    cur_ver = getenv('GDFIDL_VERSION');
-     disp(['Testing version ', cur_ver])
-    Gdfidl_run_models(mi);
-end
-% restoring the original version.
-setenv('GDFIDL_VERSION',orig_ver);
-fin = now;
-%% Postprocessing section.
-%%%%%%%%%%%%%% Setting up paths %%%%%%%%%%%%%%%%%%
+Gdfidl_run_models(run_inputs);
 
-% Location of the temporary file space. Nothing is kept here.
-ppi.scratch_path = '/scratch/afdm76/';
-% using the ram disk as the file system is too small for eigenmode simulation.
-%     ppi.scratch_path = '/dev/shm/';
-% Location to store the data generated from the modelling run.
-ppi.storage_path = '/dls/science/groups/b01/Alun/EM_tests/data/';
-% Location to store the output from the post processing.
-ppi.output_path = '/dls/science/groups/b01/Alun/EM_tests/Results/';
-
-ppi.model_name = 'rectangular_pillbox_with_ceramic';
-%%%%%%%%%%%%%% set the highest frequency of interest. %%%%%%%%%%%%%%%%%
-ppi.hfoi = 25E9;
-
-%%%%%%%%%%%%%%%%%%% Set the report number %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-ppi.rep_num = 'TDI-DIA-TS-???';
-
-%%%%%%%%%%%%%%%%%%%%% What simluation types to post process. %%%%%%%%%%%
-ppi.sim_select = 'w';
-% if wake simulation and you want to investigate machine parameters these
-% can be set here.
-ppi.bt_length = [900, 686]; % number of bunches in train.
-ppi.current = [0.08, 0.3, 0.5]; % A
-ppi.rf_volts = [2.5, 3.3, 4.5]; % MV
-ppi.RF_freq = 499.654E6; % Machine RF frequency (Hz).
-
-%%%%%%%%%%%%%% If symetry planes are used. %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-ppi.port_multiple = [1,1];
-ppi.port_fill_factor = [0.25,0.25];
-ppi.volume_fill_factor =  0.25;
-
-% Identifies port extensions so that the energy loss accounting is done
-% correctly.
-ppi.extension_names = {'input beam pipe', 'output beam pipe'};
-
-%%%%%%%%%%%%%%%% Selecting the date range to process. %%%%%%%%%%%%%%%%
-ppi.range = {start, fin};
-%%%%%%%%%%%%%%%%%%%%%%%%% Postprocessing the models. %%%%%%%%%%%%%%%%
-GdfidL_post_process_models(ppi);
-%% Use the post processed data to generate a report.
-arc_names = GdfidL_find_selected_models([ppi.output_path, ppi.model_name ], ppi.range);
-for ks = 1:length(arc_names)
-Generate_wake_report([ppi.output_path, ppi.model_name, '/',  arc_names{ks}],'Alun Morgan' )
-end
-%assemble_report([ppi.output_path, ppi.model_name ], ppi.range,  'Alun Morgan')

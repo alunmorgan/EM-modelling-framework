@@ -1,4 +1,4 @@
-function Gdfidl_run_models(mi)
+function Gdfidl_run_models(mi, stl_flag)
 % Runs the model with the requested variations in parameters and stores them in a user specified
 % location.
 %
@@ -10,13 +10,18 @@ if ispc ==1
     error('This needs to be run on the linux modelling machine')
 end
 
+if nargin < 2
+    stl_flag = '';
+end %if
+   
 model_num = 0;
-[defs, ~] = construct_defs(cat(2,mi.material_defs, mi.geometry_defs));
 
-for fdhs = 1:length(mi.model_names)    
+
+for fdhs = 1:length(mi.model_names)  
+    [defs, ~] = construct_defs(cat(2,mi.material_defs, mi.geometry_defs{fdhs}));
     for awh = 1:length(defs)
         model_num = model_num +1;
-        modelling_inputs(model_num) = base_inputs(mi, defs, mi.model_names{fdhs});
+        modelling_inputs(model_num) = base_inputs(mi, defs, mi.model_names{fdhs}, stl_flag);
         
         for bms = 2:length(mi.simulation_defs.beam_sigma)
             model_num = model_num +1;
@@ -29,7 +34,7 @@ for fdhs = 1:length(mi.model_names)
         
         for mss = 2:length(mi.simulation_defs.mesh_stepsize)
             model_num = model_num +1;
-            modelling_inputs(model_num) = base_inputs(mi, defs, mi.model_names{fdhs});
+            modelling_inputs(model_num) = base_inputs(mi, defs, mi.model_names{fdhs}, stl_flag);
             modelling_inputs(model_num).mesh_stepsize = mi.simulation_defs.mesh_stepsize{mss};
             modelling_inputs(model_num).model_name = [...
                 mi.model_names{fdhs}, '_mesh_stepsize_', ...
@@ -38,7 +43,7 @@ for fdhs = 1:length(mi.model_names)
         
         for wkl = 2:length(mi.simulation_defs.wakelength)
             model_num = model_num +1;
-            modelling_inputs(model_num) = base_inputs(mi, defs, mi.model_names{fdhs});
+            modelling_inputs(model_num) = base_inputs(mi, defs, mi.model_names{fdhs}, stl_flag);
             modelling_inputs(model_num).wakelength = mi.simulation_defs.wakelength{wkl};
             modelling_inputs(model_num).model_name = [...
                 mi.model_names{fdhs}, '_wakelength_', ...
@@ -47,7 +52,7 @@ for fdhs = 1:length(mi.model_names)
         
         for pml = 2:length(mi.simulation_defs.NPMLs)
             model_num = model_num +1;
-            modelling_inputs(model_num) = base_inputs(mi, defs, mi.model_names{fdhs});
+            modelling_inputs(model_num) = base_inputs(mi, defs, mi.model_names{fdhs}, stl_flag);
             modelling_inputs(model_num).NPMLs = mi.simulation_defs.NPMLs{pml};
             modelling_inputs(model_num).model_name = [...
                 mi.model_names{fdhs}, '_NPML_',...
@@ -56,7 +61,7 @@ for fdhs = 1:length(mi.model_names)
         
         for psn = 2:length(mi.simulation_defs.precision)
             model_num = model_num +1;
-            modelling_inputs(model_num) = base_inputs(mi, defs, mi.model_names{fdhs});
+            modelling_inputs(model_num) = base_inputs(mi, defs, mi.model_names{fdhs}, stl_flag);
             modelling_inputs(model_num).precision = mi.simulation_defs.precision{psn};
             modelling_inputs(model_num).model_name = [...
                 mi.model_names{fdhs}, '_precision_',...
@@ -65,7 +70,7 @@ for fdhs = 1:length(mi.model_names)
         
         for vsn = 2:length(mi.simulation_defs.versions)
             model_num = model_num +1;
-            modelling_inputs(model_num) = base_inputs(mi, defs, mi.model_names{fdhs});
+            modelling_inputs(model_num) = base_inputs(mi, defs, mi.model_names{fdhs}, stl_flag);
             modelling_inputs(model_num).version = mi.simulation_defs.versions{vsn};
             modelling_inputs(model_num).model_name = [...
                 mi.model_names{fdhs}, '_version_',...
@@ -75,15 +80,9 @@ for fdhs = 1:length(mi.model_names)
 end %for
 
 for awh = 1:length(modelling_inputs)
-    
-        % create the required output directories.
-if ~exist(fullfile(mi.paths.storage_path, modelling_inputs(awh).base_model_name), 'dir')
-    mkdir(mi.paths.storage_path, modelling_inputs(awh).base_model_name)
-end
-if ~exist(fullfile(mi.paths.storage_path, modelling_inputs(awh).base_model_name, modelling_inputs(awh).model_name),'dir')
-    mkdir(fullfile(mi.paths.storage_path, modelling_inputs(awh).base_model_name) ,modelling_inputs(awh).model_name)
-end
-    
+        
+    %FIXME
+    ow_behaviour = '';
     % Write update to the command line
     disp(datestr(now))
     disp(['Running ',num2str(awh), ' of ',...
@@ -91,35 +90,35 @@ end
     
     if ~isempty(strfind(mi.simulation_defs.sim_select, 'w'))
         try
-            run_wake_simulation(mi.paths, modelling_inputs(awh));
+            run_wake_simulation(mi.paths, modelling_inputs(awh), ow_behaviour, stl_flag);
         catch ERR
             display_modelling_error(ERR, 'wake')
         end %try
     end %if
     if ~isempty(strfind(mi.simulation_defs.sim_select, 's'))
         try
-            run_s_param_simulation(mi.paths, modelling_inputs(awh));
+            run_s_param_simulation(mi.paths, modelling_inputs(awh), ow_behaviour, stl_flag);
         catch ERR
             display_modelling_error(ERR, 'S-parameter')
         end %try
     end %if
     if ~isempty(strfind(mi.simulation_defs.sim_select, 'e'))
         try
-            run_eigenmode_simulation(mi.paths, modelling_inputs(awh));
+            run_eigenmode_simulation(mi.paths, modelling_inputs(awh), ow_behaviour, stl_flag);
         catch ERR
             display_modelling_error(ERR, 'eigenmode')
         end %try
     end %if
     if ~isempty(strfind(mi.simulation_defs.sim_select, 'l'))
         try
-            run_eigenmode_lossy_simulation(mi.paths, modelling_inputs(awh));
+            run_eigenmode_lossy_simulation(mi.paths, modelling_inputs(awh), ow_behaviour, stl_flag);
         catch ERR
             display_modelling_error(ERR, 'lossy eigenmode')
         end %try
     end %if
     if ~isempty(strfind(mi.simulation_defs.sim_select, 'r'))
         try
-            run_shunt_simulation(mi.paths, modelling_inputs(awh));
+            run_shunt_simulation(mi.paths, modelling_inputs(awh), ow_behaviour, stl_flag);
         catch ERR
             display_modelling_error(ERR, 'shunt')
         end %try
@@ -127,7 +126,7 @@ end
 end %for
 end % function
 
-function base = base_inputs(mi, defs, base_name)
+function base = base_inputs(mi, defs, base_name, stl_flag)
 % get the setting for the original base model.
 base.mat_list = mi.mat_list;
 base.n_cores  = mi.simulation_defs.n_cores;
@@ -137,13 +136,27 @@ base.volume_fill_factor = mi.simulation_defs.volume_fill_factor;
 base.extension_names = mi.simulation_defs.extension_names;
 base.base_model_name = base_name;
 base.model_name = base_name;
+base.set_name = mi.model_set;
 base.port_multiple = mi.simulation_defs.port_multiple;
 base.port_fill_factor = mi.simulation_defs.port_fill_factor;
 base.extension_names = mi.simulation_defs.extension_names;
 
 % Find the names of the ports used in the current model.
-model_file = fullfile(mi.paths.input_file_path, ...
-    [base.base_model_name, '_model_data']);
+if nargin <4
+    model_file = fullfile(mi.paths.input_file_path, ...
+        [base.base_model_name, '_model_data']);
+elseif nargin ==4 && ~strcmp(stl_flag, 'STL')
+    model_file = fullfile(mi.paths.input_file_path, ...
+        [base.base_model_name, '_model_data']);
+elseif nargin ==4 && strcmp(stl_flag, 'STL')
+    % FIXME This will break if multiple model sets are used.
+    model_file = fullfile(mi.paths.input_file_path, ...
+        mi.model_set{1},...
+        base.base_model_name,...
+        [base.base_model_name, '_model_data']);
+else
+    error('Unknown model_data file.')
+end %if
 base.port_names = gdf_extract_port_names(model_file);
 
 base.version = mi.simulation_defs.versions{1};
