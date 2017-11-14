@@ -1,4 +1,5 @@
-from freecad_elements import make_beampipe, make_elliptical_aperture, make_taper, ModelException, parameter_sweep
+from freecad_elements import make_beampipe, make_elliptical_aperture, make_taper, ModelException, parameter_sweep,\
+    base_model
 from sys import argv
 import os
 
@@ -47,12 +48,12 @@ def elliptical_taper_model(input_parameters):
     parts = {'all': fin4}
     return parts, os.path.splitext(os.path.basename(MODEL_NAME))[0]
 
-
-parameter_sweep(elliptical_taper_model, INPUT_PARAMETERS, OUTPUT_PATH, 'cavity_height', 5, 30, 5)
-parameter_sweep(elliptical_taper_model, INPUT_PARAMETERS, OUTPUT_PATH, 'cavity_width', 40, 120, 20)
-parameter_sweep(elliptical_taper_model, INPUT_PARAMETERS, OUTPUT_PATH, 'taper_length', 10, 60, 10)
-parameter_sweep(elliptical_taper_model, INPUT_PARAMETERS, OUTPUT_PATH, 'cavity_length', 20, 80, 20)
-parameter_sweep(elliptical_taper_model, INPUT_PARAMETERS, OUTPUT_PATH, 'pipe_height', 10, 50, 5)
-parameter_sweep(elliptical_taper_model, INPUT_PARAMETERS, OUTPUT_PATH, 'pipe_length', 50, 300, 50)
-parameter_sweep(elliptical_taper_model, INPUT_PARAMETERS, OUTPUT_PATH, 'pipe_width', 30, 70, 10)
+base_model(elliptical_taper_model, INPUT_PARAMETERS, OUTPUT_PATH, accuracy=10)
+parameter_sweep(elliptical_taper_model, INPUT_PARAMETERS, OUTPUT_PATH, 'cavity_height', [5, 10, 15, 25, 30])
+parameter_sweep(elliptical_taper_model, INPUT_PARAMETERS, OUTPUT_PATH, 'cavity_width', [40, 80, 100, 120])
+parameter_sweep(elliptical_taper_model, INPUT_PARAMETERS, OUTPUT_PATH, 'taper_length', [10, 20, 40, 50, 60])
+parameter_sweep(elliptical_taper_model, INPUT_PARAMETERS, OUTPUT_PATH, 'cavity_length', [40, 60, 80])
+parameter_sweep(elliptical_taper_model, INPUT_PARAMETERS, OUTPUT_PATH, 'pipe_height', [15, 20, 25, 30, 35, 40, 45, 50])
+parameter_sweep(elliptical_taper_model, INPUT_PARAMETERS, OUTPUT_PATH, 'pipe_length', [50, 100, 150, 200, 250, 300])
+parameter_sweep(elliptical_taper_model, INPUT_PARAMETERS, OUTPUT_PATH, 'pipe_width', [30, 50, 60, 70])
 

@@ -1,4 +1,4 @@
-from freecad_elements import make_beampipe, make_circular_aperture, ModelException, parameter_sweep
+from freecad_elements import make_beampipe, make_circular_aperture, ModelException, parameter_sweep, base_model
 from sys import argv
 import os
 
@@ -34,8 +34,9 @@ def pillbox_cavity_model(input_parameters):
     return parts, os.path.splitext(os.path.basename(MODEL_NAME))[0]
 
 
-parameter_sweep(pillbox_cavity_model, INPUT_PARAMETERS, OUTPUT_PATH, 'cavity_radius', 10, 50, 10)
-parameter_sweep(pillbox_cavity_model, INPUT_PARAMETERS, OUTPUT_PATH, 'pipe_radius', 5, 25, 5)
-parameter_sweep(pillbox_cavity_model, INPUT_PARAMETERS, OUTPUT_PATH, 'cavity_length', 10, 50, 10)
-parameter_sweep(pillbox_cavity_model, INPUT_PARAMETERS, OUTPUT_PATH, 'cavity_radius', 10, 50, 10)
-parameter_sweep(pillbox_cavity_model, INPUT_PARAMETERS, OUTPUT_PATH, 'pipe_length', 40, 110, 20)
+base_model(pillbox_cavity_model, INPUT_PARAMETERS, OUTPUT_PATH, accuracy=10)
+parameter_sweep(pillbox_cavity_model, INPUT_PARAMETERS, OUTPUT_PATH, 'cavity_radius', [10, 30, 40, 50])
+parameter_sweep(pillbox_cavity_model, INPUT_PARAMETERS, OUTPUT_PATH, 'pipe_radius', [5, 15, 20, 25])
+parameter_sweep(pillbox_cavity_model, INPUT_PARAMETERS, OUTPUT_PATH, 'cavity_length', [10, 30, 40, 50])
+parameter_sweep(pillbox_cavity_model, INPUT_PARAMETERS, OUTPUT_PATH, 'cavity_radius', [10, 30, 40, 50])
+parameter_sweep(pillbox_cavity_model, INPUT_PARAMETERS, OUTPUT_PATH, 'pipe_length', [40, 60, 100])
