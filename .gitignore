@@ -3,3 +3,6 @@ Example_top_level_scripts/
 Postprocess_models/GdfidL_read_wake_log_old.m
 Design_files/
 FreeCAD_geometry_generation/.idea/
+*.aux
+*.out
+*.toc
