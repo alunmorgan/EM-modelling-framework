@@ -1,9 +1,9 @@
-function Testing_cylindrical_pillbox(input_file_loc, scratch_loc, data_loc)
+function Testing_rectangular_pillbox_with_two_ceramics(input_file_loc, scratch_loc, data_loc)
 % input_file_loc is the location of the model input files.
 % scratch_loc is the location of the temporary file space. Nothing is kept here.
 % data_loc is the location to store the data generated from the modelling run.
 %
-% Example: Testing_cylindrical_pillbox(input_file_loc, scratch_loc, data_loc)
+% Example: Testing_rectangular_pillbox_with_two_ceramics(input_file_loc, scratch_loc, data_loc)
 
 %% Adding locations to the data structure.
 % Location of the temporary file space. Nothing is kept here.
@@ -13,10 +13,10 @@ run_inputs.paths.input_file_path = input_file_loc ;
 % Location to store the data generated from the modelling run.
 run_inputs.paths.storage_path = data_loc;
 % The model set to associate each model to.
-run_inputs.model_set = {'cylindrical_pillbox'};
+run_inputs.model_set = {'rectangular_pillbox_with_2_ceramics'};
 
 %% Adding list of model names to run.
-run_inputs.model_names = {'cylindrical_pillbox'};
+run_inputs.model_names = {'rectangular_pillbox_with_2_ceramics'};
 
 %% Material parameters for the model geometry
 % A lookup table of materials to component names
@@ -36,17 +36,19 @@ for shew = 1:length(run_inputs.model_names)
     % Parameter sweeps can be set up here by passing a cell array of >1 value.
     run_inputs.geometry_defs{shew} = {...
         {'extension_length', {100e-3},'Length of the model extensions.'},...
-        {'pipe_rad', {10e-3},'Radius of the beam pipe.'},...
+        {'pipe_width', {15e-3},'Radius of the beam pipe.'},...
+        {'pipe_height', {10e-3},'Radius of the beam pipe.'},...
         {'cav_length', {42e-3}, 'Length of the cavity.'},...
-        {'cav_rad', {65.1e-3}, 'Radius of the cavity.'},...
+        {'cav_width', {100e-3}, 'Width of the cavity.'},...
+        {'cav_height', {65.1e-3}, 'Height of the cavity.'},...
         };
 end %for
 
 %% This is for setting up the simulation parameters.
-run_inputs.simulation_defs.versions = {'161207g', '160210g','160410g','160429g','160517g','161003g','161108g', '170509g'};%{'161003g'};
+run_inputs.simulation_defs.versions = {'170509g'};%{'161003g'};
 run_inputs.simulation_defs.beam_sigma = {'5E-3'}; %in m
-run_inputs.simulation_defs.mesh_stepsize = {'2000E-6', '3000E-6', '1000E-6', '500E-6'}; %in m
-run_inputs.simulation_defs.wakelength = {'400'};
+run_inputs.simulation_defs.mesh_stepsize = {'2000E-6'}; %in m
+run_inputs.simulation_defs.wakelength = {'15'};
 %Number of perfectly matched layers used.
 run_inputs.simulation_defs.NPMLs = {'40'};
 % calculation precision (double/ single).

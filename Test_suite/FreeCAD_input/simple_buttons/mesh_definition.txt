@@ -1,0 +1,24 @@
+-mesh
+    spacing= STPSZE
+    perfectmesh= no
+    
+    xperiodic= no
+    yperiodic= no
+    zperiodic= no
+    
+    pxlow= -block_radius, pxhigh= block_radius
+    pylow= -block_radius,  pyhigh= block_radius
+	# Small 1e-6 adjustments required to cut off the closed ends of the pipes.
+    pzlow= -pipe_length - (block_s / 2) + 1e-6 , pzhigh= pipe_length + (block_s / 2) - 1e-6
+
+    cxlow= electric, cxhigh= electric
+    cylow= electric, cyhigh= electric
+    czlow= electric, czhigh= electric
+
+    #
+    # We enforce a meshline at the position of the linecharge
+    # by enforcing two meshplanes
+    #
+    xfixed(1, 0, 0)
+    yfixed(1, 0, 0)
+	

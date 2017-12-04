@@ -1,0 +1,51 @@
+-fdtd   
+    -ports
+       name = port_bp_in
+       plane = zlow
+       npml = NPMLs
+       modes= 25
+       doit
+       
+    -ports
+       name = port_bp_out
+       plane = zhigh
+       npml = NPMLs
+       modes= 25
+       doit
+
+    -ports
+       name = signal_1
+       plane = ylow
+       pxlow = -INF
+       pxhigh = 0
+       npml = NPMLs
+       modes= 5
+       doit
+
+    -ports
+       name = signal_2
+       plane = ylow
+       pxlow = 0
+       pxhigh = INF
+       npml = NPMLs
+       modes= 5
+       doit
+     
+	    -ports
+       name = signal_3
+       plane = yhigh
+       pxlow = -INF
+       pxhigh = 0
+       npml = NPMLs
+       modes= 5
+       doit
+
+    -ports
+       name = signal_4
+       plane = yhigh
+       pxlow = 0
+       pxhigh = INF
+       npml = NPMLs
+       modes= 5
+       doit
+     
