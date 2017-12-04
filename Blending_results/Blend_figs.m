@@ -24,7 +24,6 @@ for hse = length(report_input.sources):-1 :1
         data_out(hse) = extract_from_graph(graph_name, line_select);
         if data_out(hse).state == 1
             any_data = 1;
-            %             zdata{hse} = ones(length(data_out(1).xdata{1}),1) .* hse;
         end %if
     end %if
 end %for
@@ -116,12 +115,18 @@ for en = 1:length(data_out)
     if isfield(data_out(hwc), 'ydata')
         for ewh = fwl:length(data_out(en).xdata)
             if  ~isempty(data_out(en).ydata{ewh})
-                reference_data = data_out(1).xdata{ewh};
-                if isempty(reference_data)
-                    reference_data = zeros(1,length(data_out(en).xdata{ewh}));
+                if isempty(data_out(1).xdata)
+                    reference_x = zeros(1,length(data_out(en).xdata{ewh}));
+                    reference_y = zeros(1,length(data_out(en).xdata{ewh}));
+                elseif isempty(data_out(1).xdata{ewh})
+                    reference_x = zeros(1,length(data_out(en).xdata{ewh}));
+                    reference_y = zeros(1,length(data_out(en).xdata{ewh}));
+                else
+                    reference_x = data_out(1).xdata{ewh};
+                    reference_y = data_out(1).ydata{ewh};
                 end %if
-                new_y = interp1(data_out(en).xdata{ewh}, data_out(en).ydata{ewh}, reference_data);
-                plot(reference_data, new_y - data_out(1).ydata{ewh},'linestyle',l_st{1},...
+                new_y = interp1(data_out(en).xdata{ewh}, data_out(en).ydata{ewh}, reference_x);
+                plot(reference_x, new_y - reference_y ,'linestyle',l_st{1},...
                     'Color',cols{rem(en-1,10)+1}, 'linewidth',lw, 'Parent', ax4);
             else
                 plot(NaN, NaN,'linestyle',l_st{1},...

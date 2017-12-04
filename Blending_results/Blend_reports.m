@@ -30,10 +30,9 @@ else
 end %if
 
 
-for ewh = 1:length(sweeps)
+for ewh = 1:length(sweeps) 
     sweep_ind = find_position_in_cell_lst(strfind(names,sweeps{ewh}));
     names_in_sweep = names([base_name_ind, sweep_ind]);
-    
     good_data = ones(length(names_in_sweep),1);
     for psw = length(names_in_sweep):-1:1
         try
@@ -132,5 +131,6 @@ for ewh = 1:length(sweeps)
         mkdir(report_input.output_loc)
     end %if
     Blend_single_report(report_input)
+    clear param_names param_vals
 end %for
 

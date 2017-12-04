@@ -20,11 +20,16 @@ for nes = 1:2:length(source_reps)
         % graphs.
         ov = cat(1,ov,'\begin{figure}[htb]');
         ov = cat(1,ov,'\begin{center}');
+        if ~isempty(nme{nes})
         ov = cat(1,ov,['\includegraphics [width=0.46\textwidth]{',nme{nes},'}']);
+        end %if
 %         % this is to cope with the fact that MATLAB tries to be clever and
 %         % truncates the cell array if the last row is empty.
 %         if length(report_input.swept_vals) == length(source_reps) && nes == length(source_reps)
             swept_vals_tmp = report_input.swept_vals{nes};
+            if isempty(swept_vals_tmp)
+                swept_vals_tmp = '';
+            end %if
             swept_vals_tmp = regexprep(swept_vals_tmp, '\\mu{}', '$\\mu{}$');
 %         else
 %             swept_vals_tmp =[];

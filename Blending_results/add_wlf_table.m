@@ -13,7 +13,11 @@ out = cat(1,out,'Swept value & Wake loss factor \\');
 out = cat(1,out,'\hline');
 for hea = 1:length(swept_vals)
     % adding in the maths environment wrapping
-    swept_val = regexprep(swept_vals{hea}, '\\mu{}', '$\\mu{}$');
+    swept_val_temp = swept_vals{hea};
+    if isempty(swept_val_temp)
+        swept_val_temp = '';
+    end %if
+    swept_val = regexprep(swept_val_temp, '\\mu{}', '$\\mu{}$');
     out = cat(1,out,[swept_val,' & ', summary.wlf{hea},' \\' ]);
     out = cat(1,out,'\hline');
 end

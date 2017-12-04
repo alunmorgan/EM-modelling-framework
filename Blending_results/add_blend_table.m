@@ -4,8 +4,30 @@ function out = add_blend_table(model_name, subtitle, swept_vals, summary)
 %
 % Example: out = add_blend_table(model_name, subtitle, swept_vals, summary)
 
-CPU_time_sections = length(strfind(summary.CPU_time{1},','));
-wall_time_sections = length(strfind(summary.wall_time{1},','));
+for lse = 1:length(summary.wall_time)
+CPU_time_sections_list(lse) = length(strfind(summary.CPU_time{lse},','));
+wall_time_sections_list(lse) = length(strfind(summary.wall_time{lse},','));
+end %for
+CPU_time_sections = max(CPU_time_sections_list);
+wall_time_sections = max(wall_time_sections_list);
+% adding extra , to make all the time strings have the same number of
+% sections
+for lse = 1:length(summary.wall_time)
+    if CPU_time_sections - CPU_time_sections_list(lse) == 1
+        summary.CPU_time{lse} = cat(2, ',', summary.CPU_time{lse});
+    elseif CPU_time_sections - CPU_time_sections_list(lse) == 2
+        summary.CPU_time{lse} = cat(2, ',,', summary.CPU_time{lse});
+    elseif CPU_time_sections - CPU_time_sections_list(lse) == 3
+        summary.CPU_time{lse} = cat(2, ',,,', summary.CPU_time{lse});
+    end %if
+    if wall_time_sections - wall_time_sections_list(lse) == 1
+        summary.wall_time{lse} = cat(2, ',', summary.wall_time{lse});
+    elseif wall_time_sections - wall_time_sections_list(lse) == 2
+        summary.wall_time{lse} = cat(2, ',,', summary.wall_time{lse});
+    elseif wall_time_sections - wall_time_sections_list(lse) == 3
+        summary.wall_time{lse} = cat(2, ',,,', summary.wall_time{lse});
+    end %if
+end %for
 time_section_size = 0.55;
 tab1 = '\begin{tabular}{|m{1.2cm}|';
 for ne = 1:CPU_time_sections
@@ -46,9 +68,13 @@ for hea = 1:length(summary.wlf)
     % this is to cope with the fact that MATLAB tries to be clever and
     % truncates the cell array if the last row is empty.
     if length(swept_vals) == length(summary.wlf) -1 && hea == length(summary.wlf)
-        swept_vals_tmp =[];
+        swept_vals_tmp ='';
     else
+        if isempty(swept_vals{hea})
+            swept_vals_tmp ='';
+        else
         swept_vals_tmp = swept_vals{hea};
+        end %if
         % adding in the maths environment wrapping
         swept_vals_tmp = regexprep(swept_vals_tmp, '\\mu{}', '$\\mu{}$');
     end
