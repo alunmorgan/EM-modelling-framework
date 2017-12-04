@@ -141,7 +141,7 @@ base.port_multiple = mi.simulation_defs.port_multiple;
 base.port_fill_factor = mi.simulation_defs.port_fill_factor;
 base.extension_names = mi.simulation_defs.extension_names;
 
-% Find the names of the ports used in the current model.
+
 if nargin <4
     model_file = fullfile(mi.paths.input_file_path, ...
         [base.base_model_name, '_model_data']);
@@ -149,14 +149,13 @@ elseif nargin ==4 && ~strcmp(stl_flag, 'STL')
     model_file = fullfile(mi.paths.input_file_path, ...
         [base.base_model_name, '_model_data']);
 elseif nargin ==4 && strcmp(stl_flag, 'STL')
-    % FIXME This will break if multiple model sets are used.
     model_file = fullfile(mi.paths.input_file_path, ...
-        mi.model_set{1},...
         base.base_model_name,...
         [base.base_model_name, '_model_data']);
 else
     error('Unknown model_data file.')
 end %if
+% Find the names of the ports used in the current model.
 base.port_names = gdf_extract_port_names(model_file);
 
 base.version = mi.simulation_defs.versions{1};

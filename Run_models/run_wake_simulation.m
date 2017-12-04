@@ -25,8 +25,7 @@ skip = 0;
 % create the required output directories, and move any existing data out of
 % the way.
 
-% FIXME This will break if multiple model sets are used.
-results_storage_location = fullfile(paths.storage_path, modelling_inputs.set_name{1}, modelling_inputs.model_name);
+results_storage_location = fullfile(paths.storage_path, modelling_inputs.model_name);
 if exist(fullfile(results_storage_location, 'wake'),'dir')
     if nargin ==3 && strcmp(ow_behaviour, 'no_skip')
         old_store = ['old_data', datestr(now,30)];
@@ -52,9 +51,7 @@ if skip == 0;
     temp_files('make')
     
     if strcmp(stl_flag, 'STL')
-        % FIXME This will break if multiple model sets are used.
-        path_to_model = fullfile(paths.input_file_path, ...
-            modelling_inputs.set_name{1},...
+        path_to_model = fullfile(paths.storage_path, ...
             modelling_inputs.model_name,...
             [modelling_inputs.model_name, '_model_data']);
     else
