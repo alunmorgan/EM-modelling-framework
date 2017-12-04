@@ -12,7 +12,7 @@ button_hole_horizontal_offset (float): Offset of the buttons from the centre hor
 button_hole_s_offset (float): Offset of the buttons from the centre in beam direction. 
 button_angle (float): Angle from vertical.
             """
-INPUT_PARAMETERS = {'pipe_width': 27e-3, 'pipe_height': 18.4e-3, 'pipe_length': 40e-3,
+INPUT_PARAMETERS = {'pipe_width': 27e-3, 'pipe_height': 18.4e-3, 'pipe_length': 40e-3, 'pipe_thickness': 2.e-3,
                     'block_radius': 30e-3, 'block_s': 20e-3, 'button_hole_radius': 3.25e-3,
                     'button_horizontal_offset': 6e-3, 'button_s_offset': 0., 'button_angle': 18.65,
                     'button_radius': 3e-3, 'button_thickness': 4e-3, 'button_offset': 0.5e-3,
@@ -20,7 +20,7 @@ INPUT_PARAMETERS = {'pipe_width': 27e-3, 'pipe_height': 18.4e-3, 'pipe_length': 
                     'pin_radius': 0.5e-3, 'pin_height': 14.8e-3,
                     'ceramic_radius': 4.5e-3, 'ceramic_thickness': 2.4e-3, 'ceramic_offset': 5e-3,
                     'shell_upper_radius': 6.5e-3, 'shell_upper_thickness': 9.5e-3, 'shell_upper_inner_radius': 2.5e-3,
-                    'shell_lower_radius': 5e-3, 'shell_lower_thickness': 3e-3, 'shell_lower_inner_radius': 4.3e-3}
+                    'shell_lower_radius': 5.e-3, 'shell_lower_thickness': 3.e-3, 'shell_lower_inner_radius': 4.3e-3}
 
 MODEL_NAME, OUTPUT_PATH = argv
 
@@ -35,7 +35,10 @@ def ddba_buttons_model(input_parameters):
 
     try:
         wire1, face1 = make_elliptical_aperture(input_parameters['pipe_height'], input_parameters['pipe_width'])
-        beampipe = make_beampipe(face1, input_parameters['pipe_length'])
+        wire2, face2 = make_elliptical_aperture(input_parameters['pipe_height'] + input_parameters['pipe_thickness'],
+                                                input_parameters['pipe_width'] + input_parameters['pipe_thickness'])
+        beampipe_vac = make_beampipe(face1, input_parameters['pipe_length'])
+        beampipe = make_beampipe(face2, input_parameters['pipe_length'])
 
         block = Part.makeCylinder(input_parameters['block_radius'], input_parameters['block_s'],
                                   Base.Vector(-input_parameters['block_s'] / 2., 0, 0),
@@ -47,11 +50,22 @@ def ddba_buttons_model(input_parameters):
         hole3 = single_button_hole(input_parameters, quadrants=(-1, -1, 1))
         hole4 = single_button_hole(input_parameters, quadrants=(1, -1, -1))
 
-        diff = block.cut(beampipe)
+        diff = block.cut(beampipe_vac)
         diff2 = diff.cut(hole1)
         diff3 = diff2.cut(hole2)
         diff4 = diff3.cut(hole3)
         diff5 = diff4.cut(hole4)
+
+        vac1 = beampipe_vac.fuse(hole1)
+        vac2 = vac1.fuse(hole2)
+        vac3 = vac2.fuse(hole3)
+        vac4 = vac3.fuse(hole4)
+
+        beampipe1 = beampipe.cut(block)
+        beampipe2 = beampipe1.cut(hole1)
+        beampipe3 = beampipe2.cut(hole2)
+        beampipe4 = beampipe3.cut(hole3)
+        beampipe5 = beampipe4.cut(hole4)
 
         button1, pin1, ceramic1, shell1 = single_button(input_parameters, quadrants=(1, 1, 1))
         button2, pin2, ceramic2, shell2 = single_button(input_parameters, quadrants=(-1, 1, -1))
@@ -61,7 +75,7 @@ def ddba_buttons_model(input_parameters):
     except Exception as e:
         raise ModelException(e)
     # An entry in the parts dictionary corresponds to an STL file. This is useful for parts of differing materials.
-    parts = {'block': diff5,
+    parts = {'vac': vac4, 'block': diff5, 'beampipe' : beampipe5,
              'button1': button1, 'pin1': pin1, 'ceramic1': ceramic1, 'shell1': shell1,
              'button2': button2, 'pin2': pin2, 'ceramic2': ceramic2, 'shell2': shell2,
              'button3': button3, 'pin3': pin3, 'ceramic3': ceramic3, 'shell3': shell3,
@@ -83,28 +97,28 @@ def single_button_hole(input_parameters,  quadrants=(1, 1, 1)):
     beam_pipe_height = ellipse_track(input_parameters['pipe_height'], input_parameters['pipe_width'],
                                      quadrants[0] * input_parameters['button_horizontal_offset'])
 
-    cylinder1 = Part.makeCylinder(input_parameters['button_hole_radius'], 100,
+    cylinder1 = Part.makeCylinder(input_parameters['button_hole_radius'], 100e-3,
                                   Base.Vector(quadrants[2] * input_parameters['button_s_offset'],
                                               # The -2 is to make sure that it is a clean hole
-                                              quadrants[1] * (beam_pipe_height - 2),
+                                              quadrants[1] * (beam_pipe_height - 2e-3),
                                               quadrants[0] * input_parameters['button_horizontal_offset']),
                                   Base.Vector(0, quadrants[1], 0))
 
-    cylinder2 = Part.makeCylinder(10.5 / 2., 100,
+    cylinder2 = Part.makeCylinder(10.5e-3 / 2., 100e-3,
                                   Base.Vector(quadrants[2] * input_parameters['button_s_offset'],
-                                              quadrants[1] * (beam_pipe_height + 5.),
+                                              quadrants[1] * (beam_pipe_height + 5.e-3),
                                               quadrants[0] * input_parameters['button_horizontal_offset']),
                                   Base.Vector(0, quadrants[1], 0))
 
-    cylinder3 = Part.makeCylinder(13 / 2., 100,
+    cylinder3 = Part.makeCylinder(13e-3 / 2., 100e-3,
                                   Base.Vector(quadrants[2] * input_parameters['button_s_offset'],
-                                              quadrants[1] * (beam_pipe_height + 5. + 3.5),
+                                              quadrants[1] * (beam_pipe_height + 5.e-3 + 3.5e-3),
                                               quadrants[0] * input_parameters['button_horizontal_offset']),
                                   Base.Vector(0, quadrants[1], 0))
 
-    cylinder4 = Part.makeCylinder(17.4 / 2., 100,
+    cylinder4 = Part.makeCylinder(17.4e-3 / 2., 100e-3,
                                   Base.Vector(quadrants[2] * input_parameters['button_s_offset'],
-                                              quadrants[1] * (beam_pipe_height + 5. + 3.5 + 9.5),
+                                              quadrants[1] * (beam_pipe_height + 5.e-3 + 3.5e-3 + 9.5e-3),
                                               quadrants[0] * input_parameters['button_horizontal_offset']),
                                   Base.Vector(0, quadrants[1], 0))
 
