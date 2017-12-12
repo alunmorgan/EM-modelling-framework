@@ -1,0 +1,68 @@
+\documentclass[11pt]{article}
+\usepackage{blindtext, rotating, color}
+\begin{document}
+\begin{center}
+\textbf{Workflow}
+
+\emph{(Using the pillbox cavity model as an example.)}
+\end{center}
+\begin{turn}{45}
+\begin{minipage}{0.2\linewidth}
+\textcolor[rgb]{0.50,0.50,1.00}{Python FreeCAD}
+\end{minipage}
+\end{turn}
+\begin{minipage}{0.8\linewidth}
+Write a base geometry in Python and define geometric parameter sweeps (\verb|pillbox_cavity.py|)
+\vspace{10mm}
+\end{minipage}
+
+\begin{turn}{45}
+\begin{minipage}{0.2\linewidth}
+\textcolor[rgb]{0.50,0.50,1.00}{Text file}
+\end{minipage}
+\end{turn}
+\begin{minipage}{0.8\linewidth}
+Define the links between the STL files and the material names used in the EM simulation. (\verb|geometry-material-map.txt|)
+\vspace{10mm}
+\end{minipage}
+
+\begin{turn}{45}
+\begin{minipage}{0.2\linewidth}
+\textcolor[rgb]{0.50,0.50,1.00}{Text files}
+
+\textcolor[rgb]{0.50,0.50,1.00}{written in GdfidL input language.}
+\end{minipage}
+\end{turn}
+\begin{minipage}{0.6\linewidth}
+Define the volume of the mesh. (\verb|mesh_definition.txt|)
+
+Define the location and settings of any ports. (\verb|port_definition.txt|)
+\vspace{10mm}
+\end{minipage}
+
+\begin{turn}{45}
+\begin{minipage}{0.2\linewidth}
+\textcolor[rgb]{0.50,0.50,1.00}{MATLAB}
+\end{minipage}
+\end{turn}
+\begin{minipage}{0.8\linewidth}
+Write a file to define the base simulation setup, and any material sweeps or simulation parameter sweeps. (\verb|Testing_pillbox_cavity.m|)
+\vspace{10mm}
+\end{minipage}
+
+\begin{turn}{45}
+\begin{minipage}{0.2\linewidth}
+\textcolor[rgb]{0.50,0.50,1.00}{MATLAB}
+\end{minipage}
+\end{turn}
+\begin{minipage}{0.8\linewidth}
+\textbf{Run the framework.}
+
+This will generate a report for each unique parameter set, and also summary reports for any sweeps.
+\vspace{10mm}
+\end{minipage}
+
+There are other examples in the test suite/FreeCAD input folder.
+
+
+\end{document}

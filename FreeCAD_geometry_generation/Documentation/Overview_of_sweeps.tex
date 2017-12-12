@@ -1,0 +1,22 @@
+\documentclass[11pt]{article}
+\usepackage{blindtext, rotating, color}
+\begin{document}
+\begin{center}
+\textbf{Overview on parameter sweeps}
+\end{center}
+All sweeps are with respect to the base model and make changes from there.
+
+There are three types of parameter sweep.
+\begin{itemize}
+  \item Geometric parameter sweeps
+  \item Material parameter sweeps
+  \item Simulation parameter sweeps
+\end{itemize}
+
+The geometric parameters are any changes to the size/shape of components in the model. If one is using the FreeCAD based workflow then this would be defined in the python file along with the base model. If one it using GdfidL input files directly then these parameter can be defined in the same file are the material and simulation parameters.
+
+The material parameters define what material a particular component has. This would allow the effect of different materials on a cavity to be explored, for example. 
+
+The simulation parameters cover things like mesh density or the number of perfectly matched layers at ports. These sweeps are useful for validating that the simulation settings are suitable.
+
+\end{document}
