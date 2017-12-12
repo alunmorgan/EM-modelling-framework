@@ -65,7 +65,10 @@ for ewh = 1:length(sweeps)
         end %for
         param_vals(psw,1:length(param_vals_tmp)) = param_vals_tmp;
     end %for
-    
+    if sum(good_data) ==0
+        warning('No valid data. Skipping report generation')
+        return
+    end %if
     
     % Find the total list of parameters and reorganise the values to fit this
     % global list.
