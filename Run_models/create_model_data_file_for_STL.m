@@ -1,13 +1,7 @@
 function create_model_data_file_for_STL(data_location, storage_location, ...
     base_model_name, output_name)
-% 
-% parts = strsplit(storage_location, filesep);
-% common_file_loc = fullfile(parts{1:end-1});
-% if strcmp(storage_location(1), filesep)
-%     % fullfile does not keep the initial slash for an absolute path on
-%     % linux. This puts it back.
-%     common_file_loc = strcat(filesep, common_file_loc);
-% end %if
+% Combines the geometry-material-map, mesh_definition, and port_definition
+% files with the geometry STL files to form the core of the gdf input file.
 
 geom = read_file_full_line(fullfile(storage_location, 'geometry-material-map.txt'));
 mesh_def = read_file_full_line(fullfile(storage_location, 'mesh_definition.txt'));
@@ -25,7 +19,7 @@ for hes = 1:length(geom_params)
     brk_ind = strfind(temp_name, ' : ');
     g_name = temp_name(1:brk_ind-1);
     g_val = regexprep(temp_name(brk_ind+3:end), '\s', '');
-    model_file = cat(1, model_file, ['define(',g_name,',',g_val,'e-3)']);
+    model_file = cat(1, model_file, ['define(',g_name,',',g_val,')']);
 end
 model_file = cat(1, model_file, '###################################################');
 for hes = 1:length(mesh_def)
@@ -54,17 +48,11 @@ model_file = cat(1, model_file, '# From FreeCAD coordinates, to GdfidL coordinat
 model_file = cat(1, model_file, 'xprime= (0 ,0 ,1)');
 model_file = cat(1, model_file, 'yprime= (0, 1, 0)');
 model_file = cat(1, model_file, ['material=', vals{mat_ind,2}]);
-% model_file = cat(1, model_file, '# FreeCAD length units will be imported as metres by GdfidL.');
-% model_file = cat(1, model_file, '# The following three lines scale the geometry so that');
-% model_file = cat(1, model_file, '# the FreeCAD units become mm in GdfidL');
-% model_file = cat(1, model_file, 'xscale= 1e-3');
-% model_file = cat(1, model_file, 'yscale= 1e-3');
-% model_file = cat(1, model_file, 'zscale= 1e-3');
 model_file = cat(1, model_file, 'doit');
 end %for
 
-% model_file = cat(1, model_file, '-volumeplot');
-% model_file = cat(1, model_file, 'doit');
+model_file = cat(1, model_file, '-volumeplot');
+model_file = cat(1, model_file, 'doit');
 
 model_file = cat(1, model_file, '###################################################');
 for hef = 1:length(port_def)
