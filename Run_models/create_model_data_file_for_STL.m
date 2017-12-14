@@ -40,6 +40,12 @@ for lrd = 1:length(stls)
     tmp = strsplit(stls{lrd}, filesep);
     tmp = tmp{end}(1:end-4);
     mat_ind = find_position_in_cell_lst(strfind(vals(:,1), tmp));
+    if isempty(mat_ind)
+        warning(['create_model_data_file_for_STL: mat_ind is empty. ' ,...
+                 'This probably means that there is a name mismatch ',...
+                 'between the STL files and the names in the ',...
+                 'geometry-material-map file.'])
+    end %if
 model_file = cat(1, model_file, '-stlfile');
 model_file = cat(1, model_file, ['file=', stls{lrd}]);
 model_file = cat(1, model_file, '# FreeCAD defaults to x as the main axis. GdfidL uses z.');
