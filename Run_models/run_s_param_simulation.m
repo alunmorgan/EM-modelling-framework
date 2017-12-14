@@ -8,7 +8,7 @@ function run_s_param_simulation(paths, modelling_inputs, ow_behaviour, stl_flag)
 % will be moved to a folder called old data. The default is for the simulation
 % to be skipped.
 %
-% Example: run_s_param_simulation(mi, modelling_inputs)
+% Example: run_s_param_simulation(paths, modelling_inputs)
 
 % The code does not write directly to the storage area as often you want to
 % have long term storage on a network drive, but during the modelling this
@@ -23,8 +23,7 @@ end %if
 
 skip = 0;
 % Create the required top leveloutput directories.
-% FIXME This will break if multiple model sets are used.
-results_storage_location = fullfile(paths.storage_path, modelling_inputs.set_name{1}, modelling_inputs.model_name);
+results_storage_location = fullfile(paths.storage_path, modelling_inputs.model_name);
 if exist(fullfile(results_storage_location, 's_parameters'),'dir')
     if nargin ==3 && strcmp(ow_behaviour, 'no_skip')
         old_store = ['old_data', datestr(now,30)];
@@ -51,10 +50,9 @@ if skip == 0
         port_name = modelling_inputs.s_param_ports{nes};
         temp_files('make')
         if strcmp(stl_flag, 'STL')
-            path_to_model_file = fullfile(paths.input_file_path, ...
-                modelling_inputs.set_name{1},...
-                modelling_inputs.base_model_name,...
-                [modelling_inputs.base_model_name, '_model_data']);
+            path_to_model_file = fullfile(paths.storage_path, ...
+                modelling_inputs.model_name,...
+                [modelling_inputs.model_name, '_model_data']);
         else
             path_to_model_file = fullfile(paths.input_file_path, ...
                 [modelling_inputs.base_model_name, '_model_data']);
