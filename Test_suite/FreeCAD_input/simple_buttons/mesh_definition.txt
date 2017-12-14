@@ -8,8 +8,7 @@
     
     pxlow= -block_radius, pxhigh= block_radius
     pylow= -block_radius,  pyhigh= block_radius
-	# Small 1e-6 adjustments required to cut off the closed ends of the pipes.
-    pzlow= -pipe_length - (block_s / 2) + 1e-6 , pzhigh= pipe_length + (block_s / 2) - 1e-6
+    pzlow= -pipe_length/2, pzhigh= pipe_length/2 
 
     cxlow= electric, cxhigh= electric
     cylow= electric, cyhigh= electric

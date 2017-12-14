@@ -6,10 +6,10 @@
     yperiodic= no
     zperiodic= no
     
-    pxlow= -cavity_radius - wall_thickness, pxhigh= cavity_radius + wall_thickness
-    pylow= -cavity_radius - wall_thickness,  pyhigh= cavity_radius + wall_thickness
+    pxlow= -cavity_radius - pipe_thickness, pxhigh= cavity_radius + pipe_thickness
+    pylow= -cavity_radius - pipe_thickness,  pyhigh= cavity_radius + pipe_thickness
 	# Small 1e-6 adjustments required to cut off the closed ends of the pipes.
-    pzlow= -pipe_length - (cavity_length / 2) + 1e-6 , pzhigh= pipe_length + (cavity_length / 2) - 1e-6
+    pzlow= -racetrack_length /2 - taper_length - (cavity_length / 2) + 1e-6 , pzhigh= racetrack_length /2 + taper_length +(cavity_length / 2) - 1e-6
 
     cxlow= electric, cxhigh= electric
     cylow= electric, cyhigh= electric

@@ -17,7 +17,7 @@ INPUT_PARAMETERS = {'pipe_width': 27e-3, 'pipe_height': 18.4e-3, 'pipe_length': 
                     'button_horizontal_offset': 6e-3, 'button_s_offset': 0., 'button_angle': 18.65,
                     'button_radius': 3e-3, 'button_thickness': 4e-3, 'button_offset': 0.5e-3,
                     'button_ring_inner_radius': 1.2e-3, 'button_ring_outer_radius': 2.1e-3,
-                    'pin_radius': 0.5e-3, 'pin_height': 14.8e-3,
+                    'pin_radius': 0.5e-3, 'pin_height': 100e-3,
                     'ceramic_radius': 4.5e-3, 'ceramic_thickness': 2.4e-3, 'ceramic_offset': 5e-3,
                     'shell_upper_radius': 6.5e-3, 'shell_upper_thickness': 9.5e-3, 'shell_upper_inner_radius': 2.5e-3,
                     'shell_lower_radius': 5.e-3, 'shell_lower_thickness': 3.e-3, 'shell_lower_inner_radius': 4.3e-3}
@@ -25,7 +25,7 @@ INPUT_PARAMETERS = {'pipe_width': 27e-3, 'pipe_height': 18.4e-3, 'pipe_length': 
 MODEL_NAME, OUTPUT_PATH = argv
 
 
-def ddba_buttons_model(input_parameters):
+def simple_buttons_model(input_parameters):
     """ Generates the geometry for the pillbox cavity in FreeCAD. Also writes out the geometry as STL files 
        and writes a "sidecar" text file containing the input parameters used.
 
@@ -37,7 +37,7 @@ def ddba_buttons_model(input_parameters):
         wire1, face1 = make_elliptical_aperture(input_parameters['pipe_height'], input_parameters['pipe_width'])
         wire2, face2 = make_elliptical_aperture(input_parameters['pipe_height'] + input_parameters['pipe_thickness'],
                                                 input_parameters['pipe_width'] + input_parameters['pipe_thickness'])
-        beampipe_vac = make_beampipe(face1, input_parameters['pipe_length'])
+        beampipe_vac = make_beampipe(face1, input_parameters['pipe_length'] + 2e-3)
         beampipe = make_beampipe(face2, input_parameters['pipe_length'])
 
         block = Part.makeCylinder(input_parameters['block_radius'], input_parameters['block_s'],
@@ -50,22 +50,15 @@ def ddba_buttons_model(input_parameters):
         hole3 = single_button_hole(input_parameters, quadrants=(-1, -1, 1))
         hole4 = single_button_hole(input_parameters, quadrants=(1, -1, -1))
 
-        diff = block.cut(beampipe_vac)
-        diff2 = diff.cut(hole1)
-        diff3 = diff2.cut(hole2)
-        diff4 = diff3.cut(hole3)
-        diff5 = diff4.cut(hole4)
-
         vac1 = beampipe_vac.fuse(hole1)
         vac2 = vac1.fuse(hole2)
         vac3 = vac2.fuse(hole3)
         vac4 = vac3.fuse(hole4)
 
+        button_block = block.cut(vac4)
+
         beampipe1 = beampipe.cut(block)
-        beampipe2 = beampipe1.cut(hole1)
-        beampipe3 = beampipe2.cut(hole2)
-        beampipe4 = beampipe3.cut(hole3)
-        beampipe5 = beampipe4.cut(hole4)
+        beampipe2 = beampipe1.cut(beampipe_vac)
 
         button1, pin1, ceramic1, shell1 = single_button(input_parameters, quadrants=(1, 1, 1))
         button2, pin2, ceramic2, shell2 = single_button(input_parameters, quadrants=(-1, 1, -1))
@@ -75,7 +68,7 @@ def ddba_buttons_model(input_parameters):
     except Exception as e:
         raise ModelException(e)
     # An entry in the parts dictionary corresponds to an STL file. This is useful for parts of differing materials.
-    parts = {'vac': vac4, 'block': diff5, 'beampipe' : beampipe5,
+    parts = {'vac': vac4, 'block': button_block, 'beampipe': beampipe2,
              'button1': button1, 'pin1': pin1, 'ceramic1': ceramic1, 'shell1': shell1,
              'button2': button2, 'pin2': pin2, 'ceramic2': ceramic2, 'shell2': shell2,
              'button3': button3, 'pin3': pin3, 'ceramic3': ceramic3, 'shell3': shell3,
@@ -256,5 +249,5 @@ def ellipse_track(e_height, e_width, x):
     y = (b**2. - ((b / a) * x)**2.)**0.5
     return y
 
-base_model(ddba_buttons_model, INPUT_PARAMETERS, OUTPUT_PATH, accuracy=10)
-parameter_sweep(ddba_buttons_model, INPUT_PARAMETERS, OUTPUT_PATH, 'button_radius', [2E-3, 2.5E-3])
+base_model(simple_buttons_model, INPUT_PARAMETERS, OUTPUT_PATH, accuracy=10)
+parameter_sweep(simple_buttons_model, INPUT_PARAMETERS, OUTPUT_PATH, 'button_radius', [2E-3, 2.5E-3])

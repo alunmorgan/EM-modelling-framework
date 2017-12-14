@@ -12,7 +12,8 @@ MODEL_NAME, OUTPUT_PATH = argv
 
 
 def racetrack_to_octagonal_cavity_model(input_parameters):
-    """Generates the geometry for the elliptical taper in FreeCAD. Also writes out the geometry as STL files 
+    """Generates the geometry for the racetrack pipe tapered to an octagonal pipe in FreeCAD. 
+       Also writes out the geometry as STL files 
        and writes a "sidecar" text file containing the input parameters used.
 
          Args:

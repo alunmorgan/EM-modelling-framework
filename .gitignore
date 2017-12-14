@@ -6,3 +6,4 @@ FreeCAD_geometry_generation/.idea/
 *.aux
 *.out
 *.toc
+Test_suite/FreeCAD_input/load_local_paths_testing.m

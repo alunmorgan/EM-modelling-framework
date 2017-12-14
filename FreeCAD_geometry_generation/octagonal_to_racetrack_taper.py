@@ -19,32 +19,35 @@ def racetrack_to_octagonal_cavity_model(input_parameters):
             input_parameters (dict): Dictionary of input parameter names and values.
         """
     try:
-        wire1, face1 = make_racetrack_aperture(input_parameters['racetrack_height'],
-                                               input_parameters['racetrack_width'])
-        wire2, face2 = make_octagonal_aperture(input_parameters['octagon_height'],
+        wire1, face1 = make_octagonal_aperture(input_parameters['octagon_height'],
                                                input_parameters['octagon_width'],
                                                input_parameters['octagon_side_length'],
                                                input_parameters['octagon_tb_length'])
-        wire3, face3 = make_racetrack_aperture(input_parameters['racetrack_height'] + input_parameters['pipe_thickness'],
-                                               input_parameters['racetrack_width'] + input_parameters['pipe_thickness'])
-        wire4, face4 = make_octagonal_aperture(input_parameters['octagon_height'] + input_parameters['pipe_thickness'],
+        wire2, face2 = make_racetrack_aperture(input_parameters['racetrack_height'],
+                                               input_parameters['racetrack_width'])
+        wire3, face3 = make_octagonal_aperture(input_parameters['octagon_height'] + input_parameters['pipe_thickness'],
                                                input_parameters['octagon_width'] + input_parameters['pipe_thickness'],
                                                input_parameters['octagon_side_length'],
                                                input_parameters['octagon_tb_length'])
-        vac1 = make_beampipe(face2, input_parameters['octagon_length'])
+        wire4, face4 = make_racetrack_aperture(input_parameters['racetrack_height'] + input_parameters['pipe_thickness'],
+                                               input_parameters['racetrack_width'] + input_parameters['pipe_thickness'])
+
+        vac1 = make_beampipe(face1, input_parameters['octagon_length'],
+                             (-input_parameters['octagon_length'] / 2. -
+                              input_parameters['taper_length'] -
+                              input_parameters['racetrack_length'] / 2., 0, 0))
         vac2 = make_taper(wire2, wire1, input_parameters['taper_length'],
-                            (input_parameters['octagon_length'] / 2., 0, 0))
-        vac3 = make_beampipe(face1, input_parameters['racetrack_length'],
-                                  (input_parameters['racetrack_length'] / 2. +
-                                   input_parameters['taper_length'] +
-                                   input_parameters['octagon_length'] / 2., 0, 0))
-        beampipe1 = make_beampipe(face2, input_parameters['octagon_length'])
-        taper1 = make_taper(wire2, wire1, input_parameters['taper_length'],
-                            (input_parameters['octagon_length'] / 2., 0, 0))
-        beampipe2 = make_beampipe(face1, input_parameters['racetrack_length'],
-                                  (input_parameters['racetrack_length'] / 2. +
-                                   input_parameters['taper_length'] +
-                                   input_parameters['octagon_length'] / 2., 0, 0))
+                          (-input_parameters['racetrack_length'] / 2., 0, 0), (0, 180, 0))
+        vac3 = make_beampipe(face2, input_parameters['racetrack_length'])
+
+        beampipe1 = make_beampipe(face3, input_parameters['octagon_length'],
+                                  (-input_parameters['octagon_length'] / 2. -
+                                   input_parameters['taper_length'] -
+                                   input_parameters['racetrack_length'] / 2., 0, 0))
+        taper1 = make_taper(wire4, wire3, input_parameters['taper_length'],
+                            (-input_parameters['racetrack_length'] / 2., 0, 0), (0, 180, 0))
+        beampipe2 = make_beampipe(face4, input_parameters['racetrack_length'])
+
         fin1 = beampipe1.fuse(taper1)
         fin2 = fin1.fuse(beampipe2)
 
