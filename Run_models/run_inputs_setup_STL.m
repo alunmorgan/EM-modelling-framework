@@ -1,17 +1,12 @@
-function run_inputs_setup_STL(mi)
+function modelling_inputs = run_inputs_setup_STL(mi)
 % Runs the model with the requested variations in parameters and stores them in a user specified
 % location.
 %
 % mi is a structure containing the initial setup parameters.
 %
-% Example: varargout = Gdfidl_run_models_from_STL(mi)
-
-if ispc ==1
-    error('This needs to be run on the linux modelling machine')
-end
+% Example: modelling_inputs = run_inputs_setup_STL(mi)
 
 model_num = 0;
-
 
 %% Building up a set of inputs to be passed to the EM simulator.
 [defs, ~] = construct_defs(mi.material_defs);
