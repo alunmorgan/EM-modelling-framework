@@ -19,9 +19,7 @@ temp_files('make')
 % Check that the post processor has completed
 data = read_file_full_line(fullfile('pp_link', 'wake', 'model_wake_post_processing_log'));
 for hwa = 1:length(data)
-    se = strfind(data{hwa}, 'The End of File is reached');
-    se = isempty(se{1});
-    if se == 0
+    if ~isempty(strfind(data{hwa},'The End of File is reached'))
         disp('Postprocess_wakes: The post processor has run to completion')
         break
     end
