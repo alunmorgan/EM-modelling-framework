@@ -39,7 +39,7 @@ run_inputs.simulation_defs.n_cores = '25';
 % sim select - chooses which simulations to run
 % (Wake/S-parameter/Eigenmode). Uses a string as input 'esw' will select
 % all three.
-run_inputs.simulation_defs.sim_select = 'ws';
+run_inputs.simulation_defs.sim_select = 'wselr';
 % specifies if there is an electron beam passing through the structure.
 % if there is it is assumed to be passing between ports 1 and 2.
 run_inputs.simulation_defs.beam = 'yes';
@@ -71,4 +71,5 @@ run_inputs.simulation_defs.volume_fill_factor =  1;
 run_inputs.simulation_defs.extension_names = {'beampipe'};
 
 % %%%%%%%%%%%%%%%%%%%%%%%%%% Running the models %%%%%%%%%%%%%%%%%%%
-Gdfidl_run_models_from_STL(run_inputs);
+modelling_setups = run_inputs_setup_STL(run_inputs);
+run_models(run_inputs, modelling_setups, 'STL')
