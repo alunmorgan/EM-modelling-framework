@@ -8,18 +8,20 @@ function construct_eigenmode_gdf_file(path_to_model_data_file, modelling_inputs,
 %
 % Example: construct_eigenmode_gdf_file(mi, modelling_inputs, islossy)
 
-mesh = modelling_inputs.mesh_stepsize;
 materials = modelling_inputs.mat_list(:,1);
 material_labels = modelling_inputs.mat_list(:,2);
 add_defs = modelling_inputs.defs;
-num_threads = modelling_inputs.n_cores;
 
 material_override = find_material_overrides(materials,  add_defs);
 
 data = read_file_full_line(path_to_model_data_file);
 % switch the port descriptions to the eigenvalues section.
 data = regexprep(data, '-fdtd', '-eigenvalues');
-fs = gdf_eigenmode_header_construction('', 'temp', num_threads, mesh, material_override, material_labels);
+fs = gdf_eigenmode_header_construction('', 'temp', ...
+    modelling_inputs.NPMLs,...
+    modelling_inputs.n_cores,...
+    modelling_inputs.mesh_stepsize,...
+    material_override, material_labels);
 mon = gdf_eigenmode_monitor_construction(100, islossy);
 % construct the full input file.
 data = cat(1,fs, add_defs', data, mon);

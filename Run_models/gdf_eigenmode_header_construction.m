@@ -1,4 +1,5 @@
-function fs = gdf_eigenmode_header_construction(loc, name, num_threads, mesh, materials, material_labels)
+function fs = gdf_eigenmode_header_construction(loc, name, npmls, ...
+    num_threads, mesh, materials, material_labels)
 % Constructs the initial part of the gdf input file for GdfidL 
 % loc gives the location of the output files
 %
@@ -16,6 +17,7 @@ fs = {'###################################################'};
 fs = cat(1,fs,'define(INF, 10000)');
 fs = cat(1,fs,'define(LargeNumber, 1000)');
 fs = cat(1,fs,['define(STPSZE, ',mesh,') # Step size of mesh']);
+fs = cat(1,fs,['define(NPMLs, ',npmls,') # number of perfect matching layers used']);
 fs = cat(1,fs,'define(vacuum, 0)');
 fs = cat(1,fs,'define(PEC, 1)');
 for ks = 1:length(materials)

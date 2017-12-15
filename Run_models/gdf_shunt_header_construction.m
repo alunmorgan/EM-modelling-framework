@@ -1,4 +1,5 @@
-function fs = gdf_shunt_header_construction(loc, name, num_threads, mesh, materials, material_labels, frequency)
+function fs = gdf_shunt_header_construction(loc, name, npmls, num_threads,...
+    mesh, materials, material_labels, frequency)
 % Constructs the initial part of the gdf input file for GdfidL 
 %
 % fs is 
@@ -16,6 +17,7 @@ fs = {'###################################################'};
 fs = cat(1,fs,'define(INF, 10000)');
 fs = cat(1,fs,'define(LargeNumber, 1000)');
 fs = cat(1,fs,['define(STPSZE, ',mesh,') # Step size of mesh']);
+fs = cat(1,fs,['define(NPMLs, ',npmls,') # number of perfect matching layers used']);
 fs = cat(1,fs,'define(vacuum, 0)');
 fs = cat(1,fs,'define(PEC, 1)');
 for ks = 1:length(materials)
@@ -47,17 +49,17 @@ fs = cat(1,fs,'frequency = FREQ');
 fs = cat(1,fs,'amplitude = 1');
 fs = cat(1,fs,['risetime = 1 / ', frequency]);
 fs = cat(1,fs,'nextport');
+fs = cat(1,fs,'port= signal_2');
+fs = cat(1,fs,'mode = 1');
+fs = cat(1,fs,'amplitude = 1');
+fs = cat(1,fs,'phase = 0');
+fs = cat(1,fs,'nextport');
 fs = cat(1,fs,'port= signal_3');
 fs = cat(1,fs,'mode = 1');
 fs = cat(1,fs,'amplitude = 1');
 fs = cat(1,fs,'phase = 0');
 fs = cat(1,fs,'nextport');
-fs = cat(1,fs,'port= signal_5');
-fs = cat(1,fs,'mode = 1');
-fs = cat(1,fs,'amplitude = 1');
-fs = cat(1,fs,'phase = 0');
-fs = cat(1,fs,'nextport');
-fs = cat(1,fs,'port= signal_7');
+fs = cat(1,fs,'port= signal_4');
 fs = cat(1,fs,'mode = 1');
 fs = cat(1,fs,'amplitude = 1');
 fs = cat(1,fs,'phase = 0');
