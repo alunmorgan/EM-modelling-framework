@@ -9,7 +9,7 @@ function parameters = get_parameters_from_sidecar_file(file_loc)
 % geometric parameters.
 
 data = read_file_full_line(file_loc);
-data = reduce_cell_depth(data);
+% data = reduce_cell_depth(data);
 vals = reduce_cell_depth(reduce_cell_depth(...
     regexp(data, '(.*)\s:\s(.*)', 'tokens')));
 tmp = cellfun(@str2num, vals(:,2));

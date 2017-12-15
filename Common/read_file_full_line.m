@@ -9,8 +9,7 @@ ck = 1;
 while ~feof(fid)
     current_line = textscan(fid,'%[^\n]',1,'Delimiter','\n');
     if ~isempty(current_line{1})
-%         current_line = find_val_in_cell_nest(current_line);
-        data{ck,1} = current_line{1};
+        data{ck,1} = find_val_in_cell_nest(current_line);
         ck = ck+1;
     else
         % Sometimes the end of file is not properly found.

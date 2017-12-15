@@ -1,4 +1,4 @@
-function Gdfidl_run_models_from_STL(mi)
+function run_inputs_setup_STL(mi)
 % Runs the model with the requested variations in parameters and stores them in a user specified
 % location.
 %
@@ -75,85 +75,55 @@ for nw = 1:length(sim_param_sweeps)
     end %for
 end %for
 
-% Running the different simulators for each model.
-for awh = 1:length(modelling_inputs)
-    % Making the directory to store the run data in.
-    mkdir(fullfile(mi.paths.storage_path, modelling_inputs{awh}.model_name))
-    % Create model_data file from STL file.
-    create_model_data_file_for_STL(...
-        mi.paths.input_file_path, mi.paths.storage_path,...
-        modelling_inputs{awh}.base_model_name,...
-        modelling_inputs{awh}.model_name)
-    %FIXME
-    ow_behaviour = '';
-    % Write update to the command line
-    disp(datestr(now))
-    disp(['Running ',num2str(awh), ' of ',...
-        num2str(length(modelling_inputs)), ' simulations'])
-    
-    if ~isempty(strfind(mi.simulation_defs.sim_select, 'w'))
-        try
-            run_wake_simulation(mi.paths, modelling_inputs{awh}, ow_behaviour, 'STL');
-        catch ERR
-            display_modelling_error(ERR, 'wake')
-        end %try
-    end %if
-    if ~isempty(strfind(mi.simulation_defs.sim_select, 's'))
-        try
-            run_s_param_simulation(mi.paths, modelling_inputs{awh}, ow_behaviour, 'STL');
-        catch ERR
-            display_modelling_error(ERR, 'S-parameter')
-        end %try
-    end %if
-    if ~isempty(strfind(mi.simulation_defs.sim_select, 'e'))
-        try
-            run_eigenmode_simulation(mi.paths, modelling_inputs{awh}, ow_behaviour, 'STL');
-        catch ERR
-            display_modelling_error(ERR, 'eigenmode')
-        end %try
-    end %if
-    if ~isempty(strfind(mi.simulation_defs.sim_select, 'l'))
-        try
-            run_eigenmode_lossy_simulation(mi.paths, modelling_inputs{awh}, ow_behaviour, 'STL');
-        catch ERR
-            display_modelling_error(ERR, 'lossy eigenmode')
-        end %try
-    end %if
-    if ~isempty(strfind(mi.simulation_defs.sim_select, 'r'))
-        try
-            run_shunt_simulation(mi.paths, modelling_inputs{awh}, ow_behaviour, 'STL');
-        catch ERR
-            display_modelling_error(ERR, 'shunt')
-        end %try
-    end %if
-end %for
-end % function
-
-function base = base_inputs(mi, base_name)
-% get the setting for the original base model.
-base.mat_list = mi.mat_list;
-base.n_cores  = mi.simulation_defs.n_cores;
-base.sim_select = mi.simulation_defs.sim_select;
-base.beam = mi.simulation_defs.beam;
-base.volume_fill_factor = mi.simulation_defs.volume_fill_factor;
-base.extension_names = mi.simulation_defs.extension_names;
-base.base_model_name = base_name;
-base.model_name = base_name;
-% base.set_name = mi.model_set;
-base.port_multiple = mi.simulation_defs.port_multiple;
-base.port_fill_factor = mi.simulation_defs.port_fill_factor;
-base.extension_names = mi.simulation_defs.extension_names;
-base.version = mi.simulation_defs.version{1};
-% base.defs = defs{1};
-base.beam_sigma = mi.simulation_defs.beam_sigma{1};
-base.mesh_stepsize = mi.simulation_defs.mesh_stepsize{1};
-base.wakelength = mi.simulation_defs.wakelength{1};
-base.NPMLs = mi.simulation_defs.NPMLs{1};
-base.precision = mi.simulation_defs.precision{1};
-if isfield(mi.simulation_defs, 's_param_ports')
-    base.s_param_ports = mi.simulation_defs.s_param_ports;
-    base.s_param_excitation_f = mi.simulation_defs.s_param_excitation_f;
-    base.s_param_excitation_bw = mi.simulation_defs.s_param_excitation_bw;
-    base.s_param_tmax = mi.simulation_defs.s_param_tmax;
-end %if
-end %function
+% % Running the different simulators for each model.
+% for awh = 1:length(modelling_inputs)
+%     % Making the directory to store the run data in.
+%     mkdir(fullfile(mi.paths.storage_path, modelling_inputs{awh}.model_name))
+%     % Create model_data file from STL file.
+%     create_model_data_file_for_STL(...
+%         mi.paths.input_file_path, mi.paths.storage_path,...
+%         modelling_inputs{awh}.base_model_name,...
+%         modelling_inputs{awh}.model_name)
+%     %FIXME
+%     ow_behaviour = '';
+%     % Write update to the command line
+%     disp(datestr(now))
+%     disp(['Running ',num2str(awh), ' of ',...
+%         num2str(length(modelling_inputs)), ' simulations'])
+%     
+%     if ~isempty(strfind(mi.simulation_defs.sim_select, 'w'))
+%         try
+%             GdfidL_run_simulation('wake', mi.paths, modelling_inputs{awh}, ow_behaviour, 'STL');
+%         catch ERR
+%             display_modelling_error(ERR, 'wake')
+%         end %try
+%     end %if
+%     if ~isempty(strfind(mi.simulation_defs.sim_select, 's'))
+%         try
+%             GdfidL_run_simulation('s-parameter', mi.paths, modelling_inputs{awh}, ow_behaviour, 'STL');
+%         catch ERR
+%             display_modelling_error(ERR, 'S-parameter')
+%         end %try
+%     end %if
+%     if ~isempty(strfind(mi.simulation_defs.sim_select, 'e'))
+%         try
+%             GdfidL_run_simulation('eigenmode', mi.paths, modelling_inputs{awh}, ow_behaviour, 'STL');
+%         catch ERR
+%             display_modelling_error(ERR, 'eigenmode')
+%         end %try
+%     end %if
+%     if ~isempty(strfind(mi.simulation_defs.sim_select, 'l'))
+%         try
+%             GdfidL_run_simulation('lossy eigenmode', mi.paths, modelling_inputs{awh}, ow_behaviour, 'STL');
+%         catch ERR
+%             display_modelling_error(ERR, 'lossy eigenmode')
+%         end %try
+%     end %if
+%     if ~isempty(strfind(mi.simulation_defs.sim_select, 'r'))
+%         try
+%             GdfidL_run_simulation('shunt', mi.paths, modelling_inputs{awh}, ow_behaviour, 'STL');
+%         catch ERR
+%             display_modelling_error(ERR, 'shunt')
+%         end %try
+%     end %if
+% end %for

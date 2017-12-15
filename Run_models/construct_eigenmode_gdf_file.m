@@ -1,4 +1,4 @@
-function construct_eigenmode_gdf_file(mi, modelling_inputs, islossy)
+function construct_eigenmode_gdf_file(path_to_model_data_file, modelling_inputs, islossy)
 % Write the input gdf file for an eigenmode simulation of the requested
 % model.
 %
@@ -8,18 +8,15 @@ function construct_eigenmode_gdf_file(mi, modelling_inputs, islossy)
 %
 % Example: construct_eigenmode_gdf_file(mi, modelling_inputs, islossy)
 
-mesh = mi.mesh_stepsize;
-materials = mi.mat_list(:,1);
-material_labels = mi.mat_list(:,2);
-in_path = mi.input_file_path;
-model_name = mi.model_name;
+mesh = modelling_inputs.mesh_stepsize;
+materials = modelling_inputs.mat_list(:,1);
+material_labels = modelling_inputs.mat_list(:,2);
 add_defs = modelling_inputs.defs;
 num_threads = modelling_inputs.n_cores;
 
 material_override = find_material_overrides(materials,  add_defs);
 
-model_file = [in_path, model_name, '_model_data'];
-data = read_file_full_line(model_file);
+data = read_file_full_line(path_to_model_data_file);
 % switch the port descriptions to the eigenvalues section.
 data = regexprep(data, '-fdtd', '-eigenvalues');
 fs = gdf_eigenmode_header_construction('', 'temp', num_threads, mesh, material_override, material_labels);
