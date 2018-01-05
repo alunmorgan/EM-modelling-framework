@@ -168,7 +168,7 @@ cores_ind = find_position_in_cell_lst(strfind(data,'nrofthreads='));
 cores = regexp(data{cores_ind(end)},'.*nrofthreads=\s*(\d+)', 'tokens');
 lg.cores = str2double(char(cores{1}));
 
-% find the GdfidL version.
+% find the mesh step size.
 mesh_step_size_ind = find_position_in_cell_lst(regexp(data,'mesh>\s*spacing\s*=\s*'));
 mesh_step_size = regexp(data{mesh_step_size_ind},'mesh>\s*spacing\s*=\s*(.*)', 'tokens');
 lg.mesh_step_size = str2double(char(mesh_step_size{1}));
