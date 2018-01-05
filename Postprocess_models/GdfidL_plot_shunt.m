@@ -1,4 +1,4 @@
-function GdfidL_plot_shunt(shunt_data, pth)
+function GdfidL_plot_shunt(pp_data, pth)
 % Generate the graphs based on the shunt simulation data.
 % Graphs are saved in fig format and png, eps.
 % shunt data is the simulation data.
@@ -7,7 +7,7 @@ function GdfidL_plot_shunt(shunt_data, pth)
 % Example: GdfidL_plot_shunt(shunt_data, pth)
 
 fig_pos = [10000 678 560 420];
-
+shunt_data = pp_data.shunt_data;
 for aw = 1:size(shunt_data.fields,1);
     p(aw) = complex(shunt_data.fields(aw,2),shunt_data.fields(aw,3));
 end

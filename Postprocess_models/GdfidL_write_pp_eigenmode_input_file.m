@@ -1,4 +1,4 @@
-function GdfidL_write_pp_eigenmode_input_file(n_modes, pp_inputs)
+function GdfidL_write_pp_eigenmode_input_file(log, n_modes, pipe_length)
 % Writes the postprocessing input file for an eigenmode simulation.
 % 
 % n_modes is the number of modes to consider.
@@ -6,7 +6,7 @@ function GdfidL_write_pp_eigenmode_input_file(n_modes, pp_inputs)
 % postprocessing.
 %
 % example: GdfidL_write_pp_s_param_input_file('3')
-pipe_length = get_pipe_length_from_defs(pp_inputs);
+% pipe_length = get_pipe_length_from_defs(pp_inputs);
 
 ov{1} = '';
 ov = cat(1,ov,'-general');
@@ -18,8 +18,8 @@ ov = cat(1,ov,'    nrofthreads = 25');
 ov = cat(1,ov,'    ');
 ov = cat(1,ov,'-3darrowplot');
 ov = cat(1,ov,'    onlyplotfiles = no');
-ov = cat(1,ov,['	 bbzhigh = ',num2str(pp_inputs.logs.eigenmode.mesh_extent_zhigh),' - ',num2str(pipe_length)]);
-ov = cat(1,ov,['	 bbzlow = ',num2str(pp_inputs.logs.eigenmode.mesh_extent_zlow),' + ',num2str(pipe_length)]);
+ov = cat(1,ov,['	 bbzhigh = ',num2str(log.mesh_extent_zhigh),' - ',num2str(pipe_length)]);
+ov = cat(1,ov,['	 bbzlow = ',num2str(log.mesh_extent_zlow),' + ',num2str(pipe_length)]);
 ov = cat(1,ov,'	 roty= -90');
 ov = cat(1,ov,'	 rotz=-90');
 ov = cat(1,ov,'	 nlscale= yes');
@@ -50,8 +50,8 @@ for jrd = 1:n_modes
     ov = cat(1,ov,['    solution = ',num2str(jrd)]);
     ov = cat(1,ov,'    doit');
 end
-ov = cat(1,ov,['	 bbzhigh = ',num2str(pp_inputs.logs.eigenmode.mesh_extent_zhigh),' - ',num2str(pipe_length)]);
-ov = cat(1,ov,['	 bbzlow = ',num2str(pp_inputs.logs.eigenmode.mesh_extent_zlow),' + ',num2str(pipe_length)]);
+ov = cat(1,ov,['	 bbzhigh = ',num2str(log.mesh_extent_zhigh),' - ',num2str(pipe_length)]);
+ov = cat(1,ov,['	 bbzlow = ',num2str(log.mesh_extent_zlow),' + ',num2str(pipe_length)]);
 ov = cat(1,ov,'	 bbxlow = 0');
 ov = cat(1,ov,'	 bbxhigh = 0');
 ov = cat(1,ov,'	 scale = 5');
@@ -72,19 +72,19 @@ for jrd = 1:n_modes
 end
 
 for jrd = 1:n_modes
-    ov = cat(1,ov,['	 bbzhigh = ',num2str(pp_inputs.logs.eigenmode.mesh_extent_zhigh),' - ',num2str(pipe_length)]);
-    ov = cat(1,ov,['	 bbzlow = ',num2str(pp_inputs.logs.eigenmode.mesh_extent_zlow),' + ',num2str(pipe_length)]);
+    ov = cat(1,ov,['	 bbzhigh = ',num2str(log.mesh_extent_zhigh),' - ',num2str(pipe_length)]);
+    ov = cat(1,ov,['	 bbzlow = ',num2str(log.mesh_extent_zlow),' + ',num2str(pipe_length)]);
     ov = cat(1,ov,'	 bbylow = 30E-3');
-    ov = cat(1,ov,['	 bbyhigh = ',num2str(pp_inputs.logs.eigenmode.mesh_extent_yhigh)]);
+    ov = cat(1,ov,['	 bbyhigh = ',num2str(log.mesh_extent_yhigh)]);
     ov = cat(1,ov, ['	 plotopts = -colorps -o eigenmode',num2str(jrd),'_x_cut_waveguide_plot.ps']);
     ov = cat(1,ov,['    solution = ',num2str(jrd)]);
     ov = cat(1,ov,'    doit');
 end
 
-ov = cat(1,ov,['	 bbzhigh = ',num2str(pp_inputs.logs.eigenmode.mesh_extent_zhigh),' - ',num2str(pipe_length)]);
-ov = cat(1,ov,['	 bbzlow = ',num2str(pp_inputs.logs.eigenmode.mesh_extent_zlow),' + ',num2str(pipe_length)]);
-ov = cat(1,ov,['	 bbxlow = ',num2str(pp_inputs.logs.eigenmode.mesh_extent_xlow)]);
-ov = cat(1,ov,['	 bbxhigh = ',num2str(pp_inputs.logs.eigenmode.mesh_extent_xhigh)]);
+ov = cat(1,ov,['	 bbzhigh = ',num2str(log.mesh_extent_zhigh),' - ',num2str(pipe_length)]);
+ov = cat(1,ov,['	 bbzlow = ',num2str(log.mesh_extent_zlow),' + ',num2str(pipe_length)]);
+ov = cat(1,ov,['	 bbxlow = ',num2str(log.mesh_extent_xlow)]);
+ov = cat(1,ov,['	 bbxhigh = ',num2str(log.mesh_extent_xhigh)]);
 ov = cat(1,ov,'	 bbylow = 0');
 ov = cat(1,ov,'	 bbyhigh = 0');
 ov = cat(1,ov,'	 scale = 5');
@@ -216,13 +216,4 @@ for hd = 1:n_modes
     ov = cat(1,ov,['call rshunt(',num2str(hd),')']');
 end
 
-
-
 write_out_data( ov, 'pp_link/eigenmode/model_eigenmode_post_processing' )
-% fid = fopen('pp_link/model_eigenmode_post_processing','wt');
-% for be = 1:length(ov)
-%     mj = char(ov{be});
-%     fwrite(fid,mj);
-%     fprintf(fid,'\n','');
-% end
-% fclose(fid);

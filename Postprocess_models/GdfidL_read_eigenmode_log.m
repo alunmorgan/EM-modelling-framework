@@ -53,17 +53,13 @@ mesh_extent_xlow = regexp(data{mesh_extent_xlow_ind},'mesh>\s*pxlow\s*=\s*([^,]*
 mesh_extent_xhigh = regexp(data{mesh_extent_xhigh_ind},'mesh>\s*(?:[^,]*\s*,)?\s*pxhigh\s*=\s*(.*)', 'tokens');
 mesh_extent_ylow = regexp(data{mesh_extent_ylow_ind},'mesh>\s*pylow\s*=\s*([^,]*)(?:\s*,|\s*$)', 'tokens');
 mesh_extent_yhigh = regexp(data{mesh_extent_yhigh_ind},'mesh>\s*(?:[^,]*\s*,)?\s*pyhigh\s*=\s*(.*)', 'tokens');
-% The regular expressions below are to cope with the fact theat Matlab
-% str2num will return the result of a calculation if the - has a space
-% beween it and the following number. But, it will return a list if there
-% is no space. I know that in this case it is always a calculation
-% therefore I force the spacing to the appropriate convention.
-log.mesh_extent_zlow = force_to_calculation(mesh_extent_zlow{1});
-log.mesh_extent_zhigh = force_to_calculation(mesh_extent_zhigh{1});
-log.mesh_extent_xlow = force_to_calculation(mesh_extent_xlow{1});
-log.mesh_extent_xhigh = force_to_calculation(mesh_extent_xhigh{1});
-log.mesh_extent_ylow = force_to_calculation(mesh_extent_ylow{1});
-log.mesh_extent_yhigh = force_to_calculation(mesh_extent_yhigh{1});
+
+log.mesh_extent_zlow = eval(char(mesh_extent_zlow{1}{1}));
+log.mesh_extent_zhigh = eval(char(mesh_extent_zhigh{1}{1}));
+log.mesh_extent_xlow = eval(char(mesh_extent_xlow{1}{1}));
+log.mesh_extent_xhigh = eval(char(mesh_extent_xhigh{1}{1}));
+log.mesh_extent_ylow = eval(char(mesh_extent_ylow{1}{1}));
+log.mesh_extent_yhigh = eval(char(mesh_extent_yhigh{1}{1}));
 
 % find symetry planes
 % assume any magnetic boundary is also a symetry plane.
@@ -108,7 +104,7 @@ end
 
 % find the number of mesh cells
 Ncells_ind = find_position_in_cell_lst(strfind(data,'nx*ny*nz:'));
-log.Ncells = str2num(regexprep(data{Ncells_ind},'.*: ',''));
+log.Ncells = str2num(regexprep(data{Ncells_ind(1)},'.*: ',''));
 
 % find the solver time
 wall_time_ind = find_position_in_cell_lst(strfind(data,'Wall Clock Time:'));

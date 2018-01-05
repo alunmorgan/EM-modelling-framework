@@ -1,4 +1,4 @@
-function eigenmode_data = postprocess_eigenmode(pp_inputs)
+function eigenmode_data = postprocess_eigenmode(modelling_inputs, run_log)
 % Runs the GdfidL postprocessor on the selected data.
 % The model data has already been selected using soft links.
 %
@@ -10,7 +10,8 @@ function eigenmode_data = postprocess_eigenmode(pp_inputs)
 
 %% EIGENMODE POSTPROCESSING
 % run the eigenmode postprocessor
-GdfidL_write_pp_eigenmode_input_file(100, pp_inputs)
+pipe_length = get_pipe_length_from_defs(modelling_inputs.defs);
+GdfidL_write_pp_eigenmode_input_file(run_log, 10, pipe_length)
 temp_files('make')
 [~]=system('gd1.pp < pp_link/eigenmode/model_eigenmode_post_processing > pp_link/eigenmode/model_eigenmode_post_processing_log');
 %% find the location of all the required output files

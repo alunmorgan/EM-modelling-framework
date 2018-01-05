@@ -95,13 +95,4 @@ ov = cat(1,ov,'	   doit');
 % ov = cat(1,ov,'    solution = 2');
 % ov = cat(1,ov,'    doit');
 
-
-
 write_out_data( ov, ['pp_link/shunt/model_shunt',freq ,'_post_processing'] )
-% fid = fopen('pp_link/model_eigenmode_post_processing','wt');
-% for be = 1:length(ov)
-%     mj = char(ov{be});
-%     fwrite(fid,mj);
-%     fprintf(fid,'\n','');
-% end
-% fclose(fid);
