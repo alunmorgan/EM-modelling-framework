@@ -28,7 +28,7 @@ run_inputs.simulation_defs.n_cores = '25';
 % sim select - chooses which simulations to run
 % (Wake/S-parameter/Eigenmode). Uses a string as input 'esw' will select
 % all three.
-run_inputs.simulation_defs.sim_select = 'w';
+run_inputs.simulation_defs.sim_select = 'welr';
 % specifies if there is an electron beam passing through the structure.
 % if there is it is assumed to be passing between ports 1 and 2.
 run_inputs.simulation_defs.beam = 'yes';
