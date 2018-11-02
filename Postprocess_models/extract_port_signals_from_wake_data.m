@@ -9,8 +9,8 @@ end %if
 
 if isfield(wake_data.port_time_data, 'data')
     for ens = length(lab_ind):-1:1 % ports
-        [~, max_mode] = max(squeeze(wake_data.port_time_data.port_mode_energy{lab_ind(ens)}(:)));
-        dominant_modes{ens} =  squeeze(wake_data.port_time_data.data{lab_ind(ens)}(:,max_mode));
+        [~, max_mode(ens)] = max(squeeze(wake_data.port_time_data.port_mode_energy{lab_ind(ens)}(:)));
+        dominant_modes{ens} =  squeeze(wake_data.port_time_data.data{lab_ind(ens)}(:,max_mode(ens)));
         
         for seo = 1:size(wake_data.port_time_data.data{lab_ind(ens)},2) % modes
             modes{ens}{seo} =  squeeze(wake_data.port_time_data.data{lab_ind(ens)}(:,seo));
