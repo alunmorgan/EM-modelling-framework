@@ -5,7 +5,7 @@ function [bunch_energy_loss, beam_port_energy_loss, ...
 %
 bunch_energy_loss = wake_data.frequency_domain_data.Total_bunch_energy_loss * 1e9;
 beam_port_energy_loss = wake_data.frequency_domain_data.Total_energy_from_beam_ports* 1e9;
-if wake_data.frequency_domain_data.Total_energy_from_signal_ports >0
+if wake_data.frequency_domain_data.Total_energy_from_signal_ports > 0
     % add signal ports if there is any signal.
     signal_port_energy_loss = wake_data.frequency_domain_data.Total_energy_from_signal_ports* 1e9;
 else

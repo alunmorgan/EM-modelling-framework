@@ -59,21 +59,47 @@ else
     bp_only_flag = 0;
 end
 
-[bunch_energy_loss, beam_port_enegy_loss, signal_port_energy_loss, structure_energy_loss, material_names] =  extract_energy_loss_data_from_wake_data(wake_data);
-[timebase_cs, e_total_cs, e_ports_cs] =  extract_cumulative_total_energy_from_wake_data(wake_data);
-[model_mat_data, mat_loss] = extract_material_losses_from_wake_data(wake_data, mi.extension_names);
-[frequency_scale_bs, bs] = extract_bunch_spectrum_from_wake_data(wake_data);
-[m_time, m_data] = extract_mat_losses_from_wake_data(wake_data, model_mat_data);
+[bunch_energy_loss, beam_port_energy_loss, signal_port_energy_loss, ...
+    structure_energy_loss, material_names] =  ...
+           extract_energy_loss_data_from_wake_data(wake_data);
+       
+[timebase_cs, e_total_cs, e_ports_cs] =  ...
+    extract_cumulative_total_energy_from_wake_data(wake_data);
+
+[model_mat_data, mat_loss, m_time, m_data] = ...
+    extract_material_losses_from_wake_data(wake_data, mi.extension_names);
+
+[frequency_scale_bs, bs] = ...
+    extract_bunch_spectrum_from_wake_data(wake_data);
+
 [timebase_wp, wp] = extract_wake_potential_from_wake_data(wake_data);
-[frequency_scale_wi, wi_re, wi_im] = extract_longitudinal_wake_impedance_from_wake_data(wake_data, cut_ind);
-[timebase_x, timebase_y, wi_x, wi_y] = extract_transverse_wake_impedance_from_wake_data(wake_data);
-[timebase_port, modes, max_mode, dominant_modes, port_cumsum, t_start] = extract_port_signals_from_wake_data(wake_data, lab_ind);
-[frequency_scale_bls, bls] = extract_bunch_loss_spectrum_from_wake_data(wake_data);
+
+[frequency_scale_wi, wi_re, wi_im] = ...
+    extract_longitudinal_wake_impedance_from_wake_data(wake_data, cut_ind);
+
+[timebase_x, timebase_y, wi_x, wi_y] = ...
+    extract_transverse_wake_impedance_from_wake_data(wake_data);
+
+[timebase_port, modes, max_mode, dominant_modes, port_cumsum, t_start] = ...
+    extract_port_signals_from_wake_data(wake_data, lab_ind);
+
+[frequency_scale_bls, bls] = ...
+    extract_bunch_loss_spectrum_from_wake_data(wake_data);
+
 [~, pes] = extract_port_energy_spectrum_from_wake_data(wake_data);
-[frequency_scale_ports, beam_port_spectrum, signal_port_spectrum, port_energy_spectra] = extract_port_spectra_from_wake_data(wake_data, cut_ind, lab_ind);
-[frequency_scale_ts, spectra_ts, peaks_ts, n_slices, slice_length, slice_timestep] =  extract_time_slice_results_from_wake_data(wake_data);
+
+[frequency_scale_ports, beam_port_spectrum, ...
+    signal_port_spectrum, port_energy_spectra] = ...
+    extract_port_spectra_from_wake_data(wake_data, cut_ind, lab_ind);
+
+[frequency_scale_ts, spectra_ts, peaks_ts, n_slices, ...
+    slice_length, slice_timestep] =  ...
+    extract_time_slice_results_from_wake_data(wake_data);
+
 pme = extract_port_energy_from_wake_data(wake_data);
-[frequency_scale_mc, spectra_mc] = extract_machine_conditions_results_from_wake_data(wake_data);
+
+[frequency_scale_mc, spectra_mc] = ...
+    extract_machine_conditions_results_from_wake_data(wake_data);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Thermal graphs
@@ -84,7 +110,7 @@ py(1,1) = bunch_energy_loss;
 py(2,1)=0;
 % These are the places that energy has been recorded.
 % assume beam ports are always there.
-py(2,2) = beam_port_enegy_loss;
+py(2,2) = beam_port_energy_loss;
 py(1,2) =0;
 leg{1} = ['Beam ports (',num2str(py(2,2)) ,'nJ)'];
 if ~isnan(signal_port_energy_loss)
@@ -760,18 +786,25 @@ savemfmt(h(33), pth,'tstart_check')
 close(h(33))
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Checking the cumsum scaling
-if isfield(wake_data.raw_data.port, 'timebase') && ~isnan(sum(wake_data.frequency_domain_data.Total_port_spectrum))
+if isfield(wake_data.raw_data.port, 'timebase') &&...
+        ~isnan(sum(wake_data.frequency_domain_data.Total_port_spectrum))
     h(34) = figure('Position',fig_pos);
     ax(34) = axes('Parent', h(34));
     data = wake_data.frequency_domain_data.Total_port_spectrum;
     plot(wake_data.frequency_domain_data.f_raw .*1e-9,cumsum(data)*1e9,':k')
     hold(ax(34), 'on')
-    plot([wake_data.frequency_domain_data.f_raw(1) .*1e-9,wake_data.frequency_domain_data.f_raw(end) .*1e-9],...
-        [wake_data.frequency_domain_data.Total_energy_from_ports .*1e9, wake_data.frequency_domain_data.Total_energy_from_ports .*1e9],'r')
-    plot([wake_data.frequency_domain_data.f_raw(1) .*1e-9,wake_data.frequency_domain_data.f_raw(end) .*1e-9],...
-        [wake_data.port_time_data.total_energy .*1e9, wake_data.port_time_data.total_energy .*1e9],':g')
-    plot([wake_data.frequency_domain_data.f_raw(floor(end/2)) .*1e-9,wake_data.frequency_domain_data.f_raw(floor(end/2)) .*1e-9],...
-        [0, wake_data.frequency_domain_data.Total_energy_from_ports .*1e9],':c')
+    plot([wake_data.frequency_domain_data.f_raw(1) .*1e-9,...
+        wake_data.frequency_domain_data.f_raw(end) .*1e-9],...
+        [wake_data.frequency_domain_data.Total_energy_from_ports .*1e9,...
+        wake_data.frequency_domain_data.Total_energy_from_ports .*1e9],'r')
+    plot([wake_data.frequency_domain_data.f_raw(1) .*1e-9,...
+        wake_data.frequency_domain_data.f_raw(end) .*1e-9],...
+        [wake_data.port_time_data.total_energy .*1e9, ...
+        wake_data.port_time_data.total_energy .*1e9],':g')
+    plot([wake_data.frequency_domain_data.f_raw(floor(end/2)) .*1e-9,...
+        wake_data.frequency_domain_data.f_raw(floor(end/2)) .*1e-9],...
+        [0,...
+        wake_data.frequency_domain_data.Total_energy_from_ports .*1e9],':c')
     hold(ax(34), 'off')
     % ylim([0 max(wake_data.frequency_domain_data.Total_energy_from_ports, wake_data.time_domain_data.loss_from_beam) .*1e9 .*1.1])
     xlabel('Frequency (GHz)')

@@ -77,7 +77,8 @@ else
         modelling_inputs.port_multiple,...
         port_names_table);
 end
-% get the wake potentials
+
+%% Wake potentials
 if isempty(WP_l)
     %     If the model is simple enough that there is no wake potential (as it
     %     is zero) then GdfidL does not output a file.
