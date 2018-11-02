@@ -76,25 +76,21 @@ for nr = 1:length(Ports)
         end %if
     else
         nme_end = nme_end1;
-    end
-    % Now the port modes.
-    mode_end = strfind(Ports, '-tim');
-    port_names_list = cell(1,1);
-    port_modes = NaN;
-    for nr = 1:length(Ports)
-        port_names_list{nr} = Ports{nr}(nme_start{nr}+5:nme_end{nr}-1);
-        port_modes(nr) = str2num(Ports{nr}(nme_end{nr}+15:mode_end{nr}-1));
-    end
-    % find the unique port names
-    port_names = unique(port_names_list);
+    end %if
+    port_names_list{nr} = Ports{nr}(nme_start{nr}+5:nme_end{nr}-1);
+    port_modes(nr) = str2num(Ports{nr}(nme_end{nr}+15:mode_end{nr}-1));
+end %for
+% find the unique port names
+port_names = unique(port_names_list);
+if length(port_names) == 1 && isempty(port_names{1})
+    warning('No Port data - This is a problem')
+    Port_mat = NaN;
+    port_names = NaN;
+else
     % put them in a matrix
     Port_mat = cell(1,1);
     for hs = 1:length(Ports)
         p_ind = find_position_in_cell_lst(strfind(port_names, port_names_list{hs}));
         Port_mat{p_ind,port_modes(hs)} = Ports{hs};
     end
-else
-    warning('No Port data - This is a problem')
-    Port_mat = NaN;
-    port_names = NaN;
 end
