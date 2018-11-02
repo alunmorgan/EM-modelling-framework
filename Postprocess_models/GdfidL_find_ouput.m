@@ -59,11 +59,21 @@ Ports = run_list(inds);
 % first find the port names.
 nme_start = strfind(Ports, 'Port=');
 % Dealing with change of output in the log file.
-nme_end1 = strfind(Ports, '-e_amp_of_mode=');
-nme_end2 = strfind(Ports, '-e_amp_of_Mode=');
-if ~isempty(nme_end1)
-    if isempty(nme_end1{1})
-        nme_end = nme_end2;
+nme_end1 = strfind(Ports, '_amp_of_mode=');
+nme_end2 = strfind(Ports, '_amp_of_Mode=');
+% Now the port modes.
+mode_end = strfind(Ports, '-tim');
+port_names_list = cell(1,1);
+port_modes = NaN;
+for nr = 1:length(Ports)
+    if isempty(nme_end1{nr})
+        if isempty(nme_end2{nr})
+            port_names_list{nr} = '';
+            port_modes(nr) = NaN;
+            continue
+        else
+            nme_end = nme_end2;
+        end %if
     else
         nme_end = nme_end1;
     end
