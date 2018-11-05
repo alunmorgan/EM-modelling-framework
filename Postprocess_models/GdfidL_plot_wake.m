@@ -391,7 +391,7 @@ if isfield(wake_data.raw_data.port, 'timebase') && ~isnan(wake_data.frequency_do
         for ens = length(lab_ind):-1:1 % ports
             ax_sp(ens) = subplot(hwn,ksn,ens);
             plot(timebase_port, dominant_modes{ens}, 'b', 'Parent', ax_sp(ens))
-            title([port_names{lab_ind(ens)}, ' (mode ',num2str(max_mode),')'], 'Parent', ax_sp(ens))
+            title([port_names{lab_ind(ens)}, ' (mode ',num2str(max_mode(ens)),')'], 'Parent', ax_sp(ens))
             xlim([timebase_port(1) timebase_port(end)])
             xlabel('Time (ns)', 'Parent', ax_sp(ens))
             graph_add_background_patch(wake_data.raw_data.port.t_start(ens) * 1E9)
