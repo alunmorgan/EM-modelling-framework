@@ -41,9 +41,10 @@ else
     total_energy_data.data = NaN;
 end %if
 
+%% Material losses
 if isfield(log, 'mat_losses') && iscell(Energy_in_ceramics)
     % get the energy in the ceramics.
-    [ energy_ceramics_data ] = GdfidL_read_graph_datafile( Energy_in_ceramics{1});
+    energy_ceramics_data = GdfidL_read_graph_datafile( Energy_in_ceramics{1});
     % The original data is the energy sampled at a point in time. What I want
     % is the total energy over time. So cumsum it and scale with the timestep
     loss_in_ceramics = cumsum(energy_ceramics_data.data(:,2)) .* ...

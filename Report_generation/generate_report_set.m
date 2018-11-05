@@ -13,6 +13,6 @@ for hwa = 1:length(model_iterations)
     Report_setup(Author, ['Test suite ', model_name_for_report ], ...
         graphic_loc, output_loc)
     catch ME
-        warning(['Report generation for ',iteration_name, ' Failed'])
+        warning(['Report generation for ', iteration_name, ' Failed'])
     end %try
 end %for

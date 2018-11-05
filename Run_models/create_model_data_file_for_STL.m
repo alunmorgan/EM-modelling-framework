@@ -7,7 +7,7 @@ geom = read_file_full_line(fullfile(storage_location, 'geometry-material-map.txt
 mesh_def = read_file_full_line(fullfile(storage_location, 'mesh_definition.txt'));
 port_def = read_file_full_line(fullfile(storage_location, 'port_definition.txt'));
 geom_params = read_file_full_line(fullfile(data_location, base_model_name, ...
-                [base_model_name, '_parameters.txt']));
+    [base_model_name, '_parameters.txt']));
 
 % geom = reduce_cell_depth(geom);
 vals = reduce_cell_depth(reduce_cell_depth(...
@@ -23,7 +23,7 @@ for hes = 1:length(geom_params)
 end
 model_file = cat(1, model_file, '###################################################');
 for hes = 1:length(mesh_def)
-model_file = cat(1, model_file, mesh_def{hes});
+    model_file = cat(1, model_file, mesh_def{hes});
 end
 model_file = cat(1, model_file, '###################################################');
 model_file = cat(1, model_file, '# Filling the initial volume with PEC');
@@ -62,7 +62,7 @@ model_file = cat(1, model_file, 'doit');
 
 model_file = cat(1, model_file, '###################################################');
 for hef = 1:length(port_def)
-model_file = cat(1, model_file, port_def{hef});
+    model_file = cat(1, model_file, port_def{hef});
 end
 
 write_out_data(model_file, fullfile(storage_location, output_name, [output_name, '_model_data']))
