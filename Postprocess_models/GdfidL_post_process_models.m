@@ -12,8 +12,8 @@ end %if
 old_loc = pwd;
 tmp_name =move_into_tempororary_folder(ppi.scratch_path);
 
-if ~exist(fullfile(ppi.output_path, ppi.base_model_name, ppi.model_name), 'dir')
-    mkdir(fullfile(ppi.output_path, ppi.base_model_name, ppi.model_name))
+if ~exist(fullfile(ppi.output_path, ppi.model_name), 'dir')
+    mkdir(fullfile(ppi.output_path, ppi.model_name))
 end
 % make soft links to the data folder and output folder into /scratch.
 % this is because the post processor does not handle long paths well.
@@ -24,8 +24,8 @@ end
 if exist('pp_link','dir') ~= 0
     delete('pp_link')
 end
-[~]=system(['ln -s -T ',fullfile(ppi.storage_path, ppi.base_model_name, ppi.model_name), ' data_link']);
-[~]=system(['ln -s -T ',fullfile(ppi.output_path, ppi.base_model_name, ppi.model_name), ' pp_link']);
+[~]=system(['ln -s -T ',fullfile(ppi.storage_path, ppi.model_name), ' data_link']);
+[~]=system(['ln -s -T ',fullfile(ppi.output_path, ppi.model_name), ' pp_link']);
 
 disp(['GdfidL_post_process_models: Started analysis of ', ppi.model_name])
 pp_data = struct;

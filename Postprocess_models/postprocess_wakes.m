@@ -53,13 +53,43 @@ if isfield(log, 'mat_losses') && iscell(Energy_in_ceramics)
     % I have already done the scaling with timestep.)
     loss_in_ceramics = interp1(energy_ceramics_data.data(:,1), ...
         loss_in_ceramics, log.mat_losses.loss_time);
-    % scale the loss values of the simulated volume to the full volume
-    % of the structure.
-    loss_in_ceramics = loss_in_ceramics ./ modelling_inputs.volume_fill_factor;
 else
     loss_in_ceramics = 0;
 end
 
+% scale the total energy values of the simulated volume to the full volume
+% of the structure.
+if isfield(log, 'mat_losses')
+    if isfield(log.mat_losses, 'total_loss')
+        % only do it if there are user defined materials in the model.
+        total_loss = (log.mat_losses.total_loss + loss_in_ceramics)./ ...
+            modelling_inputs.volume_fill_factor;
+        % assume all the empty values are due to the fact that ceramics are not
+        % output into the log.
+        % Also I have to split the energy equally between ceramics for lack of
+        % any better information.
+        % first find out how many different ceramics are used.
+        for ern = size(log.mat_losses.single_mat_data,1):-1:1
+            cer_count(ern) = isempty(log.mat_losses.single_mat_data{ern,3});
+        end
+        cer_count = sum(cer_count);
+        for ern = 1:size(log.mat_losses.single_mat_data,1)
+            if ~isempty(log.mat_losses.single_mat_data{ern,3})
+                log.mat_losses.single_mat_data{ern,4}(:,2) = ...
+                    log.mat_losses.single_mat_data{ern,4}(:,2) ./ ...
+                    modelling_inputs.volume_fill_factor;
+            else
+                log.mat_losses.single_mat_data{ern,4}(:,2) = loss_in_ceramics ./...
+                    cer_count ./  modelling_inputs.volume_fill_factor;
+            end
+        end
+        
+    else
+        log.mat_losses.total_loss = 0;
+    end %if
+end %if
+
+%% Ports
 if ~iscell(Port_mat)
     warning('postprocess_wakes:No ports to analyse')
     port_names = NaN;
@@ -117,42 +147,14 @@ end
 if ~isempty(WI_y)
     wity_data = GdfidL_read_graph_datafile( WI_y{1} );
 end
+
 temp_files('remove')
 delete('POSTP-LOGFILE');
 delete('WHAT-PP-DID-SPIT-OUT');
 
-% scale the total energy values of the simulated volume to the full volume
-% of the structure.
-if isfield(log, 'mat_losses')
-    if isfield(log.mat_losses, 'total_loss')
-        % only do it if there are user defined materials in the model.
-        log.mat_losses.total_loss = (log.mat_losses.total_loss )./ ...
-            modelling_inputs.volume_fill_factor + loss_in_ceramics;
-        % assume all the empty values are due to the fact that ceramics are not
-        % output into the log.
-        % Also I have to split the energy equally between ceramics for lack of
-        % any better information.
-        % first find out how many different ceramics are used.
-        for ern = size(log.mat_losses.single_mat_data,1):-1:1
-            cer_count(ern) = isempty(log.mat_losses.single_mat_data{ern,3});
-        end
-        cer_count = sum(cer_count);
-        for ern = 1:size(log.mat_losses.single_mat_data,1)
-            if ~isempty(log.mat_losses.single_mat_data{ern,3})
-                log.mat_losses.single_mat_data{ern,3}(:,2) = ...
-                    log.mat_losses.single_mat_data{ern,3}(:,2) ./ ...
-                    modelling_inputs.volume_fill_factor;
-            else
-                log.mat_losses.single_mat_data{ern,3} = loss_in_ceramics ./ cer_count;
-            end
-        end
-        
-    else
-        log.mat_losses.total_loss = 0;
-    end %if
-end %if
 
-% Generate the data file which the analysis code is expecting.
+
+%% Generate the data file which the analysis code is expecting.
 raw_data.Energy = total_energy_data.data ;
 raw_data.Wake_potential = wpl_data.data;
 if exist('wptx_data','var')
@@ -193,7 +195,9 @@ raw_data.port.beta = beta_all;
 raw_data.port.t_start = tstart;
 raw_data.wake_setup.Wake_length = wpl_data.data(end,1) .* 2.99792458E8;
 if isfield(log, 'mat_losses')
-    raw_data.mat_losses = log.mat_losses;
+    raw_data.mat_losses.loss_time = log.mat_losses.loss_time;
+    raw_data.mat_losses.total_loss = total_loss;
+    raw_data.mat_losses.single_mat_data = log.mat_losses.single_mat_data;
 end
 
 [port_time_data, time_domain_data, frequency_domain_data]= ...
