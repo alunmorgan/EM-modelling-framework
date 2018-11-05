@@ -26,7 +26,7 @@ function postprocessor_setup(base_model_name, scratch_loc, data_loc, results_loc
     
     %%%%%%%%%%%%%%%%%%%%%%%%% Postprocessing the models. %%%%%%%%%%%%%%%%
         
-    [arc_names, ~] = dir_list_gen(fullfile(ppi.storage_path, ppi.base_model_name), 'dirs', 1);
+    [arc_names, ~] = dir_list_gen(ppi.storage_path, 'dirs', 1);
     for awh = 1:length(arc_names)
         ppi.model_name = arc_names{awh};
         GdfidL_post_process_models(ppi);
