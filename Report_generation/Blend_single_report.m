@@ -22,7 +22,7 @@ ov = cat(1,ov,'');
 ov = cat(1,ov,['To start with, here are the modelling setups and run times ',...
     'for all the models used in this comparison.']);
 %%%%%%%%%%%%%%%%%%%% Wake section %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-if exist(fullfile(report_input.source_path, report_input.sources{1}, 'wake'), 'dir') == 7
+% if exist(fullfile(report_input.source_path, report_input.sources{1}, 'wake'), 'dir') == 7
     summary = Blend_summaries(report_input.source_path, report_input.sources);
     out_T = add_blend_table(regexprep(report_input.base_name, '_', ' '),...
         ['sweep of ',report_input.swept_name{1}] , report_input.swept_vals, summary);
@@ -109,7 +109,7 @@ if exist(fullfile(report_input.source_path, report_input.sources{1}, 'wake'), 'd
         ov = cat(1,ov,ov1);
         ov = cat(1,ov,'\clearpage');
     end %for
-end %if
+% end %if
 %%%%%%%%%%%%%%%% S Parameter graphs %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if exist(fullfile(report_input.source_path, report_input.sources{1}, 's_parameters'), 'dir') == 7
     ov = cat(1,ov,'\chapter{S parameters}');
