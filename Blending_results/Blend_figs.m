@@ -19,7 +19,8 @@ l_st ={'--',':','-.','--',':','-.','--',':','-.'};
 
 any_data = 0;
 for hse = length(report_input.sources):-1 :1
-    graph_name = fullfile(report_input.source_path, report_input.sources{hse}, sub_folder, [fig_nme, '.fig']);
+    graph_name = fullfile(report_input.source_path, report_input.sources{hse}, sub_folder,  [fig_nme, '.fig']);
+%     graph_name = fullfile(report_input.source_path, report_input.sources{hse}, sub_folder, [fig_nme, '.fig']);
     if exist(graph_name,'file')
         data_out(hse) = extract_from_graph(graph_name, line_select);
         if data_out(hse).state == 1
@@ -31,13 +32,13 @@ if any_data == 0
     state = 0;
     return
 end
-Zlab = report_input.swept_name;
-xlims = data_out(1).xlims;
-ylims = data_out(1).ylims;
-for ew = 2:length(data_out);
-    xlims = cat(1, xlims, data_out(ew).xlims);
-    ylims = cat(1, ylims, data_out(ew).ylims);
-end %for
+% Zlab = report_input.swept_name;
+% xlims = data_out(1).xlims;
+% ylims = data_out(1).ylims;
+% for ew = 2:length(data_out);
+%     xlims = cat(1, xlims, data_out(ew).xlims);
+%     ylims = cat(1, ylims, data_out(ew).ylims);
+% end %for
 
 % This section is to remove the levels and other straight line which may be
 % on the graphs.
@@ -60,118 +61,8 @@ unwanted_lines = all(d_len <3, 1);
 fwl = find(unwanted_lines == 0,1, 'first');
 
 %% Plot graphs
-%         Generate 2D graph with legend
-h1 = figure('Position', [ 0 0 1000 400]);
-ax1 = axes('Parent', h1);
-hold(ax1, 'on')
-for en = length(data_out):-1:1
-    if isfield(data_out(hwc), 'xdata')
-        chk = 0;
-        ls_tk = 1;
-        for ewh = fwl:length(data_out(en).xdata)
-            if  ~isempty(data_out(en).xdata{ewh})
-                if chk == 1
-               h =  plot(data_out(en).xdata{ewh}, data_out(en).ydata{ewh},'linestyle',l_st{ls_tk},...
-                    'Color',cols{rem(en-1,10)+1}, 'linewidth',lw, 'Parent', ax1);
-                set(get(get(h,'Annotation'), 'LegendInformation'), 'IconDisplayStyle', 'off');
-                else
-                    plot(data_out(en).xdata{ewh}, data_out(en).ydata{ewh},'linestyle',l_st{ls_tk},...
-                    'Color',cols{rem(en-1,10)+1}, 'linewidth',lw, 'Parent', ax1);
-                chk = 1;  
-                end %if
-                ls_tk = ls_tk +1;
-            else
-                plot(NaN, NaN,'linestyle',l_st{1},...
-                    'Color',cols{rem(en-1,10)+1}, 'linewidth',lw, 'Parent', ax1);
-            end %if
-        end %for
-    end %if
-    leg{en} = [report_input.swept_name{1},' = ',report_input.swept_vals{en}];
-end %for
-hold(ax1, 'off')
-% add legend to 2D graph
-setup_graph_for_display(ax1, xlims,...
-    ylims,...
-    [-1,0], [0,lg,0], ...
-    data_out(1).Xlab, data_out(1).Ylab,...
-    '',...
-    regexprep(report_input.base_name, '_', ' '));
-legend(ax1, leg, 'Location', 'EastOutside', 'Box', 'off')
-% save 2D graph
-savemfmt(h1, report_input.output_loc, out_name)
+Generate_2D_graph_with_legend(report_input, data_out, fwl, cols, l_st, lw, lg, out_name)
 
-% if exist('udcp', 'var')
-%     xlim_old = get(gca,'XLim');
-%     xlim([xlim_old(1) udcp]);
-%     savemfmt(h1, report_input.output_loc, [out_name, '_zoom'])
-% end % if
-close(h1)
+% Generate_2D_graph_showing_the_difference_to_the_first_trace(report_input, data_out, fwl, cols, l_st, lw, lg, out_name)
 
-% Generate 2D graph showing the difference to the first trace.
-h4 = figure('Position', [ 0 0 1000 400]);
-ax4 = axes('Parent', h4);
-hold(ax4, 'on')
-for en = 1:length(data_out)
-    if isfield(data_out(hwc), 'ydata')
-        for ewh = fwl:length(data_out(en).xdata)
-            if  ~isempty(data_out(en).ydata{ewh})
-                if isempty(data_out(1).xdata)
-                    reference_x = zeros(1,length(data_out(en).xdata{ewh}));
-                    reference_y = zeros(1,length(data_out(en).xdata{ewh}));
-                elseif isempty(data_out(1).xdata{ewh})
-                    reference_x = zeros(1,length(data_out(en).xdata{ewh}));
-                    reference_y = zeros(1,length(data_out(en).xdata{ewh}));
-                else
-                    reference_x = data_out(1).xdata{ewh};
-                    reference_y = data_out(1).ydata{ewh};
-                end %if
-                new_y = interp1(data_out(en).xdata{ewh}, data_out(en).ydata{ewh}, reference_x);
-                plot(reference_x, new_y - reference_y ,'linestyle',l_st{1},...
-                    'Color',cols{rem(en-1,10)+1}, 'linewidth',lw, 'Parent', ax4);
-            else
-                plot(NaN, NaN,'linestyle',l_st{1},...
-                    'Color',cols{rem(en-1,10)+1}, 'linewidth',lw, 'Parent', ax4);
-            end %if
-        end %for
-    end %if
-    leg{en} = [report_input.swept_name{1},' = ',report_input.swept_vals{en}];
-end %for
-hold(ax4, 'off')
-setup_graph_for_display(ax4, xlims, [-inf,inf], [-1,0], [0,lg,0],...
-    data_out(1).Xlab, data_out(1).Ylab, '', regexprep(report_input.base_name, '_', ' '));
-legend(ax4, leg, 'Location', 'EastOutside', 'Box', 'off')
-% save 2D graph
-savemfmt(h4, report_input.output_loc, [out_name, '_diff'])
-close(h4)
-
-
-%         Generate 3D graph with no legend
-h2 = figure('Position', [ 0 0 1000 1000]);
-ax2 = axes('Parent', h2);
-hold(ax2, 'on')
-for en = 1:length(data_out)
-    if isfield(data_out(hwc), 'xdata')
-        for ewh = fwl:length(data_out(en).xdata)
-            if  ~isempty(data_out(en).xdata{ewh})
-                plot3(data_out(en).xdata{ewh}, ...
-                    ones(length(data_out(en).xdata{ewh}),1) * en, ...
-                    data_out(en).ydata{ewh},'linestyle',l_st{1},...
-                    'Color',cols{rem(en-1,10)+1}, 'linewidth',lw,...
-                    'HandleVisibility','off', 'Parent', ax2);
-            else
-                plot3(NaN, NaN, NaN, 'linestyle',l_st{1},...
-                    'Color',cols{rem(en-1,10)+1}, 'linewidth',lw,...
-                    'HandleVisibility','off', 'Parent', ax2);
-            end %if
-        end %for
-    end %if
-end %for
-hold(ax2, 'off')
-setup_graph_for_display(ax2, xlims, [1,length(data_out)], ylims, [0,0,lg], ...
-    data_out(1).Xlab, Zlab, data_out(1).Ylab, '');
-set(ax2, 'YTick',1:length(report_input.sources))
-set(ax2, 'YTickLabel',report_input.swept_vals)
-view(45,45)
-grid on
-savemfmt(h2, report_input.output_loc, [out_name, '_3D'])
-close(h2)
+% Generate_3D_graph_with_no_legend(report_input, data_out, fwl, cols, l_st, lw, lg, out_name)
