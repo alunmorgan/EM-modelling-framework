@@ -1,4 +1,4 @@
-function construct_s_param_gdf_file(input_file_path, modelling_inputs, port_name)
+function construct_s_param_gdf_file(data_location, storage_location, modelling_inputs, port_name)
 % Write the input gdf file for an S-paramter simulation of the requested
 % model.
 %

@@ -1,4 +1,4 @@
-function GdfidL_run_simulation(sim_type, paths, modelling_inputs, ow_behaviour, stl_flag)
+function GdfidL_run_simulation(sim_type, paths, modelling_inputs, ow_behaviour, stl_flag, plots)
 % Takes the geometry specification, adds the setup for a  simulation and
 % runs the simulation with the desired calculational precision.
 %
@@ -132,7 +132,7 @@ if skip == 0
         end %if
         save(fullfile(results_storage_location, sim_f_name, 'run_inputs.mat'), 'paths', 'modelling_inputs')
         movefile('temp_data/*', arch_out);
-        copyfile(path_to_model_file, arch_out);
+%         copyfile(path_to_model_file, arch_out);
         temp_files('remove')
         delete('SOLVER-LOGFILE');
         delete('WHAT-GDFIDL-DID-SPIT-OUT');
