@@ -50,16 +50,16 @@ ov = cat(1,ov,'\rfoot{',dte,'}');
 ov = cat(1,ov,'\begin{document}');
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 ov = cat(1,ov,'\title{');
-ov = cat(1,ov,'\begin{tabular}{|p{4.5cm}|m{5cm}|c|}');
-ov = cat(1,ov,'\hline');
-ov = cat(1,ov,'\multirow{3}{*}{\textbf{TDI-DIA}} & ');
-ov = cat(1,ov,['\multirow{3}{*}{\includegraphics[scale=0.8]{',report_input.graphic,'}} &']);
-ov = cat(1,ov,['\multirow{3}{*}{\parbox{5cm}{\small{', report_input.doc_num, '}}} \\']);
-ov = cat(1,ov,'&& \\');
-ov = cat(1,ov,'&& \\');
-ov = cat(1,ov,'\hline');
-ov = cat(1,ov,'\end{tabular} \\');
-ov = cat(1,ov, '\vspace{1cm}');
+% ov = cat(1,ov,'\begin{tabular}{|p{4.5cm}|m{5cm}|c|}');
+% ov = cat(1,ov,'\hline');
+% ov = cat(1,ov,'\multirow{3}{*}{\textbf{TDI-DIA}} & ');
+% ov = cat(1,ov,['\multirow{3}{*}{\includegraphics[scale=0.8]{',report_input.graphic,'}} &']);
+% ov = cat(1,ov,['\multirow{3}{*}{\parbox{5cm}{\small{', report_input.doc_num, '}}} \\']);
+% ov = cat(1,ov,'&& \\');
+% ov = cat(1,ov,'&& \\');
+% ov = cat(1,ov,'\hline');
+% ov = cat(1,ov,'\end{tabular} \\');
+% ov = cat(1,ov, '\vspace{1cm}');
 % put the title of the report here
 % Format the title
 
