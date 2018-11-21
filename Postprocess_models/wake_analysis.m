@@ -1,5 +1,5 @@
-function [port_time_data, time_domain_data, frequency_domain_data]= ...
-    wake_analysis(raw_data, ppi, mi, log)
+function [port_time_data, time_domain_data, frequency_domain_data,...
+    wake_sweep_data]= wake_analysis(raw_data, ppi, mi, log)
 % Takes the model generated data and processes it in order to get an 
 %idea where the power/heat is going.
 %
@@ -10,7 +10,7 @@ function [port_time_data, time_domain_data, frequency_domain_data]= ...
 %
 
 %% Time domain analysis
-[time_domain_data, port_time_data] = time_domain_analysis(raw_data, log);
+[time_domain_data, port_time_data] = time_domain_analysis(raw_data, log, ppi.port_modes_override);
 
 %% Frequency domain analysis.
 % As this is a linear system power cannot be moved between frequencies.
@@ -29,8 +29,6 @@ else
         NaN, time_domain_data, NaN, log, ppi.hfoi);
 end
 
-%% Generating data for increasingly short wakes
-frequency_domain_data.wake_sweeps = wake_sweep(time_domain_data, port_time_data, raw_data, ppi.hfoi, log);
 %% Generating data for time slices
 frequency_domain_data.time_slices = time_slices(time_domain_data, ppi.hfoi);
 
@@ -41,3 +39,6 @@ frequency_domain_data.extrap_data = loss_extrapolation(...
     mi,...
     ppi,...
     raw_data, log);
+
+%% Generating data for increasingly short wakes
+wake_sweep_data = wake_sweep(time_domain_data, port_time_data, raw_data, ppi.hfoi, log);
