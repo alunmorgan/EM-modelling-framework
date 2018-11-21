@@ -69,7 +69,7 @@ if skip == 0
     % For the other types you just need a single simulation.
     f_range = 1.3E9:5E7:1.9E9; % FIXME This needs to become a parameter
     if strcmp(sim_name, 'S-parameter')
-        n_cycles = length(modelling_inputs.s_param_ports);
+        n_cycles = length(modelling_inputs.ports);
     elseif strcmp(sim_name, 'Shunt')
         n_cycles = length(f_range);
     else

@@ -46,8 +46,8 @@ if skip == 0
     old_loc = pwd;
     tmp_location = move_into_tempororary_folder(paths.scratch_path);
     
-    for nes = 1:length(modelling_inputs.s_param_ports)
-        port_name = modelling_inputs.s_param_ports{nes};
+    for nes = 1:length(modelling_inputs.ports)
+        port_name = modelling_inputs.ports{nes};
         temp_files('make')
         if strcmp(stl_flag, 'STL')
             path_to_model_file = fullfile(paths.storage_path, ...
