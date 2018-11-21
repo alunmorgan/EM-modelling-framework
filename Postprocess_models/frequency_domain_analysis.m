@@ -99,7 +99,7 @@ end
 % Remove all data above the highest frequency of interest (hfoi).
 
 % scaling for the bunch spectra
-% Could either take the appropriate section from both the upper and lowver
+% Could either take the appropriate section from both the upper and lower
 % side of the FFT, or just multiply by sqrt(2) as it is an amplitude.
 % (and ignore the small error due to counting DC twice).
 bunch_spectra = bunch_spectra .* sqrt(2);
@@ -117,16 +117,6 @@ if ~isnan(port_impedances)
         [port_impedances, ~] = trim_to_hfoi(port_impedances, f_raw,  hfoi);
     end
 end
-
-%
-% [f_raw,bunch_spectra,...
-%     Wake_Impedance_data,...
-%     Wake_Impedance_data_im,...
-%     port_impedances] = ...
-%     regenerate_f_data(Charge_distribution, ...
-%     WakePotential, ...
-%     port_signals, cut_off_freqs,...
-%     timebase, hfoi);
 
 % The outputs from this function are for the model charge.
 % except for the wake loss factor which is V/C
