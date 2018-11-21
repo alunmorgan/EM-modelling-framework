@@ -1,4 +1,4 @@
-function [port_data] = port_analysis(port_data)
+function [port_data] = port_analysis(port_data, overrides)
 % In order to get the total power we need to sum the modes together for
 % each port to give the measured signal. Square this to get the power out
 % of each port. Add up the powers.
@@ -8,6 +8,12 @@ function [port_data] = port_analysis(port_data)
 % port_data{Parameter, Port Num, Mode Num, Time/signal}
 %
 % Example: [port_data] = port_analysis(port_data)
+
+if nargin >1 % There are overrides to the number of port modes to be used.
+    for dl = 1:length(overrides)
+        port_data.data{dl} = port_data.data{dl}(:,1:overrides(dl));
+    end %for
+end %if
 
 t_step = port_data.timebase(2) - port_data.timebase(1); % time step in s
 % To convert from signal to power you need to square the signal

@@ -1,5 +1,5 @@
 function frequency_domain_data = frequency_domain_analysis(...
-    cut_off_freqs, time_domain_data, port_data, log, hfoi)
+    cut_off_freqs, time_domain_data, port_data, log, hfoi, mode_overrides)
 % Takes the time domain results and does additional frequency domain
 % analysis on it.
 %

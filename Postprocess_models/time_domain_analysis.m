@@ -1,4 +1,4 @@
-function [time_domain_analysis, port_data] = time_domain_analysis(raw_data, log)
+function [time_domain_analysis, port_data] = time_domain_analysis(raw_data, log, mode_overrides)
 % Takes the raw time domain data and calculates the wake loss factor
 % and port losses from it.
 %
@@ -43,5 +43,5 @@ if isempty(raw_data.port.data_all)
     port_data.total_energy = 0;
 else
     %% Port calculations
-    [port_data] = port_analysis(raw_data.port);
+    [port_data] = port_analysis(raw_data.port, mode_overrides);
 end
