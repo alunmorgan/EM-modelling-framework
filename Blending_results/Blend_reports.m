@@ -4,8 +4,7 @@ function Blend_reports(results_loc,  base_name , Author, Graphic_path)
 %
 % Example: Blend_reports( rep_title, base_name , Author, Graphic_path)
 
-source_path = fullfile(results_loc, base_name);
-[names,~] = dir_list_gen(source_path, 'dirs', 1);
+[names,~] = dir_list_gen(results_loc, 'dirs', 1);
 %select only those folders whos names start with the base name.
 names = names(strncmp(names, base_name, length(base_name)));
 base_name_ind = find(strcmp(names, base_name) == 1);
@@ -36,14 +35,14 @@ for ewh = 1:length(sweeps)
     good_data = ones(length(names_in_sweep),1);
     for psw = length(names_in_sweep):-1:1
         try
-            load(fullfile(source_path, names_in_sweep{psw},'wake','run_inputs.mat'))
-            load(fullfile(source_path, names_in_sweep{psw}, 'wake', 'data_from_run_logs.mat'))
+            load(fullfile(results_loc, names_in_sweep{psw},'wake','run_inputs.mat'))
+            load(fullfile(results_loc, names_in_sweep{psw}, 'wake', 'data_from_run_logs.mat'))
             [sim_param_names_tmp, sim_param_vals_tmp, ...
                 geom_param_names_tmp, geom_param_vals_tmp] = extract_parameters(run_logs);
         catch
             try
-                load(fullfile(source_path, names_in_sweep{psw}, 's_parameter', 'data_from_run_logs.mat'))
-                load(fullfile(source_path, names_in_sweep{psw},'s_parameter','run_inputs.mat'))
+                load(fullfile(results_loc, names_in_sweep{psw}, 's_parameter', 'data_from_run_logs.mat'))
+                load(fullfile(results_loc, names_in_sweep{psw},'s_parameter','run_inputs.mat'))
                 [sim_param_names_tmp, sim_param_vals_tmp, ...
                     geom_param_names_tmp, geom_param_vals_tmp] = extract_parameters(run_logs);
                 
@@ -107,7 +106,7 @@ for ewh = 1:length(sweeps)
     report_input.author = Author;
     report_input.date = datestr(now,'dd/mm/yyyy');
     report_input.base_name = base_name;
-    report_input.source_path = source_path;
+    report_input.source_path = results_loc;
     report_input.graphic = Graphic_path;
     report_input.param_names_common = param_name_list(stable_tmp);
     report_input.param_vals_common = param_val_list(base_name_ind, stable_tmp);
@@ -128,7 +127,7 @@ for ewh = 1:length(sweeps)
     report_input.report_name = [model_name_for_report, ' - ',report_input.swept_name{isn},' sweep' ];
     report_input.rep_title = [report_input.swept_name{isn},'_sweep','-',base_name ];
     report_input.doc_num = [model_name_for_report, '\\',report_input.swept_name{isn},' sweep' ];
-    report_input.output_loc = fullfile(source_path, report_input.rep_title);
+    report_input.output_loc = fullfile(results_loc, report_input.rep_title);
     
     if ~exist(report_input.output_loc, 'dir')
         mkdir(report_input.output_loc)
