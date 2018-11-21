@@ -37,32 +37,32 @@ l_st ={'--',':','-.','--',':','-.','--',':','-.'};
 for sjew = length(wake_data.raw_data.port.labels_table):-1:1
     lab_ind(sjew) = find(strcmp(wake_data.raw_data.port.labels,...
         wake_data.raw_data.port.labels_table{sjew}));
-end
+end %for
 % can I just do a search using the original names in raw data?
 
 % Some pre processing to pull out trends.
-[wl, freqs, Qs, mags, bws] = find_Q_trends(wake_data.frequency_domain_data.wake_sweeps, range);
+[wl, freqs, Qs, mags, bws] = find_Q_trends(wake_data.wake_sweep_data.frequency_domain_data, range);
 % Show the Q values of the resonances shows if the simulation has stablised.
 for ehw = size(freqs,1):-1:1
     Q_leg{ehw} = [num2str(round(freqs(ehw,1)./1e7)./1e2), 'GHz'];
-end
+end %for
 % These are the plots to generate for a single value of sigma.
 % sigma = round(str2num(mi.beam_sigma) ./3E8 *1E12 *10)/10;
 if isfield(wake_data.raw_data.port, 'timebase')
     port_names = regexprep(wake_data.raw_data.port.labels,'_',' ');
-end
+end %if
 if size(wake_data.frequency_domain_data.raw_port_energy_spectrum,2) == 2
     % assume that only beam ports are involved and set a flag so that the
     % signal port values are not displayed.
     bp_only_flag = 1;
 else
     bp_only_flag = 0;
-end
+end %if
 
 [bunch_energy_loss, beam_port_energy_loss, signal_port_energy_loss, ...
     structure_energy_loss, material_names] =  ...
-           extract_energy_loss_data_from_wake_data(wake_data);
-       
+    extract_energy_loss_data_from_wake_data(wake_data);
+
 [timebase_cs, e_total_cs, e_ports_cs] =  ...
     extract_cumulative_total_energy_from_wake_data(wake_data);
 
@@ -140,7 +140,7 @@ set(get(annot{1},'LegendInformation'),'IconDisplayStyle', 'off')
 set(f1(1), 'FaceColor', [0.5 0.5 0.5]);
 for eh = 2:size(py,2)
     set(f1(eh), 'FaceColor', cols{eh-1});
-end
+end %for
 set(ax(1), 'XTickLabels',{'Energy lost from beam', 'Energy accounted for'})
 set(ax(1),'XTickLabelRotation',45)
 ylabel('Energy from 1 pulse (nJ)')
@@ -218,7 +218,7 @@ if ~all(isnan(timebase_port)) && ~all(isnan(port_cumsum))
             'Color',cols{ens},'LineWidth',lw, 'LineStyle', l_st{1}, 'Parent', ax(5))
         leg{clk} = port_names{lab_ind(ens)};
         clk = clk +1;
-    end
+    end %for
     hold(ax(5), 'off')
     title('Cumulative energy seen at the ports (nJ)', 'Parent', ax(5))
     xlabel('Time (ns)', 'Parent', ax(5))
@@ -227,7 +227,7 @@ if ~all(isnan(timebase_port)) && ~all(isnan(port_cumsum))
     legend(ax(5), regexprep(leg,'_',' '), 'Location', 'SouthEast')
     savemfmt(h(5), pth,'cumulative_energy')
     close(h(5))
-end
+end %if
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Wake potential over time.
 h(6) = figure('Position',fig_pos);
@@ -307,7 +307,7 @@ xlabel('beam sigma (ps)', 'Parent', ax(11))
 ylabel('Wake lossfactor (V/pC)', 'Parent', ax(11))
 if sign(wake_data.frequency_domain_data.wlf) == 1
     ylim([0 1.1*wake_data.frequency_domain_data.wlf * 1e-12])
-end
+end %if
 legend(ax(11), 'Calculated from data', 'Simulated beam size',  'Resistive wall (\sigma^{-3/2})')
 title({'Extrapolating wake loss factor', ' for longer bunch lengths'}, 'Parent', ax(11))
 savemfmt(h(11), pth, 'wake_loss_factor_extrapolation_bunch_length')
@@ -320,7 +320,7 @@ for jes = size(wake_data.frequency_domain_data.extrap_data.diff_machine_conds.po
     loss_data = squeeze(wake_data.frequency_domain_data.extrap_data.diff_machine_conds.power_loss(:,:,jes));
     tmp =loss_data';
     loss(jes,:) = tmp(:);
-end
+end %for
 bar(loss', 'Parent', ax(12));
 set(gca,'XTickLabel',['','','',''])
 lims = ylim;
@@ -337,13 +337,13 @@ for naw = 1:length(ppi.current) * length(ppi.bt_length)
         bt_tick = bt_tick +1;
     else
         cur_tick = cur_tick +1;
-    end
-end
+    end %if
+end %for
 ylabel('Power loss (W)', 'Parent', ax(12))
 title({'Power loss from beam','for different machine conditions'}, 'Parent', ax(12))
 for rh = length(ppi.rf_volts):-1:1
     leg2{rh} = [num2str(ppi.rf_volts(1)),'MV RF'];
-end
+end %for
 legend(ax(12), leg2, 'Location', 'NorthWest')
 savemfmt(h(12), pth,'power_loss_for_different_machine_conditions')
 close(h(12))
@@ -357,8 +357,8 @@ if isfield(wake_data.raw_data.port, 'timebase') && ~isnan(wake_data.frequency_do
                 structure_loss .*1e9./ run_log.charge .* ...
                 (ppi.current(ns)./(ppi.RF_freq .*...
                 ppi.bt_length(eh)/936));
-        end
-    end
+        end %for
+    end %for
     single_bunch_losses = single_bunch_losses(:,:)';
     h(13) = figure('Position',fig_pos);
     ax(13) = axes('Parent', h(13));
@@ -375,8 +375,8 @@ if isfield(wake_data.raw_data.port, 'timebase') && ~isnan(wake_data.frequency_do
             bt_tick = bt_tick +1;
         else
             cur_tick = cur_tick +1;
-        end
-    end
+        end %if
+    end %for
     ylabel('Power loss (W)', 'Parent', ax(13))
     title({'Comparison of power loss', 'with scaled single bunch', 'and full spectral analysis'}, 'Parent', ax(13))
     legend(ax(13), 'Single bunch', 'Full analysis', 'Location', 'NorthWest')
@@ -396,7 +396,7 @@ if isfield(wake_data.raw_data.port, 'timebase') && ~isnan(wake_data.frequency_do
             xlabel('Time (ns)', 'Parent', ax_sp(ens))
             graph_add_background_patch(wake_data.raw_data.port.t_start(ens) * 1E9)
             ylabel('', 'Parent', ax_sp(ens))
-        end
+        end %for
         savemfmt(h(14), pth,'dominant_port_signals')
         close(h(14))
         %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -408,18 +408,18 @@ if isfield(wake_data.raw_data.port, 'timebase') && ~isnan(wake_data.frequency_do
             hold(ax_sp2(ens), 'all')
             for seo = 1:length(modes{ens}) % modes
                 plot(timebase_port, modes{ens}{seo}, 'Parent',ax_sp2(ens))
-            end
+            end %for
             hold(ax_sp2(ens), 'off')
             title(port_names{lab_ind(ens)}, 'Parent', ax_sp2(ens))
             xlabel('Time (ns)', 'Parent', ax_sp2(ens))
             ylabel('', 'Parent', ax_sp2(ens))
             xlim([timebase_port(1) timebase_port(end)])
             graph_add_background_patch(wake_data.raw_data.port.t_start(ens) * 1E9)
-        end
+        end %for
         savemfmt(h(15), pth,'port_signals')
         close(h(15))
-    end
-end
+    end %if
+end %if
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Comparison of bunch losses vs port signals on a per frequency basis.
 if isfield(wake_data.raw_data.port, 'timebase') && ~isempty(cut_off_freqs)
@@ -427,7 +427,7 @@ if isfield(wake_data.raw_data.port, 'timebase') && ~isempty(cut_off_freqs)
 else
     % set the second trace to zeros as there is no port energy.
     y_data = {bls; zeros(length(bls),1)};
-end
+end %if
 name = {'Energy loss distribution of bunch,', 'and energy seen at ports'};
 cols = {'m','c'};
 leg = {'Bunch loss', 'Port signal'};
@@ -446,11 +446,11 @@ if isfield(wake_data.raw_data.port, 'timebase')
         power_diff = bls - pes;
     else
         power_diff = bls ;
-    end
+    end %if
     report_plot_frequency_graphs(fig_pos, pth, y_lev,...
         frequency_scale_bls, power_diff, cut_ind, power_dist_ind, cuts_temp,...
         lw, 'Energy_left_in_structure', graph_freq_lim, 'b', [])
-end
+end %if
 
 if wake_data.port_time_data.total_energy ~=0
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -469,7 +469,7 @@ if wake_data.port_time_data.total_energy ~=0
         xlabel('Frequency (GHz)')
         ylabel('Energy (nJ) per ')
         xlim([0 graph_freq_lim])
-    end
+    end %if
     savemfmt(h(16), pth,'Energy_loss_distribution')
     close(h(16))
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -489,7 +489,7 @@ if wake_data.port_time_data.total_energy ~=0
         xlabel('Frequency (GHz)')
         ylabel('Cumlative sum of Energy (nJ)')
         xlim([0 graph_freq_lim])
-    end
+    end %if
     savemfmt(h(17), pth,'cumulative_energy_loss_distribution')
     close(h(17))
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -499,14 +499,14 @@ if wake_data.port_time_data.total_energy ~=0
     hold(ax(18), 'on')
     for ns = 1:length(lab_ind)
         plot(frequency_scale_ports, port_energy_spectra{ns},'LineWidth',lw)
-    end
+    end %for
     hold(ax(18), 'off')
     graph_add_vertical_lines(cuts_temp)
     legend(port_names(lab_ind), 'Location','Best')
     xlim([0 graph_freq_lim])
     if ylim > 0 & ~isnan(ylim)
         ylim([0 fig_max .* 1.1])
-    end
+    end %if
     graph_add_vertical_lines(cuts_temp)
     title('Energy loss distribution ports')
     xlabel('Frequency (GHz)')
@@ -527,7 +527,7 @@ if wake_data.port_time_data.total_energy ~=0
     for ns = 1:length(lab_ind)
         plot(frequency_scale_ports,...
             cumsum(port_energy_spectra{ns}).*2,'LineWidth',lw)
-    end
+    end %for
     hold(ax(19), 'off')
     graph_add_vertical_lines(cuts_temp)
     legend( port_names(lab_ind), 'Location', 'NorthWest')
@@ -541,13 +541,13 @@ if wake_data.port_time_data.total_energy ~=0
     xlim([0 frequency_scale_ports(power_dist_ind)])
     savemfmt(h(19), pth,'cumulative_energy_loss_distribution_ports')
     close(h(19))
-end
+end %if
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Displaying some logfile information
 lab = cell(1,1);
 for naw = 1:size(cut_off_freqs,1)
     lab{naw} = ['Port ',num2str(naw)];
-end
+end %for
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Cut off frequencies
 h(20) = figure('Position',fig_pos);
@@ -555,7 +555,7 @@ ax(20) = axes('Parent', h(20));
 hold(ax(20), 'on')
 for sen = 1:length(cut_off_freqs)
     plot(cut_off_freqs{sen} .* 1e-9,'*')
-end
+end %for
 hold(ax(20), 'off')
 title('Cut off frequencies for different modes')
 ylabel('cut off frequency (GHz)')
@@ -568,7 +568,7 @@ ax(21) = axes('Parent', h(21));
 hold(ax(21), 'all')
 for sen = 1:length(cut_off_freqs)
     plot(cut_off_freqs{sen} .* 1e-9,'*')
-end
+end %for
 hold(ax(21), 'off')
 title('Cut off frequencies for different modes')
 ylabel('cut off frequency (GHz)')
@@ -576,20 +576,19 @@ xlabel('port mode')
 ylim([0 graph_freq_lim])
 savemfmt(h(21), pth,'Cut_off_frequencies_hfoi')
 close(h(21))
-% end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Q stability graphs
 h(22) = figure('Position',fig_pos);
 ax(22) = axes('Parent', h(22));
 if isempty(Qs) == 0
     plot(wl,Qs, ':*','LineWidth',lw)
-end
+end %if
 title({'Change in Q',' over the sweep'})
 xlabel('Wake length (m)')
 ylabel('Q')
 if isempty(Qs) == 0
     legend(Q_leg, 'Location', 'EastOutside')
-end
+end %if
 savemfmt(h(22), pth,'sweep_Q')
 close(h(22))
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -597,13 +596,13 @@ h(23) = figure('Position',fig_pos);
 ax(23) = axes('Parent', h(23));
 if isempty(mags) == 0
     plot(wl,mags, ':*','LineWidth',lw)
-end
+end %if
 title({'Change in peak magnitude',' over the sweep'})
 xlabel('Wake length (m)')
 ylabel('Peak magnitude')
 if isempty(mags) == 0
     legend(Q_leg, 'Location', 'EastOutside')
-end
+end %if
 savemfmt(h(23), pth,'sweep_mag')
 close(h(23))
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -611,13 +610,13 @@ h(24) = figure('Position',fig_pos);
 ax(24) = axes('Parent', h(24));
 if isempty(bws) == 0
     plot(wl,bws, ':*','LineWidth',lw)
-end
+end %if
 title({'Change in bandwidth',' over the sweep'})
 xlabel('Wake length (m)')
 ylabel('Bandwidth')
 if isempty(bws) == 0
     legend(Q_leg, 'Location', 'EastOutside')
-end
+end %if
 savemfmt(h(24), pth,'sweep_bw')
 close(h(24))
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -625,13 +624,13 @@ h(25) = figure('Position',fig_pos);
 ax(25) = axes('Parent', h(25));
 if isempty(freqs) == 0
     plot(wl,freqs * 1E-9, ':*','LineWidth',lw)
-end
+end %if
 title({'Change in peak frequency',' over the sweep'})
 xlabel('Wake length (mm)')
 ylabel('Frequency (GHz)')
 if isempty(freqs) == 0
     legend(Q_leg, 'Location', 'EastOutside')
-end
+end %if
 savemfmt(h(25), pth,'sweep_freqs')
 close(h(25))
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -654,7 +653,7 @@ hold(ax(27), 'on')
 for mers = 1:size(peaks_ts,1)
     plot(peaks_ts(mers,1), peaks_ts(mers,2),'*r','LineWidth',lw)
     legs{mers+1} = [num2str(round(peaks_ts(mers,1) .* 10)./10), ' GHz'];
-end
+end %for
 hold(ax(27), 'off')
 xlabel('Frequency (GHz)')
 title('FFT of final time slice')
@@ -668,7 +667,7 @@ legs = cell(size(peaks_ts,1),1);
 for wana = 1:size(peaks_ts,1)
     if wana >1
         hold(ax(28), 'all')
-    end
+    end %if
     f_ind = frequency_scale_ts == peaks_ts(wana,1);
     %     f_ind = find(f_ind ==1)
     semilogy((abs(spectra_ts(f_ind,:))),'LineWidth',lw);
@@ -682,7 +681,7 @@ for wana = 1:size(peaks_ts,1)
     Q_graph =  - pi .* peaks_ts(wana,1) .* 1./m;
     legs{wana} = [num2str(round(peaks_ts(wana,1) .* 10)./10), ' GHz   :Q: ',num2str(round(Q_graph))];
     
-end
+end %for
 hold(ax(28), 'off')
 xlabel('Time slice')
 ylabel('Magnitude (log scale)')
@@ -707,10 +706,10 @@ if isfield(wake_data.raw_data.port, 'timebase') && ...
         title('Energy in port modes')
         ylabel('Energy (nJ)')
         title(port_names{lab_ind(ydh)})
-    end
+    end %for
     savemfmt(h(29), pth,'energy_in_port_modes')
     close(h(29))
-end
+end %if
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Showing the overlap of the bunch spectra and the wake impedance.
 h(30) = figure('Position',fig_pos);
@@ -759,18 +758,18 @@ if ~isnan(energy)
                     'LineWidth',lw)
                 legend('Energy decay', 'Energy at ports')
                 hold(ax(33), 'off')
-            end
+            end %if
             if minlim < maxlim
                 ylim([minlim maxlim])
-            end
+            end %if
             graph_add_horizontal_lines(y_lev)
             ylabel('Energy (nJ)')
         else
             plot(energy(:,1), energy(:,2),'LineWidth',lw)
             ylim([minlim 0])
             ylabel('Energy (relative)')
-        end
-    end
+        end %if
+    end %if
     xlim([minxlim maxxlim])
     title('Energy over time');
     xlabel('Time (ns)')
