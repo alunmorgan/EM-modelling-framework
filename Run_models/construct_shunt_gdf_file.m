@@ -12,8 +12,12 @@ fs = gdf_shunt_header_construction('', 'temp',...
     modelling_inputs.n_cores,...
     modelling_inputs.mesh_stepsize,...
     material_override, material_labels, frequency);
+
+port_defs = gdf_write_port_definitions( modelling_inputs.ports,...
+    modelling_inputs.port_location, modelling_inputs.port_modes);
+
 mon = gdf_shunt_monitor_construction;
 % construct the full input file.
-data = cat(1,fs, add_defs', data, mon);
+data = cat(1,fs, add_defs', data, port_defs, mon);
 % write the full datafile to base_path.
  write_out_data( data, 'temp_data/model.gdf' )

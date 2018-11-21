@@ -80,21 +80,24 @@ if skip == 0
         temp_files('make')
         % The source locations are sligthly different depending on if you
         % are using GdfidL primatives or FreeCAD derived STL files.
-        if strcmp(stl_flag, 'STL')
-            path_to_model_file = fullfile(paths.storage_path, ...
-                modelling_inputs.model_name,...
-                [modelling_inputs.model_name, '_model_data']);
-        else
-            path_to_model_file = fullfile(paths.input_file_path, ...
-                [modelling_inputs.base_model_name, '_model_data']);
-        end %if
+%         if strcmp(stl_flag, 'STL')
+%             path_to_model_file = fullfile(paths.storage_path, ...
+%                 modelling_inputs.model_name,...
+%                 [modelling_inputs.model_name, '_model_data']);
+%         else
+%             path_to_model_file = fullfile(paths.input_file_path, ...
+%                 [modelling_inputs.base_model_name, '_model_data']);
+%         end %if      
+        
+        modify_mesh_definition(paths.storage_path, 'temp_data', modelling_inputs.geometry_fraction)
+        
         if strcmp(sim_name, 'S-parameter')
-            port_name = modelling_inputs.s_param_ports{nes};
-            construct_s_param_gdf_file(path_to_model_file, modelling_inputs, port_name)
+            port_name = modelling_inputs.ports{nes};
+            construct_s_param_gdf_file(paths.input_file_path, paths.storage_path, modelling_inputs, port_name)
             % Create the required sub structure output directories.
             arch_out = fullfile(results_storage_location, sim_f_name,['port_',port_name, '_excitation']);
         elseif strcmp(sim_name, 'Wake')
-            construct_wake_gdf_file(path_to_model_file, modelling_inputs)
+            construct_wake_gdf_file(paths.input_file_path, paths.storage_path, modelling_inputs, plots)
             arch_out = fullfile(results_storage_location, sim_f_name);
         elseif strcmp(sim_name, 'Eigenmode')
             construct_eigenmode_gdf_file(path_to_model_file, modelling_inputs, 'no')

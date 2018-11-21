@@ -66,6 +66,30 @@ for nw = 1:length(sim_param_sweeps)
         modelling_inputs{model_num}.geometry_defs = ...
             get_parameters_from_sidecar_file(...
             fullfile(mi.paths.input_file_path, mi.model_names{mi.base_model_ind},...
-             [mi.model_names{mi.base_model_ind}, '_parameters.txt']));
+            [mi.model_names{mi.base_model_ind}, '_parameters.txt']));
     end %for
+end %for
+
+% Now setup which fractional geometries to use
+for uned = 2:length(mi.simulation_defs.geometry_fractions)
+    model_num = model_num +1;
+    modelling_inputs{model_num} = base_inputs(mi, mi.model_names{mi.base_model_ind});
+    tne = find(mi.simulation_defs.volume_fill_factor == mi.simulation_defs.geometry_fractions(uned));
+    modelling_inputs{model_num}.geometry_fraction = mi.simulation_defs.geometry_fractions(uned);
+    modelling_inputs{model_num}.port_fill_factor = mi.simulation_defs.port_fill_factor{tne};
+    modelling_inputs{model_num}.port_multiple = mi.simulation_defs.port_multiple{tne};
+    modelling_inputs{model_num}.volume_fill_factor = mi.simulation_defs.volume_fill_factor(tne);
+    modelling_inputs{model_num}.ports = mi.simulation_defs.ports(1:end-tne +1);
+    modelling_inputs{model_num}.port_location = mi.simulation_defs.port_location(1:end-tne +1);
+    modelling_inputs{model_num}.port_modes = mi.simulation_defs.port_modes(1:end-tne +1);
+    temp = [...
+        mi.base_model_name, '_', 'Geometry_fraction', '_', ...
+        num2str(mi.simulation_defs.geometry_fractions(uned))];
+    temp = regexprep(temp, '\.','p');
+    modelling_inputs{model_num}.model_name = temp;
+    modelling_inputs{model_num}.defs = defs{1};
+    modelling_inputs{model_num}.geometry_defs = ...
+        get_parameters_from_sidecar_file(...
+        fullfile(mi.paths.input_file_path, mi.model_names{mi.base_model_ind},...
+        [mi.model_names{mi.base_model_ind}, '_parameters.txt']));
 end %for
