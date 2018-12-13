@@ -217,9 +217,14 @@ lg.mesh_extent_yhigh = eval(char(mesh_extent_yhigh{1}{1}));
 % find the ports on the z boundarys
 port_on_zlow_ind = find_position_in_cell_lst(regexp(data,'#\s*\.\.\s*The Port is at zlow'));
 num_pmls_zlow = regexp(data{port_on_zlow_ind+1},'#\s*\.\.\s*PML-Thickness\s*:\s*(\d*)', 'tokens');
+if isempty(port_on_zlow_ind)
+    % Does not appear in the log. Assume not PMLs are used.
+    lg.pmls_zlow = 0;
+else
+lg.pmls_zlow = str2double(char(num_pmls_zlow{1}));
+end
 port_on_zhigh_ind = find_position_in_cell_lst(regexp(data,'#\s*\.\.\s*The Port is at zhigh'));
 num_pmls_zhigh = regexp(data{port_on_zhigh_ind+1},'#\s*\.\.\s*PML-Thickness\s*:\s*(\d*)', 'tokens');
-lg.pmls_zlow = str2double(char(num_pmls_zlow{1}));
 lg.pmls_zhigh = str2double(char(num_pmls_zhigh{1}));
 % find symetry planes
 % assume any magnetic boundary is also a symetry plane.
