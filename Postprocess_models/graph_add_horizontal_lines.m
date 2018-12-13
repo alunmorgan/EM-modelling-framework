@@ -1,4 +1,4 @@
-function graph_add_horizontal_lines(y_locs, pattern, col)
+function graph_add_horizontal_lines(y_locs, pattern, col, lw)
 % Plot the total energy loss level on the current graph.
 %
 % y_locs is an array containing the locations of the lines on the x axis.
@@ -10,12 +10,13 @@ function graph_add_horizontal_lines(y_locs, pattern, col)
 if nargin ==1
     pattern  = ':';
     col = [1 0 0];
+    lw = 2;
 end
 
 hold on
 lims = xlim;
 for jse = 1:length(y_locs)
-        h = plot(lims,[y_locs(jse), y_locs(jse)],pattern,'Color',col);
+        h = plot(lims,[y_locs(jse), y_locs(jse)],pattern,'Color',col, 'LineWidth',lw);
         hAnnotation = get(h,'Annotation');
         hLegendEntry = get(hAnnotation,'LegendInformation');
         set(hLegendEntry,'IconDisplayStyle','off')
