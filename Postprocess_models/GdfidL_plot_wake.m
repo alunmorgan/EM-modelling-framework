@@ -673,12 +673,12 @@ for wana = 1:size(peaks_ts,1)
     semilogy((abs(spectra_ts(f_ind,:))),'LineWidth',lw);
     %length of a time slice.
     lts = slice_length * slice_timestep;
-    x2 = 4* lts;
-    y1 = log10(abs(spectra_ts(f_ind,end-4)));
+    num_slices_gap = size(spectra_ts,2);
+    x2 = num_slices_gap* lts;
+    y1 = log10(abs(spectra_ts(f_ind,end - num_slices_gap +1)));
     y2 = log10(abs(spectra_ts(f_ind,end)));
-    m = (y2 - y1)./ x2;
-    % this is eqivalent to -1/Tau.
-    Q_graph =  - pi .* peaks_ts(wana,1) .* 1./m;
+    tau =  - x2 ./(y2 - y1);
+    Q_graph = pi .* peaks_ts(wana,1)*1E9 .* tau;
     legs{wana} = [num2str(round(peaks_ts(wana,1) .* 10)./10), ' GHz   :Q: ',num2str(round(Q_graph))];
     
 end %for
