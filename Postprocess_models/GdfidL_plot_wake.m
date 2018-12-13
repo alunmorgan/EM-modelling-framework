@@ -17,7 +17,7 @@ graph_freq_lim = ppi.hfoi * 1e-9;
 % find the coresponding index.
 cut_ind = find(wake_data.frequency_domain_data.f_raw*1E-9 < graph_freq_lim,1,'last');
 % also find the index for 9GHz for zoomed graphs
-power_dist_ind = find(wake_data.frequency_domain_data.f_raw > 9E9, 1,'First');
+% power_dist_ind = find(wake_data.frequency_domain_data.f_raw > 9E9, 1,'First');
 
 % location and size of the default figures.
 fig_pos = [10000 678 560 420];
@@ -50,6 +50,7 @@ end %for
 % sigma = round(str2num(mi.beam_sigma) ./3E8 *1E12 *10)/10;
 if isfield(wake_data.raw_data.port, 'timebase')
     port_names = regexprep(wake_data.raw_data.port.labels,'_',' ');
+    port_names = regexprep(port_names,'-e$|-h$','');
 end %if
 if size(wake_data.frequency_domain_data.raw_port_energy_spectrum,2) == 2
     % assume that only beam ports are involved and set a flag so that the
@@ -435,7 +436,7 @@ leg = {'Bunch loss', 'Port signal'};
 cuts_temp = unique(cell2mat(cut_off_freqs));
 cuts_temp = cuts_temp(cuts_temp > 1E-10);
 report_plot_frequency_graphs(fig_pos, pth, y_lev, frequency_scale_bls, y_data, ...
-    cut_ind, power_dist_ind, cuts_temp, lw, ...
+    cut_ind, cuts_temp, lw, ...
     name, ...
     graph_freq_lim, cols, leg)
 clear leg
@@ -448,7 +449,7 @@ if isfield(wake_data.raw_data.port, 'timebase')
         power_diff = bls ;
     end %if
     report_plot_frequency_graphs(fig_pos, pth, y_lev,...
-        frequency_scale_bls, power_diff, cut_ind, power_dist_ind, cuts_temp,...
+        frequency_scale_bls, power_diff, cut_ind, cuts_temp,...
         lw, 'Energy_left_in_structure', graph_freq_lim, 'b', [])
 end %if
 
@@ -513,8 +514,8 @@ if wake_data.port_time_data.total_energy ~=0
     ylabel('Energy (nJ)')
     xlim([0 graph_freq_lim])
     savemfmt(h(18), pth,'energy_loss_port_types')
-    xlim([0 frequency_scale_ports(power_dist_ind)])
-    savemfmt(h(18), pth,'energy_loss_distribution_ports')
+%     xlim([0 frequency_scale_ports(power_dist_ind)])
+%     savemfmt(h(18), pth,'energy_loss_distribution_ports')
     close(h(18))
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     h(19) = figure('Position',fig_pos);
@@ -538,8 +539,8 @@ if wake_data.port_time_data.total_energy ~=0
     ylabel('Cumlative sum of Energy (nJ)')
     xlim([0 graph_freq_lim])
     savemfmt(h(19), pth,'cumulative_energy_loss_port_types')
-    xlim([0 frequency_scale_ports(power_dist_ind)])
-    savemfmt(h(19), pth,'cumulative_energy_loss_distribution_ports')
+%     xlim([0 frequency_scale_ports(power_dist_ind)])
+%     savemfmt(h(19), pth,'cumulative_energy_loss_distribution_ports')
     close(h(19))
 end %if
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

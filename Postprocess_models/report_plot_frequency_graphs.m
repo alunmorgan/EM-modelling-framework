@@ -1,4 +1,4 @@
-function report_plot_frequency_graphs(fig_pos, pth, y_lev, x_axis, y_data, cut_ind, power_dist_ind, cut_off_freqs, lw, name, graph_freq_lim, cols, leg)
+function report_plot_frequency_graphs(fig_pos, pth, y_lev, x_axis, y_data, cut_ind, cut_off_freqs, lw, name, graph_freq_lim, cols, leg)
 % Plot all the frequency domain graphs.
 %
 %fig_pos
