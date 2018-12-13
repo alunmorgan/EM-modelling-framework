@@ -160,24 +160,24 @@ raw_data.Wake_potential = wpl_data.data;
 if exist('wptx_data','var')
     raw_data.Wake_potential_trans_X = wptx_data.data;
 else
-    raw_data.Wake_potential_trans_X = NaN(length(wpl_data.data),1);
+    raw_data.Wake_potential_trans_X = NaN(length(wpl_data.data),2);
 end
 if exist('wpty_data','var')
     raw_data.Wake_potential_trans_Y = wpty_data.data;
 else
-    raw_data.Wake_potential_trans_Y = NaN(length(wpl_data.data),1);
+    raw_data.Wake_potential_trans_Y = NaN(length(wpl_data.data),2);
 end
 raw_data.Charge_distribution = cd_data.data;
 raw_data.Wake_impedance = wil_data.data;
 if exist('witx_data','var')
     raw_data.Wake_impedance_trans_X = witx_data.data;
 else
-    raw_data.Wake_impedance_trans_X = NaN(length(wil_data.data),1);
+    raw_data.Wake_impedance_trans_X = NaN(length(wil_data.data),2);
 end
 if exist('wity_data','var')
     raw_data.Wake_impedance_trans_Y = wity_data.data;
 else
-    raw_data.Wake_impedance_trans_Y = NaN(length(wil_data.data),1);
+    raw_data.Wake_impedance_trans_Y = NaN(length(wil_data.data),2);
 end
 raw_data.port.timebase = port_timebase;
 raw_data.port.data_all = port_data_all;
