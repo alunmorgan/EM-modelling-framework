@@ -852,8 +852,8 @@ savemfmt(h(35), pth,'wake_sweep_spectra')
 close(h(35))
 
 h(36) = figure('Position',fig_pos);
-for dhj = 1:6
-    subplot(3,2,dhj)
+for dhj = 1:length(port_names)
+    subplot(ceil(length(port_names)/2),2,dhj)
         hold on
     for nne = 1:length(wake_data.wake_sweep_data.frequency_domain_data)
         plot(ws_frequency_scales{nne}*1e-9, squeeze(ws_port_impedances(nne,1:ws_n_samples(nne),dhj)))

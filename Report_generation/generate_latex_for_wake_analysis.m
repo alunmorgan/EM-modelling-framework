@@ -14,13 +14,19 @@ alpha = wake_data.raw_data.port.alpha;
 beta = wake_data.raw_data.port.beta;
 cutoff = wake_data.raw_data.port.frequency_cutoffs_all;
 port_labels = wake_data.raw_data.port.labels_table;
- % Applying post processing overrides to the number of modes used for each
- % port.
- for hwd = 1:length(ppi.port_modes_override)
-     alpha{hwd} = alpha{hwd}(1:ppi.port_modes_override(hwd));
-     beta{hwd} = beta{hwd}(1:ppi.port_modes_override(hwd));
-     cutoff{hwd} = cutoff{hwd}(1:ppi.port_modes_override(hwd));
- end %for
+% Applying post processing overrides to the number of modes used for each
+% port.
+for hwd = 1:length(ppi.port_modes_override)
+    if size(alpha{hwd},2) > ppi.port_modes_override(hwd)
+        alpha{hwd} = alpha{hwd}(1:ppi.port_modes_override(hwd));
+    end %if
+    if size(beta{hwd},2) > ppi.port_modes_override(hwd)
+        beta{hwd} = beta{hwd}(1:ppi.port_modes_override(hwd));
+    end %if
+    if size(cutoff{hwd},2) > ppi.port_modes_override(hwd)
+        cutoff{hwd} = cutoff{hwd}(1:ppi.port_modes_override(hwd));
+    end %if
+end %for
 
 % Generates a latex document
 ov = cell(1,1);

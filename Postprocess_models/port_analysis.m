@@ -11,7 +11,9 @@ function [port_data] = port_analysis(port_data, overrides)
 
 if nargin >1 % There are overrides to the number of port modes to be used.
     for dl = 1:length(overrides)
-        port_data.data{dl} = port_data.data{dl}(:,1:overrides(dl));
+        if size(port_data.data{dl},2) > overrides(dl)
+            port_data.data{dl} = port_data.data{dl}(:,1:overrides(dl));
+        end %if
     end %for
 end %if
 
