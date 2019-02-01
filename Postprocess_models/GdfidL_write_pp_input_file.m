@@ -59,7 +59,7 @@ ov = cat(1,ov,'    onlyplotfiles = yes');
 ov = cat(1,ov,'    doit');
 ov = cat(1,ov,'');
 for lae = 1:length(log.port_name)
-ov = cat(1,ov,'-sparameter');
+ov = cat(1,ov,'-sparameter, showeh=no');
 ov = cat(1,ov,strcat('    ports = ', log.port_name{lae}));
 ov = cat(1,ov,'    modes = all');
 ov = cat(1,ov,'    timedata = yes');
