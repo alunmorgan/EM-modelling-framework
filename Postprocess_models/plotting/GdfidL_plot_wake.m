@@ -73,13 +73,16 @@ end %if
 [frequency_scale_bs, bs] = ...
     extract_bunch_spectrum_from_wake_data(wake_data);
 
-[timebase_wp, wp] = extract_wake_potential_from_wake_data(wake_data);
+[timebase_wp, wp, wpdx, wpdy, wpqx, wpqy] = extract_wake_potential_from_wake_data(wake_data);
 
 [frequency_scale_wi, wi_re, wi_im] = ...
     extract_longitudinal_wake_impedance_from_wake_data(wake_data, cut_ind);
 
-[timebase_x, timebase_y, wi_x, wi_y] = ...
+[wi_quad_x, wi_quad_y, wi_dipole_x, wi_dipole_y] = ...
     extract_transverse_wake_impedance_from_wake_data(wake_data);
+
+[wi_quad_x_comp, wi_quad_y_comp, wi_dipole_x_comp, wi_dipole_y_comp] = ...
+    extract_transverse_wake_impedance_from_wake_data(wake_data,'GdfidL');
 
 [timebase_port, modes, max_mode, dominant_modes, port_cumsum, t_start] = ...
     extract_port_signals_from_wake_data(wake_data, lab_ind);
@@ -240,12 +243,76 @@ plot(timebase_wp, wp,...
     'LineWidth',lw, 'Parent', ax(6))
 minxlim = min([minxlim, timebase_wp(1)]);
 maxxlim = max([maxxlim, timebase_wp(end)]);
-title('Evolution of wake potential in the structure', 'Parent', ax(6))
+title('Evolution of longitudinal wake potential in the structure', 'Parent', ax(6))
 xlabel('Time (ns)', 'Parent', ax(6))
 xlim([minxlim maxxlim])
 ylabel('Wake potential (V/pC)', 'Parent', ax(6))
 savemfmt(h(6), pth,'wake_potential')
 close(h(6))
+ax_num=50;
+h(ax_num) = figure('Position',fig_pos);
+ax(ax_num) = axes('Parent', h(ax_num));
+minxlim = timebase_wp(1);
+maxxlim = timebase_wp(end);
+hold(ax(ax_num), 'all')
+plot(timebase_wp, wpdx,...
+    'LineWidth',lw, 'Parent', ax(ax_num))
+minxlim = min([minxlim, timebase_wp(1)]);
+maxxlim = max([maxxlim, timebase_wp(end)]);
+title('Evolution of dipole transverse wake potential in the structure (x)', 'Parent', ax(ax_num))
+xlabel('Time (ns)', 'Parent', ax(ax_num))
+xlim([minxlim maxxlim])
+ylabel('Wake potential (V/pC)', 'Parent', ax(ax_num))
+savemfmt(h(ax_num), pth,'transverse_dipole_y_wake_potential')
+close(h(ax_num))
+ax_num=51;
+h(ax_num) = figure('Position',fig_pos);
+ax(ax_num) = axes('Parent', h(ax_num));
+minxlim = timebase_wp(1);
+maxxlim = timebase_wp(end);
+hold(ax(ax_num), 'all')
+plot(timebase_wp, wpdy,...
+    'LineWidth',lw, 'Parent', ax(ax_num))
+minxlim = min([minxlim, timebase_wp(1)]);
+maxxlim = max([maxxlim, timebase_wp(end)]);
+title('Evolution of dipole transverse wake potential in the structure (y)', 'Parent', ax(ax_num))
+xlabel('Time (ns)', 'Parent', ax(ax_num))
+xlim([minxlim maxxlim])
+ylabel('Wake potential (V/pC)', 'Parent', ax(ax_num))
+savemfmt(h(ax_num), pth,'transverse_dipole_y_wake_potential')
+close(h(ax_num))
+ax_num=52;
+h(ax_num) = figure('Position',fig_pos);
+ax(ax_num) = axes('Parent', h(ax_num));
+minxlim = timebase_wp(1);
+maxxlim = timebase_wp(end);
+hold(ax(ax_num), 'all')
+plot(timebase_wp, wpqx,...
+    'LineWidth',lw, 'Parent', ax(ax_num))
+minxlim = min([minxlim, timebase_wp(1)]);
+maxxlim = max([maxxlim, timebase_wp(end)]);
+title('Evolution of quadrupole transverse wake potential in the structure (x)', 'Parent', ax(ax_num))
+xlabel('Time (ns)', 'Parent', ax(ax_num))
+xlim([minxlim maxxlim])
+ylabel('Wake potential (V/pC)', 'Parent', ax(ax_num))
+savemfmt(h(ax_num), pth,'transverse_quadrupole_x_wake_potential')
+close(h(ax_num))
+ax_num=53;
+h(ax_num) = figure('Position',fig_pos);
+ax(ax_num) = axes('Parent', h(ax_num));
+minxlim = timebase_wp(1);
+maxxlim = timebase_wp(end);
+hold(ax(ax_num), 'all')
+plot(timebase_wp, wpqy,...
+    'LineWidth',lw, 'Parent', ax(ax_num))
+minxlim = min([minxlim, timebase_wp(1)]);
+maxxlim = max([maxxlim, timebase_wp(end)]);
+title('Evolution of quadrupole transverse wake potential in the structure (y)', 'Parent', ax(ax_num))
+xlabel('Time (ns)', 'Parent', ax(ax_num))
+xlim([minxlim maxxlim])
+ylabel('Wake potential (V/pC)', 'Parent', ax(ax_num))
+savemfmt(h(ax_num), pth,'transverse_quadrupole_y_wake_potential')
+close(h(ax_num))
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Wake impedance.
 h(7) = figure('Position',fig_pos);
@@ -271,26 +338,65 @@ close(h(8))
 
 h(9) = figure('Position',fig_pos);
 ax(9) = axes('Parent', h(9));
-plot(timebase_x, wi_x, 'b', 'Parent', ax(9));
-title('Transverse X real wake impedance', 'Parent', ax(9))
+plot(wi_quad_x.scale, wi_quad_x.data, 'b', 'Parent', ax(9));
+hold(ax(9), 'on')
+plot(wi_quad_x_comp.scale, wi_quad_x_comp.data, 'b', 'Parent', ax(9));
+hold(ax(9), 'off')
+title('Transverse X real quadrupole wake impedance', 'Parent', ax(9))
+legend('Matlab', 'GdfidL')
 xlabel('Frequency (GHz)', 'Parent', ax(9))
 ylabel('Impedance (Ohms)', 'Parent', ax(9))
 xlim([0 graph_freq_lim])
 ylim([0 inf])
-savemfmt(h(9), pth, 'Transverse_X_real_wake_impedance')
+savemfmt(h(9), pth, 'Transverse_X_real_quadrupole_wake_impedance')
 close(h(9))
 
 h(10) = figure('Position',fig_pos);
 ax(10) = axes('Parent', h(10));
-plot(timebase_y, wi_y, 'b', 'Parent', ax(10));
-title('Transverse Y real wake impedance', 'Parent', ax(10))
+plot(wi_quad_y.scale, wi_quad_y.data, 'b', 'Parent', ax(10));
+hold(ax(10), 'on')
+plot(wi_quad_y_comp.scale, wi_quad_y_comp.data, 'b', 'Parent', ax(10));
+hold(ax(10), 'off')
+legend('Matlab', 'GdfidL')
+title('Transverse Y real quadrupole wake impedance', 'Parent', ax(10))
 xlabel('Frequency (GHz)', 'Parent', ax(10))
 ylabel('Impedance (Ohms)', 'Parent', ax(10))
 xlim([0 graph_freq_lim])
 ylim([0 inf])
-savemfmt(h(10), pth,'Transverse_Y_real_wake_impedance')
+savemfmt(h(10), pth,'Transverse_Y_real_quadrupole_wake_impedance')
 close(h(10))
 
+ax_num = 41;
+h(ax_num) = figure('Position',fig_pos);
+ax(ax_num) = axes('Parent', h(ax_num));
+plot(wi_dipole_x.scale, wi_dipole_x.data, 'b', 'Parent', ax(ax_num));
+hold(ax(ax_num), 'on')
+plot(wi_dipole_x_comp.scale, wi_dipole_x_comp.data, 'b', 'Parent', ax(ax_num));
+hold(ax(ax_num), 'off')
+legend('Matlab', 'GdfidL')
+title('Transverse X real dipole wake impedance', 'Parent', ax(ax_num))
+xlabel('Frequency (GHz)', 'Parent', ax(ax_num))
+ylabel('Impedance (Ohms)', 'Parent', ax(ax_num))
+xlim([0 graph_freq_lim])
+ylim([0 inf])
+savemfmt(h(ax_num), pth, 'Transverse_X_real_dipole_wake_impedance')
+close(h(ax_num))
+
+ax_num = 42;
+h(ax_num) = figure('Position',fig_pos);
+ax(ax_num) = axes('Parent', h(ax_num));
+plot(wi_dipole_y.scale, wi_dipole_y.data, 'b', 'Parent', ax(ax_num));
+hold(ax(ax_num), 'on')
+plot(wi_dipole_y_comp.scale, wi_dipole_y_comp.data, 'b', 'Parent', ax(ax_num));
+hold(ax(ax_num), 'off')
+legend('Matlab', 'GdfidL')
+title('Transverse Y real dipole wake impedance', 'Parent', ax(ax_num))
+xlabel('Frequency (GHz)', 'Parent', ax(ax_num))
+ylabel('Impedance (Ohms)', 'Parent', ax(ax_num))
+xlim([0 graph_freq_lim])
+ylim([0 inf])
+savemfmt(h(ax_num), pth,'Transverse_Y_real_dipole_wake_impedance')
+close(h(ax_num))
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Extrapolating the wake loss factor for longer bunches.
 comp = wake_data.frequency_domain_data.wlf * ...

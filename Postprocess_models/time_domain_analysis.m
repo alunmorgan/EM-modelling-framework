@@ -6,8 +6,10 @@ function [time_domain_analysis, port_data] = time_domain_analysis(raw_data, log,
 
 % The wake potential needs to be scaled from V/charge to V/C
 wake_potential = raw_data.Wake_potential(:,2) ./ log.charge; 
-wake_potential_trans_x = raw_data.Wake_potential_trans_X(:,2) ./ log.charge; 
-wake_potential_trans_y = raw_data.Wake_potential_trans_Y(:,2) ./ log.charge; 
+wake_potential_trans_quad_x = raw_data.Wake_potential_trans_quad_X(:,2) ./ log.charge; 
+wake_potential_trans_quad_y = raw_data.Wake_potential_trans_quad_Y(:,2) ./ log.charge; 
+wake_potential_trans_dipole_x = raw_data.Wake_potential_trans_dipole_X(:,2) ./ log.charge; 
+wake_potential_trans_dipole_y = raw_data.Wake_potential_trans_dipole_Y(:,2) ./ log.charge; 
 
 % Rescale the charge distribution timebase to match the wake potential scale
 ncd_scaled = interp1(raw_data.Charge_distribution(:,1), raw_data.Charge_distribution(:,2),...
@@ -31,8 +33,10 @@ loss_from_beam = wake_loss_factor * log.charge.^2 ;
 
 time_domain_analysis.charge_distribution = charge_distribution;
 time_domain_analysis.wakepotential = wake_potential;
-time_domain_analysis.wakepotential_trans_x = wake_potential_trans_x;
-time_domain_analysis.wakepotential_trans_y = wake_potential_trans_y;
+time_domain_analysis.wakepotential_trans_quad_x = wake_potential_trans_quad_x;
+time_domain_analysis.wakepotential_trans_quad_y = wake_potential_trans_quad_y;
+time_domain_analysis.wakepotential_trans_dipole_x = wake_potential_trans_dipole_x;
+time_domain_analysis.wakepotential_trans_dipole_y = wake_potential_trans_dipole_y;
 time_domain_analysis.timebase = raw_data.Wake_potential(:,1);
 time_domain_analysis.wake_loss_dist = wake_loss_dist;
 time_domain_analysis.wake_loss_factor = wake_loss_factor;

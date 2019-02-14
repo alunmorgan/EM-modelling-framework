@@ -15,8 +15,10 @@ for se = n_points:-1:1
     % Construct a replacement structure containing the truncated datasets.
     t_data{se}.timebase = time_domain_data.timebase(1:trimed);
     t_data{se}.wakepotential = time_domain_data.wakepotential(1:trimed);
-    t_data{se}.wakepotential_trans_x = time_domain_data.wakepotential_trans_x(1:trimed);
-    t_data{se}.wakepotential_trans_y = time_domain_data.wakepotential_trans_y(1:trimed);
+    t_data{se}.wakepotential_trans_quad_x = time_domain_data.wakepotential_trans_quad_x(1:trimed);
+    t_data{se}.wakepotential_trans_quad_y = time_domain_data.wakepotential_trans_quad_y(1:trimed);
+    t_data{se}.wakepotential_trans_dipole_x = time_domain_data.wakepotential_trans_dipole_x(1:trimed);
+    t_data{se}.wakepotential_trans_dipole_y = time_domain_data.wakepotential_trans_dipole_y(1:trimed);
     t_data{se}.charge_distribution = time_domain_data.charge_distribution(1:trimed);
     pt_data{se}.timebase = time_domain_data.timebase(1:trimed);
     if isfield(port_data, 'data')

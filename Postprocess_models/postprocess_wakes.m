@@ -28,7 +28,7 @@ for hwa = 1:length(data)
     end
 end
 %% find the location of all the required output files
-[ WP_l, WP_2, WP_3, WI_s, WI_x, WI_y, ...
+[ WP_beam, WP_offset, WI_s, WI_x, WI_y, ...
     Port_mat, port_names_table, Energy, Energy_in_ceramics ] =...
     GdfidL_find_ouput('temp_scratch');
 
@@ -110,7 +110,7 @@ else
 end
 
 %% Wake potentials
-if isempty(WP_l)
+if isempty(WP_beam.s)
     %     If the model is simple enough that there is no wake potential (as it
     %     is zero) then GdfidL does not output a file.
     % use the total energy file to get the timescale and set all the data value
@@ -125,14 +125,22 @@ if isempty(WP_l)
 else
     % Returns the longitudinal wake potential
     % and the charge distribution with the integral scaled to 1C
-    [ wpl_data, cd_data] = GdfidL_read_graph_datafile( WP_l{1} );
+    [ wpl_data, cd_data] = GdfidL_read_graph_datafile( WP_beam.s{1} );
 end
-% Get the transverse wake potientials.
-if ~isempty(WP_2)
-    wptx_data = GdfidL_read_graph_datafile( WP_2{1} );
+% Get the transverse dipolewake potientials.
+if ~isempty(WP_offset.x)
+    wptdx_data = GdfidL_read_graph_datafile( WP_offset.x{1} );
 end
-if ~isempty(WP_3)
-    wpty_data = GdfidL_read_graph_datafile( WP_3{1} );
+if ~isempty(WP_offset.y)
+    wptdy_data = GdfidL_read_graph_datafile( WP_offset.y{1} );
+end
+
+% Get the transverse quadrupolar wake potientials.
+if ~isempty(WP_beam.x)
+    wptqx_data = GdfidL_read_graph_datafile( WP_beam.x{1} );
+end
+if ~isempty(WP_beam.y)
+    wptqy_data = GdfidL_read_graph_datafile( WP_beam.y{1} );
 end
 
 if ~isempty(WI_s)
@@ -142,10 +150,16 @@ if ~isempty(WI_s)
 end
 % Get the transverse wake potientials.
 if ~isempty(WI_x)
-    witx_data = GdfidL_read_graph_datafile( WI_x{1} );
+    witqx_data = GdfidL_read_graph_datafile( WI_x{1} );
 end
 if ~isempty(WI_y)
-    wity_data = GdfidL_read_graph_datafile( WI_y{1} );
+    witqy_data = GdfidL_read_graph_datafile( WI_y{1} );
+end
+if ~isempty(WI_x)
+    witdx_data = GdfidL_read_graph_datafile( WI_x{2} );
+end
+if ~isempty(WI_y)
+    witdy_data = GdfidL_read_graph_datafile( WI_y{2} );
 end
 
 temp_files('remove')
@@ -157,27 +171,47 @@ delete('WHAT-PP-DID-SPIT-OUT');
 %% Generate the data file which the analysis code is expecting.
 raw_data.Energy = total_energy_data.data ;
 raw_data.Wake_potential = wpl_data.data;
-if exist('wptx_data','var')
-    raw_data.Wake_potential_trans_X = wptx_data.data;
+if exist('wptqx_data','var')
+    raw_data.Wake_potential_trans_quad_X = wptqx_data.data;
 else
-    raw_data.Wake_potential_trans_X = NaN(length(wpl_data.data),2);
+    raw_data.Wake_potential_trans_quad_X = NaN(length(wpl_data.data),2);
 end
-if exist('wpty_data','var')
-    raw_data.Wake_potential_trans_Y = wpty_data.data;
+if exist('wptqy_data','var')
+    raw_data.Wake_potential_trans_quad_Y = wptqy_data.data;
 else
-    raw_data.Wake_potential_trans_Y = NaN(length(wpl_data.data),2);
+    raw_data.Wake_potential_trans_quad_Y = NaN(length(wpl_data.data),2);
+end
+if exist('wptdx_data','var')
+    raw_data.Wake_potential_trans_dipole_X = wptdx_data.data;
+else
+    raw_data.Wake_potential_trans_dipole_X = NaN(length(wpl_data.data),2);
+end
+if exist('wptdy_data','var')
+    raw_data.Wake_potential_trans_dipole_Y = wptqy_data.data;
+else
+    raw_data.Wake_potential_trans_dipole_Y = NaN(length(wpl_data.data),2);
 end
 raw_data.Charge_distribution = cd_data.data;
 raw_data.Wake_impedance = wil_data.data;
-if exist('witx_data','var')
-    raw_data.Wake_impedance_trans_X = witx_data.data;
+if exist('witqx_data','var')
+    raw_data.Wake_impedance_trans_quad_X = witqx_data.data;
 else
-    raw_data.Wake_impedance_trans_X = NaN(length(wil_data.data),2);
+    raw_data.Wake_impedance_trans_quad_X = NaN(length(wil_data.data),2);
 end
-if exist('wity_data','var')
-    raw_data.Wake_impedance_trans_Y = wity_data.data;
+if exist('witqy_data','var')
+    raw_data.Wake_impedance_trans_quad_Y = witqy_data.data;
 else
-    raw_data.Wake_impedance_trans_Y = NaN(length(wil_data.data),2);
+    raw_data.Wake_impedance_trans_quad_Y = NaN(length(wil_data.data),2);
+end
+if exist('witdx_data','var')
+    raw_data.Wake_impedance_trans_dipole_X = witdx_data.data;
+else
+    raw_data.Wake_impedance_trans_dipole_X = NaN(length(wil_data.data),2);
+end
+if exist('witdy_data','var')
+    raw_data.Wake_impedance_trans_dipole_Y = witdy_data.data;
+else
+    raw_data.Wake_impedance_trans_dipole_Y = NaN(length(wil_data.data),2);
 end
 raw_data.port.timebase = port_timebase;
 raw_data.port.data_all = port_data_all;
