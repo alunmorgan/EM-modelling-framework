@@ -1,5 +1,5 @@
 function model_file = create_model_data_file_for_STL(data_location, storage_location, ...
-    base_model_name, plots)
+    base_model_name, model_angle, plots)
 % Combines the geometry-material-map, mesh_definition, and port_definition
 % files with the geometry STL files to form the core of the gdf input file.
 
@@ -65,9 +65,6 @@ for lrd = 1:length(stls)
     model_file = cat(1, model_file, '# to rotate the model around the beam axis, to ');
     model_file = cat(1, model_file, '# adjust port locations.');
     model_file = cat(1, model_file, 'xprime= (0 ,0 ,1)');
-    % angle to rotate the model (only from 0 - 90 degrees). FIXME need to pull
-    % this to top level. This is mainly to move ports away from corners.
-    model_angle = 45;
     model_file = cat(1, model_file, ['yprime= (',num2str(model_angle/90),',', num2str(1-(model_angle/90)),', 0)']);
     model_file = cat(1, model_file, ['material=', vals{mat_ind,2}]);
     model_file = cat(1, model_file, 'doit');

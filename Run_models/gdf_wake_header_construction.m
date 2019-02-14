@@ -1,5 +1,5 @@
 function fs = gdf_wake_header_construction(loc, name, npmls, num_threads, mesh, sigma,...
-    wake_length, materials, material_labels)
+    beam_offset_x, beam_offset_y, wake_length, materials, material_labels)
 % Constructs the initial part of the gdf input file for GdfidL
 %
 % fs is
@@ -61,8 +61,8 @@ fs = cat(1,fs,'-lcharge');
 fs = cat(1,fs,'charge= CHARGE ');
 fs = cat(1,fs,'shape = gaussian');
 fs = cat(1,fs,'sigma= SIGMA');
-fs = cat(1,fs,'xposition= 0');
-fs = cat(1,fs,'yposition= 0');
+fs = cat(1,fs,['xposition= ', beam_offset_x]);
+fs = cat(1,fs,['yposition= ', beam_offset_y]);
 fs = cat(1,fs,'direction = beam_dir');
 fs = cat(1,fs,['shigh=',wake_length]);
 fs = cat(1,fs,'showdata= no');

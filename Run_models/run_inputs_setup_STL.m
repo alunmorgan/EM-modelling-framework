@@ -49,7 +49,8 @@ end %for
 % Then set up the simulation parameter scans off the the base model.
 % Generally all the codes starts with the temp_inputs as a starting
 % point and then modifies the specific variable of that sweep.
-sim_param_sweeps = {'beam_sigma', 'mesh_stepsize', 'wakelength', ...
+sim_param_sweeps = {'beam_sigma', 'beam_offset_x', 'beam_offset_y',...
+    'mesh_stepsize', 'wakelength', ...
     'NPMLs', 'precision', 'version'};
 for nw = 1:length(sim_param_sweeps)
     for mss = 2:length(mi.simulation_defs.(sim_param_sweeps{nw}))
