@@ -1,9 +1,11 @@
-function tfirst = GdfidL_write_pp_input_file(log, pipe_length)
+function tfirst = GdfidL_write_pp_input_file(log, pipe_length, tqw_offset)
 % Writes the post processing input file.
 %
 % log is a structure containing the information extracted from the log
 % files.
 % pipe_length is the length of the beam pipe extensions used in the model
+%
+% tqw_offset is the offset to look at the transverse quadrupole wake at (in m)
 %
 % Assume that the 1st port in the list is the beam input port.
 % the second is the beam output port, and all the others are signal ports.
@@ -39,10 +41,8 @@ ov = cat(1,ov,'    awtatq = yes');
 ov = cat(1,ov,'    impedances = yes');
 % ov = cat(1,ov,'    peroffset = yes');
 % ov = cat(1,ov,'    window = no');
-ov = cat(1,ov,'    wxatxy = (-3e-3, 3e-3)');
-ov = cat(1,ov,'    wyatxy = (-3e-3, 3e-3)');
-% ov = cat(1,ov,'    wxatxy = (3e-3, 3e-3)');
-% ov = cat(1,ov,'    wyatxy = (3e-3, 3e-3)');
+ov = cat(1,ov,['    wxatxy = (-', tqw_offset,',', tqw_offset,')']);
+ov = cat(1,ov,['    wyatxy = (-', tqw_offset,',', tqw_offset,')']);
 ov = cat(1,ov,'    showchargemax = yes');
 ov = cat(1,ov,'    onlyplotfiles = yes');
 ov = cat(1,ov,'    watsfiles = yes');
@@ -65,7 +65,6 @@ ov = cat(1,ov,'    modes = all');
 ov = cat(1,ov,'    timedata = yes');
 ov = cat(1,ov,'    ignoreexc = yes');
 ov = cat(1,ov,strcat('    tfirst = ',num2str(tfirst(lae))));
-%ov = cat(1,ov,strcat('    tfirst = 0'));
 ov = cat(1,ov,'    tintpower = yes');
 ov = cat(1,ov,'    onlyplotfiles = yes');
 ov = cat(1,ov,'    doit');
