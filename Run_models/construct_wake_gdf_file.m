@@ -1,4 +1,4 @@
-function construct_wake_gdf_file(data_location, storage_location, modelling_inputs, plots)
+function construct_wake_gdf_file(data_location, storage_location, modelling_inputs, model_angle, plots)
 % Write the input gdf file for an wake simulation of the requested
 % model.
 %
@@ -45,10 +45,9 @@ modify_mesh_definition( storage_location, 'temp_data', modelling_inputs.geometry
 mesh_def = read_file_full_line(fullfile('temp_data', 'mesh_definition.txt'));
 mesh_fixed_planes = gdf_write_mesh_fixed_planes(modelling_inputs.beam_offset_x, ...
     modelling_inputs.beam_offset_y);
-% angle to rotate the model (only from 0 - 90 degrees). FIXME need to pull
-% this to top level. This is mainly to move ports away from corners.
-model_angle = 45;
-data = create_model_data_file_for_STL(data_location, storage_location, ...
+% angle to rotate the model (only from 0 - 90 degrees). This is mainly to move ports away from corners.
+% model_angle = 45;
+data = create_model_data_file_for_STL(data_location, modelling_inputs.stl_part_mapping, ...
     modelling_inputs.base_model_name, model_angle, plots);
 % data = read_file_full_line(path_to_model_data_file);
 
