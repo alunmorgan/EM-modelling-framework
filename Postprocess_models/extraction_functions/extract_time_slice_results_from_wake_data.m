@@ -6,7 +6,9 @@ n_slices = wake_data.frequency_domain_data.time_slices.n_slices;
 frequency_scale = wake_data.frequency_domain_data.time_slices.fscale * 1e-9; %ns
 spectra = wake_data.frequency_domain_data.time_slices.ffts;
 peaks = wake_data.frequency_domain_data.time_slices.peaks; %J
-peaks(:,1) = peaks(:,1) * 1E-9; %nJ
+if ~isempty(peaks)
+    peaks(:,1) = peaks(:,1) * 1E-9; %nJ
+end %if
 
 slice_length = wake_data.frequency_domain_data.time_slices.slice_length;
 slice_timestep = wake_data.frequency_domain_data.time_slices.timestep;
