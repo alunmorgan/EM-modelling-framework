@@ -1,4 +1,4 @@
-function tfirst = GdfidL_write_pp_input_file(log, pipe_length, tqw_offset)
+function tfirst = GdfidL_write_pp_input_file(log, pipe_length, tqw_offset, ver)
 % Writes the post processing input file.
 %
 % log is a structure containing the information extracted from the log
@@ -19,7 +19,7 @@ function tfirst = GdfidL_write_pp_input_file(log, pipe_length, tqw_offset)
 % what is accounted for. And a sharp pling which messes up the FFT later in
 % the processing chain.
 tfirst(1) = log.beam_sigma*9 ./299792458; % beam entering the model.
-tfirst(2) = ( log.mesh_extent_zhigh - log.mesh_extent_zlow + log.beam_sigma .* 9) ./ 299792458; 
+tfirst(2) = ( log.mesh_extent_zhigh - log.mesh_extent_zlow + log.beam_sigma .* 9) ./ 299792458;
 for ek = 3:length(log.port_name)
     % HAVING ODD BEHAVIOR FOR DDBA BUTTONS WITH LARGE SIGNAL WHILE THE BEAM
     % IS PASSING THROUGH THE PORTS.
@@ -59,15 +59,19 @@ ov = cat(1,ov,'    onlyplotfiles = yes');
 ov = cat(1,ov,'    doit');
 ov = cat(1,ov,'');
 for lae = 1:length(log.port_name)
-ov = cat(1,ov,'-sparameter, showeh=no');
-ov = cat(1,ov,strcat('    ports = ', log.port_name{lae}));
-ov = cat(1,ov,'    modes = all');
-ov = cat(1,ov,'    timedata = yes');
-ov = cat(1,ov,'    ignoreexc = yes');
-ov = cat(1,ov,strcat('    tfirst = ',num2str(tfirst(lae))));
-ov = cat(1,ov,'    tintpower = yes');
-ov = cat(1,ov,'    onlyplotfiles = yes');
-ov = cat(1,ov,'    doit');
+    if ver > 170000 % output changed between versions.
+        ov = cat(1,ov,'-sparameter, showeh=no');
+    else
+        ov = cat(1,ov,'-sparameter');
+    end
+    ov = cat(1,ov,strcat('    ports = ', log.port_name{lae}));
+    ov = cat(1,ov,'    modes = all');
+    ov = cat(1,ov,'    timedata = yes');
+    ov = cat(1,ov,'    ignoreexc = yes');
+    ov = cat(1,ov,strcat('    tfirst = ',num2str(tfirst(lae))));
+    ov = cat(1,ov,'    tintpower = yes');
+    ov = cat(1,ov,'    onlyplotfiles = yes');
+    ov = cat(1,ov,'    doit');
 end
 % tk = 1;
 % for kes = log.mesh_extent_zlow + pipe_length:50e-3:log.mesh_extent_zhigh - pipe_length
