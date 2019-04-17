@@ -17,8 +17,12 @@ sb_Values_list{3} = [num2str(round(wake_data.frequency_domain_data.fractional_lo
 sb_Settings_list{4} = 'Fraction lost into ports (\%)';
 sb_Values_list{4} = [num2str(round(wake_data.frequency_domain_data.fractional_loss_signal_ports * 100)),'\%'];
 sb_Settings_list{5} = 'Fraction lost into the structure (\%)';
-sb_Values_list{5} = [num2str(round(wake_data.raw_data.mat_losses.total_loss(end)/wake_data.frequency_domain_data.Total_bunch_energy_loss * 100)),'\%'];
-
+if isfield(wake_data.raw_data, 'mat_losses')
+    sb_Values_list{5} = [num2str(round(wake_data.raw_data.mat_losses.total_loss(end)/wake_data.frequency_domain_data.Total_bunch_energy_loss * 100)),'\%'];
+else
+    % no loss data so assume all is PEC
+    sb_Values_list{5} = '0\%';
+end %if
 % preallocation
 extrap_data =  wake_data.frequency_domain_data.extrap_data;
 pl = cell(length(ppi.current), length(ppi.bt_length), length(ppi.rf_volts));
