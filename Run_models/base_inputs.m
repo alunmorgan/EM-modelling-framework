@@ -1,5 +1,6 @@
 function base = base_inputs(mi, base_name)
 % get the setting for the original base model.
+base.stl_part_mapping = mi.stl_part_mapping;
 base.mat_list = mi.mat_list;
 base.n_cores  = mi.simulation_defs.n_cores;
 base.sim_select = mi.simulation_defs.sim_select;
