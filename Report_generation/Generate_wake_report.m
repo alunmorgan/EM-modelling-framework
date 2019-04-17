@@ -16,8 +16,8 @@ catch
     w_ltx = cat(1,w_ltx,'\clearpage');
 end %try
 % This adds the input file to the document as an appendix.
-if exist(fullfile(data_path,'model.gdf'),'file') == 2
-    gdf_data = add_gdf_file_to_report(fullfile(data_path,'model.gdf'));
+if exist(fullfile(data_path,'wake', 'model.gdf'),'file') == 2
+    gdf_data = add_gdf_file_to_report(fullfile(data_path, 'wake', 'model.gdf'));
     w_appnd = cat(1,'\chapter{Wake input file}',gdf_data);
 end %if
 
