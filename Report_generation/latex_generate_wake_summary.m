@@ -55,12 +55,12 @@ end
 
 combined = cell(1,1);
 combined = cat(1,combined, '\renewcommand{\arraystretch}{1.3}');
-[wlf_f, wlf_scale] = rescale_value(wake_data.frequency_domain_data.wlf * 1E-12,'');
-[wlf_t, ~] = rescale_value(wake_data.time_domain_data.wake_loss_factor * 1E-12,'');
+[wlf_f, wlf_f_scale] = rescale_value(wake_data.frequency_domain_data.wlf * 1E-12,'');
+[wlf_t, wlf_t_scale] = rescale_value(wake_data.time_domain_data.wake_loss_factor * 1E-12,'');
 combined = cat(1,combined, '\begin{table}[ht]');
 combined = cat(1,combined, '\begin{tabular}{|p{0.4\textwidth}|p{0.4\textwidth}|}');
 combined = cat(1,combined, '\hline');
-combined = cat(1,combined, '\multicolumn{2}{|c|}{\textbf{',['Wakeloss factor (', wlf_scale, 'V/pC)'],' }}\\');
+combined = cat(1,combined, ['Wakeloss factor (', wlf_t_scale, 'V/pC)', ' & Wakeloss factor (', wlf_f_scale, 'V/pC)','\\']);
 combined = cat(1,combined, '\hline');
 combined = cat(1,combined, ' From time analysis & From frequency analysis \\');
 combined = cat(1,combined, '\hline');
