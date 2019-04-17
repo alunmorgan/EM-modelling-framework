@@ -1,4 +1,4 @@
-function GdfidL_run_simulation(sim_type, paths, modelling_inputs, ow_behaviour, stl_flag, plots)
+function GdfidL_run_simulation(sim_type, paths, modelling_inputs,  model_angle, ow_behaviour, stl_flag, plots)
 % Takes the geometry specification, adds the setup for a  simulation and
 % runs the simulation with the desired calculational precision.
 %
@@ -16,10 +16,10 @@ function GdfidL_run_simulation(sim_type, paths, modelling_inputs, ow_behaviour, 
 % have long term storage on a network drive, but during the modelling this
 % will kill performance. So initially write to a local drive and then move
 % it.
-if nargin == 4 && ~strcmp(ow_behaviour, 'STL')
+if nargin == 5 && ~strcmp(ow_behaviour, 'STL')
     stl_flag = '';
 end %if
-if nargin == 4 && strcmp(ow_behaviour, 'STL')
+if nargin == 5 && strcmp(ow_behaviour, 'STL')
     stl_flag = 'STL';
 end %if
 
@@ -97,8 +97,6 @@ if skip == 0
             % Create the required sub structure output directories.
             arch_out = fullfile(results_storage_location, sim_f_name,['port_',port_name, '_excitation']);
         elseif strcmp(sim_name, 'Wake')
-            % angle to rotate the model (only from 0 - 90 degrees). This is mainly to move ports away from corners.
-            model_angle = 45;
             construct_wake_gdf_file(paths.input_file_path, paths.storage_path, modelling_inputs, model_angle, plots)
             arch_out = fullfile(results_storage_location, sim_f_name);
         elseif strcmp(sim_name, 'Eigenmode')

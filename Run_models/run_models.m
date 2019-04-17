@@ -1,4 +1,4 @@
-function run_models(mi, modelling_inputs, stl_flag, plots)
+function run_models(mi, modelling_inputs, model_angle, stl_flag, plots)
 
 if ispc ==1
     error('This needs to be run on the linux modelling machine')
@@ -25,38 +25,38 @@ for awh = 1:length(modelling_inputs)
     disp(datestr(now))
     disp(['Running ',num2str(awh), ' of ',...
         num2str(length(modelling_inputs)), ' simulations'])
-    
+  
     if ~isempty(strfind(mi.simulation_defs.sim_select, 'w'))
         try
-            GdfidL_run_simulation('wake', mi.paths, modelling_inputs{awh}, ow_behaviour, stl_flag, plots);
+            GdfidL_run_simulation('wake', mi.paths, modelling_inputs{awh}, model_angle, ow_behaviour, stl_flag, plots);
         catch ERR
             display_modelling_error(ERR, 'wake')
         end %try
     end %if
     if ~isempty(strfind(mi.simulation_defs.sim_select, 's'))
         try
-            GdfidL_run_simulation('s-parameter', mi.paths, modelling_inputs{awh}, ow_behaviour, stl_flag);
+            GdfidL_run_simulation('s-parameter', mi.paths, modelling_inputs{awh}, model_angle, ow_behaviour, stl_flag);
         catch ERR
             display_modelling_error(ERR, 'S-parameter')
         end %try
     end %if
     if ~isempty(strfind(mi.simulation_defs.sim_select, 'e'))
         try
-            GdfidL_run_simulation('eigenmode', mi.paths, modelling_inputs{awh}, ow_behaviour, stl_flag);
+            GdfidL_run_simulation('eigenmode', mi.paths, modelling_inputs{awh}, model_angle, ow_behaviour, stl_flag);
         catch ERR
             display_modelling_error(ERR, 'eigenmode')
         end %try
     end %if
     if ~isempty(strfind(mi.simulation_defs.sim_select, 'l'))
         try
-            GdfidL_run_simulation('lossy eigenmode', mi.paths, modelling_inputs{awh}, ow_behaviour, stl_flag);
+            GdfidL_run_simulation('lossy eigenmode', mi.paths, modelling_inputs{awh}, model_angle, ow_behaviour, stl_flag);
         catch ERR
             display_modelling_error(ERR, 'lossy eigenmode')
         end %try
     end %if
     if ~isempty(strfind(mi.simulation_defs.sim_select, 'r'))
         try
-            GdfidL_run_simulation('shunt', mi.paths, modelling_inputs{awh}, ow_behaviour, stl_flag);
+            GdfidL_run_simulation('shunt', mi.paths, modelling_inputs{awh}, model_angle, ow_behaviour, stl_flag);
         catch ERR
             display_modelling_error(ERR, 'shunt')
         end %try
