@@ -75,16 +75,16 @@ for oef = 1:length(sim_types)
                 % restoring the original version.
                 setenv('GDFIDL_VERSION',orig_ver)
                 save(fullfile('pp_link', sim_types{oef}, 'data_postprocessed.mat'), 'pp_data','-v7.3')
-                % Generate the plots.
-                if strcmp(sim_types{oef}, 'wake')
-                    GdfidL_plot_wake(pp_data, ppi, ...
-                        modelling_inputs, run_logs,...
-                        fullfile('pp_link', [sim_types{oef}, '/']), 1E7)
-                elseif strcmp(sim_types{oef}, 'eigenmode')
-                    GdfidL_plot_eigenmode(pp_data, fullfile('pp_link', [sim_types{oef}, '/']))
-                elseif strcmp(sim_types{oef}, 'eigenmode_lossy')
-                    GdfidL_plot_eigenmode_lossy(pp_data, fullfile('pp_link', [sim_types{oef}, '/']))
-                end %if
+%                 % Generate the plots.
+%                 if strcmp(sim_types{oef}, 'wake')
+%                     GdfidL_plot_wake(pp_data, ppi, ...
+%                         modelling_inputs, run_logs,...
+%                         fullfile('pp_link', [sim_types{oef}, '/']), 1E7)
+%                 elseif strcmp(sim_types{oef}, 'eigenmode')
+%                     GdfidL_plot_eigenmode(pp_data, fullfile('pp_link', [sim_types{oef}, '/']))
+%                 elseif strcmp(sim_types{oef}, 'eigenmode_lossy')
+%                     GdfidL_plot_eigenmode_lossy(pp_data, fullfile('pp_link', [sim_types{oef}, '/']))
+%                 end %if
             end %if
         catch W_ERR
             display_postprocessing_error(W_ERR, sim_types{oef})
@@ -142,14 +142,14 @@ for heb = 1:length(sim_types)
                 setenv('GDFIDL_VERSION',orig_ver)
                 save(fullfile('pp_link', sim_types{heb}, 'data_postprocessed.mat'), 'pp_data','-v7.3')
                 % location and size of the default figures.
-                fig_pos = [10000 678 560 420];
-                % Generate the plots for the report.
-                if strcmp(sim_types{heb}, 's_parameters')
-                    GdfidL_plot_s_parameters(pp_data, ppi, fig_pos, ...
-                        fullfile('pp_link', [sim_types{heb}, '/']));
-                elseif strcmp(sim_types{heb}, 'shunt')
-                    GdfidL_plot_shunt(pp_data, fullfile('pp_link', sim_types{heb}))
-                end %if
+%                 fig_pos = [10000 678 560 420];
+%                 % Generate the plots for the report.
+%                 if strcmp(sim_types{heb}, 's_parameters')
+%                     GdfidL_plot_s_parameters(pp_data, ppi, fig_pos, ...
+%                         fullfile('pp_link', [sim_types{heb}, '/']));
+%                 elseif strcmp(sim_types{heb}, 'shunt')
+%                     GdfidL_plot_shunt(pp_data, fullfile('pp_link', sim_types{heb}))
+%                 end %if
             end %if
         catch ERR
             display_postprocessing_error(ERR, sim_types{heb})
@@ -158,45 +158,6 @@ for heb = 1:length(sim_types)
     clear run_logs orig_ver pp_data modelling_inputs
 end %for
 
-% %% Post processing shunt
-% sim_type = 'shunt';
-% if exist(fullfile('data_link', sim_type), 'dir')
-%     try
-%         % Creating sub structure.
-%         skip = creating_space_for_postprocessing(sim_type, ow_behaviour, ppi.model_name);
-%         if skip == 0
-%             [~] = system(['mkdir ', fullfile('pp_link', sim_type)]);
-%             % Save input structure
-%             save(fullfile('pp_link', sim_type, 'pp_inputs.mat'), 'ppi');
-%             [name_list, ~] =  dir_list_gen(fullfile('data_link', sim_type),'dirs', 1);
-%             name_list = name_list(3:end);
-%             for ufs = 1:length(name_list)
-%                 copyfile(fullfile('data_link', sim_type, num2str(name_list{ufs}),'model_log'),...
-%                     fullfile('pp_link', sim_type, [num2str(name_list{ufs}),'_model_log']));
-%             end % for
-%             % Reading logs
-%             [out, ~] = dir_list_gen(fullfile('data_link', sim_type),'dirs', 1);
-%             for ief = 1:length(out)
-%                 run_logs.(['f_', out{ief}]) = GdfidL_read_rshunt_log(fullfile('data_link', sim_type, out{ief},'model_log'));
-%             end %for
-%
-%             save(fullfile('pp_link', sim_type, 'data_from_run_logs.mat'), 'run_logs')
-%             disp(['GdfidL_post_process_models: Post processing ', sim_type,' data.'])
-%             % Running postprocessor
-%             orig_ver = getenv('GDFIDL_VERSION');
-%             setenv('GDFIDL_VERSION',run_logs.(['f_', out{1}]).ver);
-%             pp_data.shunt_data = postprocess_shunt;
-%             % restoring the original version.
-%             setenv('GDFIDL_VERSION',orig_ver)
-%             save(fullfile('pp_link', sim_type, 'data_postprocessed.mat'), 'pp_data','-v7.3')
-%             GdfidL_plot_shunt(pp_data, fullfile('pp_link', sim_type))
-%
-%         end %if
-%     catch ME
-%         display_postprocessing_error(ME, sim_type)
-%     end %try
-% end %if
-% clear run_logs orig_ver pp_data modelling_inputs
 %% Remove the links and move back to the original directory.
 delete('pp_link')
 delete('data_link')
