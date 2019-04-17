@@ -37,15 +37,17 @@ ov = cat(1,ov,'\section{Losses}');
 combined = latex_generate_wake_summary(wake_data, mi, ppi, run_log);
 ov = cat(1, ov, combined);
 
-ov1 = latex_side_by_side_images('wake/Thermal_Losses_within_the_structure.eps',...
-    'wake/Thermal_Fractional_Losses_distribution_within_the_structure.eps',...
-    'Absolute energy loss', 'Relative energy loss');
-ov = cat(1,ov,ov1);
-ov = cat(1,ov,'\begin{figure}[htb]');
-ov = cat(1,ov,'\centering');
-ov = cat(1,ov,'\includegraphics [width=0.48\textwidth]{wake/Material_loss_over_time.eps}');
-ov = cat(1,ov,'\caption{Energy lost into different structural elements.}');
-ov = cat(1,ov,'\end{figure}');
+if exist('wake/Thermal_Losses_within_the_structure.eps','file')
+    ov1 = latex_side_by_side_images('wake/Thermal_Losses_within_the_structure.eps',...
+        'wake/Thermal_Fractional_Losses_distribution_within_the_structure.eps',...
+        'Absolute energy loss', 'Relative energy loss');
+    ov = cat(1,ov,ov1);
+    ov = cat(1,ov,'\begin{figure}[htb]');
+    ov = cat(1,ov,'\centering');
+    ov = cat(1,ov,'\includegraphics [width=0.48\textwidth]{wake/Material_loss_over_time.eps}');
+    ov = cat(1,ov,'\caption{Energy lost into different structural elements.}');
+    ov = cat(1,ov,'\end{figure}');
+end %if
 if ~isempty(alpha)
     ov1 = latex_side_by_side_images('wake/cumulative_total_energy.eps',...
         'wake/cumulative_energy.eps',...

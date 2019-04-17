@@ -50,18 +50,6 @@ ov = cat(1,ov,'\rfoot{',dte,'}');
 ov = cat(1,ov,'\begin{document}');
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 ov = cat(1,ov,'\title{');
-% ov = cat(1,ov,'\begin{tabular}{|p{4.5cm}|m{5cm}|c|}');
-% ov = cat(1,ov,'\hline');
-% ov = cat(1,ov,'\multirow{3}{*}{\textbf{TDI-DIA}} & ');
-% ov = cat(1,ov,['\multirow{3}{*}{\includegraphics[scale=0.8]{',report_input.graphic,'}} &']);
-% ov = cat(1,ov,['\multirow{3}{*}{\parbox{5cm}{\small{', report_input.doc_num, '}}} \\']);
-% ov = cat(1,ov,'&& \\');
-% ov = cat(1,ov,'&& \\');
-% ov = cat(1,ov,'\hline');
-% ov = cat(1,ov,'\end{tabular} \\');
-% ov = cat(1,ov, '\vspace{1cm}');
-% put the title of the report here
-% Format the title
 
 % model_name = regexprep(model_name, '_', ' ');
 ov = cat(1,ov,'\centering');
@@ -134,36 +122,19 @@ else
     ov = cat(1,ov, '\hline');
     ov = cat(1,ov, '\multicolumn{2}{|c|}{\textbf{Geometry settings}}\\');
     ov = cat(1,ov, '\hline');
-    for enaw = 1:length(report_input.geometry_param_list)
-        val_tmp = report_input.geometry_param_vals{enaw};
-        if ~ischar(val_tmp)
-            val_tmp = num2str(val_tmp);
-        end %if
-        op = remove_material_counter(val_tmp);
-        ov = cat(1,ov, [report_input.geometry_param_list{enaw},' & ', op, '\\' ]);
-        ov = cat(1,ov, '\hline');
-    end %for
+    if ~isnan(report_input.geometry_param_vals)
+        for enaw = 1:length(report_input.geometry_param_list)
+            val_tmp = report_input.geometry_param_vals{enaw};
+            if ~ischar(val_tmp)
+                val_tmp = num2str(val_tmp);
+            end %if
+            op = remove_material_counter(val_tmp);
+            ov = cat(1,ov, [report_input.geometry_param_list{enaw},' & ', op, '\\' ]);
+            ov = cat(1,ov, '\hline');
+        end %for
+    end %if
     ov = cat(1,ov, '\end{tabular}');
     ov = cat(1,ov, '\caption{Geometry settings}');
     ov = cat(1,ov, '\end{table}');
-    %     for esk = 1:length(report_input.mb_param_list)
-    %         if mod(esk,pl_length) == 1
-    %             ov = cat(1,ov,'\begin{tabular}{r@{\hspace{0.25cm}=\hspace{0.25cm}}l}');
-    %             ov = cat(1,ov,'\centering');
-    %         end %if
-    %
-    %         ov = cat(1,ov,['\Large{\emph{',regexprep(report_input.param_list{esk},'_',' '),'}} & \Large{',op,'}\\']);
-    %         if mod(esk,pl_length) == 0
-    %             ov = cat(1,ov,'\end{tabular} \\');
-    %             ov = cat(1,ov,'\clearpage');
-    %         end %if
-    %     end %for
-    %     ov = cat(1,ov,'\end{tabular} \\');
 end %if
 ov = cat(1,ov, '\end{center}');
-
-%ov = cat(1,ov,'\setlength{\topmargin}{0pt}');
-%ov = cat(1,ov,'\setlength{\voffset}{-50pt}');
-%ov = cat(1,ov,'\setlength{\textheight}{720pt}');
-
-
