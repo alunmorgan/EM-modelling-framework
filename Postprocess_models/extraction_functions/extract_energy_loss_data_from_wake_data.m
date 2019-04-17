@@ -21,4 +21,7 @@ if isfield(wake_data.raw_data, 'mat_losses')
             structure_energy_loss(ka) =  wake_data.raw_data.mat_losses.single_mat_data{ka,4}(end,2) .* 1E9;
         end %if
     end %for
+else
+    structure_energy_loss = NaN;
+    material_names = NaN;
 end %if

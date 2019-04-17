@@ -153,47 +153,51 @@ savemfmt(h(1), pth,'Thermal_Losses_within_the_structure')
 close(h(1))
 clear leg
 
-h(2) = figure('Position',fig_pos);
-ax(2) = axes('Parent', h(2));
-plot_data = mat_loss/sum(mat_loss) *100;
-% matlab will ignore any values of zero which messes up the maping of the
-% lables. This just makes any zero values a very small  positive value to avoid
-% this.
-plot_data(plot_data == 0) = 1e-12;
-% add numerical value to label
-leg = {};
-for ena = length(plot_data):-1:1
-    leg{ena} = strcat(model_mat_data{ena,2}, ' (',num2str(round(plot_data(ena)*100)/100),'%)');
-end %for
-p = pie(ax(2), plot_data, ones(length(plot_data),1));
-% setting the colours on the pie chart.
-pp = findobj(p, 'Type', 'patch');
-% check if both beam ports and signal ports are used.
-col_ofst = size(py,2) -1 - length(plot_data);
-for sh = 1:length(pp)
-    set(pp(sh), 'FaceColor',cols{sh+col_ofst});
-end %for
-legend(ax(2), leg,'Location','EastOutside', 'Interpreter', 'none')
-clear leg
-title('Losses distribution within the structure', 'Parent', ax(2))
-savemfmt(h(2), pth,'Thermal_Fractional_Losses_distribution_within_the_structure')
-close(h(2))
+if ~isnan(mat_loss)
+    h(2) = figure('Position',fig_pos);
+    ax(2) = axes('Parent', h(2));
+    plot_data = mat_loss/sum(mat_loss) *100;
+    % matlab will ignore any values of zero which messes up the maping of the
+    % lables. This just makes any zero values a very small  positive value to avoid
+    % this.
+    plot_data(plot_data == 0) = 1e-12;
+    % add numerical value to label
+    leg = {};
+    for ena = length(plot_data):-1:1
+        leg{ena} = strcat(model_mat_data{ena,2}, ' (',num2str(round(plot_data(ena)*100)/100),'%)');
+    end %for
+    p = pie(ax(2), plot_data, ones(length(plot_data),1));
+    % setting the colours on the pie chart.
+    pp = findobj(p, 'Type', 'patch');
+    % check if both beam ports and signal ports are used.
+    col_ofst = size(py,2) -1 - length(plot_data);
+    for sh = 1:length(pp)
+        set(pp(sh), 'FaceColor',cols{sh+col_ofst});
+    end %for
+    legend(ax(2), leg,'Location','EastOutside', 'Interpreter', 'none')
+    clear leg
+    title('Losses distribution within the structure', 'Parent', ax(2))
+    savemfmt(h(2), pth,'Thermal_Fractional_Losses_distribution_within_the_structure')
+    close(h(2))
+end %if
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-h(3) = figure('Position',fig_pos);
-ax(3) = axes('Parent', h(3));
-for na = 1:length(m_time)
-    hold on
-    plot(ax(3), m_time{na} ,m_data{na}, 'Color', cols{na+col_ofst},'LineWidth',lw)
-    leg{na} = model_mat_data{na,2};
-    hold off
-end %for
-legend(ax(3), leg, 'Location', 'SouthEast')
-xlabel(ax(3), 'Time (ns)')
-ylabel(ax(3), 'Energy (nJ)')
-title('Material loss over time', 'Parent', ax(3))
-savemfmt(h(3), pth,'Material_loss_over_time')
-close(h(3))
-clear leg
+if ~isnan(m_time{1})
+    h(3) = figure('Position',fig_pos);
+    ax(3) = axes('Parent', h(3));
+    for na = 1:length(m_time)
+        hold on
+        plot(ax(3), m_time{na} ,m_data{na}, 'Color', cols{na+col_ofst},'LineWidth',lw)
+        leg{na} = model_mat_data{na,2};
+        hold off
+    end %for
+    legend(ax(3), leg, 'Location', 'SouthEast')
+    xlabel(ax(3), 'Time (ns)')
+    ylabel(ax(3), 'Energy (nJ)')
+    title('Material loss over time', 'Parent', ax(3))
+    savemfmt(h(3), pth,'Material_loss_over_time')
+    close(h(3))
+    clear leg
+end %if
 
 %% Cumulative total energy.
 if ~all(isnan(timebase_port)) && ~all(isnan(port_cumsum))

@@ -39,13 +39,17 @@ for se = n_points:-1:1
     f_data{se}.Wake_length = ...
         raw_data.wake_setup.Wake_length / n_points * se;
     % Material loss
-    mt_ind = find(raw_data.mat_losses.loss_time < t_data{se}.timebase(end), 1, 'last');
-    m_data{se}.loss_time = raw_data.mat_losses.loss_time(1:mt_ind);
-    m_data{se}.total_loss = raw_data.mat_losses.total_loss(1:mt_ind);
-    m_data{se}.single_mat_data = raw_data.mat_losses.single_mat_data;
-    for shw = 1:size(m_data{se}.single_mat_data,1)
-        m_data{se}.single_mat_data{shw, 4} =  m_data{se}.single_mat_data{shw, 4}(1:mt_ind,:);
-    end %for
+    if isfield(raw_data, 'mat_losses')
+        mt_ind = find(raw_data.mat_losses.loss_time < t_data{se}.timebase(end), 1, 'last');
+        m_data{se}.loss_time = raw_data.mat_losses.loss_time(1:mt_ind);
+        m_data{se}.total_loss = raw_data.mat_losses.total_loss(1:mt_ind);
+        m_data{se}.single_mat_data = raw_data.mat_losses.single_mat_data;
+        for shw = 1:size(m_data{se}.single_mat_data,1)
+            m_data{se}.single_mat_data{shw, 4} =  m_data{se}.single_mat_data{shw, 4}(1:mt_ind,:);
+        end %for
+    else
+        m_data{se} = NaN;
+    end %if
 end %for
 
 wake_sweep_data.frequency_domain_data = f_data;

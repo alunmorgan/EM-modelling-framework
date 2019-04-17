@@ -25,6 +25,9 @@ if isfield(wake_data.raw_data, 'mat_losses')
             end %for    
         end %if
     end %if
+else
+    model_mat_data =NaN;
+    mat_loss = NaN;
 end %if
 
 % Evolution over time
@@ -41,6 +44,6 @@ if isfield(wake_data.raw_data, 'mat_losses')
         end %for    
     end %if
 else
-    m_time = NaN;
-    m_data = NaN;
+    m_time = {NaN};
+    m_data = {NaN};
 end %if
