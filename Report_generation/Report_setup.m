@@ -1,4 +1,4 @@
-function Report_setup(Author, results_path)
+function Report_setup(results_path)
 % Generates a single report.
 % Author is a string which contains the names of the authors listed on the
 % report.
@@ -7,7 +7,7 @@ function Report_setup(Author, results_path)
 %
 % Example: Report_setup(Author, Report_num, Graphic_path, results_path, input_folder)
 %% Use the post processed data to generate a report.
-report_input.author = Author;
+
 % report_input.doc_num = Report_num;
 % report_input.graphic = Graphic_path;
 % data_path = dir_list_gen(fullfile(results_path),'dirs',1);
@@ -62,6 +62,11 @@ report_input.geometry_param_vals = geom_param_vals;
 report_input.mb_param_list = mb_param_list;
 report_input.mb_param_vals = mb_param_vals;
 % This makes the preamble for the latex file.
+if isfield(modelling_inputs, 'author')
+    report_input.author = modelling_inputs.author;
+else
+    report_input.author = '';
+end %if
 preamble = latex_add_preamble(report_input);
 summary = latex_generate_summary( ppi, modelling_inputs, run_logs);
 
