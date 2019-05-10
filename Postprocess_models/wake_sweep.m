@@ -8,7 +8,7 @@ dsd = length(time_domain_data.timebase);
 % Set the number of wake lengths to do.
 
 raw_port_data = put_on_reference_timebase(time_domain_data.timebase, port_data);
-n_points = 20;
+n_points = 5;
 for se = n_points:-1:1
     % find the data length required.
     trimed = round((dsd/n_points)*se);
