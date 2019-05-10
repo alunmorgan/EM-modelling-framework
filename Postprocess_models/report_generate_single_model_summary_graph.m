@@ -91,13 +91,13 @@ tmp = run_log.Ncells;
 tmp = num2str(tmp);
 ck = 1;
 c = fliplr(tmp);
-for sh = 1:length(c);
+for sh = 1:length(c)
     b(ck) = c(sh);ck = ck+1;
     if rem(sh,3)==0
         b(ck) = ',';
         ck=ck+1;
-    end;
-end;
+    end
+end
 b = fliplr(b);
 
 if isempty(tmp) == 0

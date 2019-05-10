@@ -8,7 +8,7 @@ np = 1;
 leg = {};
 
 s_in  = find_position_in_cell_lst(strfind(s.all_ports,s.port_list{es}));
-    for m=1:size(s.data{es,n},1); % Iterate over modes
+    for m=1:size(s.data{es,n},1) % Iterate over modes
         if max(20* log10(s.data{es,n}(m,1:end-2))) > -40
             hold on
             plot(s.scale(1:end-2) * 1e-9, 20* log10(s.data{es,n}(m,1:end-2)), '-',...

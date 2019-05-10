@@ -20,7 +20,7 @@ if isfield(wake_data.raw_data, 'mat_losses')
         %select on only those materials which are in the model proper.
         model_mat_data = wake_data.raw_data.mat_losses.single_mat_data(model_mat_index == 1,:);
         if ~isempty(model_mat_data)
-            for mes = size(model_mat_data,1):-1:1;
+            for mes = size(model_mat_data,1):-1:1
                 mat_loss(mes) = model_mat_data{mes,4}(end,2);
             end %for    
         end %if

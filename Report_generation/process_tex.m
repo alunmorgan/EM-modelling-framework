@@ -6,9 +6,9 @@ old_path = pwd;
 cd(output_path)
 fprintf(['Processing latex file. ', output_path, '/',file_name])
 latex_cmd = '"C:\Program Files\MiKTeX 2.9\miktex\bin\x64\pdflatex.exe" -etex -interaction nonstopmode -halt-on-error ';
-[status(1), log] = system([latex_cmd, file_name,'.tex']);
+[status(1), ~] = system([latex_cmd, file_name,'.tex']);
 fprintf('.')
-[status(2), log] = system([latex_cmd, file_name,'.tex']);
+[status(2), ~] = system([latex_cmd, file_name,'.tex']);
 fprintf('.')
 [status(3), log] = system([latex_cmd, file_name,'.tex']);
 fprintf('.')

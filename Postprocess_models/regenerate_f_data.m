@@ -85,7 +85,7 @@ if iscell(port_data)
                     % the cumulative sum graphs show some drops.)
 %                     n = 0;
 %                     tmp_ind = tmp_ind +n;
-                    if tmp_ind < length(f_raw);% +n;
+                    if tmp_ind < length(f_raw)
                         %end_ind = length(f_raw);
                         port_mode_fft{nsf}(1:tmp_ind,  esns) = 0;
                         %port_mode_fft{nsf}(end_ind - tmp_ind+2:end_ind,  esns) = 0;

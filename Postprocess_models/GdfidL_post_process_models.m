@@ -36,7 +36,7 @@ for oef = 1:length(sim_types)
         % Creating sub structure.
         try
             skip = creating_space_for_postprocessing(sim_types{oef}, ow_behaviour, ppi.model_name);
-            if skip == 0;
+            if skip == 0
                 [~] = system(['mkdir ', fullfile('pp_link', sim_types{oef})]);
                 % Save input structure
                 save(fullfile('pp_link', sim_types{oef}, 'pp_inputs.mat'), 'ppi');

@@ -77,17 +77,7 @@ if skip == 0
     end %if
     
     for nes = 1:n_cycles
-        temp_files('make')
-        % The source locations are sligthly different depending on if you
-        % are using GdfidL primatives or FreeCAD derived STL files.
-%         if strcmp(stl_flag, 'STL')
-%             path_to_model_file = fullfile(paths.storage_path, ...
-%                 modelling_inputs.model_name,...
-%                 [modelling_inputs.model_name, '_model_data']);
-%         else
-%             path_to_model_file = fullfile(paths.input_file_path, ...
-%                 [modelling_inputs.base_model_name, '_model_data']);
-%         end %if      
+        temp_files('make') 
         
         modify_mesh_definition(paths.storage_path, 'temp_data', modelling_inputs.geometry_fraction)
         

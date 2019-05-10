@@ -18,7 +18,7 @@ main_transmissions = find_position_in_cell_lst(strfind(s_list, 'transmission_mod
 s_params_ind = find_position_in_cell_lst(strfind(s_list, 's_parameters_S'));
 s_params = s_list(s_params_ind);
 t = regexp(s_params, 's_parameters_S(\d{1,2})_(\d{1,2})\.eps', 'tokens');
-for wah = length(t):-1:1;
+for wah = length(t):-1:1
     for ha = 1:2
     t2(wah,ha) = str2double(t{wah}{1}{ha});
     end % for

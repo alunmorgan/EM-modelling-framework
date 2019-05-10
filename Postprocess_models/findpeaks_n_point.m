@@ -82,7 +82,7 @@ end
 if limit == 0
 else
     peak_maxes = sort(peaks(:,2),'descend');
-    if limit > size(peak_maxes,1);
+    if limit > size(peak_maxes,1)
         new_limit = size(peak_maxes,1);
         peaks(peaks(:,2) < peak_maxes(new_limit),:) = [];
         %        peaks = cat(1,peaks,NaN(limit -new_limit,2));

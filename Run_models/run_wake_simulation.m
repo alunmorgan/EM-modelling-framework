@@ -42,7 +42,7 @@ if exist(fullfile(results_storage_location, 'wake'),'dir')
         
     end %if
 end %if
-if skip == 0;
+if skip == 0
     mkdir(results_storage_location, 'wake')
     % Move into the temporary folder.
     old_loc = pwd;
