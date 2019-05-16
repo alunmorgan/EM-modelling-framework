@@ -1,4 +1,4 @@
-function run_models(mi, modelling_inputs, model_angle, stl_flag, plots)
+function run_models(mi, ppi, modelling_inputs, model_angle, stl_flag, plots)
 
 if ispc ==1
     error('This needs to be run on the linux modelling machine')
@@ -12,25 +12,31 @@ end %if
 for awh = 1:length(modelling_inputs)
     % Making the directory to store the run data in.
     mkdir(fullfile(mi.paths.storage_path, modelling_inputs{awh}.model_name))
-%     if ~isempty(stl_flag)
-%         % Create model_data file from STL file.
-%         create_model_data_file_for_STL(...
-%             mi.paths.input_file_path, mi.paths.storage_path,...
-%             modelling_inputs{awh}.base_model_name,...
-%             modelling_inputs{awh}.model_name)
-%     end %if
+    %     if ~isempty(stl_flag)
+    %         % Create model_data file from STL file.
+    %         create_model_data_file_for_STL(...
+    %             mi.paths.input_file_path, mi.paths.storage_path,...
+    %             modelling_inputs{awh}.base_model_name,...
+    %             modelling_inputs{awh}.model_name)
+    %     end %if
     %FIXME
     ow_behaviour = '';
     % Write update to the command line
     disp(datestr(now))
     disp(['Running ',num2str(awh), ' of ',...
         num2str(length(modelling_inputs)), ' simulations'])
-  
+    
     if ~isempty(strfind(mi.simulation_defs.sim_select, 'w'))
         try
             GdfidL_run_simulation('wake', mi.paths, modelling_inputs{awh}, model_angle, ow_behaviour, stl_flag, plots);
         catch ERR
             display_modelling_error(ERR, 'wake')
+        end %try
+        try
+            ppi.model_name = modelling_inputs{awh}.model_name;
+            GdfidL_post_process_models(ppi);
+        catch ERR
+            display_postprocessing_error(ERR, 'wake')
         end %try
     end %if
     if ~isempty(strfind(mi.simulation_defs.sim_select, 's'))

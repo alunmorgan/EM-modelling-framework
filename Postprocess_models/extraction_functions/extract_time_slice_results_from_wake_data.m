@@ -1,4 +1,5 @@
-function [frequency_scale, spectra, peaks, n_slices, slice_length, slice_timestep] = extract_time_slice_results_from_wake_data(wake_data)
+function [frequency_scale, spectra, peaks, n_slices, slice_length, slice_timestep] = ...
+    extract_time_slice_results_from_wake_data(wake_data)
 % wake data (structure): contains all the data from the wake postprocessing
 %
 

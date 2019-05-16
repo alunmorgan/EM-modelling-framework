@@ -1,4 +1,4 @@
-function wake_data = postprocess_wakes(ppi, modelling_inputs, log)
+function raw_data = postprocess_wakes(ppi, modelling_inputs, log)
 % Runs the GdfidL postprocessor on the selected data.
 % The model data has already been selected using soft links.
 %
@@ -230,12 +230,3 @@ if isfield(log, 'mat_losses')
     raw_data.mat_losses.total_loss = total_loss;
     raw_data.mat_losses.single_mat_data = log.mat_losses.single_mat_data;
 end
-
-[port_time_data, time_domain_data, frequency_domain_data, wake_sweep_data]= ...
-    wake_analysis(raw_data, ppi, modelling_inputs, log);
-
-wake_data.port_time_data = port_time_data;
-wake_data.time_domain_data = time_domain_data;
-wake_data.frequency_domain_data = frequency_domain_data;
-wake_data.raw_data = raw_data;
-wake_data.wake_sweep_data = wake_sweep_data;

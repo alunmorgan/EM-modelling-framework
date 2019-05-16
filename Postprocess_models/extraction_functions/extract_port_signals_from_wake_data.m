@@ -1,4 +1,5 @@
-function [timebase,  modes, max_mode, dominant_modes, port_cumsum, t_start] = extract_port_signals_from_wake_data(wake_data, lab_ind)
+function [timebase,  modes, max_mode, dominant_modes, port_cumsum, t_start] = ...
+extract_port_signals_from_wake_data(pp_data, wake_data, lab_ind)
 % wake data (structure): contains all the data from the wake postprocessing
 %
 if isfield(wake_data.port_time_data, 'timebase')
@@ -26,4 +27,4 @@ if isfield(wake_data.port_time_data, 'total_energy_cumsum')
 else
     port_cumsum = NaN;
 end %if
-t_start = wake_data.raw_data.port.t_start;
+t_start = pp_data.port.t_start;

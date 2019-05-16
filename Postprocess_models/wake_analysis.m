@@ -1,5 +1,4 @@
-function [port_time_data, time_domain_data, frequency_domain_data,...
-    wake_sweep_data]= wake_analysis(raw_data, ppi, mi, log)
+function wake_data = wake_analysis(raw_data, ppi, mi, log)
 % Takes the model generated data and processes it in order to get an 
 %idea where the power/heat is going.
 %
@@ -42,3 +41,8 @@ frequency_domain_data.extrap_data = loss_extrapolation(...
 
 %% Generating data for increasingly short wakes
 wake_sweep_data = wake_sweep(time_domain_data, port_time_data, raw_data, ppi.hfoi, log);
+
+wake_data.port_time_data = port_time_data;
+wake_data.time_domain_data = time_domain_data;
+wake_data.frequency_domain_data = frequency_domain_data;
+wake_data.wake_sweep_data = wake_sweep_data;

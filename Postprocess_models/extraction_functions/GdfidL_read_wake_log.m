@@ -30,14 +30,14 @@ if ~isempty(sec_ind)
     defines = data(define_ind);
     ajs = 1;
     for aj = 1:length(defines)
-        tmd = regexp(defines{aj},'.*(define\(.*,([.\d -e+z]+|\s*steel.*|\s*carbon.*|\s*copper.*)?\).*)"', 'tokens');
+        tmd = regexp(defines{aj},'.*(define\(.*,([.\d -e+z]+|\s*steel.*|\s*carbon.*|\s*copper.*|\s*PEC.*)?\).*)"', 'tokens');
         if ~isempty(tmd)
             tmd = tmd{1}{1};
             lg.defs{ajs} = tmd;
             ajs = ajs +1;
-        end
-    end
-end
+        end %if
+    end %for
+end %if
 
 %generate a look up between material names and numbers.
 mat_names_ind = find_position_in_cell_lst(regexp(data,'material>\s*material'));
