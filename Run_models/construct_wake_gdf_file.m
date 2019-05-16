@@ -39,17 +39,14 @@ for hes = 1:length(geom_params)
     g_name = temp_name(1:brk_ind-1);
     g_val = regexprep(temp_name(brk_ind+3:end), '\s', '');
     geom = cat(1, geom, ['define(',g_name,',',g_val,')']);
-end
+end %for
 geom = cat(1, geom, '###################################################');
 modify_mesh_definition( storage_location, 'temp_data', modelling_inputs.geometry_fraction)
 mesh_def = read_file_full_line(fullfile('temp_data', 'mesh_definition.txt'));
 mesh_fixed_planes = gdf_write_mesh_fixed_planes(modelling_inputs.beam_offset_x, ...
     modelling_inputs.beam_offset_y);
-% angle to rotate the model (only from 0 - 90 degrees). This is mainly to move ports away from corners.
-% model_angle = 45;
 data = create_model_data_file_for_STL(data_location, modelling_inputs.stl_part_mapping, ...
     modelling_inputs.base_model_name, model_angle, plots);
-% data = read_file_full_line(path_to_model_data_file);
 
 port_defs = gdf_write_port_definitions( modelling_inputs.ports,...
     modelling_inputs.port_location, modelling_inputs.port_modes);
