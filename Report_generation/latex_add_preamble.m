@@ -122,7 +122,7 @@ else
     ov = cat(1,ov, '\hline');
     ov = cat(1,ov, '\multicolumn{2}{|c|}{\textbf{Geometry settings}}\\');
     ov = cat(1,ov, '\hline');
-    if ~isnan(report_input.geometry_param_vals)
+    if ~isnan(report_input.geometry_param_vals{1})
         for enaw = 1:length(report_input.geometry_param_list)
             val_tmp = report_input.geometry_param_vals{enaw};
             if ~ischar(val_tmp)

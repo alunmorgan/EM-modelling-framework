@@ -34,8 +34,8 @@ if exist('first_name', 'var')
             geom_param_vals{ei} = toks{1}{1}{2};
         end %for
     else
-        geom_param_names = NaN;
-        geom_param_vals = NaN;
+        geom_param_names = {NaN};
+        geom_param_vals = {NaN};
     end %if
 else
     % for all other simulation types.
@@ -46,8 +46,8 @@ else
             geom_param_vals{ei} = toks{1}{1}{2};
         end %for
     else
-        geom_param_names = NaN;
-        geom_param_vals = NaN;
+        geom_param_names = {NaN};
+        geom_param_vals = {NaN};
     end %if
 end %if
 
