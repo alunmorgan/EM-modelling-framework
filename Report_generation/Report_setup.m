@@ -19,42 +19,43 @@ load(fullfile(results_path, 'wake','run_inputs.mat'));
 
 if contains(modelling_inputs.sim_select, 's')
     % Load up the data extracted from the run log.
-load(fullfile(results_path, 'data_from_run_logs.mat'))
-% Load up post processing inputs
-load(fullfile(results_path, 'pp_inputs.mat'))
-report_input.model_name = regexprep(ppi.model_name,'_',' ');
-report_input.doc_root = ppi.output_path;
-% Load up the post precessed data.
-load(fullfile(results_path, 'data_postprocessed.mat'))
-
-first_name = fieldnames(run_logs);
-[mb_param_list, mb_param_vals, ...
-    geom_param_list, geom_param_vals ] = extract_parameters(run_logs);
+    load(fullfile(results_path, 'data_from_run_logs.mat'))
+    % Load up post processing inputs
+    load(fullfile(results_path, 'pp_inputs.mat'))
+    report_input.model_name = regexprep(ppi.model_name,'_',' ');
+    report_input.doc_root = ppi.output_path;
+    % Load up the post precessed data.
+    load(fullfile(results_path, 'data_postprocessed.mat'))
+    
+    first_name = fieldnames(run_logs);
+    [mb_param_list, mb_param_vals, ...
+        geom_param_list, geom_param_vals ] = extract_parameters(run_logs);
     report_input.date = run_logs.(first_name{1}).dte;
     [s_ltx, s_appnd] = Generate_s_parameter_report(results_path{ks});
 end %if
 
 if contains(modelling_inputs.sim_select, 'w')
     % Load up the data extracted from the run log.
-load(fullfile(results_path, 'wake', 'data_from_run_logs.mat'))
-% Load up post processing inputs
-load(fullfile(results_path, 'wake', 'pp_inputs.mat'))
-report_input.model_name = regexprep(ppi.model_name,'_',' ');
-report_input.doc_root = ppi.output_path;
-% Load up the post precessed data.
-load(fullfile(results_path, 'wake', 'data_postprocessed.mat'))
-
-first_name = fieldnames(run_logs);
-[mb_param_list, mb_param_vals, ...
-    geom_param_list, geom_param_vals ] = extract_parameters(run_logs);
-
+    load(fullfile(results_path, 'wake', 'data_from_run_logs.mat'), 'run_logs')
+    % Load up post processing inputs
+    load(fullfile(results_path, 'wake', 'pp_inputs.mat'), 'ppi')
+    report_input.model_name = regexprep(ppi.model_name,'_',' ');
+    report_input.doc_root = ppi.output_path;
+    % Load up the post precessed data.
+    load(fullfile(results_path, 'wake', 'data_postprocessed.mat'), 'pp_data')
+    load(fullfile(results_path, 'wake', 'data_analysed_wake.mat'), 'wake_data')
+    
+    first_name = fieldnames(run_logs);
+    [mb_param_list, mb_param_vals, ...
+        geom_param_list, geom_param_vals ] = extract_parameters(run_logs);
+    
     report_input.date = run_logs.dte;
     [w_ltx, w_appnd] = Generate_wake_report(results_path, ...
-        pp_data, modelling_inputs, ppi, run_logs);
+        pp_data, wake_data, modelling_inputs, ppi, run_logs);
 end %if
 
 mb_param_list = regexprep(mb_param_list,'_',' ');
-if iscell(geom_param_list)
+if ~isnan(geom_param_list{1})
     geom_param_list = regexprep(geom_param_list,'_',' ');
 end
 report_input.geometry_param_list = geom_param_list;

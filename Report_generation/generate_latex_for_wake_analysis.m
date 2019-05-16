@@ -1,4 +1,4 @@
-function ov = generate_latex_for_wake_analysis(wake_data, mi, ppi, run_log)
+function ov = generate_latex_for_wake_analysis(pp_data, wake_data, mi, ppi, run_log)
 % Generates latex code based on the wake simulation results.
 %
 % alpha is
@@ -10,10 +10,10 @@ function ov = generate_latex_for_wake_analysis(wake_data, mi, ppi, run_log)
 % Example: ov = generate_latex_for_wake_analysis(wake_data)
 
 
-alpha = wake_data.raw_data.port.alpha;
-beta = wake_data.raw_data.port.beta;
-cutoff = wake_data.raw_data.port.frequency_cutoffs_all;
-port_labels = wake_data.raw_data.port.labels_table;
+alpha = pp_data.port.alpha;
+beta = pp_data.port.beta;
+cutoff = pp_data.port.frequency_cutoffs_all;
+port_labels = pp_data.port.labels_table;
 % Applying post processing overrides to the number of modes used for each
 % port.
 for hwd = 1:length(ppi.port_modes_override)
@@ -34,7 +34,7 @@ ov = cell(1,1);
 ov = cat(1,ov,'\chapter{Wakefield analysis}');
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 ov = cat(1,ov,'\section{Losses}');
-combined = latex_generate_wake_summary(wake_data, mi, ppi, run_log);
+combined = latex_generate_wake_summary(pp_data, wake_data, mi, ppi, run_log);
 ov = cat(1, ov, combined);
 
 if exist('wake/Thermal_Losses_within_the_structure.eps','file')

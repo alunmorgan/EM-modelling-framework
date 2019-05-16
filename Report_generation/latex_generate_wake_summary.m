@@ -1,4 +1,4 @@
-function combined = latex_generate_wake_summary(wake_data, mi, ppi, run_log)
+function combined = latex_generate_wake_summary(pp_data, wake_data, mi, ppi, run_log)
 
 % Generates a summary table fo the results on loss.
 %
@@ -17,8 +17,8 @@ sb_Values_list{3} = [num2str(round(wake_data.frequency_domain_data.fractional_lo
 sb_Settings_list{4} = 'Fraction lost into ports (\%)';
 sb_Values_list{4} = [num2str(round(wake_data.frequency_domain_data.fractional_loss_signal_ports * 100)),'\%'];
 sb_Settings_list{5} = 'Fraction lost into the structure (\%)';
-if isfield(wake_data.raw_data, 'mat_losses')
-    sb_Values_list{5} = [num2str(round(wake_data.raw_data.mat_losses.total_loss(end)/wake_data.frequency_domain_data.Total_bunch_energy_loss * 100)),'\%'];
+if isfield(pp_data, 'mat_losses')
+    sb_Values_list{5} = [num2str(round(pp_data.mat_losses.total_loss(end)/wake_data.frequency_domain_data.Total_bunch_energy_loss * 100)),'\%'];
 else
     % no loss data so assume all is PEC
     sb_Values_list{5} = '0\%';
@@ -44,7 +44,7 @@ for l1 = 1:length(ppi.current)
             bc{l1,l2,l3} = num2str(round(extrap_data.diff_machine_conds.bunch_charge(l1,l2,l3) * 1e9*100)/100);
             bl{l1,l2,l3} = num2str(round(extrap_data.diff_machine_conds.bunch_length(l1,l2,l3) *1E12*10)/10);
             mc_wlf{l1,l2,l3} = num2str(round(extrap_data.diff_machine_conds.wlf(l1,l2,l3)* 1e-12*10)/10);
-            if isfield(wake_data.raw_data.port, 'timebase')
+            if isfield(pp_data.port, 'timebase')
                 pl_bp{l1,l2,l3} = num2str(round(extrap_data.diff_machine_conds.power_loss(l1,l2,l3) * extrap_data.diff_machine_conds.loss_beam_pipe(l1,l2,l3) * 10)/10);
                 pl_sp{l1,l2,l3} = num2str(round(extrap_data.diff_machine_conds.power_loss(l1,l2,l3) * extrap_data.diff_machine_conds.loss_signal_ports(l1,l2,l3) * 10)/10);
                 pl_st{l1,l2,l3} = num2str(round(extrap_data.diff_machine_conds.power_loss(l1,l2,l3) * extrap_data.diff_machine_conds.loss_structure(l1,l2,l3) * 10) / 10);
