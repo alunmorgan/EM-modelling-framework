@@ -916,19 +916,27 @@ for n=length(wake_data.wake_sweep_data.frequency_domain_data):-1:1
     ws_Wake_Impedance(n,1:ws_n_samples(n)) = wake_data.wake_sweep_data.frequency_domain_data{n}.Wake_Impedance_data;
 end %for
 h(34) = figure('Position',fig_pos);
-subplot(2,2,1)
 plot(ws_wake_length, ws_wlf)
 title('Wake loss factor')
 xlabel('Wakelength (m)')
-subplot(2,2,2)
+savemfmt(h(34), pth,'wake_sweep_wlf')
+close(h(34))
+
+h(34) = figure('Position',fig_pos);
 plot(ws_wake_length, ws_Total_energy_from_beam_ports)
 title('Total energy from beam ports')
 xlabel('Wakelength (m)')
-subplot(2,2,3)
+savemfmt(h(34), pth,'wake_sweep_energy_beam_ports')
+close(h(34))
+
+h(34) = figure('Position',fig_pos);
 plot(ws_wake_length, ws_Total_energy_from_signal_ports)
 title('Total energy from signal ports')
 xlabel('Wakelength (m)')
-subplot(2,2,4)
+savemfmt(h(34), pth,'wake_sweep_energy_signal_ports')
+close(h(34))
+
+h(34) = figure('Position',fig_pos);
 plot(ws_wake_length, ws_Total_bunch_energy_loss)
 title('Total bunch energy loss')
 xlabel('Wakelength (m)')
