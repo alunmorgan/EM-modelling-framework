@@ -71,7 +71,7 @@ end %if
     extract_energy_loss_data_from_wake_data(pp_data, wake_data);
 
 [timebase_cs, e_total_cs, e_ports_cs] =  ...
-    extract_cumulative_total_energy_from_wake_data(wake_data);
+    extract_cumulative_total_energy_from_wake_data(pp_data,wake_data);
 
 [model_mat_data, mat_loss, m_time, m_data] = ...
     extract_material_losses_from_wake_data(pp_data, modelling_inputs.extension_names);
@@ -100,7 +100,7 @@ end %if
 
 [frequency_scale_ports, beam_port_spectrum, ...
     signal_port_spectrum, port_energy_spectra] = ...
-    extract_port_spectra_from_wake_data(wake_data, cut_ind, lab_ind);
+    extract_port_spectra_from_wake_data(pp_data, wake_data, cut_ind, lab_ind);
 
 [frequency_scale_ts, spectra_ts, peaks_ts, n_slices, ...
     slice_length, slice_timestep] =  ...
@@ -984,7 +984,7 @@ for dhj = 1:length(port_names)
     end %for
     hold off
     xlabel('Frequency (GHz)')
-    title(regexprep(wake_data.port_time_data.labels{dhj},'_', ' '));
+    title(regexprep(pp_data.port.labels{dhj},'_', ' '));
 end %for
 savemfmt(h(36), pth,'wake_sweep_port_impedance')
 close(h(36))

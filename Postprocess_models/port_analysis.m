@@ -1,4 +1,4 @@
-function [port_data] = port_analysis(port_data, overrides)
+function [port_data] = port_analysis(raw_port_data, overrides)
 % In order to get the total power we need to sum the modes together for
 % each port to give the measured signal. Square this to get the power out
 % of each port. Add up the powers.
@@ -11,22 +11,22 @@ function [port_data] = port_analysis(port_data, overrides)
 
 if nargin >1 % There are overrides to the number of port modes to be used.
     for dl = 1:length(overrides)
-        if size(port_data.data{dl},2) > overrides(dl)
-            port_data.data{dl} = port_data.data{dl}(:,1:overrides(dl));
+        if size(raw_port_data.data{dl},2) > overrides(dl)
+            raw_port_data.data{dl} = raw_port_data.data{dl}(:,1:overrides(dl));
         end %if
     end %for
 end %if
 
-t_step = port_data.timebase(2) - port_data.timebase(1); % time step in s
+t_step = raw_port_data.timebase(2) - raw_port_data.timebase(1); % time step in s
 % To convert from signal to power you need to square the signal
 % The t_step scaling is to deal with the fact that the data
 % is not a continous function, but rather a set of decrete
 % points with a certain separation. In order to get a truthful
 % value of the integral one needs to multiply each point by the
 % separation (effectively turning the point into areas).
-for es =length(port_data.data):-1:1
-    port_mode_energy{es} = sum(port_data.data{es} .^2, 1)  .* t_step;
-    port_mode_energy_cumsum{es} = cumsum(port_data.data{es} .^2) * t_step;
+for es =length(raw_port_data.data):-1:1
+    port_mode_energy{es} = sum(raw_port_data.data{es} .^2, 1)  .* t_step;
+    port_mode_energy_cumsum{es} = cumsum(raw_port_data.data{es} .^2) * t_step;
     port_energy_cumsum(:,es) = squeeze(sum(port_mode_energy_cumsum{es},2));
     port_energy(es) = sum(port_mode_energy{es});
 end

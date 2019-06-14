@@ -1,4 +1,4 @@
-function wake_sweep_data = wake_sweep(time_domain_data, port_data, raw_data, hfoi, log)
+function wake_sweep_data = wake_sweep(time_domain_data, raw_data, hfoi, log)
 % Run the frequency domain analysis over data which is increasingly reduced
 % in length (i.e. having different wake lengths).
 %
@@ -7,7 +7,7 @@ function wake_sweep_data = wake_sweep(time_domain_data, port_data, raw_data, hfo
 dsd = length(time_domain_data.timebase);
 % Set the number of wake lengths to do.
 
-raw_port_data = put_on_reference_timebase(time_domain_data.timebase, port_data);
+raw_port_data = put_on_reference_timebase(time_domain_data.timebase, raw_data.port);
 n_points = 5;
 for se = n_points:-1:1
     % find the data length required.
@@ -21,8 +21,8 @@ for se = n_points:-1:1
     t_data{se}.wakepotential_trans_dipole_y = time_domain_data.wakepotential_trans_dipole_y(1:trimed);
     t_data{se}.charge_distribution = time_domain_data.charge_distribution(1:trimed);
     pt_data{se}.timebase = time_domain_data.timebase(1:trimed);
-    if isfield(port_data, 'data')
-        for nr = 1:length(port_data.data)
+    if isfield(raw_data.port, 'data')
+        for nr = 1:length(raw_data.port.data)
             pt_data{se}.data{nr} = raw_port_data{nr}(1:trimed,:);
         end %for
         % Run the frequency analysis.

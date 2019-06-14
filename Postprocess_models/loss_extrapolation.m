@@ -12,7 +12,7 @@ function [extrap_data] = loss_extrapolation(time_domain_data, port_data, mi, ppi
 %
 % Example: [extrap_data] = loss_extrapolation(time_domain_data, port_data, beam_data, raw_data, hfoi, log )
 
-[ raw_port_data] = put_on_reference_timebase(time_domain_data.timebase, port_data);
+[ raw_port_data] = put_on_reference_timebase(time_domain_data.timebase, raw_data.port);
 
 %% Pad the time domain data.
 
