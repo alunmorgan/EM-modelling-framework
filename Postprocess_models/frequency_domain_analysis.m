@@ -149,7 +149,7 @@ end
 % (and ignore the small error due to counting DC twice).
 bunch_spectra = bunch_spectra .* sqrt(2);
 
-[bunch_spectra, f_raw] = trim_to_hfoi(bunch_spectra, f_raw,  hfoi);
+
 [Wake_Impedance_data, ~] = trim_to_hfoi(Wake_Impedance_data, f_raw,  hfoi);
 [Wake_Impedance_data_im, ~] = trim_to_hfoi(Wake_Impedance_data_im, f_raw,  hfoi);
 [Wake_Impedance_data_quad_X, ~] = trim_to_hfoi(Wake_Impedance_data_quad_X, f_raw,  hfoi);
@@ -160,12 +160,12 @@ bunch_spectra = bunch_spectra .* sqrt(2);
 [Wake_Impedance_data_im_dipole_X, ~] = trim_to_hfoi(Wake_Impedance_data_im_dipole_X, f_raw,  hfoi);
 [Wake_Impedance_data_dipole_Y, ~] = trim_to_hfoi(Wake_Impedance_data_dipole_Y, f_raw,  hfoi);
 [Wake_Impedance_data_im_dipole_Y, ~] = trim_to_hfoi(Wake_Impedance_data_im_dipole_Y, f_raw,  hfoi);
-
 if ~isnan(port_impedances)
     if  sum(size(port_impedances) == [1, 1]) == 0
         [port_impedances, ~] = trim_to_hfoi(port_impedances, f_raw,  hfoi);
     end
 end
+[bunch_spectra, f_raw] = trim_to_hfoi(bunch_spectra, f_raw,  hfoi);
 
 % The outputs from this function are for the model charge.
 % except for the wake loss factor which is V/C
