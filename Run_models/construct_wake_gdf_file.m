@@ -1,4 +1,4 @@
-function construct_wake_gdf_file(data_location, storage_location, modelling_inputs, model_angle, plots)
+function construct_wake_gdf_file(models_location, storage_location, modelling_inputs, plots)
 % Write the input gdf file for an wake simulation of the requested
 % model.
 %
