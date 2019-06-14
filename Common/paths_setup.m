@@ -33,8 +33,10 @@ copyfile(fullfile(path_to_input_files, '*.txt'), store);
 %% Adding locations to the data structure.
 % Location of the temporary file space. Nothing is kept here.
 run_inputs.paths.scratch_path = scratch_loc;
-% Location of the model input files.
+% Location of the framework input files.
 run_inputs.paths.input_file_path = path_to_input_files;
+% Location of the models.
+run_inputs.paths.path_to_models = path_to_models;
 % Location to store the data generated from the modelling run.
 run_inputs.paths.storage_path = store;
 % Location to put the post processed output and reports.
@@ -43,7 +45,7 @@ run_inputs.paths.results_path = results_path;
 run_inputs.paths.graphics_path = graphic_loc;
 
 %% Adding list of model names to run.
-[run_inputs.model_names, ~] = dir_list_gen(run_inputs.paths.input_file_path, 'dirs',1);
+[run_inputs.model_names, ~] = dir_list_gen(fullfile(run_inputs.paths.path_to_models, model_name), 'dirs',1);
 run_inputs.base_model_ind = find_position_in_cell_lst(strfind(run_inputs.model_names, '_Base'));
 run_inputs.base_model_name = regexprep(run_inputs.model_names{run_inputs.base_model_ind}, '_Base', '');
 
