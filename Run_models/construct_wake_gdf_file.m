@@ -29,24 +29,32 @@ fs = gdf_wake_header_construction('', 'temp', ...
     material_override,...
     material_labels);
 
-geom_params = read_file_full_line(fullfile(data_location, modelling_inputs.base_model_name, ...
-    [modelling_inputs.base_model_name, '_parameters.txt']));
-
 geom = {'###################################################'};
-for hes = 1:length(geom_params)
-    temp_name = geom_params{hes};
-    brk_ind = strfind(temp_name, ' : ');
-    g_name = temp_name(1:brk_ind-1);
-    g_val = regexprep(temp_name(brk_ind+3:end), '\s', '');
-    geom = cat(1, geom, ['define(',g_name,',',g_val,')']);
-end %for
+parameter_file_path = fullfile(models_location, ...
+    modelling_inputs.base_model_name,...
+    modelling_inputs.model_name, ...
+    [modelling_inputs.model_name, '_parameters.txt']);
+if exist(parameter_file_path, 'file') == 2
+    geom_params = read_file_full_line(parameter_file_path);
+
+    for hes = 1:length(geom_params)
+        temp_name = geom_params{hes};
+        brk_ind = strfind(temp_name, ' : ');
+        g_name = temp_name(1:brk_ind-1);
+        g_val = regexprep(temp_name(brk_ind+3:end), '\s', '');
+        geom = cat(1, geom, ['define(',g_name,',',g_val,')']);
+    end %for
+   
+else
+    geom =  cat(1, geom, '# NO parameter file assume fixed geometry #');
+end %if
 geom = cat(1, geom, '###################################################');
-modify_mesh_definition( storage_location, 'temp_data', modelling_inputs.geometry_fraction)
+
+modify_mesh_definition( storage_location, 'temp_data', modelling_inputs.geometry_fraction) % is this the second time? is this needed?
 mesh_def = read_file_full_line(fullfile('temp_data', 'mesh_definition.txt'));
 mesh_fixed_planes = gdf_write_mesh_fixed_planes(modelling_inputs.beam_offset_x, ...
     modelling_inputs.beam_offset_y);
-data = create_model_data_file_for_STL(data_location, modelling_inputs.stl_part_mapping, ...
-    modelling_inputs.base_model_name, model_angle, plots);
+data = create_model_data_file_for_STL(modelling_inputs, models_location, plots);
 
 port_defs = gdf_write_port_definitions( modelling_inputs.ports,...
     modelling_inputs.port_location, modelling_inputs.port_modes);
@@ -55,7 +63,7 @@ if isfield(modelling_inputs, 'geom_only')
     mon = {'-volumeplot'};
     mon = cat(1,mon,'    doit');
 else
-    mon = gdf_wake_monitor_construction(modelling_inputs.wakelength);
+    mon = gdf_wake_monitor_construction(modelling_inputs.wakelength, modelling_inputs.mov);
 end %if
 % construct the full input file.
 data = cat(1,fs, modelling_inputs.defs', geom, mesh_def, mesh_fixed_planes, ...

@@ -14,17 +14,31 @@ model_num = 0;
 for fdhs = 1:length(mi.model_names)
     model_num = model_num +1;
     modelling_inputs{model_num} = base_inputs(mi, mi.model_names{fdhs});
+    modelling_inputs{model_num}.mov = 0; %Default to no movie
+    if strcmpi(mi.movie_flag, 'All')
+        modelling_inputs{model_num}.mov = 1;
+    end %if
     if fdhs ~= mi.base_model_ind
         modelling_inputs{model_num}.set_name = regexprep(mi.model_names{fdhs}, ...
             [mi.base_model_name, '_(.*)?_value_.*'], '$1' );
     else
         modelling_inputs{model_num}.set_name ='Base';
+        if strcmpi(mi.movie_flag, 'Base')
+            modelling_inputs{model_num}.mov = 1;
+        end %if
+        
     end %if
     modelling_inputs{model_num}.defs = defs{1};
-    modelling_inputs{model_num}.geometry_defs = ...
-        get_parameters_from_sidecar_file(...
-        fullfile(mi.paths.input_file_path, mi.model_names{fdhs},...
-        [mi.model_names{fdhs}, '_parameters.txt']));
+    
+    parameter_file_path = fullfile(mi.paths.path_to_models, ...
+        mi.base_model_name,mi.model_names{fdhs},...
+        [mi.model_names{fdhs}, '_parameters.txt']);
+    if exist(parameter_file_path, 'file') == 2
+        modelling_inputs{model_num}.geometry_defs = ...
+            get_parameters_from_sidecar_file(parameter_file_path);
+    else
+        modelling_inputs{model_num}.geometry_defs = {};
+    end %if
 end %for
 
 % Setting up the material variations off the base model.
@@ -36,6 +50,10 @@ for awh = 2:length(defs)
     % The inputs of the current geometry before any simulation
     % parameter sweeps.
     modelling_inputs{model_num} = base_inputs(mi, mi.model_names{mi.base_model_ind});
+    modelling_inputs{model_num}.mov = 0; %Default to no movie
+    if strcmpi(mi.movie_flag, 'All')
+        modelling_inputs{model_num}.mov = 1;
+    end %if
     modelling_inputs{model_num}.set_name = def{1};
     modelling_inputs{model_num}.defs = defs{awh};
     modelling_inputs{model_num}.model_name = [...
@@ -56,6 +74,10 @@ for nw = 1:length(sim_param_sweeps)
     for mss = 2:length(mi.simulation_defs.(sim_param_sweeps{nw}))
         model_num = model_num +1;
         modelling_inputs{model_num} = base_inputs(mi, mi.model_names{mi.base_model_ind});
+        modelling_inputs{model_num}.mov = 0; %Default to no movie
+        if strcmpi(mi.movie_flag, 'All')
+            modelling_inputs{model_num}.mov = 1;
+        end %if
         modelling_inputs{model_num}.(sim_param_sweeps{nw}) = mi.simulation_defs.(sim_param_sweeps{nw}){mss};
         modelling_inputs{model_num}.model_name = [...
             mi.base_model_name, '_', sim_param_sweeps{nw}, '_', ...
@@ -72,6 +94,10 @@ end %for
 for uned = 2:length(mi.simulation_defs.geometry_fractions)
     model_num = model_num +1;
     modelling_inputs{model_num} = base_inputs(mi, mi.model_names{mi.base_model_ind});
+    modelling_inputs{model_num}.mov = 0; %Default to no movie
+    if strcmpi(mi.movie_flag, 'All')
+        modelling_inputs{model_num}.mov = 1;
+    end %if
     tne = find(mi.simulation_defs.volume_fill_factor == mi.simulation_defs.geometry_fractions(uned));
     modelling_inputs{model_num}.geometry_fraction = mi.simulation_defs.geometry_fractions(uned);
     modelling_inputs{model_num}.port_fill_factor = mi.simulation_defs.port_fill_factor{tne};

@@ -16,7 +16,12 @@ tstart = GdfidL_write_pp_input_file(log, pipe_length, transverse_quadrupole_wake
 
 %% run the wake postprocessor
 temp_files('make')
+% setting the GdfidL version to test
+orig_ver = getenv('GDFIDL_VERSION');
+setenv('GDFIDL_VERSION',modelling_inputs.version);
 [~]=system('gd1.pp < pp_link/wake/model_wake_post_processing > pp_link/wake/model_wake_post_processing_log');
+% restoring the original version.
+setenv('GDFIDL_VERSION',orig_ver);
 % Check that the post processor has completed
 data = read_file_full_line(fullfile('pp_link', 'wake', 'model_wake_post_processing_log'));
 for hwa = 1:length(data)
@@ -28,6 +33,25 @@ for hwa = 1:length(data)
         warning('postprocess_wakes:NotCompleted', 'The postprocessor has not completed properly')
     end
 end
+
+%% find the gld files for the field output images.
+% gld_files = dir_list_gen('temp_scratch', 'gld', 1);
+% for fjh = 1:length(gld_files)
+% system(['gd1.3dplot -xwd -geometry 1920x1080 ', gld_files{fjh}]);
+% system(['convert dumped.window ',gld_files{fjh}(1:end-3) ,'png']);
+% end %for
+
+% system('ffmpeg -r 10 -f image2 -s 1920x1080 -i temp_scratch/3D-Arrowplot.%04d.png -vcodec mpeg4 -pix_fmt yuv420p test.mp4')
+% movefile('test.mp4', 'pp_link/wake/e_on_surfaces.mp4')
+system('for file in pp_link/wake/*.gif; do convert $file pp_link/wake/`basename $file .gif`.png; done')
+system('rm -f pp_link/wake/*.gif')
+system('ffmpeg -r 10 -i pp_link/wake/E2DHy%9d.png -vcodec mpeg4 -pix_fmt yuv420p pp_link/wake/E2Dy.mp4')
+system('ffmpeg -r 10 -i pp_link/wake/E2DHx%9d.png -vcodec mpeg4 -pix_fmt yuv420p pp_link/wake/E2Dx.mp4')
+system('ffmpeg -r 10 -i pp_link/wake/H2DHy%9d.png -vcodec mpeg4 -pix_fmt yuv420p pp_link/wake/H2Dy.mp4')
+system('ffmpeg -r 10 -i pp_link/wake/H2DHx%9d.png -vcodec mpeg4 -pix_fmt yuv420p pp_link/wake/H2Dx.mp4')
+system('ffmpeg -r 10 -i pp_link/wake/honmat3D%9d.png -vcodec mpeg4 -pix_fmt yuv420p pp_link/wake/Honmat3D.mp4')
+system('rm -f pp_link/wake/*2DH*.png')
+system('rm -f pp_link/wake/honmat3D*.png')
 %% find the location of all the required output files
 [ WP_beam, WP_offset, WI_s, WI_x, WI_y, ...
     Port_mat, port_names_table, Energy, Energy_in_ceramics ] =...

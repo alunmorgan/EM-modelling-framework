@@ -13,6 +13,19 @@ if strcmp(data{end}, ' rc:  -1')
     lg = data;
     return
 end
+lg = struct;
+
+%% Find the information on the stored fields.
+field_data = regexp(data,'\s*#+\s*I am storing at t=\s*([.0-9e-+]+)\s*s, Name: "(.*)".\s*The sequential Number is\s*([0-9]+)\.', 'tokens');
+field_inds = find_position_in_cell_lst(field_data);
+field_data = field_data(field_inds);
+field_data = reduce_cell_depth(field_data);
+field_data = reduce_cell_depth(field_data);
+field_sets = unique(field_data(:,2));
+for whj = 1:length(field_sets)
+    temp = field_data(strcmp(field_data(:,2), field_sets{whj}), [1,3]);
+    lg.field_data.(field_sets{whj}) = cellfun(@str2num, temp);
+end %for
 %% Remove the commented out parts of the input file
 cmnt_ind = find_position_in_cell_lst(regexp(data,'.*>\W*#'));
 data(cmnt_ind) = [];
@@ -20,7 +33,7 @@ del_ind = find_position_in_cell_lst(regexp(data,'.. deleting: '));
 data(del_ind) = [];
 clear del_ind cmnt_ind
 %% Analyse the data
-lg = struct;
+
 % Find the user defines variables.
 define_ind = find_position_in_cell_lst(regexp(data,'\s*#\s*was:\s*"\s*define\(.*,.*\)'));
 sec_ind = find_position_in_cell_lst(regexp(data,'\s*material>.*'));
