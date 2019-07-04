@@ -63,33 +63,37 @@ end %if
 [max_charge, max_charge_index] = max(time_domain_data.charge_distribution);
 charge_end_index_temp = find(time_domain_data.charge_distribution(max_charge_index:end) < max_charge ./1E4, 1,'first');
 charge_end_index = charge_end_index_temp + max_charge_index;
+wakepotential_temp = time_domain_data.wakepotential;
+wakepotential_tqx_temp = time_domain_data.wakepotential_trans_quad_x;
+wakepotential_tqy_temp = time_domain_data.wakepotential_trans_quad_y;
+wakepotential_tdx_temp = time_domain_data.wakepotential_trans_dipole_x;
+wakepotential_tdy_temp = time_domain_data.wakepotential_trans_dipole_y;
+% %Taking away the mean value to reduce the DC component -- IS this valid?
+% % If there is a large DC offset then padding with zeros causes strong
+% % ringing in the impedance data.
+% % this should not be required for on axis measurements.
+% wakepotential_temp = time_domain_data.wakepotential - mean(time_domain_data.wakepotential);
+% wakepotential_tqx_temp = time_domain_data.wakepotential_trans_quad_x - mean(time_domain_data.wakepotential_trans_quad_x(charge_end_index:end));
+% wakepotential_tqy_temp = time_domain_data.wakepotential_trans_quad_y - mean(time_domain_data.wakepotential_trans_quad_y(charge_end_index:end));
+% wakepotential_tdx_temp = time_domain_data.wakepotential_trans_dipole_x - mean(time_domain_data.wakepotential_trans_dipole_x(charge_end_index:end));
+% wakepotential_tdy_temp = time_domain_data.wakepotential_trans_dipole_y - mean(time_domain_data.wakepotential_trans_dipole_y(charge_end_index:end));
 
-%Taking away the mean value to reduce the DC component -- IS this valid?
-% If there is a large DC offset then padding with zeros causes strong
-% ringing in the impedance data.
-% this should not be required for on axis measurements.
-wakepotential_temp = time_domain_data.wakepotential - mean(time_domain_data.wakepotential);
-wakepotential_tqx_temp = time_domain_data.wakepotential_trans_quad_x - mean(time_domain_data.wakepotential_trans_quad_x(charge_end_index:end));
-wakepotential_tqy_temp = time_domain_data.wakepotential_trans_quad_y - mean(time_domain_data.wakepotential_trans_quad_y(charge_end_index:end));
-wakepotential_tdx_temp = time_domain_data.wakepotential_trans_dipole_x - mean(time_domain_data.wakepotential_trans_dipole_x(charge_end_index:end));
-wakepotential_tdy_temp = time_domain_data.wakepotential_trans_dipole_y - mean(time_domain_data.wakepotential_trans_dipole_y(charge_end_index:end));
+% % blanking out the period where the bunch is in the structure
+% % for the wake we are more interested in the response after the bunch has
+% % left.
+% wakepotential_temp(1:charge_end_index) = 0;
+% wakepotential_tqx_temp(1:charge_end_index) = 0;
+% wakepotential_tqy_temp(1:charge_end_index) = 0;
+% wakepotential_tdx_temp(1:charge_end_index) = 0;
+% wakepotential_tdy_temp(1:charge_end_index) = 0;
 
-% blanking out the period where the bunch is in the structure
-% for the wake we are more interested in the response after the bunch has
-% left.
-wakepotential_temp(1:charge_end_index) = 0;
-wakepotential_tqx_temp(1:charge_end_index) = 0;
-wakepotential_tqy_temp(1:charge_end_index) = 0;
-wakepotential_tdx_temp(1:charge_end_index) = 0;
-wakepotential_tdy_temp(1:charge_end_index) = 0;
-
-% in order to reduce artifacts we want to end the blanking at a zero
-% crossing point.
-wakepotential_temp = blank_to_first_zero_crossing(wakepotential_temp);
-wakepotential_tqx_temp = blank_to_first_zero_crossing(wakepotential_tqx_temp);
-wakepotential_tqy_temp = blank_to_first_zero_crossing(wakepotential_tqy_temp);
-wakepotential_tdx_temp = blank_to_first_zero_crossing(wakepotential_tdx_temp);
-wakepotential_tdy_temp = blank_to_first_zero_crossing(wakepotential_tdy_temp);
+% % in order to reduce artifacts we want to end the blanking at a zero
+% % crossing point.
+% wakepotential_temp = blank_to_first_zero_crossing(wakepotential_temp);
+% wakepotential_tqx_temp = blank_to_first_zero_crossing(wakepotential_tqx_temp);
+% wakepotential_tqy_temp = blank_to_first_zero_crossing(wakepotential_tqy_temp);
+% wakepotential_tdx_temp = blank_to_first_zero_crossing(wakepotential_tdx_temp);
+% wakepotential_tdy_temp = blank_to_first_zero_crossing(wakepotential_tdy_temp);
 
 % Zero pad the data to improve the shape representation.
 [timebase, Charge_distribution] = ...
