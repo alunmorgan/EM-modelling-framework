@@ -11,6 +11,13 @@ function model_file = create_model_data_file_for_STL(modelling_inputs, models_lo
 % stl_mapping = reduce_cell_depth(reduce_cell_depth(...
 %     regexp(geom, '(.*)\s:\s(.*)', 'tokens')));
 
+ background = modelling_inputs.background;
+ stl_mapping = modelling_inputs.stl_part_mapping;
+ base_model_name = modelling_inputs.base_model_name; 
+ model_name = modelling_inputs.model_name;
+ model_angle = modelling_inputs.model_angle;
+ model_scaling = modelling_inputs.stl_scaling;
+
 model_file = {'###################################################'};
 % for hes = 1:length(geom_params)
 %     temp_name = geom_params{hes};
@@ -24,16 +31,16 @@ model_file = {'###################################################'};
 %     model_file = cat(1, model_file, mesh_def{hes});
 % end
 % model_file = cat(1, model_file, '###################################################');
-model_file = cat(1, model_file, '# Filling the initial volume with PEC');
+model_file = cat(1, model_file, '# Filling the initial volume with material');
 model_file = cat(1, model_file, '-brick');
-model_file = cat(1, model_file, 'material=PEC');
+model_file = cat(1, model_file, ['material=',background]);
 model_file = cat(1, model_file, 'xlow= -INF, xhigh= INF');
 model_file = cat(1, model_file, 'ylow= -INF, yhigh= INF');
 model_file = cat(1, model_file, 'zlow= -INF, zhigh= INF');
 model_file = cat(1, model_file, 'doit');
 
 model_file = cat(1, model_file, '###################################################');
-stls = dir_list_gen(fullfile(data_location, base_model_name, 'ascii'), 'stl',1);
+stls = dir_list_gen(fullfile(models_location, base_model_name, model_name, 'ascii'), 'stl',1);
 % %%%% TEMP to fix ordering
 % temp1 = find_position_in_cell_lst(strfind(stls, '-vac.stl'));
 % temp2 = find_position_in_cell_lst(strfind(stls, '-button'));
@@ -64,6 +71,10 @@ for lrd = 1:length(stls)
     model_file = cat(1, model_file, '# adjust port locations.');
     model_file = cat(1, model_file, 'xprime= (0 ,0 ,1)');
     model_file = cat(1, model_file, ['yprime= (',num2str(model_angle/90),',', num2str(1-(model_angle/90)),', 0)']);
+    model_file = cat(1, model_file, '# The following three lines account for if the input file scale is not in m.');
+    model_file = cat(1, model_file, ['xscale = ', num2str(model_scaling)]);
+    model_file = cat(1, model_file, ['yscale = ', num2str(model_scaling)]);
+    model_file = cat(1, model_file, ['zscale = ', num2str(model_scaling)]);
     model_file = cat(1, model_file, ['material=', stl_mapping{mat_ind,2}]);
     model_file = cat(1, model_file, 'doit');
     if plots > 1
@@ -78,5 +89,3 @@ if plots == 1
 end %if
 
 model_file = cat(1, model_file, '###################################################');
-
-% write_out_data(model_file, fullfile(storage_location, output_name, [output_name, '_model_data']))
