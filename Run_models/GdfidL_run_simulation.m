@@ -1,4 +1,4 @@
-function GdfidL_run_simulation(sim_type, paths, modelling_inputs,  model_angle, ow_behaviour, stl_flag, plots)
+function GdfidL_run_simulation(sim_type, paths, modelling_inputs, ow_behaviour, stl_flag, plots)
 % Takes the geometry specification, adds the setup for a  simulation and
 % runs the simulation with the desired calculational precision.
 %
@@ -108,12 +108,12 @@ if skip == 0
         if strcmp(modelling_inputs.precision, 'single')
             [status, ~] = system('single.gd1 < temp_data/model.gdf > temp_data/model_log');
         elseif strcmp(modelling_inputs.precision, 'double')
-            [status, ~] = system('gd1 < temp_data/model.gdf > temp_data/model_log');
+            [status, cmd_output] = system('gd1 < temp_data/model.gdf > temp_data/model_log');
         end %if
         % restoring the original version.
         setenv('GDFIDL_VERSION',orig_ver);
         if status ~= 0
-            disp('Look at model log')
+            disp(['Look at model log', cmd_output])
         end %if
         
         % Move the data to the storage area.
@@ -124,8 +124,10 @@ if skip == 0
         movefile('temp_data/*', arch_out);
 %         copyfile(path_to_model_file, arch_out);
         temp_files('remove')
-        delete('SOLVER-LOGFILE');
-        delete('WHAT-GDFIDL-DID-SPIT-OUT');
+        if status == 0
+            delete('SOLVER-LOGFILE');
+            delete('WHAT-GDFIDL-DID-SPIT-OUT');
+        end %if
     end %for
     cd(old_loc)
     rmdir(tmp_location,'s');
