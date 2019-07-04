@@ -21,7 +21,7 @@ lw = 2;
 % limit to the horizontal axis.
 graph_freq_lim = ppi.hfoi * 1e-9;
 % find the coresponding index.
-cut_ind = find(wake_data.frequency_domain_data.f_raw*1E-9 < graph_freq_lim,1,'last');
+cut_freq_ind = find(wake_data.frequency_domain_data.f_raw*1E-9 < graph_freq_lim,1,'last');
 % also find the index for 9GHz for zoomed graphs
 % power_dist_ind = find(wake_data.frequency_domain_data.f_raw > 9E9, 1,'First');
 
@@ -29,7 +29,9 @@ cut_ind = find(wake_data.frequency_domain_data.f_raw*1E-9 < graph_freq_lim,1,'la
 fig_pos = [10000 678 560 420];
 
 % Set the level vector to show the total energy loss on graphs (nJ).
-y_lev = [wake_data.frequency_domain_data.Total_bunch_energy_loss *1e9,...
+y_lev_t = [wake_data.time_domain_data.loss_from_beam *1e9,...
+    wake_data.time_domain_data.loss_from_beam * 1e9];
+y_lev_f = [wake_data.frequency_domain_data.Total_bunch_energy_loss *1e9,...
     wake_data.frequency_domain_data.Total_bunch_energy_loss * 1e9];
 
 cut_off_freqs = pp_data.port.frequency_cutoffs;
@@ -71,7 +73,7 @@ end %if
     extract_energy_loss_data_from_wake_data(pp_data, wake_data);
 
 [timebase_cs, e_total_cs, e_ports_cs] =  ...
-    extract_cumulative_total_energy_from_wake_data(pp_data,wake_data);
+    extract_cumulative_total_energy_from_wake_data(wake_data);
 
 [model_mat_data, mat_loss, m_time, m_data] = ...
     extract_material_losses_from_wake_data(pp_data, modelling_inputs.extension_names);
@@ -82,7 +84,7 @@ end %if
 [timebase_wp, wp, wpdx, wpdy, wpqx, wpqy] = extract_wake_potential_from_wake_data(wake_data);
 
 [frequency_scale_wi, wi_re, wi_im] = ...
-    extract_longitudinal_wake_impedance_from_wake_data(wake_data, cut_ind);
+    extract_longitudinal_wake_impedance_from_wake_data(wake_data, cut_freq_ind);
 
 [wi_quad_x, wi_quad_y, wi_dipole_x, wi_dipole_y] = ...
     extract_transverse_wake_impedance_from_wake_data(pp_data, wake_data);
@@ -100,7 +102,7 @@ end %if
 
 [frequency_scale_ports, beam_port_spectrum, ...
     signal_port_spectrum, port_energy_spectra] = ...
-    extract_port_spectra_from_wake_data(pp_data, wake_data, cut_ind, lab_ind);
+    extract_port_spectra_from_wake_data(pp_data, wake_data, cut_freq_ind, lab_ind);
 
 [frequency_scale_ts, spectra_ts, peaks_ts, n_slices, ...
     slice_length, slice_timestep] =  ...
@@ -210,13 +212,13 @@ if ~all(isnan(timebase_port)) && ~all(isnan(port_cumsum))
     h(4) = figure('Position',fig_pos);
     ax(4) = axes('Parent', h(4));
     plot(timebase_cs, e_total_cs,'b','LineWidth',lw, 'Parent', ax(4))
-    graph_add_horizontal_lines(y_lev)
+    graph_add_horizontal_lines(y_lev_t)
     title('Cumulative Energy seen at all ports', 'Parent', ax(4))
     xlabel('Time (ns)', 'Parent', ax(4))
     ylabel('Cumulative Energy (nJ)', 'Parent', ax(4))
     xlim([0 timebase_cs(end)])
-    text(timebase_cs(end), y_lev(1), '100%')
-    fr = (e_total_cs(end) / y_lev(1)) *100;
+    text(timebase_cs(end), y_lev_t(1), '100%')
+    fr = (e_total_cs(end) / y_lev_t(1)) *100;
     text(timebase_cs(end), e_total_cs(end), [num2str(round(fr)),'%'])
     savemfmt(h(4), pth,'cumulative_total_energy')
     close(h(4))
@@ -328,6 +330,9 @@ close(h(ax_num))
 h(7) = figure('Position',fig_pos);
 ax(7) = axes('Parent', h(7));
 plot(frequency_scale_wi, wi_re, 'b', 'Parent', ax(7));
+hold(ax(7), 'on')
+plot(pp_data.Wake_impedance(:,1)*1e-9, pp_data.Wake_impedance(:,2), 'r', 'Parent', ax(7))
+hold(ax(7), 'off')
 title('Longditudinal real wake impedance', 'Parent', ax(7))
 xlabel('Frequency (GHz)', 'Parent', ax(7))
 ylabel('Impedance (Ohms)', 'Parent', ax(7))
@@ -502,7 +507,7 @@ if isfield(pp_data.port, 'timebase') && ~isnan(wake_data.frequency_domain_data.T
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %% Port signals
-    if  iscell(modes)
+%     if  iscell(modes)
         h(14) = figure('Position',fig_pos);
         [hwn, ksn] = num_subplots(length(lab_ind));
         for ens = length(lab_ind):-1:1 % ports
@@ -536,7 +541,7 @@ if isfield(pp_data.port, 'timebase') && ~isnan(wake_data.frequency_domain_data.T
         savemfmt(h(15), pth,'port_signals')
         close(h(15))
     end %if
-end %if
+% end %if
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Comparison of bunch losses vs port signals on a per frequency basis.
 if isfield(pp_data.port, 'timebase') && ~isempty(cut_off_freqs)
@@ -551,8 +556,8 @@ leg = {'Bunch loss', 'Port signal'};
 % Combining all the port cutoff freqencies into one list.
 cuts_temp = unique(cell2mat(cut_off_freqs));
 cuts_temp = cuts_temp(cuts_temp > 1E-10);
-report_plot_frequency_graphs(fig_pos, pth, y_lev, frequency_scale_bls, y_data, ...
-    cut_ind, cuts_temp, lw, ...
+report_plot_frequency_graphs(fig_pos, pth, y_lev_f, frequency_scale_bls, y_data, ...
+    cut_freq_ind, cuts_temp, lw, ...
     name, ...
     graph_freq_lim, cols, leg)
 clear leg
@@ -564,8 +569,8 @@ if isfield(pp_data.port, 'timebase')
     else
         power_diff = bls ;
     end %if
-    report_plot_frequency_graphs(fig_pos, pth, y_lev,...
-        frequency_scale_bls, power_diff, cut_ind, cuts_temp,...
+    report_plot_frequency_graphs(fig_pos, pth, y_lev_f,...
+        frequency_scale_bls, power_diff, cut_freq_ind, cuts_temp,...
         lw, 'Energy_left_in_structure', graph_freq_lim, 'b', [])
 end %if
 
@@ -599,7 +604,7 @@ if wake_data.port_time_data.total_energy ~=0
     if bp_only_flag == 0
         plot(frequency_scale_ports, cumsum(signal_port_spectrum) .*2,'r',...
             frequency_scale_ports, cumsum(beam_port_spectrum).*2,'k','LineWidth',lw)
-        graph_add_horizontal_lines(y_lev)
+        graph_add_horizontal_lines(y_lev_f)
         graph_add_vertical_lines(cuts_temp)
         legend('Signal ports', 'Beam ports', 'Location','Best')
         title('Energy loss distribution')
@@ -813,12 +818,13 @@ if isfield(pp_data.port, 'timebase') && ...
         isfield(wake_data.port_time_data, 'port_mode_energy')
     h(29) = figure('Position',fig_pos);
     ax(29) = axes('Parent', h(29));
-    [hwn, ksn] = num_subplots(length(lab_ind));
-    for ydh = 1:length(lab_ind) % Ports
-        x_vals = linspace(1,length(pme{lab_ind(ydh)}),...
-            length(pme{lab_ind(ydh)}));
+    [hwn, ksn] = num_subplots(size(pme,1));
+    for ydh = 1:size(pme,1) % Ports
+        x_vals = 1:size(pme,2);
+%         x_vals = linspace(1,size(pme),...
+%             length(pme{lab_ind(ydh)}));
         subplot(hwn,ksn,ydh)
-        plot(x_vals, pme{lab_ind(ydh)},'LineWidth',lw);
+        plot(x_vals, pme(ydh,:),'LineWidth',lw);
         xlabel('mode number')
         title('Energy in port modes')
         ylabel('Energy (nJ)')
@@ -879,7 +885,7 @@ if ~isnan(energy)
             if minlim < maxlim
                 ylim([minlim maxlim])
             end %if
-            graph_add_horizontal_lines(y_lev)
+            graph_add_horizontal_lines(y_lev_t)
             ylabel('Energy (nJ)')
         else
             plot(energy(:,1), energy(:,2),'LineWidth',lw)
