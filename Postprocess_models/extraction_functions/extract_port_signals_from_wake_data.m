@@ -2,19 +2,19 @@ function [timebase,  modes, max_mode, dominant_modes, port_cumsum, t_start] = ..
 extract_port_signals_from_wake_data(pp_data, wake_data, lab_ind)
 % wake data (structure): contains all the data from the wake postprocessing
 %
-if isfield(pp_data.port, 'timebase')
-    timebase = pp_data.port.timebase *1E9; %in ns
+if isfield(wake_data.port_time_data, 'timebase')
+    timebase = wake_data.port_time_data.timebase *1E9; %in ns
 else
     timebase = NaN;
 end %if
 
 if isfield(pp_data.port, 'data')
-    for ens = length(lab_ind):-1:1 % ports
-        [~, max_mode(ens)] = max(squeeze(wake_data.port_time_data.port_mode_energy{lab_ind(ens)}(:)));
-        dominant_modes{ens} =  squeeze(pp_data.port.data{lab_ind(ens)}(:,max_mode(ens)));
-        
-        for seo = 1:size(pp_data.port.data{lab_ind(ens)},2) % modes
-            modes{ens}{seo} =  squeeze(pp_data.port.data{lab_ind(ens)}(:,seo));
+    [~, max_mode] = max(wake_data.port_time_data.port_mode_energy,[],2);
+    for ens = size(wake_data.port_time_data.port_mode_energy, 1):-1:1 % ports
+%         [~, max_mode(ens)] = max(squeeze(wake_data.port_time_data.port_mode_energy{lab_ind(ens)}(:)));
+        dominant_modes{ens} =  squeeze(wake_data.port_time_data.port_mode_signals(lab_ind(ens),max_mode(ens), :));     
+        for seo = 1:size(wake_data.port_time_data.port_mode_signals, 2) % modes
+            modes{ens}{seo} =  squeeze(wake_data.port_time_data.port_mode_signals(lab_ind(ens),seo, :));
         end %for
     end %for
 else

@@ -1,5 +1,4 @@
-function model_file = create_model_data_file_for_STL(data_location, stl_mapping, ...
-    base_model_name, model_angle, plots)
+function model_file = create_model_data_file_for_STL(modelling_inputs, models_location, plots)
 % Combines the geometry-material-map, mesh_definition, and port_definition
 % files with the geometry STL files to form the core of the gdf input file.
 

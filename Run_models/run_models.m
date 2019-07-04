@@ -1,4 +1,4 @@
-function run_models(mi, ppi, modelling_inputs, model_angle, stl_flag, plots)
+function run_models(mi, ppi, stl_flag)
 
 if ispc ==1
     error('This needs to be run on the linux modelling machine')
@@ -7,6 +7,8 @@ end %if
 if nargin < 3
     stl_flag = '';
 end %if
+
+modelling_inputs = run_inputs_setup_STL(mi);
 
 % Running the different simulators for each model.
 for awh = 1:length(modelling_inputs)
@@ -28,7 +30,8 @@ for awh = 1:length(modelling_inputs)
     
     if ~isempty(strfind(mi.simulation_defs.sim_select, 'w'))
         try
-            GdfidL_run_simulation('wake', mi.paths, modelling_inputs{awh}, model_angle, ow_behaviour, stl_flag, plots);
+            GdfidL_run_simulation('wake', mi.paths, modelling_inputs{awh}, ...
+                ow_behaviour, stl_flag, mi.Plotting);
         catch ERR
             display_modelling_error(ERR, 'wake')
         end %try
@@ -41,28 +44,32 @@ for awh = 1:length(modelling_inputs)
     end %if
     if ~isempty(strfind(mi.simulation_defs.sim_select, 's'))
         try
-            GdfidL_run_simulation('s-parameter', mi.paths, modelling_inputs{awh}, model_angle, ow_behaviour, stl_flag);
+            GdfidL_run_simulation('s-parameter', mi.paths, modelling_inputs{awh}, ...
+                modelling_inputs{awh}.model_angle, ow_behaviour, stl_flag);
         catch ERR
             display_modelling_error(ERR, 'S-parameter')
         end %try
     end %if
     if ~isempty(strfind(mi.simulation_defs.sim_select, 'e'))
         try
-            GdfidL_run_simulation('eigenmode', mi.paths, modelling_inputs{awh}, model_angle, ow_behaviour, stl_flag);
+            GdfidL_run_simulation('eigenmode', mi.paths, modelling_inputs{awh}, ...
+                modelling_inputs{awh}.model_angle, ow_behaviour, stl_flag);
         catch ERR
             display_modelling_error(ERR, 'eigenmode')
         end %try
     end %if
     if ~isempty(strfind(mi.simulation_defs.sim_select, 'l'))
         try
-            GdfidL_run_simulation('lossy eigenmode', mi.paths, modelling_inputs{awh}, model_angle, ow_behaviour, stl_flag);
+            GdfidL_run_simulation('lossy eigenmode', mi.paths, modelling_inputs{awh}, ...
+                modelling_inputs{awh}.model_angle, ow_behaviour, stl_flag);
         catch ERR
             display_modelling_error(ERR, 'lossy eigenmode')
         end %try
     end %if
     if ~isempty(strfind(mi.simulation_defs.sim_select, 'r'))
         try
-            GdfidL_run_simulation('shunt', mi.paths, modelling_inputs{awh}, model_angle, ow_behaviour, stl_flag);
+            GdfidL_run_simulation('shunt', mi.paths, modelling_inputs{awh}, ...
+                modelling_inputs{awh}.model_angle, ow_behaviour, stl_flag);
         catch ERR
             display_modelling_error(ERR, 'shunt')
         end %try

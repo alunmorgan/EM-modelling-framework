@@ -1,4 +1,4 @@
-function [timebase_cs, e_total_cs, e_ports_cs] =  extract_cumulative_total_energy_from_wake_data(pp_data, wake_data)
+function [timebase_cs, e_total_cs, e_ports_cs] =  extract_cumulative_total_energy_from_wake_data(wake_data)
 %
 % wake data (structure): contains all the data from the wake postprocessing
 %

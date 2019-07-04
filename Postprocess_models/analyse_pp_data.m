@@ -1,4 +1,4 @@
-function analyse_pp_data(root_path, model_sets)
+function analyse_pp_data(root_path, model_sets, wl_override)
 
 for sts = 1:length(model_sets)
     files = dir_list_gen_tree(fullfile(root_path, model_sets{sts}), 'mat', 1);
