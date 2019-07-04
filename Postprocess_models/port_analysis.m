@@ -25,18 +25,18 @@ t_step = raw_port_data.timebase(2) - raw_port_data.timebase(1); % time step in s
 % value of the integral one needs to multiply each point by the
 % separation (effectively turning the point into areas).
 for es =length(raw_port_data.data):-1:1
-    port_mode_energy{es} = sum(raw_port_data.data{es} .^2, 1)  .* t_step;
-    port_mode_energy_cumsum{es} = cumsum(raw_port_data.data{es} .^2) * t_step;
-    port_energy_cumsum(:,es) = squeeze(sum(port_mode_energy_cumsum{es},2));
-    port_energy(es) = sum(port_mode_energy{es});
-end
-% if it errors here check the port multiple settings are correct.
-total_energy_cumsum = sum(port_energy_cumsum,2);% .* ...
-total_energy = sum(port_energy);
+%     convert port signal to port energy. (port, modes, time)
+    port_mode_energy_time(es,:,:) = (raw_port_data.data{es} .^2 .* t_step)';
+    port_mode_signals(es,:,:) = raw_port_data.data{es}';
+end %for
+port_data.port_mode_signals = port_mode_signals;
+port_data.port_mode_energy_time = port_mode_energy_time;
+port_data.port_mode_energy = sum(port_mode_energy_time, 3);
+port_data.port_mode_energy_cumsum = cumsum(port_mode_energy_time, 3);
+port_data.port_energy = sum(sum(port_mode_energy_time, 3), 2);
+port_data.port_energy_cumsum = squeeze(cumsum(sum(port_mode_energy_time,2), 2));
 
-port_data.port_mode_energy = port_mode_energy;
-port_data.port_mode_energy_cumsum = port_mode_energy_cumsum;
-port_data.port_energy_cumsum = port_energy_cumsum;
-port_data.total_energy_cumsum = total_energy_cumsum;
-port_data.port_energy = port_energy;
-port_data.total_energy = total_energy;
+% if it errors here check the port multiple settings are correct.
+port_data.total_energy = sum(sum(sum(port_mode_energy_time, 3),2),1);
+port_data.total_energy_cumsum = squeeze(cumsum(sum(sum(port_mode_energy_time, 2),1),3));
+port_data.timebase = raw_port_data.timebase;
