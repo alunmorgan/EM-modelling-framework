@@ -12,7 +12,15 @@ for sts = 1:length(model_sets)
         load(fullfile(current_folder, 'pp_inputs.mat'), 'ppi');
         load(fullfile(current_folder, 'data_from_run_logs.mat'), 'run_logs');
         load(fullfile(current_folder, 'run_inputs.mat'), 'modelling_inputs');
-        wake_data = wake_analysis(pp_data, ppi, modelling_inputs, run_logs);
+        wake_lengths_to_analyse = [str2double(modelling_inputs.wakelength),...
+            str2double(modelling_inputs.wakelength) ./2,...
+            str2double(modelling_inputs.wakelength) ./4];
+        if nargin > 2
+            reported_wake_length = wl_override;
+        else
+            reported_wake_length = modelling_inputs.wakelength;
+        end %if
+        wake_data = wake_analysis(pp_data, ppi, modelling_inputs, run_logs, wake_lengths_to_analyse, reported_wake_length);
         
         save(fullfile(current_folder, 'data_analysed_wake.mat'), 'wake_data','-v7.3')
         disp(['Analysed ', current_folder])
