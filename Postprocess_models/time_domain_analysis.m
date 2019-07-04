@@ -47,5 +47,5 @@ if isempty(raw_data.port.data_all)
     port_data.total_energy = 0;
 else
     %% Port calculations
-    [port_data] = port_analysis(raw_data.port, mode_overrides);
+    port_data = port_analysis(raw_data.port, mode_overrides);
 end
