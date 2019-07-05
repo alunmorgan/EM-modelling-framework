@@ -55,7 +55,7 @@ if mov == 1
     fs = cat(1,fs,' define( DISTSAV, 3e-3 / 3e8 )');
     fs = cat(1,fs,'       firstsaved= 1e-3  / 3e8');
     fs = cat(1,fs,'       distancesaved= DISTSAV');
-    fs = cat(1,fs,'       lastsaved= FIRSTSAV + 1000000 * DISTSAV');
+    fs = cat(1,fs,'       lastsaved= FIRSTSAV + MODELLEN / 3e8 + 200 * DISTSAV');
     fs = cat(1,fs,'       doit');
     fs = cat(1,fs,'    -fexport');
     fs = cat(1,fs,'       outfile= temp_data/hfields');
@@ -65,7 +65,7 @@ if mov == 1
     fs = cat(1,fs,' define( DISTSAV, 3e-3 / 3e8 )');
     fs = cat(1,fs,'       firstsaved= 1e-3  / 3e8');
     fs = cat(1,fs,'       distancesaved= DISTSAV');
-    fs = cat(1,fs,'       lastsaved= FIRSTSAV + 1000000 * DISTSAV');
+    fs = cat(1,fs,'       lastsaved= FIRSTSAV + MODELLEN / 3e8 + 200 * DISTSAV');
     fs = cat(1,fs,'       doit');
     fs = cat(1,fs,'    -fexport');
     fs = cat(1,fs,'       outfile= temp_data/honmat');
@@ -75,10 +75,11 @@ if mov == 1
     fs = cat(1,fs,' define( DISTSAV, 3e-3 / 3e8 )');
     fs = cat(1,fs,'       firstsaved= 1e-3  / 3e8');
     fs = cat(1,fs,'       distancesaved= DISTSAV');
-    fs = cat(1,fs,'       lastsaved= FIRSTSAV + 1000000 * DISTSAV');
+    fs = cat(1,fs,'       lastsaved= FIRSTSAV + MODELLEN / 3e8 + 200 * DISTSAV');
     fs = cat(1,fs,'       doit');
-    fs = cat(1,fs,'-fdtd   ');
-    fs = cat(1,fs,'    doit');
 else
     fs = cat(1,fs,'# No movie requested... not storing additional files.');
 end %if
+
+    fs = cat(1,fs,'-fdtd   ');
+    fs = cat(1,fs,'    doit');
