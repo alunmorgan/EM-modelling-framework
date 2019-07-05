@@ -1,4 +1,4 @@
-function GdfidL_run_simulation(sim_type, paths, modelling_inputs, ow_behaviour, stl_flag, plots)
+function GdfidL_run_simulation(sim_type, paths, modelling_inputs, ow_behaviour, plots)
 % Takes the geometry specification, adds the setup for a  simulation and
 % runs the simulation with the desired calculational precision.
 %
@@ -10,18 +10,12 @@ function GdfidL_run_simulation(sim_type, paths, modelling_inputs, ow_behaviour, 
 %       will be moved to a folder called old data.
 %       The default is for the simulation to be skipped.
 %
-% Example: GdifL_run_simulation('wake' paths, modelling_inputs)
+% Example: GdifL_run_simulation('wake' paths, modelling_inputs, ow_behaviour, plots)
 
 % The code does not write directly to the storage area as often you want to
 % have long term storage on a network drive, but during the modelling this
 % will kill performance. So initially write to a local drive and then move
 % it.
-if nargin == 5 && ~strcmp(ow_behaviour, 'STL')
-    stl_flag = '';
-end %if
-if nargin == 5 && strcmp(ow_behaviour, 'STL')
-    stl_flag = 'STL';
-end %if
 
 if strcmpi(sim_type, 'wake')
     sim_f_name = 'wake';
