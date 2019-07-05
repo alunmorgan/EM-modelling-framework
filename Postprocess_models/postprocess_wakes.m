@@ -43,15 +43,25 @@ end
 
 % system('ffmpeg -r 10 -f image2 -s 1920x1080 -i temp_scratch/3D-Arrowplot.%04d.png -vcodec mpeg4 -pix_fmt yuv420p test.mp4')
 % movefile('test.mp4', 'pp_link/wake/e_on_surfaces.mp4')
-system('for file in pp_link/wake/*.gif; do convert $file pp_link/wake/`basename $file .gif`.png; done')
-system('rm -f pp_link/wake/*.gif')
-system('ffmpeg -r 10 -i pp_link/wake/E2DHy%9d.png -vcodec mpeg4 -pix_fmt yuv420p pp_link/wake/E2Dy.mp4')
-system('ffmpeg -r 10 -i pp_link/wake/E2DHx%9d.png -vcodec mpeg4 -pix_fmt yuv420p pp_link/wake/E2Dx.mp4')
-system('ffmpeg -r 10 -i pp_link/wake/H2DHy%9d.png -vcodec mpeg4 -pix_fmt yuv420p pp_link/wake/H2Dy.mp4')
-system('ffmpeg -r 10 -i pp_link/wake/H2DHx%9d.png -vcodec mpeg4 -pix_fmt yuv420p pp_link/wake/H2Dx.mp4')
-system('ffmpeg -r 10 -i pp_link/wake/honmat3D%9d.png -vcodec mpeg4 -pix_fmt yuv420p pp_link/wake/Honmat3D.mp4')
-system('rm -f pp_link/wake/*2DH*.png')
-system('rm -f pp_link/wake/honmat3D*.png')
+[~] = system('for file in pp_link/wake/*.gif; do convert $file pp_link/wake/`basename $file .gif`.png; done');
+[~] = system('rm -f pp_link/wake/*.gif');
+if exist('pp_link/wake/E2DHy000000001.png', 'file') == 2
+[~] = system('ffmpeg -r 10 -i pp_link/wake/E2DHy%9d.png -vcodec mpeg4 -pix_fmt yuv420p pp_link/wake/E2Dy.mp4');
+end %if
+if exist('pp_link/wake/E2DHx000000001.png', 'file') == 2
+[~] = system('ffmpeg -r 10 -i pp_link/wake/E2DHx%9d.png -vcodec mpeg4 -pix_fmt yuv420p pp_link/wake/E2Dx.mp4');
+end %if
+if exist('pp_link/wake/H2DHy000000001.png', 'file') == 2
+[~] = system('ffmpeg -r 10 -i pp_link/wake/H2DHy%9d.png -vcodec mpeg4 -pix_fmt yuv420p pp_link/wake/H2Dy.mp4');
+end %if
+if exist('pp_link/wake/H2DHx000000001.png', 'file') == 2
+[~] = system('ffmpeg -r 10 -i pp_link/wake/H2DHx%9d.png -vcodec mpeg4 -pix_fmt yuv420p pp_link/wake/H2Dx.mp4');
+end %if
+if exist('pp_link/wake/honmat3D000000001.png', 'file') == 2
+[~] = system('ffmpeg -r 10 -i pp_link/wake/honmat3D%9d.png -vcodec mpeg4 -pix_fmt yuv420p pp_link/wake/Honmat3D.mp4');
+end %if
+[~] = system('rm -f pp_link/wake/*2DH*.png');
+[~] = system('rm -f pp_link/wake/honmat3D*.png');
 %% find the location of all the required output files
 [ WP_beam, WP_offset, WI_s, WI_x, WI_y, ...
     Port_mat, port_names_table, Energy, Energy_in_ceramics ] =...
