@@ -41,17 +41,7 @@ model_file = cat(1, model_file, 'doit');
 
 model_file = cat(1, model_file, '###################################################');
 stls = dir_list_gen(fullfile(models_location, base_model_name, model_name, 'ascii'), 'stl',1);
-% %%%% TEMP to fix ordering
-% temp1 = find_position_in_cell_lst(strfind(stls, '-vac.stl'));
-% temp2 = find_position_in_cell_lst(strfind(stls, '-button'));
-% temp3 = find_position_in_cell_lst(strfind(stls, '-ceramic'));
-% temp4 = find_position_in_cell_lst(strfind(stls, '-pin'));
-% temp5 = find_position_in_cell_lst(strfind(stls, '-shell'));
-% temp6 = find_position_in_cell_lst(strfind(stls, '-block.stl'));
-% temp7 = find_position_in_cell_lst(strfind(stls, '-beampipe.stl'));
-% inds = [temp1, temp2, temp3, temp4, temp5, temp6, temp7];
-% stls = stls(inds);
-%%%%%%%%%%
+
 for lrd = 1:length(stls)
     tmp = strsplit(stls{lrd}, filesep);
     tmp = tmp{end}(1:end-4);
