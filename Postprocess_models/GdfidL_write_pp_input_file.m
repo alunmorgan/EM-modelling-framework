@@ -168,7 +168,7 @@ if exist('data_link/wake/honmat-000000001.gz','file') == 2
     ov = cat(1,ov,'     outfiles= pp_link/wake/honmat3D');
     ov = cat(1,ov,'     what= logabs');
     ov = cat(1,ov,'     show=no');
-    ov = cat(1,ov,'     zrot=-90'); % make the beam horizontal
+    %     ov = cat(1,ov,'     zrot=-90'); % make the beam horizontal
     %  ov = cat(1,ov,'     xrot=180');
     ov = cat(1,ov,'     scale= 4');
     ov = cat(1,ov,'     mpegfile= ./temp.mpeg');
@@ -216,7 +216,6 @@ if exist('data_link/wake/hfields-000000001.gz','file') == 2
     ov = cat(1,ov,'     scale= 4');
     ov = cat(1,ov,'     mpegfile= ./temp.mpeg');
     ov = cat(1,ov,'     doit');
-    write_out_data( ov, 'pp_link/wake/model_wake_post_processing' )
 end %if
-
+write_out_data( ov, 'pp_link/wake/model_wake_post_processing' )
 
