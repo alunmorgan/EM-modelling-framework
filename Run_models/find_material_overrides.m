@@ -15,7 +15,7 @@ for wam = 1:length(materials)
         ind = find_position_in_cell_lst(strfind(add_defs, materials{wam}));
         if ~isempty(ind)
             % an override exists
-            [toks, ~] =regexp(add_defs{ind},'define\(.*,\s*(.*)\s*\).*', 'tokens', 'match');
+            [toks, ~] =regexp(add_defs{ind(1)},'define\(.*,\s*(.*)\s*\).*', 'tokens', 'match');
             material_override{wam} = toks{1}{1};
         end
     end
