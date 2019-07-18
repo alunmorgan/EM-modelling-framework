@@ -1,13 +1,24 @@
-function summary = Blend_summaries(doc_root, names)
+function summary = Blend_summaries(doc_root, names, chosen_wake_length)
 % Extacts data from the summary graph fig files.
 %
 % Example: summary = Blend_summaries(doc_root, names)
 for hse = 1:length(names)
     try
-        load(fullfile(doc_root, names{hse}, 'wake', 'data_postprocessed.mat'));
-        load(fullfile(doc_root, names{hse}, 'wake', 'data_from_run_logs.mat'));
-        load(fullfile(doc_root, names{hse}, 'wake', 'run_inputs.mat'));
-        summary.wlf{hse} = [num2str(pp_data.time_domain_data.wake_loss_factor * 1e-12), '~V/pC' ];
+        %         load(fullfile(doc_root, names{hse}, 'wake', 'data_postprocessed.mat'), 'pp_data');
+        load(fullfile(doc_root, names{hse}, 'wake', 'data_from_run_logs.mat'), 'run_logs');
+        load(fullfile(doc_root, names{hse}, 'wake', 'run_inputs.mat'), 'modelling_inputs');
+        load(fullfile(doc_root, names{hse}, 'wake', 'data_analysed_wake.mat'), 'wake_sweep_data');
+        
+        for nw = 1:length(wake_sweep_data.raw)
+            wake_sweep_vals(nw) = wake_sweep_data.raw{1, nw}.wake_setup.Wake_length;
+        end %for
+        chosen_wake_ind = find(wake_sweep_vals == str2double(chosen_wake_length));
+        if isempty(chosen_wake_ind)
+            chosen_wake_ind = find(wake_sweep_vals == max(wake_sweep_vals));
+            warning('Chosen wake length not found. Setting the wakelength to maximum value.')
+        end %if
+        %         load(fullfile(doc_root, names{hse}, 'wake', 'pp_inputs.mat'), 'ppi');
+        summary.wlf{hse} = [num2str(wake_sweep_data.time_domain_data{chosen_wake_ind}.wake_loss_factor * 1e-12), '~V/pC' ];
         summary.date{hse} = [run_logs.dte, '  ', run_logs.tme];
         summary.soft_ver{hse} = num2str(run_logs.ver);
         summary.soft_type{hse} = 'GdfidL';

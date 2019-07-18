@@ -1,4 +1,4 @@
-function Report_setup(results_path)
+function Report_setup(results_path, chosen_wake_length)
 % Generates a single report.
 % Author is a string which contains the names of the authors listed on the
 % report.

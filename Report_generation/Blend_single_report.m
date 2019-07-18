@@ -1,4 +1,4 @@
-function Blend_single_report(report_input)
+function Blend_single_report(report_input, chosen_wake_length, frequency_display_limit)
 
 
 % Setting up the latex headers etc.
@@ -24,70 +24,75 @@ ov = cat(1,ov,['To start with, here are the modelling setups and run times ',...
 
 %%%%%%%%%%%%%%%%%%%% Material Losses section %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % if exist(fullfile(report_input.source_path, report_input.sources{1}, 'wake'), 'dir') == 7
-summary = Blend_summaries(report_input.source_path, report_input.sources);
+summary = Blend_summaries(report_input.source_path, report_input.sources, chosen_wake_length);
 out_T = add_blend_table(regexprep(report_input.base_name, '_', ' '),...
     ['sweep of ',report_input.swept_name{1}] , report_input.swept_vals, summary);
 ov = cat(1,ov,out_T);
 ov = cat(1,ov,' ');
-ov = cat(1,ov,'\chapter{Material losses}');
-ov = cat(1,ov,['These graphs below shows a comparison of the losses into the ',...
-    'various materials present in the models, as well as the amount of ',...
-    'energy passing through the ports. This is compared to the energy ',...
-    'lost from the beam (gray bar). Both bars should be the same height, ',...
-    'as this indicates that all the energy lost from the beam has ',...
-    'been accounted for.']);
 for pns = 1:length(report_input.sources)
     data_name = fullfile(report_input.source_path, report_input.sources{pns}, 'wake',  'data_from_run_logs.mat');
     run_log_data{pns} = load(data_name);
 end %for
+
 for knwe = 1:length(report_input.sources)
-    for whad = 1:size(run_log_data{knwe}.run_logs.mat_losses.single_mat_data, 1)
-        loss_vals(knwe, whad) = run_log_data{knwe}.run_logs.mat_losses.single_mat_data{whad, 4}(end, 2);
-        loss_names{knwe,whad} = run_log_data{knwe}.run_logs.mat_losses.single_mat_data{whad, 2};
-    end %for
+    if isfield(run_log_data{knwe}.run_logs, 'mat_losses')
+        for whad = 1:size(run_log_data{knwe}.run_logs.mat_losses.single_mat_data, 1)
+            loss_vals(knwe, whad) = run_log_data{knwe}.run_logs.mat_losses.single_mat_data{whad, 4}(end, 2);
+            loss_names{knwe,whad} = run_log_data{knwe}.run_logs.mat_losses.single_mat_data{whad, 2};
+        end %for
+    end %if
 end %for
-all_loss_names = unique(loss_names);
-for whw = 1:length(all_loss_names)
-    for hwf = 1:length(report_input.sources)
-        loc = find(strcmp(loss_names(hwf,:), all_loss_names{whw}));
-        loss_vals_sorted(hwf, whw) = loss_vals(hwf, loc);
+if exist('loss_names', 'var') == 2
+    all_loss_names = unique(loss_names);
+    for whw = 1:length(all_loss_names)
+        for hwf = 1:length(report_input.sources)
+            loc = find(strcmp(loss_names(hwf,:), all_loss_names{whw}));
+            loss_vals_sorted(hwf, whw) = loss_vals(hwf, loc);
+        end %for
     end %for
-end %for
-h = figure('Position', [ 0 0 1000 400]);
-ax = axes('Parent', h);
-plot(loss_vals_sorted .* 1e9, ':*')
-legend(all_loss_names)
-ax.XTickLabel = report_input.swept_vals;
-set(ax,'FontSize', 14)
-set(ax,'FontName', 'Times')
-set(ax,'FontWeight', 'bold')
-xlabel(report_input.swept_name{1}, 'FontWeight', 'bold', 'FontSize', 16,'FontName', 'Times')
-ylabel('Absolute structure losses (nJ)', 'FontWeight', 'bold', 'FontSize', 16,'FontName', 'Times')
-savemfmt(h, report_input.output_loc, 'Thermal_absolute_losses_within_the_structure')
-close(h)
-
-sum_loss = sum(loss_vals_sorted, 2);
-fractional_loss = loss_vals_sorted ./ repmat(sum_loss,1, size(loss_vals_sorted, 2));
-h = figure('Position', [ 0 0 1000 400]);
-ax = axes('Parent', h);
-plot(fractional_loss .* 100, ':*')
-legend(all_loss_names)
-ax.XTickLabel = report_input.swept_vals;
-set(ax,'FontSize', 14)
-set(ax,'FontName', 'Times')
-set(ax,'FontWeight', 'bold')
-xlabel(report_input.swept_name{1}, 'FontWeight', 'bold', 'FontSize', 16,'FontName', 'Times')
-ylabel('Loss distribution (%)', 'FontWeight', 'bold', 'FontSize', 16,'FontName', 'Times')
-savemfmt(h, report_input.output_loc, 'Thermal_fractional_loss_distribution_within_the_structure')
-close(h)
-
-ov1 = latex_top_bottom_images('Thermal_absolute_losses_within_the_structure.eps',...
-    'Thermal_fractional_loss_distribution_within_the_structure.eps',...
-    'Absolute structure losses', 'Loss distribution into the structure', ...
-    'Absolute_structure_losses', 'Loss_distribution_into_the_structure', 1, 1);
-ov = cat(1,ov,ov1);
-
+    ov = cat(1,ov,'\chapter{Material losses}');
+    ov = cat(1,ov,['These graphs below shows a comparison of the losses into the ',...
+        'various materials present in the models, as well as the amount of ',...
+        'energy passing through the ports. This is compared to the energy ',...
+        'lost from the beam (gray bar). Both bars should be the same height, ',...
+        'as this indicates that all the energy lost from the beam has ',...
+        'been accounted for.']);
+    h = figure('Position', [ 0 0 1000 400]);
+    ax = axes('Parent', h);
+    plot(loss_vals_sorted .* 1e9, ':*')
+    legend(all_loss_names)
+    ax.XTickLabel = report_input.swept_vals;
+    set(ax,'FontSize', 14)
+    set(ax,'FontName', 'Times')
+    set(ax,'FontWeight', 'bold')
+    xlabel(report_input.swept_name{1}, 'FontWeight', 'bold', 'FontSize', 16,'FontName', 'Times')
+    ylabel('Absolute structure losses (nJ)', 'FontWeight', 'bold', 'FontSize', 16,'FontName', 'Times')
+    savemfmt(h, report_input.output_loc, 'Thermal_absolute_losses_within_the_structure')
+    close(h)
+    
+    sum_loss = sum(loss_vals_sorted, 2);
+    fractional_loss = loss_vals_sorted ./ repmat(sum_loss,1, size(loss_vals_sorted, 2));
+    h = figure('Position', [ 0 0 1000 400]);
+    ax = axes('Parent', h);
+    plot(fractional_loss .* 100, ':*')
+    legend(all_loss_names)
+    ax.XTickLabel = report_input.swept_vals;
+    set(ax,'FontSize', 14)
+    set(ax,'FontName', 'Times')
+    set(ax,'FontWeight', 'bold')
+    xlabel(report_input.swept_name{1}, 'FontWeight', 'bold', 'FontSize', 16,'FontName', 'Times')
+    ylabel('Loss distribution (%)', 'FontWeight', 'bold', 'FontSize', 16,'FontName', 'Times')
+    savemfmt(h, report_input.output_loc, 'Thermal_fractional_loss_distribution_within_the_structure')
+    close(h)
+    
+    ov1 = latex_top_bottom_images('Thermal_absolute_losses_within_the_structure.eps',...
+        'Thermal_fractional_loss_distribution_within_the_structure.eps',...
+        'Absolute structure losses', 'Loss distribution into the structure', ...
+        'Absolute_structure_losses', 'Loss_distribution_into_the_structure', 1, 1);
+    ov = cat(1,ov,ov1);
+end %if
 %%%%%%%%%%%%%%%%%%% Energy and Wakes section %%%%%%%%%%%%%%%%%%%%%%%%%%
+Blend_figs(report_input, 'wake', chosen_wake_length, frequency_display_limit);
 ov = cat(1,ov,'\chapter{Energy and wakes}');
 ov = cat(1,ov,['The wake loss factor is an indicator of energy loss ',...
     'from the beam. A higher value means more loss']);

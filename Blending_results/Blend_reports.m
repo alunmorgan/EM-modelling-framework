@@ -1,4 +1,4 @@
-function Blend_reports(results_loc,  base_name , Author, Graphic_path)
+function Blend_reports(results_loc, chosen_wake_length, frequency_display_limit)
 %Blends some of the output from the individual thermal analysis reports to
 %generate a summary comparison report.
 %
@@ -125,14 +125,14 @@ for ewh = 1:length(sweeps)
     % replace all spaces with _ as latex has problems with spaces.
     model_name_for_report = regexprep(base_name, '_', ' ');
     report_input.report_name = [model_name_for_report, ' - ',report_input.swept_name{isn},' sweep' ];
-    report_input.rep_title = [report_input.swept_name{isn},'_sweep','-',base_name ];
+    report_input.rep_title = [report_input.swept_name{isn},'_sweep','-',base_name(1:end-5)];
     report_input.doc_num = [model_name_for_report, '\\',report_input.swept_name{isn},' sweep' ];
     report_input.output_loc = fullfile(results_loc, report_input.rep_title);
     
     if ~exist(report_input.output_loc, 'dir')
         mkdir(report_input.output_loc)
     end %if
-    Blend_single_report(report_input)
+    Blend_single_report(report_input, chosen_wake_length, frequency_display_limit)
     clear param_names param_vals
 end %for
 
