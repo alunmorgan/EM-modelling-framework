@@ -22,29 +22,31 @@ for awk = 1:length(tmp2)
         tmp3{awk} = tmp{awk}(tmp2{awk}(1) +1:tmp2{awk}(end) -1);
     end %if
 end %for
-if length(tmp2) > 0
+if ~isempty(tmp2)
     sweeps = unique(tmp3);
 else
     sweeps = [];
 end %if
 
 
-for ewh = 1:length(sweeps) 
+for ewh = 1:length(sweeps)
     sweep_ind = find_position_in_cell_lst(strfind(names,sweeps{ewh}));
     names_in_sweep = names([base_name_ind, sweep_ind]);
     good_data = ones(length(names_in_sweep),1);
     for psw = length(names_in_sweep):-1:1
         try
-            load(fullfile(results_loc, names_in_sweep{psw},'wake','run_inputs.mat'))
-            load(fullfile(results_loc, names_in_sweep{psw}, 'wake', 'data_from_run_logs.mat'))
+            load(fullfile(results_loc, names_in_sweep{psw},'wake','run_inputs.mat'), 'modelling_inputs')
+            load(fullfile(results_loc, names_in_sweep{psw}, 'wake', 'data_from_run_logs.mat'), 'run_logs')
             [sim_param_names_tmp, sim_param_vals_tmp, ...
-                geom_param_names_tmp, geom_param_vals_tmp] = extract_parameters(run_logs);
+                geom_param_names_tmp, geom_param_vals_tmp,...
+                mat_param_names_tmp, mat_param_vals_tmp] = extract_parameters(run_logs, modelling_inputs);
         catch
             try
-                load(fullfile(results_loc, names_in_sweep{psw}, 's_parameter', 'data_from_run_logs.mat'))
-                load(fullfile(results_loc, names_in_sweep{psw},'s_parameter','run_inputs.mat'))
+                load(fullfile(results_loc, names_in_sweep{psw}, 's_parameter', 'data_from_run_logs.mat'), 'run_logs')
+                load(fullfile(results_loc, names_in_sweep{psw},'s_parameter','run_inputs.mat'), 'modelling_inputs')
                 [sim_param_names_tmp, sim_param_vals_tmp, ...
-                    geom_param_names_tmp, geom_param_vals_tmp] = extract_parameters(run_logs);
+                    geom_param_names_tmp, geom_param_vals_tmp,...
+                    mat_param_names_tmp, mat_param_vals_tmp] = extract_parameters(run_logs);
                 
             catch
                 warning(['No data files found for ', names_in_sweep{psw}])
@@ -103,11 +105,11 @@ for ewh = 1:length(sweeps)
     stable_tmp = true(length(stable), 1);
     stable_tmp(varying_pars_ind(isn)) = 0;
     %     report_name = regexprep(rep_title,'_', ' ');
-    report_input.author = Author;
+    report_input.author = modelling_inputs.author;
     report_input.date = datestr(now,'dd/mm/yyyy');
     report_input.base_name = base_name;
     report_input.source_path = results_loc;
-    report_input.graphic = Graphic_path;
+%     report_input.graphic = Graphic_path;
     report_input.param_names_common = param_name_list(stable_tmp);
     report_input.param_vals_common = param_val_list(base_name_ind, stable_tmp);
     report_input.swept_name = param_name_list(~stable_tmp);

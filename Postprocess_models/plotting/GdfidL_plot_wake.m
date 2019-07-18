@@ -11,10 +11,20 @@ function GdfidL_plot_wake(path_to_data, range, chosen_wake_length)
 pth = fullfile(path_to_data, 'wake');
 load(fullfile(pth, 'run_inputs.mat'), 'modelling_inputs'); 
 load(fullfile(pth,'data_postprocessed.mat'), 'pp_data');
-load(fullfile(pth, 'data_analysed_wake'),'wake_data');
+load(fullfile(pth, 'data_analysed_wake'),'wake_sweep_data');
 load(fullfile(pth, 'pp_inputs.mat'), 'ppi');
 load(fullfile(pth, 'data_from_run_logs.mat'), 'run_logs')
-
+for nw = 1:length(wake_sweep_data.raw)
+wake_sweep_vals(nw) = wake_sweep_data.raw{1, nw}.wake_setup.Wake_length;
+end %for
+chosen_wake_ind = find(wake_sweep_vals == str2double(chosen_wake_length));
+if isempty(chosen_wake_ind)
+    [~,chosen_wake_ind] = min(abs((wake_sweep_vals ./ str2double(chosen_wake_length)) - 1));
+    warning('Chosen wake length not found. Setting the wakelength closest value.')
+end %if
+wake_data.port_time_data = wake_sweep_data.port_time_data{chosen_wake_ind};
+wake_data.time_domain_data = wake_sweep_data.time_domain_data{chosen_wake_ind};
+wake_data.frequency_domain_data = wake_sweep_data.frequency_domain_data{chosen_wake_ind};
 
 %Line width of the graphs
 lw = 2;
@@ -49,7 +59,7 @@ end %for
 % can I just do a search using the original names in raw data?
 
 % Some pre processing to pull out trends.
-[wl, freqs, Qs, mags, bws] = find_Q_trends(wake_data.wake_sweep_data.frequency_domain_data, range);
+[wl, freqs, Qs, mags, bws] = find_Q_trends(wake_sweep_data.frequency_domain_data, range);
 % Show the Q values of the resonances shows if the simulation has stablised.
 for ehw = size(freqs,1):-1:1
     Q_leg{ehw} = [num2str(round(freqs(ehw,1)./1e7)./1e2), 'GHz'];
@@ -907,19 +917,19 @@ end %if
 savemfmt(h(33), pth,'tstart_check')
 close(h(33))
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-for n=length(wake_data.wake_sweep_data.frequency_domain_data):-1:1
-    ws_wake_length(n) = wake_data.wake_sweep_data.frequency_domain_data{n}.Wake_length;
-    ws_wake_length_labels{n} = [num2str(wake_data.wake_sweep_data.frequency_domain_data{n}.Wake_length), 'm'];
-    ws_wlf(n) = wake_data.wake_sweep_data.frequency_domain_data{n}.wlf;
-    ws_Total_bunch_energy_loss(n) = wake_data.wake_sweep_data.frequency_domain_data{n}.Total_bunch_energy_loss;
-    ws_Total_energy_from_signal_ports(n) = wake_data.wake_sweep_data.frequency_domain_data{n}.Total_energy_from_signal_ports;
-    ws_Total_energy_from_beam_ports(n) = wake_data.wake_sweep_data.frequency_domain_data{n}.Total_energy_from_beam_ports;
-    ws_n_samples(n) = length(wake_data.wake_sweep_data.frequency_domain_data{n}.f_raw);
-    ws_frequency_scales{n} = wake_data.wake_sweep_data.frequency_domain_data{n}.f_raw;
-    ws_signal_port_spectrum(n,1:ws_n_samples(n)) = wake_data.wake_sweep_data.frequency_domain_data{n}.signal_port_spectrum;
-    ws_beam_port_spectrum(n,1:ws_n_samples(n)) = wake_data.wake_sweep_data.frequency_domain_data{n}.beam_port_spectrum;
-    ws_port_impedances(n,1:ws_n_samples(n), :) = wake_data.wake_sweep_data.frequency_domain_data{n}.port_impedances;
-    ws_Wake_Impedance(n,1:ws_n_samples(n)) = wake_data.wake_sweep_data.frequency_domain_data{n}.Wake_Impedance_data;
+for n=length(wake_sweep_data.frequency_domain_data):-1:1
+    ws_wake_length(n) = wake_sweep_data.frequency_domain_data{n}.Wake_length;
+    ws_wake_length_labels{n} = [num2str(wake_sweep_data.frequency_domain_data{n}.Wake_length), 'm'];
+    ws_wlf(n) = wake_sweep_data.frequency_domain_data{n}.wlf;
+    ws_Total_bunch_energy_loss(n) = wake_sweep_data.frequency_domain_data{n}.Total_bunch_energy_loss;
+    ws_Total_energy_from_signal_ports(n) = wake_sweep_data.frequency_domain_data{n}.Total_energy_from_signal_ports;
+    ws_Total_energy_from_beam_ports(n) = wake_sweep_data.frequency_domain_data{n}.Total_energy_from_beam_ports;
+    ws_n_samples(n) = length(wake_sweep_data.frequency_domain_data{n}.f_raw);
+    ws_frequency_scales{n} = wake_sweep_data.frequency_domain_data{n}.f_raw;
+    ws_signal_port_spectrum(n,1:ws_n_samples(n)) = wake_sweep_data.frequency_domain_data{n}.signal_port_spectrum;
+    ws_beam_port_spectrum(n,1:ws_n_samples(n)) = wake_sweep_data.frequency_domain_data{n}.beam_port_spectrum;
+    ws_port_impedances(n,1:ws_n_samples(n), :) = wake_sweep_data.frequency_domain_data{n}.port_impedances;
+    ws_Wake_Impedance(n,1:ws_n_samples(n)) = wake_sweep_data.frequency_domain_data{n}.Wake_Impedance_data;
 end %for
 h(34) = figure('Position',fig_pos);
 plot(ws_wake_length, ws_wlf)

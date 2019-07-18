@@ -15,16 +15,14 @@ for sts = 1:length(model_sets)
         wake_lengths_to_analyse = [str2double(modelling_inputs.wakelength),...
             str2double(modelling_inputs.wakelength) ./2,...
             str2double(modelling_inputs.wakelength) ./4];
-        if nargin > 2
-            reported_wake_length = wl_override;
-        else
-            reported_wake_length = modelling_inputs.wakelength;
-        end %if
-        wake_data = wake_analysis(pp_data, ppi, modelling_inputs, run_logs, wake_lengths_to_analyse, reported_wake_length);
-        
-        save(fullfile(current_folder, 'data_analysed_wake.mat'), 'wake_data','-v7.3')
+if nargin == 3
+        wake_sweep_data = wake_sweep(wake_lengths_to_analyse, pp_data, modelling_inputs, ppi, run_logs, hfoi_override);
+else
+     wake_sweep_data = wake_sweep(wake_lengths_to_analyse, pp_data, modelling_inputs, ppi, run_logs);
+end %if
+        save(fullfile(current_folder, 'data_analysed_wake.mat'), 'wake_sweep_data','-v7.3')
         disp(['Analysed ', current_folder])
-        clear 'pp_data' 'ppi' 'run_logs' 'modelling_inputs' 'wake_data',
+        clear 'pp_data' 'ppi' 'run_logs' 'modelling_inputs' 'wake_sweep_data',
         else
             disp(['Analysis for ', current_folder, ' already exists... Skipping'])
         end %if

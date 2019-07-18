@@ -1,5 +1,6 @@
 function [mb_param_names, mb_param_vals,...
-    geom_param_names, geom_param_vals] = extract_parameters(run_logs)
+    geom_param_names, geom_param_vals, mat_param_names, mat_param_vals] =...
+    extract_parameters(run_logs, modelling_inputs)
 % Reads the relavent log file and returns the simulation setup parameters.
 %
 % mi is the stored original simulation input parameters.
@@ -39,12 +40,27 @@ if exist('first_name', 'var')
     end %if
 else
     % for all other simulation types.
-    if isfield(run_logs, 'defs')
-        for ei = length(run_logs.('defs')):-1:1
-            toks = regexp(run_logs.('defs')(ei), 'define\(\s*(.*)\s*,\s*(.*?)\s*\).*','tokens');
-            geom_param_names{ei} = toks{1}{1}{1};
-            geom_param_vals{ei} = toks{1}{1}{2};
+    if isfield(modelling_inputs, 'defs')
+        for ei = length(modelling_inputs.('defs')):-1:1
+            toks = regexp(modelling_inputs.('defs')(ei), 'define\(\s*(.*)\s*,\s*(.*?)\s*\).*','tokens');
+            mat_param_names{ei} = toks{1}{1}{1};
+            mat_param_vals{ei} = toks{1}{1}{2};
         end %for
+    else
+        mat_param_names = {NaN};
+        mat_param_vals = {NaN};
+    end %if
+    
+    if isfield(modelling_inputs, 'geometry_defs')
+        if ~isempty(modelling_inputs.geometry_defs)
+            for ei = length(modelling_inputs.('geometry_defs')):-1:1
+                geom_param_names{ei} = modelling_inputs.('geometry_defs'){ei}{1};
+                geom_param_vals{ei} = modelling_inputs.('geometry_defs'){ei}{2}{1};
+            end %for
+        else
+            geom_param_names = {NaN};
+            geom_param_vals = {NaN};
+        end %if
     else
         geom_param_names = {NaN};
         geom_param_vals = {NaN};

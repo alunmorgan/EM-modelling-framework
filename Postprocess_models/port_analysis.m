@@ -26,8 +26,8 @@ t_step = raw_port_data.timebase(2) - raw_port_data.timebase(1); % time step in s
 % separation (effectively turning the point into areas).
 for es =length(raw_port_data.data):-1:1
 %     convert port signal to port energy. (port, modes, time)
-    port_mode_energy_time(es,:,:) = (raw_port_data.data{es} .^2 .* t_step)';
-    port_mode_signals(es,:,:) = raw_port_data.data{es}';
+    port_mode_energy_time(es,1:size(raw_port_data.data{es},2),:) = (raw_port_data.data{es} .^2 .* t_step)';
+    port_mode_signals(es,1:size(raw_port_data.data{es},2),:) = raw_port_data.data{es}';
 end %for
 port_data.port_mode_signals = port_mode_signals;
 port_data.port_mode_energy_time = port_mode_energy_time;

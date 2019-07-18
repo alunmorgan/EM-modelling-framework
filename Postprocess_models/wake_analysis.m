@@ -1,4 +1,4 @@
-function wake_data = wake_analysis(raw_data, ppi, mi, log, wake_sweep_vals, chosen_wake_length)
+function wake_sweep_data = wake_analysis(raw_data, ppi, mi, log, wake_sweep_vals)
 % Takes the model generated data and processes it in order to get an 
 %idea where the power/heat is going.
 %

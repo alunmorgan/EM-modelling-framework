@@ -1,4 +1,4 @@
-function wake_sweep_data = wake_sweep(sweep_lengths, raw_data, mi, ppi, log)
+function wake_sweep_data = wake_sweep(sweep_lengths, raw_data, mi, ppi, log, hfoi_override)
 % Run the frequency domain analysis over data which is increasingly reduced
 % in length (i.e. having different wake lengths).
 %
@@ -7,7 +7,11 @@ function wake_sweep_data = wake_sweep(sweep_lengths, raw_data, mi, ppi, log)
 % dsd = length(time_domain_data.timebase);
 % Set the number of wake lengths to do.
 
-
+if nargin == 6
+    hfoi = hfoi_override;
+else
+    hfoi = ppi.hfoi;
+end %if
 
 % raw_port_data = put_on_reference_timebase(time_domain_data.timebase, raw_data.port);
 for se = length(sweep_lengths):-1:1
@@ -33,6 +37,7 @@ for se = length(sweep_lengths):-1:1
     for pd = length(r_data{se}.port.data):-1:1
         r_data{se}.port.data{1,pd} = r_data{se}.port.data{1,pd}(1:trimed_ports, :);
     end %for
+    r_data{se}.wake_setup.Wake_length = sweep_lengths(se);
     %     t_data{se}.timebase = time_domain_data.timebase(1:trimed);
     %     t_data{se}.wakepotential = time_domain_data.wakepotential(1:trimed);
     %     t_data{se}.wakepotential_trans_quad_x = time_domain_data.wakepotential_trans_quad_x(1:trimed);
@@ -44,19 +49,16 @@ for se = length(sweep_lengths):-1:1
     %% Time domain analysis
     [t_data{se}, pt_data{se}] = time_domain_analysis(r_data{se}, log, ppi.port_modes_override);
     if isfield(raw_data.port, 'data')
-        %         for nr = 1:length(raw_data.port.data)
-        %             pt_data{se}.data{nr} = raw_port_data{nr}(1:trimed,:);
-        %         end %for
         % Run the frequency analysis.
         f_data{se} = frequency_domain_analysis(...
             r_data{se}.port.frequency_cutoffs, ...
             t_data{se},...
             r_data{se}.port,...
-            log, ppi.hfoi);
+            log, hfoi);
     else
         % Run the frequency analysis.
         f_data{se} = frequency_domain_analysis(...
-            NaN, t_data{se}, NaN, log, ppi.hfoi);
+            NaN, t_data{se}, NaN, log, hfoi);
     end %if
     f_data{se}.Wake_length = round(r_data{se}.Wake_potential(end,1)*3e8, 2);
     % Material loss
@@ -72,11 +74,10 @@ for se = length(sweep_lengths):-1:1
         m_data{se} = NaN;
     end %if
     %% Generating data for time slices
-    f_data{se}.time_slices = time_slices(t_data{se}, ppi.hfoi);
+    f_data{se}.time_slices = time_slices(t_data{se}, hfoi);
     %% Calculating the losses for different bunch lengths and bunch charges.
     f_data{se}.extrap_data = loss_extrapolation(...
     t_data{se}, pt_data{se}, mi, ppi, raw_data, log);
-
 end %for
 
 wake_sweep_data.raw = r_data;

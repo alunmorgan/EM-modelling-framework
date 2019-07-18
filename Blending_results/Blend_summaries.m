@@ -49,5 +49,5 @@ for hse = 1:length(names)
         summary.name{hse} = '';
         continue
     end %try
-    clear run_log modelling_inputs
+    clear run_log modelling_inputs wake_data
 end %for

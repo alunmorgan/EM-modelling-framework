@@ -13,8 +13,8 @@ function model_file = create_model_data_file_for_STL(modelling_inputs, models_lo
 
  background = modelling_inputs.background;
  stl_mapping = modelling_inputs.stl_part_mapping;
- base_model_name = modelling_inputs.base_model_name; 
- model_name = modelling_inputs.model_name;
+%  base_model_name = modelling_inputs.base_model_name; 
+%  model_name = modelling_inputs.model_name;
  model_angle = modelling_inputs.model_angle;
  model_scaling = modelling_inputs.stl_scaling;
 
