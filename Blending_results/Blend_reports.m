@@ -6,15 +6,19 @@ function Blend_reports(results_loc, chosen_wake_length, frequency_display_limit)
 
 [names,~] = dir_list_gen(results_loc, 'dirs', 1);
 %select only those folders whos names start with the base name.
-names = names(strncmp(names, base_name, length(base_name)));
-base_name_ind = find(strcmp(names, base_name) == 1);
-if isempty(base_name_ind)
-    base_name_ind = find(strcmp(names, [base_name, '_Base']) == 1);
-end %if
+% names = names(strncmp(names, base_name, length(base_name)));
+% base_name_ind = find(strcmp(names, base_name) == 1);
+% if isempty(base_name_ind)
+base_name_ind = find_position_in_cell_lst(strfind(names, '_Base'));
+% end %if
+base_name = names{base_name_ind};
+names = names(strncmp(names, base_name, length(base_name)-4));
 
-tmp=regexprep(names, base_name, '');
+base_name_ind = find_position_in_cell_lst(strfind(names, '_Base'));
+tmp = names;
 tmp(base_name_ind) = [];
 tmp2 = strfind(tmp, '_');
+tmp3 = cell(length(tmp2),1);
 for awk = 1:length(tmp2)
     if isempty(tmp2{awk})
         tmp3{awk} = [];
