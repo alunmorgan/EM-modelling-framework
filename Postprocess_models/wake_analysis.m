@@ -30,32 +30,4 @@ function wake_sweep_data = wake_analysis(raw_data, ppi, mi, log, wake_sweep_vals
 
 %% Generating data for increasingly short wakes
 wake_sweep_data = wake_sweep(wake_sweep_vals, raw_data, mi, ppi, log);
-% [120, 80, 60, 40, 20]
-% chosen_wake_length_ind = 1;
-chosen_wake_ind = find(wake_sweep_vals == str2double(chosen_wake_length));
-if isempty(chosen_wake_ind)
-    chosen_wake_ind = find(wake_sweep_vals == max(wake_sweep_vals));
-    warning('Chosen wake length too long. Setting the wakelength to maximum value.')
-end %if
-wake_data.port_time_data = wake_sweep_data.port_time_data{chosen_wake_ind};
-wake_data.time_domain_data = wake_sweep_data.time_domain_data{chosen_wake_ind};
-wake_data.frequency_domain_data = wake_sweep_data.frequency_domain_data{chosen_wake_ind};
-wake_data.wake_sweep_data = wake_sweep_data;
 
-% wake_data.port_time_data = port_time_data;
-% wake_data.time_domain_data = time_domain_data;
-% wake_data.frequency_domain_data = frequency_domain_data;
-% wake_data.wake_sweep_data = wake_sweep_data;
-
-%% Generating data for time slices
-wake_data.frequency_domain_data.time_slices = wake_sweep_data.frequency_domain_data{chosen_wake_ind}.time_slices;
-% wake_data.frequency_domain_data.time_slices = time_slices(wake_data.time_domain_data, ppi.hfoi);
-
-%% Calculating the losses for different bunch lengths and bunch charges.
-wake_data.frequency_domain_data.extrap_data = wake_sweep_data.frequency_domain_data{chosen_wake_ind}.extrap_data;
-% wake_data.frequency_domain_data.extrap_data = loss_extrapolation(...
-%     wake_data.time_domain_data,...
-%     wake_data.port_time_data,...
-%     mi,...
-%     ppi,...
-%     raw_data, log);
