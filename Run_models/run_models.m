@@ -9,7 +9,9 @@ modelling_inputs = run_inputs_setup_STL(mi);
 % Running the different simulators for each model.
 for awh = 1:length(modelling_inputs)
     % Making the directory to store the run data in.
+    if ~exist(fullfile(mi.paths.storage_path, modelling_inputs{awh}.model_name),'file')
     mkdir(fullfile(mi.paths.storage_path, modelling_inputs{awh}.model_name))
+    end %if
     %     if ~isempty(stl_flag)
     %         % Create model_data file from STL file.
     %         create_model_data_file_for_STL(...
