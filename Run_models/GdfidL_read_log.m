@@ -54,6 +54,8 @@ else
     mat_losses.num_mats = length(mat_losses.mats);
     for wan = 1:mat_losses.num_mats
         mat_loc = find(mat_num == mat_losses.mats(wan));
+        mat_time = NaN(length(mat_loc),1);
+        tmp_mat_loss = NaN(length(mat_loc),1);
         for anv = 1:length(mat_loc)
             tmp = sscanf(regexprep(data{material_loss_inds(mat_loc(anv))},'<=',''),'%f%f');
             mat_time(anv) = tmp(1);
