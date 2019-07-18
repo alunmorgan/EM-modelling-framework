@@ -26,3 +26,7 @@ elseif strcmp(in,'remove')
         rmdir('temp_restart','s');
     end
 end
+% Sometimes the filesystems take time to propogate the update
+% especially after deleting a large number of files.
+% This puase gives the system a chance to catch up.
+pause(10)
