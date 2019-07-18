@@ -136,27 +136,19 @@ for awn = 1:length(fig_names)
     end %if
 end %for
 
-% log or linear
-lgolin = [0,0,0];
-lw = [1,2,2];
-for awn = 1:2:length(fig_names)
-    [~] = Blend_figs(report_input, 'wake', fig_names{awn}, fig_names{awn}, lgolin(awn), lw(awn));
-    if awn < length(fig_names)
-        [~] = Blend_figs(report_input, 'wake', fig_names{awn + 1}, fig_names{awn + 1}, lgolin(awn + 1), lw(awn + 1));
-        ov1 = latex_top_bottom_images([fig_names{awn}, '.eps'], ...
-            [fig_names{awn + 1}, '.eps'], ...
-            caps{awn},caps{awn + 1}, ...
-            labs{awn}, labs{awn + 1}, 1, 1);
-    else
-        ov1 = latex_top_bottom_images([fig_names{awn}, '.eps'], ...
-            [], ...
-            caps{awn},'', ...
-            labs{awn}, '', 1, 1);
-    end %if
-    ov = cat(1,ov,ov1);
-    ov = cat(1,ov,'\clearpage');
-end %for
-% end %if
+ov1 = latex_top_bottom_images('wake_potential.eps', ...
+    'longitudinal_wake_impedance_real.eps', ...
+    'Wake potential','Wake impedance real', ...
+    'wake_potential', 'wake_impedance_real', 1, 1);
+ov = cat(1,ov,ov1);
+ov1 = latex_top_bottom_images('longitudinal_wake_impedance_imaginary.eps', ...
+    [], ...
+    'Wake impedance imaginary','', ...
+    'wake_impedance_imaginary', '', 1, 1);
+
+ov = cat(1,ov,ov1);
+ov = cat(1,ov,'\clearpage');
+
 %%%%%%%%%%%%%%%% S Parameter graphs %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if exist(fullfile(report_input.source_path, report_input.sources{1}, 's_parameters'), 'dir') == 7
     ov = cat(1,ov,'\chapter{S parameters}');
