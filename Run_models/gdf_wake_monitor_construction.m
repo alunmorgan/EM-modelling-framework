@@ -38,48 +38,54 @@ fs = cat(1,fs,['           firstsaved= (',num2str(str2double(wake_length)),' / @
 fs = cat(1,fs,'           lastsaved= INF');
 fs = cat(1,fs,'           distance= 100e-12');
 fs = cat(1,fs,'        doit');
-% fs = cat(1,fs,'    -storefieldsat');
-% fs = cat(1,fs,'        name= ALL');
-% fs = cat(1,fs,'        whattosave = both');
-% fs = cat(1,fs,['           firstsaved= 1e-12']);
-% fs = cat(1,fs,'           lastsaved= INF');
-% fs = cat(1,fs,'           distance= 10e-12');
-% fs = cat(1,fs,'        doit');
 if mov == 1
+    fs = cat(1,fs,' define( PMLCOMPENSATION, 51e-3  / @clight )'); % for 40 PMLS
+    fs = cat(1,fs,' define( FIRSTSAV, 1e-3  / @clight )');
+    fs = cat(1,fs,' define( DISTSAV, 3e-3 / @clight )');
+    fs = cat(1,fs,' define( MODELLENTIME, MODELLEN / @clight )');
+    fs = cat(1,fs,'    -storefieldsat');
+    fs = cat(1,fs,'        name= ALL');
+    fs = cat(1,fs,'        whattosave = e');
+    fs = cat(1,fs,['           firstsaved= PMLCOMPENSATION']);
+    fs = cat(1,fs,'           lastsaved= PMLCOMPENSATION + MODELLENTIME + 200 * DISTSAV');
+    fs = cat(1,fs,'           distancesaved= DISTSAV');
+    fs = cat(1,fs,'        doit');
+    fs = cat(1,fs,'    -storefieldsat');
+    fs = cat(1,fs,'        name= IMP');
+    fs = cat(1,fs,'        whattosave = jimpedance');
+    fs = cat(1,fs,['           firstsaved= PMLCOMPENSATION']);
+    fs = cat(1,fs,'           lastsaved= PMLCOMPENSATION + MODELLENTIME + 200 * DISTSAV');
+    fs = cat(1,fs,'           distancesaved= DISTSAV');
+    fs = cat(1,fs,'        doit');
+    
     fs = cat(1,fs,'# Store data for the Movie.');
     fs = cat(1,fs,'    -fexport');
     fs = cat(1,fs,'       outfile= temp_data/efields');
     fs = cat(1,fs,'       what= e-fields');
     % fs = cat(1,fs,'       bbylow=0'); % only recording half height.
-    fs = cat(1,fs,' define( FIRSTSAV, 1e-3  / 3e8 )');
-    fs = cat(1,fs,' define( DISTSAV, 3e-3 / 3e8 )');
-    fs = cat(1,fs,'       firstsaved= 1e-3  / 3e8');
+    fs = cat(1,fs,'       firstsaved= PMLCOMPENSATION');
     fs = cat(1,fs,'       distancesaved= DISTSAV');
-    fs = cat(1,fs,'       lastsaved= FIRSTSAV + MODELLEN / 3e8 + 200 * DISTSAV');
+    fs = cat(1,fs,'       lastsaved= PMLCOMPENSATION + MODELLENTIME + 200 * DISTSAV');
     fs = cat(1,fs,'       doit');
     fs = cat(1,fs,'    -fexport');
     fs = cat(1,fs,'       outfile= temp_data/hfields');
     fs = cat(1,fs,'       what= h-fields');
     % fs = cat(1,fs,'       bbylow=0'); % only recording half height.
-    fs = cat(1,fs,' define( FIRSTSAV, 1e-3  / 3e8 )');
-    fs = cat(1,fs,' define( DISTSAV, 3e-3 / 3e8 )');
-    fs = cat(1,fs,'       firstsaved= 1e-3  / 3e8');
+    fs = cat(1,fs,'       firstsaved= PMLCOMPENSATION');
     fs = cat(1,fs,'       distancesaved= DISTSAV');
-    fs = cat(1,fs,'       lastsaved= FIRSTSAV + MODELLEN / 3e8 + 200 * DISTSAV');
+    fs = cat(1,fs,'       lastsaved= PMLCOMPENSATION + MODELLENTIME + 200 * DISTSAV');
     fs = cat(1,fs,'       doit');
     fs = cat(1,fs,'    -fexport');
     fs = cat(1,fs,'       outfile= temp_data/honmat');
     fs = cat(1,fs,'       what= honmat');
     % fs = cat(1,fs,'       bbylow=0'); % only recording half height.
-    fs = cat(1,fs,' define( FIRSTSAV, 1e-3  / 3e8 )');
-    fs = cat(1,fs,' define( DISTSAV, 3e-3 / 3e8 )');
-    fs = cat(1,fs,'       firstsaved= 1e-3  / 3e8');
+    fs = cat(1,fs,'       firstsaved= PMLCOMPENSATION');
     fs = cat(1,fs,'       distancesaved= DISTSAV');
-    fs = cat(1,fs,'       lastsaved= FIRSTSAV + MODELLEN / 3e8 + 200 * DISTSAV');
+    fs = cat(1,fs,'       lastsaved= PMLCOMPENSATION + MODELLENTIME + 200 * DISTSAV');
     fs = cat(1,fs,'       doit');
 else
     fs = cat(1,fs,'# No movie requested... not storing additional files.');
 end %if
 
-    fs = cat(1,fs,'-fdtd   ');
-    fs = cat(1,fs,'    doit');
+fs = cat(1,fs,'-fdtd   ');
+fs = cat(1,fs,'    doit');
