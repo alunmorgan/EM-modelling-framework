@@ -58,8 +58,10 @@ for ewh = 1:length(sweeps)
                 continue
             end %try
         end %try
-        param_names_tmp = cat(2,sim_param_names_tmp, geom_param_names_tmp, 'geometry_fraction');
-        param_vals_tmp = cat(2,sim_param_vals_tmp, geom_param_vals_tmp, modelling_inputs.geometry_fraction);
+        param_names_tmp = cat(2,sim_param_names_tmp, geom_param_names_tmp,...
+            'geometry_fraction', mat_param_names_tmp);
+        param_vals_tmp = cat(2,sim_param_vals_tmp, geom_param_vals_tmp,...
+            modelling_inputs.geometry_fraction, mat_param_vals_tmp );
         
         %     model_names{psw} =  regexprep(modelling_inputs.('model_name'),'_',' ');
         param_names(psw,1:length(param_names_tmp)) = regexprep(param_names_tmp,'_',' ');
