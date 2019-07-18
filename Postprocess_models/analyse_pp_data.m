@@ -1,4 +1,8 @@
-function analyse_pp_data(root_path, model_sets, wl_override)
+function analyse_pp_data(root_path, model_sets, hfoi_override, analysis_override)
+
+if nargin <4 
+    analysis_override = 0;
+end %if
 
 for sts = 1:length(model_sets)
     files = dir_list_gen_tree(fullfile(root_path, model_sets{sts}), 'mat', 1);
@@ -6,7 +10,7 @@ for sts = 1:length(model_sets)
     
     for ind = 1:length(wanted_files)
         current_folder = fileparts(wanted_files{ind});
-        if ~isfile(fullfile(current_folder, 'data_analysed_wake.mat'))
+        if ~isfile(fullfile(current_folder, 'data_analysed_wake.mat')) || analysis_override == 1
         
         load(fullfile(current_folder, 'data_postprocessed'), 'pp_data');
         load(fullfile(current_folder, 'pp_inputs.mat'), 'ppi');
