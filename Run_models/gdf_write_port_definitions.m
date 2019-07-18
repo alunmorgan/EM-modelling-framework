@@ -7,14 +7,14 @@ fs = cat(1,fs, '    -ports');
 fs = cat(1,fs,'        name = port_bp_in');
 fs = cat(1,fs,'        plane = zlow');
 fs = cat(1,fs,'        npml = NPMLs');
-fs = cat(1,fs,'        modes = 10');
+fs = cat(1,fs,'        modes = 20');
 fs = cat(1,fs,'        doit');
 fs = cat(1,fs,' ');
 fs = cat(1,fs,'    -ports');
 fs = cat(1,fs,'        name = port_bp_out');
 fs = cat(1,fs,'        plane = zhigh');
 fs = cat(1,fs,'        npml = NPMLs');
-fs = cat(1,fs,'        modes = 10');
+fs = cat(1,fs,'        modes = 20');
 fs = cat(1,fs,'        doit');
 fs = cat(1,fs,' ');
 
