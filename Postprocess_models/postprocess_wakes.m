@@ -34,34 +34,55 @@ for hwa = 1:length(data)
     end
 end
 
-%% find the gld files for the field output images.
-% gld_files = dir_list_gen('temp_scratch', 'gld', 1);
-% for fjh = 1:length(gld_files)
-% system(['gd1.3dplot -xwd -geometry 1920x1080 ', gld_files{fjh}]);
-% system(['convert dumped.window ',gld_files{fjh}(1:end-3) ,'png']);
-% end %for
+% find the gld files for the field output images.
+gld_list = dir_list_gen('pp_link/wake/', 'gld');
+if ~isempty(gld_list)
+    gld_files = dir_list_gen('temp_scratch', 'gld', 1);
+    parfor fjh = 1:length(gld_files)
+        system(['gd1.3dplot -colorps -geometry 800x600 -o ',gld_files{fjh}(1:end-3), 'ps -i ' , gld_files{fjh}]);
+        system(['convert ', gld_files{fjh}(1:end-3), 'ps ',gld_files{fjh}(1:end-3) ,'png']);
+    end %for
+system('ffmpeg -r 10 -f image2 -s 1920x1080 -i temp_scratch/3D-Arrowplot.%04d.png -vcodec mpeg4 -pix_fmt yuv420p test.mp4')
+movefile('test.mp4', 'pp_link/wake/h_on_surfaces.mp4')
+end %if
 
-% system('ffmpeg -r 10 -f image2 -s 1920x1080 -i temp_scratch/3D-Arrowplot.%04d.png -vcodec mpeg4 -pix_fmt yuv420p test.mp4')
-% movefile('test.mp4', 'pp_link/wake/e_on_surfaces.mp4')
-[~] = system('for file in pp_link/wake/*.gif; do convert $file pp_link/wake/`basename $file .gif`.png; done');
-[~] = system('rm -f pp_link/wake/*.gif');
-if exist('pp_link/wake/E2DHy000000001.png', 'file') == 2
-[~] = system('ffmpeg -r 10 -i pp_link/wake/E2DHy%9d.png -vcodec mpeg4 -pix_fmt yuv420p pp_link/wake/E2Dy.mp4');
+gif_list = dir_list_gen('pp_link/wake/', 'gif');
+if ~isempty(gif_list)
+    convert_status = system('for file in pp_link/wake/*.gif; do convert $file pp_link/wake/`basename $file .gif`.png; done');
+    if convert_status == 0
+        [~] = system('rm -f pp_link/wake/*.gif');
+    end%if
+    if exist('pp_link/wake/E2DHy000000002.png', 'file') == 2
+        E2DHy_status = system('ffmpeg -r 10 -i pp_link/wake/E2DHy%9d.png -vcodec mpeg4 -pix_fmt yuv420p pp_link/wake/E2Dy.mp4');
+        if E2DHy_status == 0
+            [~] = system('rm -f pp_link/wake/E2DHy*.png');
+        end %if
+    end %if
+    if exist('pp_link/wake/E2DHx000000002.png', 'file') == 2
+        E2DHx_status = system('ffmpeg -r 10 -i pp_link/wake/E2DHx%9d.png -vcodec mpeg4 -pix_fmt yuv420p pp_link/wake/E2Dx.mp4');
+        if E2DHx_status == 0
+            [~] = system('rm -f pp_link/wake/E2DHx*.png');
+        end %if
+    end %if
+    if exist('pp_link/wake/H2DHy000000002.png', 'file') == 2
+        H2DHy_status = system('ffmpeg -r 10 -i pp_link/wake/H2DHy%9d.png -vcodec mpeg4 -pix_fmt yuv420p pp_link/wake/H2Dy.mp4');
+        if H2DHy_status == 0
+            [~] = system('rm -f pp_link/wake/H2DHy*.png');
+        end %if
+    end %if
+    if exist('pp_link/wake/H2DHx000000002.png', 'file') == 2
+        H2DHx_status = system('ffmpeg -r 10 -i pp_link/wake/H2DHx%9d.png -vcodec mpeg4 -pix_fmt yuv420p pp_link/wake/H2Dx.mp4');
+        if H2DHx_status == 0
+            [~] = system('rm -f pp_link/wake/H2DHx*.png');
+        end %if
+    end %if
+    if exist('pp_link/wake/honmat3D000000002.png', 'file') == 2
+        honmat_status = system('ffmpeg -r 10 -i pp_link/wake/honmat3D%9d.png -vcodec mpeg4 -pix_fmt yuv420p pp_link/wake/Honmat3D.mp4');
+        if honmat_status == 0
+            [~] = system('rm -f pp_link/wake/honmat3D*.png');
+        end %if
+    end %if
 end %if
-if exist('pp_link/wake/E2DHx000000001.png', 'file') == 2
-[~] = system('ffmpeg -r 10 -i pp_link/wake/E2DHx%9d.png -vcodec mpeg4 -pix_fmt yuv420p pp_link/wake/E2Dx.mp4');
-end %if
-if exist('pp_link/wake/H2DHy000000001.png', 'file') == 2
-[~] = system('ffmpeg -r 10 -i pp_link/wake/H2DHy%9d.png -vcodec mpeg4 -pix_fmt yuv420p pp_link/wake/H2Dy.mp4');
-end %if
-if exist('pp_link/wake/H2DHx000000001.png', 'file') == 2
-[~] = system('ffmpeg -r 10 -i pp_link/wake/H2DHx%9d.png -vcodec mpeg4 -pix_fmt yuv420p pp_link/wake/H2Dx.mp4');
-end %if
-if exist('pp_link/wake/honmat3D000000001.png', 'file') == 2
-[~] = system('ffmpeg -r 10 -i pp_link/wake/honmat3D%9d.png -vcodec mpeg4 -pix_fmt yuv420p pp_link/wake/Honmat3D.mp4');
-end %if
-[~] = system('rm -f pp_link/wake/*2DH*.png');
-[~] = system('rm -f pp_link/wake/honmat3D*.png');
 %% find the location of all the required output files
 [ WP_beam, WP_offset, WI_s, WI_x, WI_y, ...
     Port_mat, port_names_table, Energy, Energy_in_ceramics ] =...
@@ -71,7 +92,7 @@ end %if
 
 % get the Total energy in the structure
 if iscell(Energy)
-[ total_energy_data ] = GdfidL_read_graph_datafile( Energy{1});
+    [ total_energy_data ] = GdfidL_read_graph_datafile( Energy{1});
 else
     total_energy_data.data = NaN;
 end %if
