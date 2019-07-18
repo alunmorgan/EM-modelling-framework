@@ -40,8 +40,13 @@ model_file = cat(1, model_file, 'zlow= -INF, zhigh= INF');
 model_file = cat(1, model_file, 'doit');
 
 model_file = cat(1, model_file, '###################################################');
-stls = dir_list_gen(fullfile(models_location, base_model_name, model_name, 'ascii'), 'stl',1);
-
+stls = dir_list_gen(modelling_inputs.stl_location, 'stl',1);
+t1 = squeeze(modelling_inputs.stl_part_mapping(:,1));
+for lwfc = 1:size(stls,1)
+    tmep(lwfc) = find_position_in_cell_lst(strfind(stls, t1{lwfc}));
+end
+ordering = cell2mat(squeeze(modelling_inputs.stl_part_mapping(:,3)));
+stls = stls(tmep(ordering));
 for lrd = 1:length(stls)
     tmp = strsplit(stls{lrd}, filesep);
     tmp = tmp{end}(1:end-4);
