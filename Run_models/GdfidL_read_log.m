@@ -37,9 +37,10 @@ for nse = 1:length(total_loss_inds)
 end
 clear nse temp
 material_loss_inds = find_position_in_cell_lst(strfind(data,'IntegratedSumPowerMat'));
+
 for jse = 1:length(material_loss_inds)
     tmp = regexp(data{material_loss_inds(jse)},'IntegratedSumPowerMat(.*)','tokens');
-    mat_num(jse) = str2num(tmp{1}{1});
+    mat_num(jse) = str2double(tmp{1}{1});
 end
 clear tmp jse
 if exist('mat_num', 'var') == 0
@@ -110,36 +111,36 @@ log.tme = char(tme{1});
 % find the GdfidL version.
 ver_ind = find_position_in_cell_lst(strfind(data,'Version is '));
 ver = regexp(data{ver_ind},'.*Version is\s*(.+)', 'tokens');
-log.ver = str2num(char(ver{1}));
+log.ver = str2double(char(ver{1}));
 
 % find the line containing info on the number of cores used
 cores_ind = find_position_in_cell_lst(strfind(data,'nrofthreads='));
 cores = regexp(data{cores_ind(end)},'.*nrofthreads=\s*(\d+)', 'tokens');
-log.cores = str2num(char(cores{1}));
+log.cores = str2double(char(cores{1}));
 
 % find the GdfidL version.
 mesh_step_size_ind = find_position_in_cell_lst(regexp(data,'mesh>\s*spacing\s*=\s*'));
 mesh_step_size = regexp(data{mesh_step_size_ind},'mesh>\s*spacing\s*=\s*(.*)', 'tokens');
-log.mesh_step_size = str2num(char(mesh_step_size{1}));
+log.mesh_step_size = str2double(char(mesh_step_size{1}));
 
 % find the line containing the charge info
 charge_ind = find_position_in_cell_lst(regexp(data,'charge\s*=\s*'));
 charge_ind = intersect(charge_ind,lcharges_ind);
 charge = regexprep(data{charge_ind},'.*charge\s*=\s*','');
 charge = regexprep(charge,'"','');
-log.charge = str2num(charge);
+log.charge = str2double(charge);
 
 % find the set beam sigma.
 beam_sigma_ind = find_position_in_cell_lst(regexp(data,'lcharges>\s*sigma\s*=\s*'));
 beam_sigma = regexp(data{beam_sigma_ind},'lcharges>\s*sigma\s*=\s*([^,]*)(?:\s*,|\s*$)', 'tokens');
-log.beam_sigma = str2num(char(beam_sigma{1}));
+log.beam_sigma = str2double(char(beam_sigma{1}));
 %find the memory usage
 memory_ind = find_position_in_cell_lst(strfind(data,'The Memory Usage is at least'));
 memory = regexprep(data{memory_ind},'The Memory Usage is at least','');
 memory = regexprep(memory,'##','');
 memory = regexprep(memory,'MBytes','');
 memory = regexprep(memory,'\.','');
-log.memory = str2num(memory);
+log.memory = str2double(memory);
 
 % find the meshing extent.
 mesh_extent_zlow_ind = find_position_in_cell_lst(regexp(data,'mesh>\s*pzlow\s*=\s*'));
@@ -159,20 +160,20 @@ mesh_extent_yhigh = regexp(data{mesh_extent_yhigh_ind},'mesh>\s*(?:[^,]*\s*,)?\s
 % beween it and the following number. But, it will return a list if there
 % is no space. I know that in this case it is always a calculation
 % therefore I force the spacing to the appropriate convention.
-log.mesh_extent_zlow = str2num(regexprep(regexprep(char(mesh_extent_zlow{1}),'-','- '),'(\d)(?:e|E)\s*-\s*(\d)','$1e-$2'));
-log.mesh_extent_zhigh = str2num(regexprep(regexprep(char(mesh_extent_zhigh{1}),'-','- '),'(\d)(?:e|E)\s*-\s*(\d)','$1e-$2'));
-log.mesh_extent_xlow = str2num(regexprep(regexprep(char(mesh_extent_xlow{1}),'-','- '),'(\d)(?:e|E)\s*-\s*(\d)','$1e-$2'));
-log.mesh_extent_xhigh = str2num(regexprep(regexprep(char(mesh_extent_xhigh{1}),'-','- '),'(\d)(?:e|E)\s*-\s*(\d)','$1e-$2'));
-log.mesh_extent_ylow = str2num(regexprep(regexprep(char(mesh_extent_ylow{1}),'-','- '),'(\d)(?:e|E)\s*-\s*(\d)','$1e-$2'));
-log.mesh_extent_yhigh = str2num(regexprep(regexprep(char(mesh_extent_yhigh{1}),'-','- '),'(\d)(?:e|E)\s*-\s*(\d)','$1e-$2'));
+log.mesh_extent_zlow = str2double(regexprep(regexprep(char(mesh_extent_zlow{1}),'-','- '),'(\d)(?:e|E)\s*-\s*(\d)','$1e-$2'));
+log.mesh_extent_zhigh = str2double(regexprep(regexprep(char(mesh_extent_zhigh{1}),'-','- '),'(\d)(?:e|E)\s*-\s*(\d)','$1e-$2'));
+log.mesh_extent_xlow = str2double(regexprep(regexprep(char(mesh_extent_xlow{1}),'-','- '),'(\d)(?:e|E)\s*-\s*(\d)','$1e-$2'));
+log.mesh_extent_xhigh = str2double(regexprep(regexprep(char(mesh_extent_xhigh{1}),'-','- '),'(\d)(?:e|E)\s*-\s*(\d)','$1e-$2'));
+log.mesh_extent_ylow = str2double(regexprep(regexprep(char(mesh_extent_ylow{1}),'-','- '),'(\d)(?:e|E)\s*-\s*(\d)','$1e-$2'));
+log.mesh_extent_yhigh = str2double(regexprep(regexprep(char(mesh_extent_yhigh{1}),'-','- '),'(\d)(?:e|E)\s*-\s*(\d)','$1e-$2'));
 
 % find the ports on the z boundarys
 port_on_zlow_ind = find_position_in_cell_lst(regexp(data,'#\s*\.\.\s*The Port is at zlow'));
 num_pmls_zlow = regexp(data{port_on_zlow_ind+1},'#\s*\.\.\s*PML-Thickness\s*:\s*(\d*)', 'tokens');
 port_on_zhigh_ind = find_position_in_cell_lst(regexp(data,'#\s*\.\.\s*The Port is at zhigh'));
 num_pmls_zhigh = regexp(data{port_on_zhigh_ind+1},'#\s*\.\.\s*PML-Thickness\s*:\s*(\d*)', 'tokens');
-log.pmls_zlow = str2num(char(num_pmls_zlow{1}));
-log.pmls_zhigh = str2num(char(num_pmls_zhigh{1}));
+log.pmls_zlow = str2double(char(num_pmls_zlow{1}));
+log.pmls_zhigh = str2double(char(num_pmls_zhigh{1}));
 % find symetry planes
 % assume any magnetic boundary is also a symetry plane.
 boundaries_ind1 = find_position_in_cell_lst(regexp(data,'mesh>\s*c[xyz]low\s*= '));
@@ -211,12 +212,12 @@ end
 
 % find the number of mesh cells
 Ncells_ind = find_position_in_cell_lst(strfind(data,'Cell-Numbers'));
-log.Ncells = str2num(regexprep(data{Ncells_ind},'.*= ',''));
+log.Ncells = str2double(regexprep(data{Ncells_ind},'.*= ',''));
 
 % find the timestep
 Timestep_ind = find_position_in_cell_lst(strfind(data,'The paranoid Timestep'));
 Timestep = regexprep(data{Timestep_ind},'.*:','');
-log.Timestep = str2num(regexprep(Timestep, '\[s\]',''));
+log.Timestep = str2double(regexprep(Timestep, '\[s\]',''));
 
 % find the solver time
  wall_time_ind = find_position_in_cell_lst(strfind(data,'Wall Clock Time:'));
@@ -226,12 +227,12 @@ log.Timestep = str2num(regexprep(Timestep, '\[s\]',''));
  else
 wall_time = regexp(data{wall_time_ind(end)},'.*Wall Clock Time\s*:\s*(\d+)\s*Seconds\s*,\s+diff:\s+[0-9]+\s*,\s*[A-Z]Flop/s\s*:\s+\d+.*\d+', 'tokens');
 wall_time = find_val_in_cell_nest(wall_time);
-log.wall_time = str2num(wall_time);
+log.wall_time = str2double(wall_time);
 for hse = 1:length(wall_time_ind)
 wall_rate = regexp(data{wall_time_ind(hse)},'.*Wall Clock Time\s*:\s*\d+\s*Seconds\s*,\s+diff:\s+[0-9]+\s*,\s*([A-Z])Flop/s\s*:\s+(\d+.*\d+)', 'tokens');
 wall_rate = wall_rate{1};
 wall_multiplier = wall_rate{1};
-wall_rate = str2num(wall_rate{2});
+wall_rate = str2double(wall_rate{2});
 if strcmp(wall_multiplier, 'M')
     wall_rate(hse) = wall_rate .* 1E6;
 elseif strcmp(wall_multiplier, 'G')
