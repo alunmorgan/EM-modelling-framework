@@ -2,7 +2,7 @@ function GdfidL_post_process_models(ppi, ow_behaviour)
 % Takes the output of the GdfidL run and postprocesses it to generate
 % reports.
 %
-% Example: pp_log = GdfidL_post_process_models(ui, ppi.range, 'w');
+% Example: pp_log = GdfidL_post_process_models(ppi);
 
 if nargin <2
     ow_behaviour = 'skip';
@@ -75,16 +75,6 @@ for oef = 1:length(sim_types)
                 % restoring the original version.
                 setenv('GDFIDL_VERSION',orig_ver)
                 save(fullfile('pp_link', sim_types{oef}, 'data_postprocessed.mat'), 'pp_data','-v7.3')
-%                 % Generate the plots.
-%                 if strcmp(sim_types{oef}, 'wake')
-%                     GdfidL_plot_wake(pp_data, ppi, ...
-%                         modelling_inputs, run_logs,...
-%                         fullfile('pp_link', [sim_types{oef}, '/']), 1E7)
-%                 elseif strcmp(sim_types{oef}, 'eigenmode')
-%                     GdfidL_plot_eigenmode(pp_data, fullfile('pp_link', [sim_types{oef}, '/']))
-%                 elseif strcmp(sim_types{oef}, 'eigenmode_lossy')
-%                     GdfidL_plot_eigenmode_lossy(pp_data, fullfile('pp_link', [sim_types{oef}, '/']))
-%                 end %if
             end %if
         catch W_ERR
             display_postprocessing_error(W_ERR, sim_types{oef})
@@ -141,15 +131,6 @@ for heb = 1:length(sim_types)
                 % restoring the original version.
                 setenv('GDFIDL_VERSION',orig_ver)
                 save(fullfile('pp_link', sim_types{heb}, 'data_postprocessed.mat'), 'pp_data','-v7.3')
-                % location and size of the default figures.
-%                 fig_pos = [10000 678 560 420];
-%                 % Generate the plots for the report.
-%                 if strcmp(sim_types{heb}, 's_parameters')
-%                     GdfidL_plot_s_parameters(pp_data, ppi, fig_pos, ...
-%                         fullfile('pp_link', [sim_types{heb}, '/']));
-%                 elseif strcmp(sim_types{heb}, 'shunt')
-%                     GdfidL_plot_shunt(pp_data, fullfile('pp_link', sim_types{heb}))
-%                 end %if
             end %if
         catch ERR
             display_postprocessing_error(ERR, sim_types{heb})
