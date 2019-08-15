@@ -1,9 +1,11 @@
 function run_models(mi, ppi)
 
+
 if ispc ==1
     error('This needs to be run on the linux modelling machine')
 end %if
 
+force_pp = 'skip';
 modelling_inputs = run_inputs_setup_STL(mi);
 
 % Running the different simulators for each model.
@@ -35,7 +37,7 @@ for awh = 1:length(modelling_inputs)
         end %try
         try
             ppi.model_name = modelling_inputs{awh}.model_name;
-            GdfidL_post_process_models(ppi);
+            GdfidL_post_process_models(ppi, force_pp);
         catch ERR
             display_postprocessing_error(ERR, 'wake')
         end %try
