@@ -1,4 +1,4 @@
-function [extrap_data] = loss_extrapolation(time_domain_data, port_data, mi, ppi, raw_data, log )
+function [extrap_data] = loss_extrapolation(time_domain_data, port_data, mi, ppi, raw_data, log , hfoi)
 % calculates the change in wake loss factor and energy lost from the beam
 % and into the ports as the bunch and bunch train is varied.
 %
@@ -35,7 +35,7 @@ end %if
     regenerate_f_data(Charge_distribution_sig, ...
     wakepotential_sig,...
     port_data_sig, raw_data.port.frequency_cutoffs,...
-    timescale_sig, ppi.hfoi);
+    timescale_sig, hfoi);
 
 %% Find the variation with increasing beam sigma.
 for odf = 1:55
@@ -88,7 +88,7 @@ timescale_bc = timescale_bc_1_turn;
     port_impedances_bc] = ...
     regenerate_f_data(Charge_distribution_bc, ...
     wakepotential_bc, port_data_bc, raw_data.port.frequency_cutoffs,...
-    timescale_bc, ppi.hfoi);
+    timescale_bc, hfoi);
 
 % When both bunch_spectra_model and
 % fft_t_wp are 0 this gives a NaN, but that poisons

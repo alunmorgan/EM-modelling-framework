@@ -1,4 +1,4 @@
-function wake_sweep_data = wake_sweep(sweep_lengths, raw_data, mi, ppi, log, hfoi_override)
+function wake_sweep_data = wake_sweep(sweep_lengths, raw_data, mi, ppi, log, hfoi, port_modes_override)
 % Run the frequency domain analysis over data which is increasingly reduced
 % in length (i.e. having different wake lengths).
 %
@@ -6,12 +6,6 @@ function wake_sweep_data = wake_sweep(sweep_lengths, raw_data, mi, ppi, log, hfo
 
 % dsd = length(time_domain_data.timebase);
 % Set the number of wake lengths to do.
-
-if nargin == 6
-    hfoi = hfoi_override;
-else
-    hfoi = ppi.hfoi;
-end %if
 
 % raw_port_data = put_on_reference_timebase(time_domain_data.timebase, raw_data.port);
 for se = length(sweep_lengths):-1:1
@@ -47,7 +41,7 @@ for se = length(sweep_lengths):-1:1
     %     t_data{se}.charge_distribution = time_domain_data.charge_distribution(1:trimed);
     %     pt_data{se}.timebase = time_domain_data.timebase(1:trimed);
     %% Time domain analysis
-    [t_data{se}, pt_data{se}] = time_domain_analysis(r_data{se}, log, ppi.port_modes_override);
+    [t_data{se}, pt_data{se}] = time_domain_analysis(r_data{se}, log, port_modes_override);
     if isfield(raw_data.port, 'data')
         % Run the frequency analysis.
         f_data{se} = frequency_domain_analysis(...
@@ -77,7 +71,7 @@ for se = length(sweep_lengths):-1:1
     f_data{se}.time_slices = time_slices(t_data{se}, hfoi);
     %% Calculating the losses for different bunch lengths and bunch charges.
     f_data{se}.extrap_data = loss_extrapolation(...
-    t_data{se}, pt_data{se}, mi, ppi, raw_data, log);
+    t_data{se}, pt_data{se}, mi, ppi, raw_data, log, hfoi);
 end %for
 
 wake_sweep_data.raw = r_data;
