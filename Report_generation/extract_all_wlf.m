@@ -1,4 +1,4 @@
-function [model_names, wlf, wake_length, metric] = extract_all_wlf(root_path, model_sets)
+function [model_names, wlf, wake_length, mesh_density, decay_to, simulation_time] = extract_all_wlf(root_path, model_sets)
 
 
 for sts = 1:length(model_sets)
@@ -15,13 +15,17 @@ for sts = 1:length(model_sets)
         current_folder = fileparts(wanted_files{ind});
         load(fullfile(current_folder, 'data_postprocessed'), 'pp_data');
         load(fullfile(current_folder, 'data_analysed_wake'),'wake_sweep_data');
+        load(fullfile(current_folder, 'run_inputs'), 'modelling_inputs');
+        load(fullfile(current_folder, 'data_from_run_logs.mat'), 'run_logs');
         model_names{sts,ind} = split_str{ind}{end - 2};
         wlf(sts,ind) = wake_sweep_data.time_domain_data{end}.wake_loss_factor;
-        wake_length(sts,ind) = pp_data.wake_setup.Wake_length;
+        wake_length(sts,ind) = (round(((wake_sweep_data.time_domain_data{end}.timebase(end)) *3e8)*100))/100;
+        mesh_density(sts, ind) = str2num(modelling_inputs.mesh_stepsize);
         pling = max(abs(pp_data.Wake_potential(:,2)));
         % now looking at the last ~10ps of data
         tail = max(abs(pp_data.Wake_potential(end-600:end,2)));
-        metric(sts,ind) = (tail ./ pling) .* 100;
+        decay_to(sts,ind) = mean(abs(tail));
+        simulation_time(sts, ind) = run_logs.wall_time;
         clear pp_data wake_data
     end %for
 end %for
