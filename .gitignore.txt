@@ -1,5 +1,0 @@
-*.log
-*.bak
-*.asv
-*.m~
-Documentation/Thumbs.db
