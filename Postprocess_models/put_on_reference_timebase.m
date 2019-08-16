@@ -15,8 +15,7 @@ if isfield(port_data, 'data')
             % Replace the NaNs at the begining with zeros. 
             %This is because the wakepotential starts at a -ve time.
             % there is still no signal there.
-            ind = find(isnan(tmp),1,'last');
-            tmp(1:ind) = 0;
+            tmp(isnan(tmp)==1) = 0;
             raw_port_data{jsff}(1:length(tmp), jsfs) = tmp;
         end
     end
