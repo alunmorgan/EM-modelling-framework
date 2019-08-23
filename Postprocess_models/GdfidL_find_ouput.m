@@ -100,6 +100,8 @@ else
     Port_mat = cell(1,1);
     for hs = 1:length(Ports)
         p_ind = find_position_in_cell_lst(strfind(port_names, port_names_list{hs}));
-        Port_mat{p_ind,port_modes(hs)} = Ports{hs};
-    end
-end
+        if ~isnan(port_modes(hs))
+            Port_mat{p_ind,port_modes(hs)} = Ports{hs};
+        end %if
+    end %for
+end %if
