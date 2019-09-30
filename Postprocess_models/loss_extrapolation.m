@@ -2,13 +2,13 @@ function [extrap_data] = loss_extrapolation(time_domain_data, port_data, mi, ppi
 % calculates the change in wake loss factor and energy lost from the beam
 % and into the ports as the bunch and bunch train is varied.
 %
-% time_domain_data is 
+% time_domain_data is
 % port_data is
 % beam_data is
 % raw_data is
 % hfoi is
-% log is 
-% extrap_data is 
+% log is
+% extrap_data is
 %
 % Example: [extrap_data] = loss_extrapolation(time_domain_data, port_data, beam_data, raw_data, hfoi, log )
 
@@ -25,7 +25,7 @@ function [extrap_data] = loss_extrapolation(time_domain_data, port_data, mi, ppi
 
 if iscell(raw_port_data)
     [~, port_data_sig] = ...
-    pad_data(time_domain_data.timebase, 14, 'points', raw_port_data);
+        pad_data(time_domain_data.timebase, 14, 'points', raw_port_data);
 else
     port_data_sig = NaN;
 end %if
@@ -43,13 +43,13 @@ for odf = 1:55
     % generate the time domain signal
     pulse = (1/(sqrt(2*pi)*pulse_sig)) * ...
         exp(-(timescale_sig.^2)/(2*pulse_sig^2));
-
+    
     bunch_spec_sig = fft(pulse)/length(timescale_sig);
     % truncate the new bunch sigma in the same way as all the other
     % frequency data.
-        % the sqrt(2) it to account for the fact that realy you should fold
-        % over the signal and combine the overlapping signals to preserve
-        % the power.
+    % the sqrt(2) it to account for the fact that really you should fold
+    % over the signal and combine the overlapping signals to preserve
+    % the power.
     bunch_spec_sig = bunch_spec_sig(1:length(wakeimpedance_sig)) .* sqrt(2);
     [extrap_data.beam_sigma_sweep.wlf(odf),~, ~, ~, ~, ~, ~, ~, ~, ~] = ...
         find_wlf_and_power_loss(log.charge, timescale_sig, bunch_spec_sig, ...
@@ -104,24 +104,21 @@ for cur_ind = 1:length(ppi.current)
             rf_val = ppi.rf_volts(rf_ind);
             
             % calculating the bunch charge and bunch length for the given current fill pattern and RF voltage.
-            bunch_charge = cur.*1e-3 ./ ((1./gap) .* (fill_pattern ./ 936));
+            bunch_charge = cur ./ ((1./gap) .* (fill_pattern ./ 936));
             bunch_length =...
-                (3.87 + 2.41 * (cur./fill_pattern) .^ 0.81) * sqrt(2.5/rf_val) * 1e-3./3E8; %in s
+                (3.87 + 2.41 * (cur * 1E3./fill_pattern) .^ 0.81) * sqrt(2.5/rf_val) * 1e-3./3E8; %in s
             
             pulse = zeros(length(timescale_bc_1_turn),1);
             % added gap/2 so that the peak of the pulse does not happen at 0. So
             % we get a complete first pulse.
+            % Generating a pulse train of 1C bunches
             parfor jawe = 1:fill_pattern
                 new_pulse = ((1 ./ (sqrt(2 .* pi) .* bunch_length)) .* ...
-                    exp(-((timescale_bc_1_turn - (gap .* (jawe - 1)) - gap ./ 2).^2) ./ (2 .* bunch_length.^2)) .* ...
-                    bunch_charge);
+                    exp(-((timescale_bc_1_turn - (gap .* (jawe - 1)) - gap ./ 2).^2) ./ (2 .* bunch_length.^2)));
                 pulse = pulse + new_pulse;
             end
-            bunch_spec_bc = fft(pulse./bunch_charge)/length(timescale_bc);
-            %             This outputs the powers
-                % truncate the new bunch sigma in the same way as all the other
-    % frequency data.
-    bunch_spec_bc = bunch_spec_bc(1:length(wakeimpedance_bc));
+            bunch_spec_bc = fft(pulse)/length(timescale_bc);
+            bunch_spec_bc = bunch_spec_bc(1:length(wakeimpedance_bc));
             [wake_loss_factor, ...
                 Bunch_loss_energy_spectrum, Total_bunch_energy_loss, beam_port_spectrum, ~,...
                 signal_port_spectrum, ~, ~, ~, ~] = ...
