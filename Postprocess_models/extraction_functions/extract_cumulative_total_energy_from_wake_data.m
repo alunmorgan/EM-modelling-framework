@@ -11,6 +11,12 @@ if wake_data.port_time_data.total_energy ~=0
     e_total_cs = wake_data.port_time_data.total_energy_cumsum .* 1e9;
     timebase_cs = wake_data.port_time_data.timebase * 1e9;
 else
+    if isfield(wake_data.port_time_data, 'data')
     e_ports_cs = zeros(1,length(wake_data.port_time_data.data));
+    else
+        % no ports have transmitting modes.
+        e_ports_cs = 0;
+    end %if
     e_total_cs = 0;
+    timebase_cs = 0;
 end

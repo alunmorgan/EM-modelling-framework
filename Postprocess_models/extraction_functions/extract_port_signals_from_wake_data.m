@@ -4,11 +4,13 @@ extract_port_signals_from_wake_data(pp_data, wake_data, lab_ind)
 %
 if isfield(wake_data.port_time_data, 'timebase')
     timebase = wake_data.port_time_data.timebase *1E9; %in ns
+    t_start = pp_data.port.t_start;
 else
     timebase = NaN;
+    t_start = NaN;
 end %if
 
-if isfield(pp_data.port, 'data')
+if isfield(pp_data.port, 'data') && isfield(wake_data.port_time_data, 'port_mode_energy')
     [~, max_mode] = max(wake_data.port_time_data.port_mode_energy,[],2);
     for ens = size(wake_data.port_time_data.port_mode_energy, 1):-1:1 % ports
 %         [~, max_mode(ens)] = max(squeeze(wake_data.port_time_data.port_mode_energy{lab_ind(ens)}(:)));
@@ -20,6 +22,7 @@ if isfield(pp_data.port, 'data')
 else
     dominant_modes = NaN;
     modes = NaN;
+    max_mode = NaN;
 end %if
 
 if isfield(wake_data.port_time_data, 'total_energy_cumsum')
@@ -27,4 +30,3 @@ if isfield(wake_data.port_time_data, 'total_energy_cumsum')
 else
     port_cumsum = NaN;
 end %if
-t_start = pp_data.port.t_start;

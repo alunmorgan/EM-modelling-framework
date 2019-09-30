@@ -87,7 +87,7 @@ for nr = 1:length(Ports)
         nme_end = nme_end1;
     end %if
     port_names_list{nr} = Ports{nr}(nme_start{nr}+5:nme_end{nr}-1);
-    port_modes(nr) = str2num(Ports{nr}(nme_end{nr}+15:mode_end{nr}-1));
+    port_modes(nr) = str2double(Ports{nr}(nme_end{nr}+13:mode_end{nr}-1));
 end %for
 % find the unique port names
 port_names = unique(port_names_list);
