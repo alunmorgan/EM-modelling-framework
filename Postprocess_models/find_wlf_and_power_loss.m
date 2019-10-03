@@ -31,18 +31,19 @@ pwr_f(inds) = 0;
 % set by the wake length. To get the power of one bunch you need to
 % divide by the number of bunches in 1 sec (as it is power).
 % Alternativly multiply by the simulation time.
-Bunch_loss_energy_spectrum = pwr_f  * (timescale(end) - timescale(1));
+simulation_time = timescale(end) - timescale(1);
+Bunch_loss_energy_spectrum = pwr_f  * simulation_time;
 pwr = sum(pwr_f);
 % multiply the power for an infinite train by the simulation time in
 % order to get the energy in one simulation run, i.e.1 bunch.
-Total_bunch_energy_loss = pwr * (timescale(end) - timescale(1));
+Total_bunch_energy_loss = pwr * simulation_time;
 
 % Wake loss factor is V/C or J/C^2
 wake_loss_factor =   Total_bunch_energy_loss;
 
 %%%%% Scale the output to the model charge
 Bunch_loss_energy_spectrum = Bunch_loss_energy_spectrum .* model_charge.^2;
-Total_bunch_energy_loss = Total_bunch_energy_loss .* model_charge.^2;
+Total_bunch_energy_loss = wake_loss_factor .* model_charge.^2;
 
 if isnan(port_impedances)
     beam_port_spectrum = NaN;
@@ -60,7 +61,7 @@ else
 %         repmat(port_multiple,[size(port_spectra,1),1]));
 % the port spectrum includes the model charge so additional scaling is not
 % necessary.
-    raw_port_energy_spectrum =  raw_port_energy_spectrum  * (timescale(end) - timescale(1));   
+    raw_port_energy_spectrum =  raw_port_energy_spectrum  * simulation_time;   
     beam_port_spectrum = sum(raw_port_energy_spectrum(:,1:2),2);
     signal_port_spectrum = sum(raw_port_energy_spectrum(:,3:end),2);
     Total_port_spectrum = sum(raw_port_energy_spectrum,2);
