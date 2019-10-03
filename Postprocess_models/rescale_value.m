@@ -14,7 +14,7 @@ scales = {'y','z','a','f', 'p', 'n', 'u', 'm', '0' , 'k', 'M', 'G', 'T', 'P','E'
 
 sel = find_position_in_cell_lst(strfind(scales, scale));
 if abs(val) == 0
-% the value will be unchaged with a scale change so just return the
+% the value will be unchanged with a scale change so just return the
 % requested scale.
 elseif abs(val) < 1
     while(abs(val) <1)
@@ -28,7 +28,11 @@ elseif abs(val) > 1000
     end
 else
 end
+try
 scale = scales{sel};
+catch
+    warning('rescale_value: scaling range exceeded')
+end %try
 if strcmp(scale, '0')
     scale = '';
 end

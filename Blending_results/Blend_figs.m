@@ -1,4 +1,4 @@
-function Blend_figs(report_input, sub_folder , chosen_wake_length, frequency_dispaly_range)
+function Blend_figs(report_input, sub_folder , chosen_wake_length, frequency_display_range)
 % Take existing fig files and combine them.
 % lg specifes if a log or linear scale it to be used (0 = linear, 1 = log)
 % lw specifies the linewidth.
@@ -27,9 +27,9 @@ for hse = length(report_input.sources):-1 :1
     %     graph_name = fullfile(report_input.source_path, report_input.sources{hse}, sub_folder, [fig_nme, '.fig']);
     %     if exist(graph_name,'file')
     %         data_out(hse) = extract_from_graph(graph_name, line_select);
-    f_disp_ind = find(wake_sweep_data.frequency_domain_data{chosen_wake_ind}.f_raw > frequency_dispaly_range, 1, 'first');
+    f_disp_ind = find(wake_sweep_data.frequency_domain_data{chosen_wake_ind}.f_raw > frequency_display_range, 1, 'first');
     data_out(hse, 1).ydata = wake_sweep_data.time_domain_data{chosen_wake_ind}.wakepotential * 1E-9;
-    data_out(hse, 1).xdata = wake_sweep_data.time_domain_data{chosen_wake_ind}.timebase * 1E-9;
+    data_out(hse, 1).xdata = wake_sweep_data.time_domain_data{chosen_wake_ind}.timebase * 1E9;
     data_out(hse, 1).Ylab = 'Wake potential (mV/pC)';
     data_out(hse, 1).Xlab = 'Time (ns)';
     data_out(hse, 1).out_name = 'wake_potential';
@@ -37,7 +37,7 @@ for hse = length(report_input.sources):-1 :1
     data_out(hse, 1).islog = 0;
     data_out(hse, 2).ydata = wake_sweep_data.frequency_domain_data{chosen_wake_ind}.Wake_Impedance_data(1:f_disp_ind);
     data_out(hse, 2).xdata = wake_sweep_data.frequency_domain_data{chosen_wake_ind}.f_raw(1:f_disp_ind) * 1E-9;
-    data_out(hse, 2).Ylab = 'Real wake impedance (\Omega)';
+    data_out(hse, 2).Ylab = 'Real longitudinal wake impedance (\Omega)';
     data_out(hse, 2).Xlab = 'Frequency (GHz)';
     data_out(hse, 2).out_name = 'longitudinal_wake_impedance_real';
     data_out(hse, 2).linewidth = 1;
@@ -50,14 +50,14 @@ for hse = length(report_input.sources):-1 :1
     data_out(hse, 3).linewidth = 1;
     data_out(hse, 3).islog = 0;
     data_out(hse, 4).ydata = cumsum(wake_sweep_data.raw{chosen_wake_ind}.Energy(:,2));
-    data_out(hse, 4).xdata = wake_sweep_data.raw{chosen_wake_ind}.Energy(:,1) * 1e-9;
+    data_out(hse, 4).xdata = wake_sweep_data.raw{chosen_wake_ind}.Energy(:,1) * 1e9;
     data_out(hse, 4).Ylab = 'Cumulative energy (J)';
     data_out(hse, 4).Xlab = 'Time (ns)';
     data_out(hse, 4).out_name = 'cumulative_total_energy';
     data_out(hse, 4).linewidth = 1;
     data_out(hse, 4).islog = 0;
     data_out(hse, 5).ydata = wake_sweep_data.raw{chosen_wake_ind}.Energy(:,2);
-    data_out(hse, 5).xdata = wake_sweep_data.raw{chosen_wake_ind}.Energy(:,1) * 1e-9;
+    data_out(hse, 5).xdata = wake_sweep_data.raw{chosen_wake_ind}.Energy(:,1) * 1e9;
     data_out(hse, 5).Ylab = 'Energy (J)';
     data_out(hse, 5).Xlab = 'Time (ns)';
     data_out(hse, 5).out_name = 'Energy';
