@@ -73,7 +73,7 @@ if skip == 0
     for nes = 1:n_cycles
         temp_files('make') 
         
-        modify_mesh_definition(paths.storage_path, 'temp_data', modelling_inputs.geometry_fraction)
+%         modify_mesh_definition(paths.storage_path, 'temp_data', modelling_inputs.geometry_fraction)
         
         if strcmp(sim_name, 'S-parameter')
             port_name = modelling_inputs.ports{nes};

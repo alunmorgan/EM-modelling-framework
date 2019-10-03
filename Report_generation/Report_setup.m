@@ -1,22 +1,11 @@
 function Report_setup(results_path, chosen_wake_length)
-% Generates a single report.
-% Author is a string which contains the names of the authors listed on the
-% report.
-% rep_num is the number of the particular report.
-% Graphic_path is the path to the logo you want on the report.
-%
-% Example: Report_setup(Author, Report_num, Graphic_path, results_path, input_folder)
+% Generates a single report. Data is loaded in from files found in the
+% results path.
+% 
+% Example: Report_setup(results_path, chosen_wake_length)
+
 %% Use the post processed data to generate a report.
-
-% report_input.doc_num = Report_num;
-% report_input.graphic = Graphic_path;
-% data_path = dir_list_gen(fullfile(results_path),'dirs',1);
-
-% for ks = 1:length(data_path)
-% [~,folder_name,~] = fileparts(results_path);
-% Load up the original model input parameters.
-load(fullfile(results_path, 'wake','run_inputs.mat'));
-
+load(fullfile(results_path, 'wake','run_inputs.mat'), 'modelling_inputs');
 if contains(modelling_inputs.sim_select, 's')
     % Load up the data extracted from the run log.
     load(fullfile(results_path, 'data_from_run_logs.mat'))
