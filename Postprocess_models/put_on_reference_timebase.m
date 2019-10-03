@@ -7,7 +7,11 @@ raw_port_data = NaN;
 
 % Interpolate the port signals onto the reference timebase.
 if isfield(port_data, 'data')
+    if length(port_data.data) ~=0
+        % if length is 0 then there are no transmitting modes in the
+        % spectral range requested.
     clear raw_port_data
+    end %if
     for jsff = 1:length(port_data.data) % number of ports
         for jsfs = 1:size(port_data.data{jsff},2) % number of transmitting modes
             tmp  = interp1(port_data.timebase,...
