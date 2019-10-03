@@ -6,7 +6,7 @@ function construct_wake_gdf_file(models_location, storage_location, modelling_in
 % modelling_inputs is the structure containing the input data for a single
 % simulation run.
 %
-% Example: construct_s_param_gdf_file(input_file_path, modelling_inputs)
+% Example: construct_wake_gdf_file(models_location, storage_location, modelling_inputs, plots)
 
 if ~isempty(modelling_inputs.mat_list)
     materials = modelling_inputs.mat_list(:,1);
@@ -30,12 +30,22 @@ fs = gdf_wake_header_construction('', 'temp', ...
     material_labels);
 
 geom = {'###################################################'};
+ if ~isempty(length(modelling_inputs.geometry_defs))
+for gdefind = 1:length(modelling_inputs.geometry_defs)
+    geom = cat(1, geom, ['define(',modelling_inputs.geometry_defs{gdefind}{1},...
+        ',',num2str(modelling_inputs.geometry_defs{gdefind}{2}{1}),')']);
+end %for
+ else
     geom =  cat(1, geom, '# NO parameter file assume fixed geometry #');
 end %if
 geom = cat(1, geom, '###################################################');
 
-modify_mesh_definition( storage_location, 'temp_data', modelling_inputs.geometry_fraction) % is this the second time? is this needed?
-mesh_def = read_file_full_line(fullfile('temp_data', 'mesh_definition.txt'));
+modelling_inputs.mesh = modify_mesh_definition(modelling_inputs.mesh, modelling_inputs.geometry_fraction);
+mesh_def = mesh_definition_construction(modelling_inputs.mesh);
+mesh_def = cat(1,mesh_def, '#');
+mesh_def = cat(1,mesh_def, '# We enforce a meshline at the position of the linecharge');
+mesh_def = cat(1,mesh_def, '# by enforcing two meshplanes');
+mesh_def = cat(1,mesh_def, '#');
 mesh_fixed_planes = gdf_write_mesh_fixed_planes(modelling_inputs.beam_offset_x, ...
     modelling_inputs.beam_offset_y);
 data = create_model_data_file_for_STL(modelling_inputs, models_location, plots);
@@ -44,8 +54,7 @@ port_defs = gdf_write_port_definitions( modelling_inputs.ports,...
     modelling_inputs.port_location, modelling_inputs.port_modes);
 
 if isfield(modelling_inputs, 'geom_only')
-    mon = {'-volumeplot'};
-    mon = cat(1,mon,'    doit');
+    mon = {''};
 else
     mon = gdf_wake_monitor_construction(...
         modelling_inputs.wakelength, modelling_inputs.mov);
