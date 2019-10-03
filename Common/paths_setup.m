@@ -28,7 +28,7 @@ end %if
 % mesh_definition.txt is used for defining the extent and the density of the mesh.
 %Also boundary conditions.
 % port_definition.txt is used for defining port locations and parameters.
-copyfile(fullfile(path_to_input_files, '*.txt'), store);
+%copyfile(fullfile(path_to_input_files, '*.txt'), store);
 
 %% Adding locations to the data structure.
 % Location of the temporary file space. Nothing is kept here.

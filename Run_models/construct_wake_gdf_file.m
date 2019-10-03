@@ -30,22 +30,6 @@ fs = gdf_wake_header_construction('', 'temp', ...
     material_labels);
 
 geom = {'###################################################'};
-parameter_file_path = fullfile(models_location, ...
-    modelling_inputs.base_model_name,...
-    modelling_inputs.model_name, ...
-    [modelling_inputs.model_name, '_parameters.txt']);
-if exist(parameter_file_path, 'file') == 2
-    geom_params = read_file_full_line(parameter_file_path);
-
-    for hes = 1:length(geom_params)
-        temp_name = geom_params{hes};
-        brk_ind = strfind(temp_name, ' : ');
-        g_name = temp_name(1:brk_ind-1);
-        g_val = regexprep(temp_name(brk_ind+3:end), '\s', '');
-        geom = cat(1, geom, ['define(',g_name,',',g_val,')']);
-    end %for
-   
-else
     geom =  cat(1, geom, '# NO parameter file assume fixed geometry #');
 end %if
 geom = cat(1, geom, '###################################################');

@@ -5,7 +5,7 @@ if ispc ==1
     error('This needs to be run on the linux modelling machine')
 end %if
 
-force_pp = 'skip';
+force_pp = 'no_skip';
 modelling_inputs = run_inputs_setup_STL(mi);
 
 % Running the different simulators for each model.
@@ -14,14 +14,6 @@ for awh = 1:length(modelling_inputs)
     if ~exist(fullfile(mi.paths.storage_path, modelling_inputs{awh}.model_name),'file')
     mkdir(fullfile(mi.paths.storage_path, modelling_inputs{awh}.model_name))
     end %if
-    %     if ~isempty(stl_flag)
-    %         % Create model_data file from STL file.
-    %         create_model_data_file_for_STL(...
-    %             mi.paths.input_file_path, mi.paths.storage_path,...
-    %             modelling_inputs{awh}.base_model_name,...
-    %             modelling_inputs{awh}.model_name)
-    %     end %if
-    %FIXME
     ow_behaviour = '';
     % Write update to the command line
     disp(datestr(now))
