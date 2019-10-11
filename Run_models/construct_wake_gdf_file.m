@@ -57,7 +57,7 @@ if isfield(modelling_inputs, 'geom_only')
     mon = {''};
 else
     mon = gdf_wake_monitor_construction(...
-        modelling_inputs.wakelength, modelling_inputs.mov);
+        modelling_inputs.wakelength, modelling_inputs.dtsafety, modelling_inputs.mov);
 end %if
 % construct the full input file.
 data = cat(1,fs, modelling_inputs.defs', geom, mesh_def, mesh_fixed_planes, ...

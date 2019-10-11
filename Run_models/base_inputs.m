@@ -15,6 +15,7 @@ base.model_angle = mi.model_angle;
 base.stl_scaling = mi.stl_scaling;
 base.cuts = mi.cuts;
 base.mesh = mi.simulation_defs.mesh;
+base.dtsafety = mi.simulation_defs.dtsafety;
 base.port_multiple = mi.simulation_defs.port_multiple{1};
 base.port_fill_factor = mi.simulation_defs.port_fill_factor{1};
 base.geometry_fraction = mi.simulation_defs.geometry_fractions(1);
