@@ -1,4 +1,4 @@
-function mesh_def = mesh_definition_construction(mesh_data)
+function mesh_def = mesh_definition_construction(mesh_data, mesh_density_scaling)
 %Constructs the mesh definition.
 
 mesh_def = {'###################################################'};
@@ -42,7 +42,7 @@ for lsf = 1:length(mesh_data.fixed_radii)
     temp = gdf_write_mesh_fixed_planes_range(...
         {['-(',inner_xy,')'], ['-(',mesh_data.fixed_radii{lsf},')']},...
         {['-(',inner_xy,')'], ['-(',mesh_data.fixed_radii{lsf},')']}, ...
-        mesh_data.fixed_radii_density{lsf});
+        num2str(mesh_data.fixed_radii_density{lsf} * mesh_density_scaling));
     mesh_def = cat(1, mesh_def, temp);
 end %for
 
@@ -50,18 +50,18 @@ for nfs = 1:length(mesh_data.range)
       temp = gdf_write_mesh_fixed_planes_range(...
         {mesh_data.range{nfs}{1}, mesh_data.range{nfs}{2}},...
         {mesh_data.range{nfs}{1}, mesh_data.range{nfs}{2}}, ...
-        mesh_data.range_density{nfs});
+        num2str(mesh_data.range_density{nfs} * mesh_density_scaling));
     mesh_def = cat(1, mesh_def, temp);
     temp = gdf_write_mesh_fixed_planes_range(...
         {['-(',mesh_data.range{nfs}{1},')'], ['-(',mesh_data.range{nfs}{2},')']},...
         {['-(',mesh_data.range{nfs}{1},')'], ['-(',mesh_data.range{nfs}{2},')']}, ...
-        mesh_data.range_density{nfs});
+        num2str(mesh_data.range_density{nfs} * mesh_density_scaling));
     mesh_def = cat(1, mesh_def, temp);
 end %for
 
 for nfs = 1:length(mesh_data.range_z)
       temp = gdf_write_mesh_fixed_planes_range_z(...
         {mesh_data.range_z{nfs}{1}, mesh_data.range_z{nfs}{2}},...
-        mesh_data.range_z_density{nfs});
+        num2str(mesh_data.range_z_density{nfs} * mesh_density_scaling));
     mesh_def = cat(1, mesh_def, temp);
 end %for

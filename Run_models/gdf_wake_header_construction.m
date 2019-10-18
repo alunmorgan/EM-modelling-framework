@@ -1,4 +1,4 @@
-function fs = gdf_wake_header_construction(loc, name, npmls, num_threads, mesh, sigma,...
+function fs = gdf_wake_header_construction(loc, name, npmls, num_threads, mesh, mesh_scaling, sigma,...
     beam_offset_x, beam_offset_y, wake_length, materials, material_labels)
 % Constructs the initial part of the gdf input file for GdfidL
 %
@@ -29,7 +29,7 @@ charge = '1E-9';
 fs = {'###################################################'};
 fs = cat(1,fs,'define(INF, 10000)');
 fs = cat(1,fs,'define(LargeNumber, 1000)');
-fs = cat(1,fs,['define(STPSZE, ',mesh,') # Step size of mesh']);
+fs = cat(1,fs,['define(STPSZE, ',num2str(mesh / mesh_scaling),') # Step size of mesh']);
 fs = cat(1,fs,['define(SIGMA, ',sigma,') # bunch length in mm']);
 fs = cat(1,fs,['define(NPMLs, ',npmls,') # number of perfect matching layers used']);
 fs = cat(1,fs,['define(CHARGE, ', charge,') # Bunch charge in C']);
