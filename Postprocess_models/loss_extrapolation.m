@@ -1,4 +1,4 @@
-function [extrap_data] = loss_extrapolation(time_domain_data, port_data, mi, ppi, raw_data, log , hfoi)
+function [extrap_data] = loss_extrapolation(time_domain_data, port_data, mi, ppi, raw_data, log)
 % calculates the change in wake loss factor and energy lost from the beam
 % and into the ports as the bunch and bunch train is varied.
 %
@@ -6,11 +6,10 @@ function [extrap_data] = loss_extrapolation(time_domain_data, port_data, mi, ppi
 % port_data is
 % beam_data is
 % raw_data is
-% hfoi is
 % log is
 % extrap_data is
 %
-% Example: [extrap_data] = loss_extrapolation(time_domain_data, port_data, beam_data, raw_data, hfoi, log )
+% Example: [extrap_data] = loss_extrapolation(time_domain_data, port_data, beam_data, raw_data, log )
 
 [ raw_port_data] = put_on_reference_timebase(time_domain_data.timebase, raw_data.port);
 
@@ -35,11 +34,11 @@ end %if
     regenerate_f_data(Charge_distribution_sig, ...
     wakepotential_sig,...
     port_data_sig, raw_data.port.frequency_cutoffs,...
-    timescale_sig, hfoi);
+    timescale_sig, ppi.hfoi);
 
 %% Find the variation with increasing beam sigma.
 for odf = 1:55
-    pulse_sig = str2num(mi.beam_sigma) ./ 3E8 + (odf-1) * 1E-12;
+    pulse_sig = str2double(mi.beam_sigma) ./ 3E8 + (odf-1) * 1E-12;
     % generate the time domain signal
     pulse = (1/(sqrt(2*pi)*pulse_sig)) * ...
         exp(-(timescale_sig.^2)/(2*pulse_sig^2));
@@ -83,7 +82,6 @@ else
     port_data_bc = NaN;
 end %if
 
-timescale_bc = timescale_bc_1_turn;
 % Regenerate the frequency domain data.
 % Note: replicating the longditudinal wake data for the transverse for the
 % moment as the transverse data is not used and this garentees the data is
@@ -94,7 +92,7 @@ timescale_bc = timescale_bc_1_turn;
     port_impedances_bc] = ...
     regenerate_f_data(Charge_distribution_bc, ...
     wakepotential_bc, port_data_bc, raw_data.port.frequency_cutoffs,...
-    timescale_bc, hfoi);
+    timescale_bc, ppi.hfoi);
 
 % When both bunch_spectra_model and
 % fft_t_wp are 0 this gives a NaN, but that poisons
