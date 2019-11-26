@@ -12,9 +12,21 @@ data = read_file_full_line(file_loc);
 % data = reduce_cell_depth(data);
 vals = reduce_cell_depth(reduce_cell_depth(...
     regexp(data, '(.*)\s:\s(.*)', 'tokens')));
-tmp = cellfun(@str2num, vals(:,2));
-for nse = 1:length(tmp)
-parameters{nse}{1} = vals{nse, 1};
-parameters{nse}{2} = {tmp(nse)};
-parameters{nse}{3} = '';
+for nse = 1:size(vals, 1)
+    parameters{nse}{1} = vals{nse, 1};
+    if ~isempty(strfind(vals{nse, 2}, '['))
+        list_begin = strfind(vals{nse, 2}, '[');
+        list_end = strfind(vals{nse, 2}, ']');
+        delims = strfind(vals{nse, 2}, ',');
+        tmp(1) = str2double(vals{nse, 2}(list_begin+1:delims(1)-1));
+        for ns = 1: length(delims) -1
+            vals{nse, 2}(delims(ns)+1:delims(1+1)-1)
+            tmp(ns+1) = str2double(vals{nse, 2}(delims(ns)+1:delims(ns+1)-1));
+        end %for
+        tmp(ns +2) = str2double(vals{nse, 2}(delims(ns + 1)+1:list_end-1));
+        parameters{nse}{2} = {tmp};
+    else
+        parameters{nse}{2} = {str2double(vals{nse, 2})};
+    end
+    parameters{nse}{3} = '';
 end %if
