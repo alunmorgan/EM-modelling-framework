@@ -69,7 +69,7 @@ rev = ppi.RF_freq/936;
 gap = 1/ppi.RF_freq;
 rev_time = (1/ppi.RF_freq) * 936; %time of 1 revolution
 % Pad the time domain data to one revolution length.
-[ timescale_bc_1_turn, Charge_distribution_bc] = ...
+[ timescale_bc, Charge_distribution_bc] = ...
     pad_data(time_domain_data.timebase, rev_time, 'time',...
     time_domain_data.charge_distribution);
 [~, wakepotential_bc] = ...
@@ -114,13 +114,13 @@ for cur_ind = 1:length(ppi.current)
             bunch_length =...
                 (3.87 + 2.41 * (cur * 1E3./fill_pattern) .^ 0.81) * sqrt(2.5/rf_val) * 1e-3./3E8; %in s
             
-            pulse = zeros(length(timescale_bc_1_turn),1);
+            pulse = zeros(length(timescale_bc),1);
             % added gap/2 so that the peak of the pulse does not happen at 0. So
             % we get a complete first pulse.
             % Generating a pulse train of 1C bunches
-            parfor jawe = 1:fill_pattern
+            for jawe = 1:fill_pattern
                 new_pulse = ((1 ./ (sqrt(2 .* pi) .* bunch_length)) .* ...
-                    exp(-((timescale_bc_1_turn - (gap .* (jawe - 1)) - gap ./ 2).^2) ./ (2 .* bunch_length.^2)));
+                    exp(-((timescale_bc - (gap .* (jawe - 1)) - gap ./ 2).^2) ./ (2 .* bunch_length.^2)));
                 pulse = pulse + new_pulse;
             end
             bunch_spec_bc = fft(pulse)/length(timescale_bc);
