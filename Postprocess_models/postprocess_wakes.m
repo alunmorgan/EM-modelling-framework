@@ -1,4 +1,4 @@
-function raw_data = postprocess_wakes(ppi, modelling_inputs, log)
+function raw_data = postprocess_wakes(modelling_inputs, log)
 % Runs the GdfidL postprocessor on the selected data.
 % The model data has already been selected using soft links.
 %

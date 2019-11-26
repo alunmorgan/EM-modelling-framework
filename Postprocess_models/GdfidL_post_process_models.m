@@ -1,4 +1,4 @@
-function GdfidL_post_process_models(ppi, ow_behaviour)
+function GdfidL_post_process_models(paths, model_name, ow_behaviour)
 % Takes the output of the GdfidL run and postprocesses it to generate
 % reports.
 %
@@ -10,10 +10,10 @@ end %if
 
 % storing the original location so that  we can return there at the end.
 old_loc = pwd;
-tmp_name =move_into_tempororary_folder(ppi.scratch_path);
+tmp_name =move_into_tempororary_folder(paths.scratch_path);
 
-if ~exist(fullfile(ppi.output_path, ppi.model_name), 'dir')
-    mkdir(fullfile(ppi.output_path, ppi.model_name))
+if ~exist(fullfile(paths.results_path, model_name), 'dir')
+    mkdir(fullfile(paths.results_path, model_name))
 end
 % make soft links to the data folder and output folder into /scratch.
 % this is because the post processor does not handle long paths well.
@@ -24,10 +24,10 @@ end
 if exist('pp_link','dir') ~= 0
     delete('pp_link')
 end
-[~]=system(['ln -s -T ',fullfile(ppi.storage_path, ppi.model_name), ' data_link']);
-[~]=system(['ln -s -T ',fullfile(ppi.output_path, ppi.model_name), ' pp_link']);
+[~]=system(['ln -s -T ',fullfile(paths.storage_path, model_name), ' data_link']);
+[~]=system(['ln -s -T ',fullfile(paths.results_path, model_name), ' pp_link']);
 
-disp(['GdfidL_post_process_models: Started analysis of ', ppi.model_name])
+disp(['GdfidL_post_process_models: Started analysis of ', model_name])
 pp_data = struct;
 %% Post processing wakes, eigenmode and lossy eigenmode
 sim_types = {'wake', 'eigenmode', 'eigenmode_lossy'};
@@ -35,11 +35,11 @@ for oef = 1:length(sim_types)
     if exist(fullfile('data_link', [sim_types{oef},'/']), 'dir')
         % Creating sub structure.
         try
-            skip = creating_space_for_postprocessing(sim_types{oef}, ow_behaviour, ppi.model_name);
+            skip = creating_space_for_postprocessing(sim_types{oef}, ow_behaviour, model_name);
             if skip == 0
                 [~] = system(['mkdir ', fullfile('pp_link', sim_types{oef})]);
                 % Save input structure
-                save(fullfile('pp_link', sim_types{oef}, 'pp_inputs.mat'), 'ppi');
+%                 save(fullfile('pp_link', sim_types{oef}, 'pp_inputs.mat'), 'ppi');
                 % Move files to the post processing folder.
                 copyfile(fullfile('data_link', sim_types{oef}, 'model.gdf'),...
                     fullfile('pp_link', sim_types{oef}, 'model.gdf'));
@@ -66,7 +66,7 @@ for oef = 1:length(sim_types)
                 orig_ver = getenv('GDFIDL_VERSION');
                 setenv('GDFIDL_VERSION',run_logs.ver);
                 if strcmp(sim_types{oef}, 'wake')
-                    pp_data = postprocess_wakes(ppi, modelling_inputs, run_logs);
+                    pp_data = postprocess_wakes(modelling_inputs, run_logs);
                 elseif strcmp(sim_types{oef}, 'eigenmode')
                     pp_data = postprocess_eigenmode(modelling_inputs, run_logs);
                 elseif strcmp(sim_types{oef}, 'eigenmode_lossy')
@@ -89,11 +89,11 @@ for heb = 1:length(sim_types)
     if exist(fullfile('data_link', sim_types{heb}), 'dir')
         % Creating sub structure.
         try
-            skip = creating_space_for_postprocessing(sim_types{heb}, ow_behaviour, ppi.model_name);
+            skip = creating_space_for_postprocessing(sim_types{heb}, ow_behaviour, model_name);
             if skip == 0
                 [~] = system(['mkdir ', fullfile('pp_link', sim_types{heb})]);
                 % Save input structure
-                save(fullfile('pp_link', sim_types{heb}, 'pp_inputs.mat'), 'ppi');
+%                 save(fullfile('pp_link', sim_types{heb}, 'pp_inputs.mat'), 'ppi');
                 % Move files to the post processing folder.
                 copyfile(fullfile('data_link', sim_types{heb}, 'run_inputs.mat'),...
                     fullfile('pp_link', [sim_types{heb}, '/']));

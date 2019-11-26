@@ -1,4 +1,4 @@
-function ov = generate_latex_for_wake_analysis(pp_data, wake_data, mi, ppi, run_log)
+function ov = generate_latex_for_wake_analysis(pp_data, wake_data, mi, ppi, port_overrides, run_log)
 % Generates latex code based on the wake simulation results.
 %
 % alpha is
@@ -9,6 +9,7 @@ function ov = generate_latex_for_wake_analysis(pp_data, wake_data, mi, ppi, run_
 %
 % Example: ov = generate_latex_for_wake_analysis(wake_data)
 
+port_overrides = port_overrides{1};
 
 alpha = pp_data.port.alpha;
 beta = pp_data.port.beta;
@@ -16,15 +17,15 @@ cutoff = pp_data.port.frequency_cutoffs_all;
 port_labels = pp_data.port.labels_table;
 % Applying post processing overrides to the number of modes used for each
 % port.
-for hwd = 1:length(ppi.port_modes_override)
-    if size(alpha{hwd},2) > ppi.port_modes_override(hwd)
-        alpha{hwd} = alpha{hwd}(1:ppi.port_modes_override(hwd));
+for hwd = 1:length(port_overrides)
+    if size(alpha{hwd},2) > port_overrides(hwd)
+        alpha{hwd} = alpha{hwd}(1:port_overrides(hwd));
     end %if
-    if size(beta{hwd},2) > ppi.port_modes_override(hwd)
-        beta{hwd} = beta{hwd}(1:ppi.port_modes_override(hwd));
+    if size(beta{hwd},2) > port_overrides(hwd)
+        beta{hwd} = beta{hwd}(1:port_overrides(hwd));
     end %if
-    if size(cutoff{hwd},2) > ppi.port_modes_override(hwd)
-        cutoff{hwd} = cutoff{hwd}(1:ppi.port_modes_override(hwd));
+    if size(cutoff{hwd},2) > port_overrides(hwd)
+        cutoff{hwd} = cutoff{hwd}(1:port_overrides(hwd));
     end %if
 end %for
 

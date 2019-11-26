@@ -1,4 +1,4 @@
-function wake_sweep_data = wake_sweep(sweep_lengths, raw_data, mi, ppi, log, hfoi, port_modes_override)
+function wake_sweep_data = wake_sweep(sweep_lengths, raw_data, mi, ppi, log, port_modes_override)
 % Run the frequency domain analysis over data which is increasingly reduced
 % in length (i.e. having different wake lengths).
 %
@@ -48,11 +48,11 @@ for se = length(sweep_lengths):-1:1
             r_data{se}.port.frequency_cutoffs, ...
             t_data{se},...
             r_data{se}.port,...
-            log, hfoi);
+            log, ppi.hfoi);
     else
         % Run the frequency analysis.
         f_data{se} = frequency_domain_analysis(...
-            NaN, t_data{se}, NaN, log, hfoi);
+            NaN, t_data{se}, NaN, log, ppi.hfoi);
     end %if
     f_data{se}.Wake_length = round(r_data{se}.Wake_potential(end,1)*3e8, 2);
     % Material loss
@@ -68,10 +68,10 @@ for se = length(sweep_lengths):-1:1
         m_data{se} = NaN;
     end %if
     %% Generating data for time slices
-    f_data{se}.time_slices = time_slices(t_data{se}, hfoi);
+    f_data{se}.time_slices = time_slices(t_data{se}, ppi.hfoi);
     %% Calculating the losses for different bunch lengths and bunch charges.
     f_data{se}.extrap_data = loss_extrapolation(...
-    t_data{se}, pt_data{se}, mi, ppi, raw_data, log, hfoi);
+    t_data{se}, pt_data{se}, mi, ppi, raw_data, log);
 end %for
 
 wake_sweep_data.raw = r_data;
