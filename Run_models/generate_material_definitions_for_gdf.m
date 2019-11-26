@@ -42,6 +42,14 @@ materials.aluminium_oxide.tan_delta = 0.00026;
 materials.aluminium_oxide.epsilon_r = 9.48;% Relative permativity
 materials.aluminium_oxide.mu_r = 1;% Relative permiability
 
+materials.silicon_dioxide.tan_delta = 0.001;
+materials.silicon_dioxide.epsilon_r = 3.9;% Relative permativity
+materials.silicon_dioxide.mu_r = 1;% Relative permiability
+
+materials.glass_borosilicate.tan_delta = 0.0022;
+materials.glass_borosilicate.epsilon_r = 4.9;% Relative permativity
+materials.glass_borosilicate.mu_r = 1;% Relative permiability
+
 materials.kovar.conductivity = 2.04082E6; % (S/m)
 materials.kovar.epsilon_r = 1;% Relative permativity
 materials.kovar.mu_r = 1;% Relative permiability
