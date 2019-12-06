@@ -1,6 +1,6 @@
 function run_inputs = paths_setup(model_name)
 %
-
+run_inputs.base_model_name = model_name;
 path_to_code = which(model_name);
 [path_to_input_files, ~, ~] = fileparts(path_to_code);
 
