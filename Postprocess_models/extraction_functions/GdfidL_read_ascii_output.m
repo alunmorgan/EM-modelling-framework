@@ -64,6 +64,8 @@ fy2 = reshape(fy',length(x_vals), length(y_vals), length(z_vals));
 fx2 = reshape(fx',length(x_vals), length(y_vals), length(z_vals));
 % get the overall aplitude of the field
 [~,~,fa2] = cart2sph(fx2,fy2,fz2);
+% [~,~,fa] = cart2sph(fx,fy,fz);
+% [x,y,z] = meshgrid(x_vals,y_vals,z_vals); 
 % trim away half (will not be needed for data after 19th Fab 2016 as it is
 % fixed in the GdfidL code)
 % fa2 = fa2(:,166:330,:);
