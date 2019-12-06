@@ -215,12 +215,19 @@ mesh_extent_xlow_ind = find_position_in_cell_lst(regexp(data,'mesh>\s*pxlow\s*=\
 mesh_extent_xhigh_ind = find_position_in_cell_lst(regexp(data,'mesh>\s*(?:[^,]*\s*,)?\s*pxhigh\s*=\s*'));
 mesh_extent_ylow_ind = find_position_in_cell_lst(regexp(data,'mesh>\s*pylow\s*=\s*'));
 mesh_extent_yhigh_ind = find_position_in_cell_lst(regexp(data,'mesh>\s*(?:[^,]*\s*,)?\s*pyhigh\s*=\s*'));
-mesh_extent_zlow = regexp(data{mesh_extent_zlow_ind},'mesh>\s*pzlow\s*=\s*([^,#]*)(?:\s*,|\s*#|\s*$)', 'tokens');
-mesh_extent_zhigh = regexp(data{mesh_extent_zhigh_ind},'mesh>\s*(?:[^,#]*\s*,)?\s*pzhigh\s*=\s*(.*)', 'tokens');
-mesh_extent_xlow = regexp(data{mesh_extent_xlow_ind},'mesh>\s*pxlow\s*=\s*([^,#]*)(?:\s*,|\s*#|\s*$)', 'tokens');
-mesh_extent_xhigh = regexp(data{mesh_extent_xhigh_ind},'mesh>\s*(?:[^,#]*\s*,)?\s*pxhigh\s*=\s*(.*)', 'tokens');
-mesh_extent_ylow = regexp(data{mesh_extent_ylow_ind},'mesh>\s*pylow\s*=\s*([^,#]*)(?:\s*,|\s*#|\s*$)', 'tokens');
-mesh_extent_yhigh = regexp(data{mesh_extent_yhigh_ind},'mesh>\s*(?:[^,#]*\s*,)?\s*pyhigh\s*=\s*(.*)', 'tokens');
+mesh_extent_zlow = regexp(data{mesh_extent_zlow_ind},'mesh>\s*pzlow\s*=\s*(.*)', 'tokens');
+mesh_extent_zhigh = regexp(data{mesh_extent_zhigh_ind},'mesh>\s*pzhigh\s*=\s*(.*)', 'tokens');
+mesh_extent_xlow = regexp(data{mesh_extent_xlow_ind},'mesh>\s*pxlow\s*=\s*(.*)', 'tokens');
+mesh_extent_xhigh = regexp(data{mesh_extent_xhigh_ind},'mesh>\s*pxhigh\s*=\s*(.*)', 'tokens');
+mesh_extent_ylow = regexp(data{mesh_extent_ylow_ind},'mesh>\s*pylow\s*=\s*(.*)', 'tokens');
+mesh_extent_yhigh = regexp(data{mesh_extent_yhigh_ind},'mesh>\s*pyhigh\s*=\s*(.*)', 'tokens');
+% mesh_extent_zlow = regexp(data{mesh_extent_zlow_ind},'mesh>\s*pzlow\s*=\s*([^,#]*)(?:\s*,|\s*#|\s*$)', 'tokens');
+% mesh_extent_zhigh = regexp(data{mesh_extent_zhigh_ind},'mesh>\s*(?:[^,#]*\s*,)?\s*pzhigh\s*=\s*(.*)', 'tokens');
+% mesh_extent_xlow = regexp(data{mesh_extent_xlow_ind},'mesh>\s*pxlow\s*=\s*([^,#]*)(?:\s*,|\s*#|\s*$)', 'tokens');
+% mesh_extent_xhigh = regexp(data{mesh_extent_xhigh_ind},'mesh>\s*(?:[^,#]*\s*,)?\s*pxhigh\s*=\s*(.*)', 'tokens');
+% mesh_extent_ylow = regexp(data{mesh_extent_ylow_ind},'mesh>\s*pylow\s*=\s*([^,#]*)(?:\s*,|\s*#|\s*$)', 'tokens');
+% mesh_extent_yhigh = regexp(data{mesh_extent_yhigh_ind},'mesh>\s*(?:[^,#]*\s*,)?\s*pyhigh\s*=\s*(.*)', 'tokens');
+
 
 lg.mesh_extent_zlow = eval(char(mesh_extent_zlow{1}{1}));
 lg.mesh_extent_zhigh = eval(char(mesh_extent_zhigh{1}{1}));
