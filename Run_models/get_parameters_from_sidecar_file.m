@@ -18,12 +18,16 @@ for nse = 1:size(vals, 1)
         list_begin = strfind(vals{nse, 2}, '[');
         list_end = strfind(vals{nse, 2}, ']');
         delims = strfind(vals{nse, 2}, ',');
-        tmp(1) = str2double(vals{nse, 2}(list_begin+1:delims(1)-1));
-        for ns = 1: length(delims) -1
-            vals{nse, 2}(delims(ns)+1:delims(1+1)-1)
-            tmp(ns+1) = str2double(vals{nse, 2}(delims(ns)+1:delims(ns+1)-1));
-        end %for
-        tmp(ns +2) = str2double(vals{nse, 2}(delims(ns + 1)+1:list_end-1));
+        if ~isempty(delims)
+            tmp(1) = str2double(vals{nse, 2}(list_begin+1:delims(1)-1));
+            for ns = 1: length(delims) -1
+                %             vals{nse, 2}(delims(ns)+1:delims(1+1)-1);
+                tmp(ns+1) = str2double(vals{nse, 2}(delims(ns)+1:delims(ns+1)-1));
+            end %for
+            tmp(ns +2) = str2double(vals{nse, 2}(delims(ns + 1)+1:list_end-1));
+        else
+            tmp = [];
+        end %if
         parameters{nse}{2} = {tmp};
     else
         parameters{nse}{2} = {str2double(vals{nse, 2})};
