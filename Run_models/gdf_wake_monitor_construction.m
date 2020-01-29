@@ -44,7 +44,7 @@ if mov == 1
 %     fs = cat(1,fs,' define( PMLCOMPENSATION, 51e-3  / @clight )'); % for 40 PMLS
     fs = cat(1,fs,' define( FIRSTSAV, 1e-3  / @clight )');
     fs = cat(1,fs,' define( DISTSAV, 3e-3 / @clight )');
-    fs = cat(1,fs,' define( MODELLENTIME, 50E-3 / @clight )');%( @zmax - @zmin) / @clight )');
+    fs = cat(1,fs,' define( MODELLENTIME, INF)');%50E-3 / @clight )');%( @zmax - @zmin) / @clight )');
     fs = cat(1,fs,'    -storefieldsat');
     fs = cat(1,fs,'        name= ALL');
     fs = cat(1,fs,'        whattosave = e');
