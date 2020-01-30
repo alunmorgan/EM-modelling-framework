@@ -18,12 +18,11 @@ function tfirst = GdfidL_write_pp_input_file(log, pipe_length, tqw_offset, ver)
 % port. If you do not leave enough time then there is an enhancement in
 % what is accounted for. And a sharp pling which messes up the FFT later in
 % the processing chain.
-tfirst(1) = log.beam_sigma*9 ./299792458; % beam entering the model.
-tfirst(2) = ( log.mesh_extent_zhigh - log.mesh_extent_zlow + log.beam_sigma .* 9) ./ 299792458;
+tfirst(1) = 0;
+tfirst(2) = 0;
 for ek = 3:length(log.port_name)
-    % HAVING ODD BEHAVIOR FOR DDBA BUTTONS WITH LARGE SIGNAL WHILE THE BEAM
-    % IS PASSING THROUGH THE PORTS.
-    % FOR NOW SET TO tfirst(2)
+    % These are now set to 0 as this truncation is done as a postprocessing
+    % step.
     tfirst(ek) =tfirst(2);
 end
 
@@ -58,6 +57,25 @@ ov = cat(1,ov,'    symbol = TEC');
 ov = cat(1,ov,'    onlyplotfiles = yes');
 ov = cat(1,ov,'    doit');
 ov = cat(1,ov,'');
+
+% ov = cat(1,ov,'-fexport');
+% if isfield(log, 'field_data')
+%     if isfield(log.field_data, 'EF')
+%         for kew = 1:size(log.field_data.EF,1)
+%             ov = cat(1,ov,['symbol = EF_e_', num2str(kew)]);
+%             ov = cat(1,ov,['outfile= pp_link/wake/EF_e_', num2str(kew)]);
+%             ov = cat(1,ov,'    doit');
+%         end %for
+%     end %if
+%      if isfield(log.field_data, 'ED')
+%         for kew = 1:size(log.field_data.ED, 1)
+%             ov = cat(1,ov,['symbol = EF_e_', num2str(kew)]);
+%             ov = cat(1,ov,['outfile= pp_link/wake/EF_e_', num2str(kew)]);
+%             ov = cat(1,ov,'    doit');
+%         end %for
+%     end %if
+% end %if
+
 for lae = 1:length(log.port_name)
     if ver > 170000 % output changed between versions.
         ov = cat(1,ov,'-sparameter, showeh=no');
@@ -87,16 +105,20 @@ if isfield(log, 'field_data')
         ov = cat(1,ov,'    scale= 4');
         ov = cat(1,ov,'    fcolour= 7');
         ov = cat(1,ov,'    arrows= 10');
-         ov = cat(1,ov,'    fonmat= yes');
-%         ov = cat(1,ov,'    fonmat= no');
-%         ov = cat(1,ov,'    jonmat= yes');
-        ov = cat(1,ov,'    eyeposition= ( 1.0, 2.3, 0.5 )');
-        ov = cat(1,ov,'    roty=-90'); % make the beam horizontal
+        ov = cat(1,ov,'    fonmat= yes');
+        ov = cat(1,ov,'    eyeposition= ( 1.0, -2.3, 0.5 )');
+        ov = cat(1,ov,'    bbxlow=0'); % cutting in half
+        ov = cat(1,ov,'    bbxhigh=1E30');
+        ov = cat(1,ov,'    bbylow=-8E-3');
+        ov = cat(1,ov,'    bbyhigh=8E-3');
+        ov = cat(1,ov,'    bbzlow=-10E-3');
+        ov = cat(1,ov,'    bbzhigh=10E-3');
         ov = cat(1,ov,'    rotx=180');
+        ov = cat(1,ov,'    roty=90'); % make the beam horizontal
+        ov = cat(1,ov,'    rotz=-90');
         ov = cat(1,ov,'    logfonmat=yes');
-        ov = cat(1,ov,'    onlyplotfile= yes');
+        ov = cat(1,ov,'    onlyplotfile= no');
         ov = cat(1,ov,'    quantity= ALL_e');
-        ov = cat(1,ov,'    bbylow=0'); % cutting in half
         ov = cat(1,ov,'    #');
         ov = cat(1,ov,'    # A first Pass through the Results.');
         ov = cat(1,ov,'    # We want to know what the max-Values of the Fields are ,');
@@ -105,17 +127,15 @@ if isfield(log, 'field_data')
         ov = cat(1,ov,'    #');
         ov = cat(1,ov,'define( FARROWMAX, 1e-6 )');
         ov = cat(1,ov,'define( FMAXONMAT, 1e-6 )');
-        %  ov = cat(1,ov,['define( NUMSETS, ','50',' )']);
-        ov = cat(1,ov,['define( NUMSETS, ',num2str(length(log.field_data.ALL)),' )']);
-        ov = cat(1,ov,['    do ii= ',num2str(field_start),', NUMSETS']);
-        ov = cat(1,ov,'       solution= ii');
-        %  ov = cat(1,ov,'# Just to not occupy too much FileSpace.');
-        %  ov = cat(1,ov,'system(rm -f ./*-3D-Arrowplot.*.gld )');
-        ov = cat(1,ov,'       doit');
-        ov = cat(1,ov,'define( FARROWMAX, max( FARROWMAX, @farrowmax ) )');
-        ov = cat(1,ov,'define( FMAXONMAT, max( FMAXONMAT, @absfmax ) )');
-        ov = cat(1,ov,'    end do');
-        ov = cat(1,ov,'system(rm -f ./*-3D-Arrowplot.*.gld )');
+        for ii = field_start:40 %length(log.field_data.ALL)
+            ov = cat(1,ov,['       solution= ', num2str(ii)]);
+            ov = cat(1,ov,['plotopts =  -geometry 1440X900 -colorps -o ./pp_link/wake/All_scaling_',num2str(ii,'%02d'),'.ps']);
+            ov = cat(1,ov,'       doit');
+            ov = cat(1,ov,'define( FARROWMAX, max( FARROWMAX, @farrowmax ) )');
+            ov = cat(1,ov,'define( FMAXONMAT, max( FMAXONMAT, @absfmax ) )');
+        end %for
+        %         ov = cat(1,ov,'    end do');
+        %         ov = cat(1,ov,'system(rm -f ./*-3D-Arrowplot.*.gld )');
         ov = cat(1,ov,'    #');
         ov = cat(1,ov,'    # The second pass through the Results.');
         ov = cat(1,ov,'    # We now know the Max Values, and scale every Frame for the same');
@@ -123,18 +143,35 @@ if isfield(log, 'field_data')
         ov = cat(1,ov,'    #');
         ov = cat(1,ov,'    fmaxonmat= FMAXONMAT / 2  # Slightly cheating.');
         ov = cat(1,ov,'    fscale= 1.5 /  FARROWMAX');
-        ov = cat(1,ov,'    do ii= 1, NUMSETS');
-        ov = cat(1,ov,'       solution= ii');
-        ov = cat(1,ov,'       doit   # Create the gld-File.');
-        ov = cat(1,ov,'    end do');
-        %  ov = cat(1,ov,'    fonmat= no');
-         ov = cat(1,ov,'    jonmat= yes');
-         ov = cat(1,ov,'    # Now looking at power on the surfaces.');
-         ov = cat(1,ov,'    #');
-         ov = cat(1,ov,'    do ii= 1, NUMSETS');
-         ov = cat(1,ov,'       solution= ii');
-         ov = cat(1,ov,'       doit   # Create the gld-File.');
-         ov = cat(1,ov,'    end do');
+        for ii = field_start:40 %length(log.field_data.ALL)
+            ov = cat(1,ov,['       solution= ', num2str(ii)]);
+            ov = cat(1,ov,['plotopts =  -geometry 1440X900 -colorps -o pp_link/wake/All_scaled_',num2str(ii,'%02d'),'.ps']);
+            ov = cat(1,ov,'       doit   # Create the gld-File.');
+        end %for
+        ov = cat(1,ov,'    fonmat= no');
+        ov = cat(1,ov,'    jonmat= yes');
+        ov = cat(1,ov,'    # Now looking at power on the surfaces.');
+        ov = cat(1,ov,'    fscale= auto');
+        ov = cat(1,ov,'    fmaxonmat= auto');
+        for ii = field_start:40 %length(log.field_data.ALL)
+            ov = cat(1,ov,['       solution= ', num2str(ii)]);
+            ov = cat(1,ov,['plotopts =  -geometry 1440X900 -colorps -o pp_link/wake/All_power_scaling_',num2str(ii,'%02d'),'.ps']);
+            ov = cat(1,ov,'       doit');
+            ov = cat(1,ov,'define( FARROWMAX, max( FARROWMAX, @farrowmax ) )');
+            ov = cat(1,ov,'define( FMAXONMAT, max( FMAXONMAT, @absfmax ) )');
+        end %for
+        ov = cat(1,ov,'    #');
+        ov = cat(1,ov,'    # The second pass through the Results.');
+        ov = cat(1,ov,'    # We now know the Max Values, and scale every Frame for the same');
+        ov = cat(1,ov,'    # Max Values that will occur in all the Frames.');
+        ov = cat(1,ov,'    #');
+        ov = cat(1,ov,'    fmaxonmat= FMAXONMAT / 2  # Slightly cheating.');
+        ov = cat(1,ov,'    fscale= 1.5 /  FARROWMAX');
+        for ii = field_start:40 %length(log.field_data.ALL)
+            ov = cat(1,ov,['       solution= ', num2str(ii)]);
+            ov = cat(1,ov,['plotopts =  -geometry 1440X900 -colorps -o pp_link/wake/All_power_scaled_',num2str(ii,'%02d'),'.ps']);
+            ov = cat(1,ov,'       doit   # Create the gld-File.');
+        end %for
     end %if
 end %if
 if exist('data_link/wake/honmat-000000001.gz','file') == 2

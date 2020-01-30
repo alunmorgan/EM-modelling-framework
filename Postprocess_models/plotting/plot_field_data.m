@@ -1,8 +1,13 @@
 function plot_field_data(field_data, metadata) 
 field_data = permute(field_data,[3,1,2]);
-h =slice(field_data, 1:size(field_data,2), 1:size(field_data,1), 1:size(field_data,3));
+[X,Y,Z] = meshgrid(...
+    metadata.horizontal_scale,...
+        metadata.beam_direction_scale,...
+    metadata.vertical_scale);
+h =slice(X, Y, Z, field_data, metadata.beam_direction_scale,...
+    metadata.horizontal_scale, metadata.vertical_scale);
 
-% set properties for all 19 objects at once using the "set" function
+% set properties for all objects at once using the "set" function
 set(h,'EdgeColor','none',...
     'FaceColor','interp',...
     'FaceAlpha','interp');
@@ -12,8 +17,8 @@ colormap(jet);
 grid off
 box off
 axis off
-axis equal
 axis ij
-rotate(h,[0,0,1],70)
+axis equal
+% rotate(h,[0,0,1],70)
 title(metadata.title)
 

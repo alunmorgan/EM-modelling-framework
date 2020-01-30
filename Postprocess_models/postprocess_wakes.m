@@ -34,16 +34,33 @@ for hwa = 1:length(data)
     end
 end
 
+[file_list, path_list] = dir_list_gen('pp_link/wake/', 'ps');
+if  ~isempty(file_list)
+    All_scaled_list = file_list(contains(file_list, 'All_scaled'));
+    if ~isempty(All_scaled_list)
+        for cek = 1:length(All_scaled_list)
+            system(['convert ', [path_list, All_scaled_list{cek}], ' -rotate -90 ', [path_list, All_scaled_list{cek}(1:end-2)],'png']);
+        end
+        system(['ffmpeg -r 2 -f image2 -s 1440x900 -i ', path_list, 'All_scaled_%02d.png -vcodec mpeg4 -pix_fmt yuv420p ' path_list, 'All_scaled.mp4'])
+    end %if
+    All_power_list = file_list(contains(file_list, 'All_power_scaled'));
+    if ~isempty(All_power_list)
+        for cek = 1:length(All_power_list)
+            system(['convert ', [path_list, All_power_list{cek}], ' -rotate -90 ', [path_list, All_power_list{cek}(1:end-2)],'png']);
+        end
+        system(['ffmpeg -r 2 -f image2 -s 1440x900 -i ', path_list, 'All_power_%02d.png -vcodec mpeg4 -pix_fmt yuv420p ' path_list, 'All_power.mp4'])
+    end %if
+end %if
 % find the gld files for the field output images.
 gld_list = dir_list_gen('pp_link/wake/', 'gld');
 if ~isempty(gld_list)
     gld_files = dir_list_gen('temp_scratch', 'gld', 1);
     parfor fjh = 1:length(gld_files)
         system(['gd1.3dplot -colorps -geometry 800x600 -o ',gld_files{fjh}(1:end-3), 'ps -i ' , gld_files{fjh}]);
-        system(['convert ', gld_files{fjh}(1:end-3), 'ps ',gld_files{fjh}(1:end-3) ,'png']);
+        system(['convert ', gld_files{fjh}(1:end-3), 'ps -rotate -90 ',gld_files{fjh}(1:end-3) ,'png']);
     end %for
-system('ffmpeg -r 10 -f image2 -s 1920x1080 -i temp_scratch/3D-Arrowplot.%04d.png -vcodec mpeg4 -pix_fmt yuv420p test.mp4')
-movefile('test.mp4', 'pp_link/wake/h_on_surfaces.mp4')
+    system('ffmpeg -r 10 -f image2 -s 1920x1080 -i temp_scratch/3D-Arrowplot.%04d.png -vcodec mpeg4 -pix_fmt yuv420p test.mp4')
+    movefile('test.mp4', 'pp_link/wake/h_on_surfaces.mp4')
 end %if
 
 gif_list = dir_list_gen('pp_link/wake/', 'gif');
