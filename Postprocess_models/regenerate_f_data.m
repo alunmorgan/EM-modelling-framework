@@ -64,17 +64,20 @@ wakeimpedance_IM =  - imag(fft_wp ./ bunch_spectra);
 fft_wp = []; % Cannot use clear in a parfor loop but I need to reduce the size.
 
 if iscell(port_data)
-    for nsf = 1:length(port_data)% number of ports
+    n_ports = length(port_data);% number of ports
+    port_impedances = zeros(hf_ind, n_ports); % Initialise with zeros.
+    for nsf = 1:n_ports
         single_port = port_data{nsf};
         if sum(isnan(single_port)) > 0
-            port_impedances_one_mode = NaN;
-            %             port_mode_fft = NaN;
+            port_impedances(:,nsf) = NaN;
         else
             single_port = cat(1,single_port,zeros(length(timescale) - ...
                 size(single_port,1), size(single_port,2)));
             % Calculating the fft of the port signals
-            for kef = 1:size(single_port, 2) % number of modes
-                port_mode_fft_temp = fft(single_port(:,kef))./n_freq_points;
+            n_modes = size(single_port, 2); % number of modes
+            port_mode_fft = zeros(hf_ind, n_modes); % Initialise with zeros.
+            for kef = 1:n_modes 
+                port_mode_fft_temp = fft(single_port(:,kef), [], 1)./n_freq_points;
                 % truncating to below the higest frequency of interest.
                 port_mode_fft_temp = port_mode_fft_temp(1:hf_ind);
                 if isempty(cut_off_freqs) == 0
@@ -88,7 +91,7 @@ if iscell(port_data)
                     % remove. If it is a gibbs like phenomina then the integral will be
                     % correct so the energy losses and power will be correct even if
                     % the cumulative sum graphs show some drops.)
-                    if tmp_ind < length(f_raw)
+                    if tmp_ind <= length(f_raw)
                         port_mode_fft_temp(1:tmp_ind) = 0;
                     end %if
                 end %if
@@ -102,12 +105,10 @@ if iscell(port_data)
             %     We take the real part as this corresponds to resistive losses.
             % take the abs because.....not quite sure if that is correct,however the
             % port impedance is oscillating around 0 otherwise.????
-            port_impedances_one_mode = real(sum(abs(port_mode_fft).^2,2)) ./...
+            port_impedances(:,nsf) = real(sum(abs(port_mode_fft).^2,2)) ./...
                 abs(bunch_spectra).^2;
         end %if
-        port_impedances(:,nsf) = port_impedances_one_mode;
-        port_impedances_one_mode = [];% Cannot use clear in a parfor loop but I need to reduce the size.
-    end %parfor
+     end %for
 else
     port_impedances = NaN;
 end %if
