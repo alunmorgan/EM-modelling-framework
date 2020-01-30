@@ -81,7 +81,7 @@ if skip == 0
             % Create the required sub structure output directories.
             arch_out = fullfile(results_storage_location, sim_f_name,['port_',port_name, '_excitation']);
         elseif strcmp(sim_name, 'Wake')
-            construct_wake_gdf_file(paths.path_to_models, paths.storage_path, modelling_inputs, plots)
+            construct_wake_gdf_file(paths.path_to_models, modelling_inputs, plots)
             arch_out = fullfile(results_storage_location, sim_f_name);
         elseif strcmp(sim_name, 'Eigenmode')
             construct_eigenmode_gdf_file(path_to_model_file, modelling_inputs, 'no')
