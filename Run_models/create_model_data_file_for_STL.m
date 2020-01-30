@@ -64,7 +64,7 @@ for lrd = 1:length(stls)
     model_file = cat(1, model_file, '# There is also an adjustment in yprime in order.');
     model_file = cat(1, model_file, '# to rotate the model around the beam axis, to ');
     model_file = cat(1, model_file, '# adjust port locations.');
-    model_file = cat(1, model_file, 'xprime= (0 ,0 ,1)');
+    model_file = cat(1, model_file, 'xprime= (0 ,0 ,-1)');
     model_file = cat(1, model_file, ['yprime= (',num2str(model_angle/90),',', num2str(1-(model_angle/90)),', 0)']);
     model_file = cat(1, model_file, '# The following three lines account for if the input file scale is not in m.');
     model_file = cat(1, model_file, ['xscale = ', num2str(model_scaling)]);
@@ -122,7 +122,7 @@ if plots == 1
         model_file = cat(1, model_file, ['   plotopts = -o temp_data/3Dmodel_cut_',modelling_inputs.cuts{ndw, 1},'_',num2str(modelling_inputs.cuts{ndw, 2}),'.ps -colorps']);
         model_file = cat(1, model_file, 'doit');
     end %for
-    model_file = reset_bounding_box(model_file);
+        model_file = reset_bounding_box(model_file);
     for ndw = 1:size(modelling_inputs.cuts,1)
         model_file = cat(1, model_file, '-cutplot');
         model_file = cat(1, model_file, 'draw= approximated');

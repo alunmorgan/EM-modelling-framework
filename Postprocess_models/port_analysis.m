@@ -16,7 +16,6 @@ if nargin >1 % There are overrides to the number of port modes to be used.
         end %if
     end %for
 end %if
-
 t_step = raw_port_data.timebase(2) - raw_port_data.timebase(1); % time step in s
 % To convert from signal to power you need to square the signal
 % The t_step scaling is to deal with the fact that the data
