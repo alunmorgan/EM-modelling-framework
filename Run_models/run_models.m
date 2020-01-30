@@ -1,11 +1,9 @@
-function run_models(mi)
+function run_models(mi, force_pp)
 
 
 if ispc ==1
     error('This needs to be run on the linux modelling machine')
 end %if
-
-force_pp = 'no_skip';
 
 %%%% Generating mappings %%%%%
 for nwe = 1:length(mi.mat_params) 
