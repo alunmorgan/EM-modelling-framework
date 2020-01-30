@@ -100,9 +100,9 @@ if skip == 0
         orig_ver = getenv('GDFIDL_VERSION');
         setenv('GDFIDL_VERSION',modelling_inputs.version);
         if strcmp(modelling_inputs.precision, 'single')
-            [status, ~] = system('single.gd1 < temp_data/model.gdf > temp_data/model_log');
+            [status, ~] = system('nice single.gd1 < temp_data/model.gdf > temp_data/model_log');
         elseif strcmp(modelling_inputs.precision, 'double')
-            [status, cmd_output] = system('gd1 < temp_data/model.gdf > temp_data/model_log');
+            [status, cmd_output] = system('nice gd1 < temp_data/model.gdf > temp_data/model_log');
         end %if
         % restoring the original version.
         setenv('GDFIDL_VERSION',orig_ver);
