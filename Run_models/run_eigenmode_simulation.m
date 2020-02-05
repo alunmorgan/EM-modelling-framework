@@ -1,4 +1,4 @@
-function arch_date = run_eigenmode_simulation(mi, modelling_inputs, arch_date)
+function arch_date = run_eigenmode_simulation(paths, modelling_inputs, ow_behaviour, stl_flag)
 % Takes the geomtry specification, adds the setup for a wake simulation and
 % runs a wake field simulation with the desired calulational precision.
 %

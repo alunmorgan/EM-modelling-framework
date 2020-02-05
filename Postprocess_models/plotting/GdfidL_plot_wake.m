@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 function GdfidL_plot_wake(path_to_data, ppi, range, chosen_wake_length, hfoi)
 % Generate the graphs based on the wake simulation data.
 % Graphs are saved in fig format and png, eps.

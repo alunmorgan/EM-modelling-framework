@@ -14,35 +14,21 @@ function run_wake_simulation(paths, modelling_inputs, ow_behaviour, stl_flag)
 % have long term storage on a network drive, but during the modelling this
 % will kill performance. So initially write to a local drive and then move
 % it.
-if nargin == 3 && ~strcmp(ow_behaviour, 'STL')
-    stl_flag = '';
-end %if
-if nargin == 3 && strcmp(ow_behaviour, 'STL')
-    stl_flag = 'STL';
-end %if
+% if nargin == 3 && ~strcmp(ow_behaviour, 'STL')
+%     stl_flag = '';
+% end %if
+% if nargin == 3 && strcmp(ow_behaviour, 'STL')
+%     stl_flag = 'STL';
+% end %if
 
-skip = 0;
+% skip = 0;
 % create the required output directories, and move any existing data out of
 % the way.
-
+skip = strcmp(ow_behaviour, 'no_skip');
 results_storage_location = fullfile(paths.storage_path, modelling_inputs.model_name);
-if exist(fullfile(results_storage_location, 'wake'),'dir')
-    if nargin ==3 && strcmp(ow_behaviour, 'no_skip')
-        old_store = ['old_data', datestr(now,30)];
-        mkdir(results_storage_location, old_store)
-        movefile(fullfile(results_storage_location, 'wake'),...
-            fullfile(results_storage_location, old_store))
-        disp(['Wake data already exists for ',...
-            modelling_inputs.model_name, ...
-            '. However the overwrite flag is set so the simulation will be run anyway. Old data moved to ',...
-            fullfile(results_storage_location, old_store)])
-    else
-        disp(['Skipping ', modelling_inputs.model_name, '. Wake data already exists'])
-        skip = 1;
-        
-    end %if
-end %if
-if skip == 0
+run_sim = make_data_store(results_storage_location, 'wake', skip);
+
+if run_sim == 1
     mkdir(results_storage_location, 'wake')
     % Move into the temporary folder.
     old_loc = pwd;

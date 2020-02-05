@@ -34,26 +34,28 @@ elseif strcmpi(sim_type, 'shunt')
     sim_f_name = 'shunt';
     sim_name = 'Shunt';
 end %if
-skip = 0;
+skip = strcmp(ow_behaviour, 'no_skip');
 % Create the required top leveloutput directories.
 results_storage_location = fullfile(paths.storage_path, modelling_inputs.model_name);
-if exist(fullfile(results_storage_location, sim_f_name),'dir')
-    if nargin ==4 && strcmp(ow_behaviour, 'no_skip')
-        old_store = ['old_data', datestr(now,30)];
-        mkdir(results_storage_location, old_store)
-        movefile(fullfile(results_storage_location, sim_f_name),...
-            fullfile(results_storage_location, old_store))
-        disp([sim_name,' data already exists for ',...
-            modelling_inputs.model_name, ...
-            '. However the overwrite flag is set so the simulation will be run anyway. Old data moved to ',...
-            fullfile(results_storage_location, old_store)])
-    else
-        disp(['Skipping ', modelling_inputs.model_name, '. ', sim_name,' data already exists'])
-        skip = 1;
-    end %if
-end %if
+run_sim = make_data_store(results_storage_location, sim_f_name, skip);
+% if exist(fullfile(results_storage_location, sim_f_name),'dir')
+%     if nargin ==4 && strcmp(ow_behaviour, 'no_skip')
+%         old_store = ['old_data', datestr(now,30)];
+%         mkdir(results_storage_location, old_store)
+%         movefile(fullfile(results_storage_location, sim_f_name),...
+%             fullfile(results_storage_location, old_store))
+%         disp([sim_name,' data already exists for ',...
+%             modelling_inputs.model_name, ...
+%             '. However the overwrite flag is set so the simulation will be run anyway. Old data moved to ',...
+%             fullfile(results_storage_location, old_store)])
+%     else
+%         disp(['Skipping ', modelling_inputs.model_name, '. ', sim_name,' data already exists'])
+%         skip = 1;
+%     end %if
+% end %if
 
-if skip == 0
+% if skip == 0
+if run_sim == 1
     mkdir(results_storage_location, sim_f_name)
     % Move into the temporary folder.
     old_loc = pwd;
@@ -71,57 +73,61 @@ if skip == 0
     end %if
     
     for nes = 1:n_cycles
-        temp_files('make') 
+        temp_files('make')
         
-%         modify_mesh_definition(paths.storage_path, 'temp_data', modelling_inputs.geometry_fraction)
-        
-        if strcmp(sim_name, 'S-parameter')
-            port_name = modelling_inputs.ports{nes};
-            construct_s_param_gdf_file(paths.input_file_path, paths.storage_path, modelling_inputs, port_name)
-            % Create the required sub structure output directories.
-            arch_out = fullfile(results_storage_location, sim_f_name,['port_',port_name, '_excitation']);
-        elseif strcmp(sim_name, 'Wake')
-            construct_wake_gdf_file(paths.path_to_models, modelling_inputs, plots)
-            arch_out = fullfile(results_storage_location, sim_f_name);
-        elseif strcmp(sim_name, 'Eigenmode')
-            construct_eigenmode_gdf_file(path_to_model_file, modelling_inputs, 'no')
-            arch_out = fullfile(results_storage_location, sim_f_name);
-        elseif strcmp(sim_name, 'Lossy eigenmode')
-            construct_eigenmode_gdf_file(path_to_model_file, modelling_inputs, 'yes')
-            arch_out = fullfile(results_storage_location, sim_f_name);
-        elseif strcmp(sim_name, 'Shunt')
-            frequency = num2str(f_range(nes));
-            construct_shunt_gdf_file(path_to_model_file, modelling_inputs, frequency)
-            % Create the required sub structure output directories.
-            arch_out = fullfile(results_storage_location, sim_f_name, frequency);
-        end %if
+        %         modify_mesh_definition(paths.storage_path, 'temp_data', modelling_inputs.geometry_fraction)
+        frequency = num2str(f_range(nes));
+        port_name = modelling_inputs.ports{nes};
+        arch_out = construct_storage_area_path(results_storage_location, sim_f_name, port_name, frequency);
+        construct_gdf_file(paths, modelling_inputs, port_name, frequency, plots)
+        %         if strcmp(sim_name, 'S-parameter')
+        %             port_name = modelling_inputs.ports{nes};
+        %             construct_s_param_gdf_file(paths.input_file_path, paths.storage_path, modelling_inputs, port_name)
+        %             % Create the required sub structure output directories.
+        %             arch_out = fullfile(results_storage_location, sim_f_name,['port_',port_name, '_excitation']);
+        %         elseif strcmp(sim_name, 'Wake')
+        %             construct_wake_gdf_file(paths.path_to_models, modelling_inputs, plots)
+        %             arch_out = fullfile(results_storage_location, sim_f_name);
+        %         elseif strcmp(sim_name, 'Eigenmode')
+        %             construct_eigenmode_gdf_file(path_to_model_file, modelling_inputs, 'no')
+        %             arch_out = fullfile(results_storage_location, sim_f_name);
+        %         elseif strcmp(sim_name, 'Lossy eigenmode')
+        %             construct_eigenmode_gdf_file(path_to_model_file, modelling_inputs, 'yes')
+        %             arch_out = fullfile(results_storage_location, sim_f_name);
+        %         elseif strcmp(sim_name, 'Shunt')
+        %             frequency = num2str(f_range(nes));
+        %             construct_shunt_gdf_file(path_to_model_file, modelling_inputs, frequency)
+        %             % Create the required sub structure output directories.
+        %             arch_out = fullfile(results_storage_location, sim_f_name, frequency);
+        %         end %if
         disp(['Running ', sim_name,' simulation for ', modelling_inputs.model_name, '.'])
-        % setting the GdfidL version to test
-        orig_ver = getenv('GDFIDL_VERSION');
-        setenv('GDFIDL_VERSION',modelling_inputs.version);
-        if strcmp(modelling_inputs.precision, 'single')
-            [status, ~] = system('nice single.gd1 < temp_data/model.gdf > temp_data/model_log');
-        elseif strcmp(modelling_inputs.precision, 'double')
-            [status, cmd_output] = system('nice gd1 < temp_data/model.gdf > temp_data/model_log');
-        end %if
-        % restoring the original version.
-        setenv('GDFIDL_VERSION',orig_ver);
-        if status ~= 0
-            disp(['Look at model log', cmd_output])
-        end %if
+        GdfidL_simulation_core(modelling_inputs.version, modelling_inputs.precision)
+%         % setting the GdfidL version to test
+%         orig_ver = getenv('GDFIDL_VERSION');
+%         setenv('GDFIDL_VERSION',modelling_inputs.version);
+%         if strcmp(modelling_inputs.precision, 'single')
+%             [status, ~] = system('nice single.gd1 < temp_data/model.gdf > temp_data/model_log');
+%         elseif strcmp(modelling_inputs.precision, 'double')
+%             [status, cmd_output] = system('nice gd1 < temp_data/model.gdf > temp_data/model_log');
+%         end %if
+%         % restoring the original version.
+%         setenv('GDFIDL_VERSION',orig_ver);
+%         if status ~= 0
+%             disp(['Look at model log', cmd_output])
+%         end %if
         
         % Move the data to the storage area.
-        if ~exist(arch_out,'dir')
-            mkdir(arch_out)
-        end %if
+%         if ~exist(arch_out,'dir')
+%             mkdir(arch_out)
+%         end %if
         save(fullfile(results_storage_location, sim_f_name, 'run_inputs.mat'), 'paths', 'modelling_inputs')
         movefile('temp_data/*', arch_out);
-%         copyfile(path_to_model_file, arch_out);
+        %         copyfile(path_to_model_file, arch_out);
         temp_files('remove')
-        if status == 0
-            delete('SOLVER-LOGFILE');
-            delete('WHAT-GDFIDL-DID-SPIT-OUT');
-        end %if
+%         if status == 0
+%             delete('SOLVER-LOGFILE');
+%             delete('WHAT-GDFIDL-DID-SPIT-OUT');
+%         end %if
     end %for
     cd(old_loc)
     rmdir(tmp_location,'s');
