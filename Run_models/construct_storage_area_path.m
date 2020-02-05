@@ -4,16 +4,16 @@ function arch_out = construct_storage_area_path(results_storage_location, sim_f_
 % if the folder does not exist it is made.
 
 
-if strcmp(sim_name, 'S-parameter')
+if strcmp(sim_f_name, 's_parameter')
     % Create the required sub structure output directories.
     arch_out = fullfile(results_storage_location, sim_f_name,['port_',port_name, '_excitation']);
-elseif strcmp(sim_name, 'Wake')
+elseif strcmp(sim_f_name, 'wake')
     arch_out = fullfile(results_storage_location, sim_f_name);
-elseif strcmp(sim_name, 'Eigenmode')
+elseif strcmp(sim_f_name, 'eigenmode')
     arch_out = fullfile(results_storage_location, sim_f_name);
-elseif strcmp(sim_name, 'Lossy eigenmode')
+elseif strcmp(sim_f_name, 'lossy eigenmode')
     arch_out = fullfile(results_storage_location, sim_f_name);
-elseif strcmp(sim_name, 'Shunt')
+elseif strcmp(sim_f_name, 'shunt')
     % Create the required sub structure output directories.
     arch_out = fullfile(results_storage_location, sim_f_name, frequency);
 end %if

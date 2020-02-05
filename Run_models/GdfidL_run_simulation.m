@@ -37,7 +37,7 @@ end %if
 skip = strcmp(ow_behaviour, 'no_skip');
 % Create the required top leveloutput directories.
 results_storage_location = fullfile(paths.storage_path, modelling_inputs.model_name);
-run_sim = make_data_store(results_storage_location, sim_f_name, skip);
+run_sim = make_data_store(modelling_inputs.model_name, results_storage_location, sim_f_name, skip);
 % if exist(fullfile(results_storage_location, sim_f_name),'dir')
 %     if nargin ==4 && strcmp(ow_behaviour, 'no_skip')
 %         old_store = ['old_data', datestr(now,30)];
@@ -79,7 +79,7 @@ if run_sim == 1
         frequency = num2str(f_range(nes));
         port_name = modelling_inputs.ports{nes};
         arch_out = construct_storage_area_path(results_storage_location, sim_f_name, port_name, frequency);
-        construct_gdf_file(paths, modelling_inputs, port_name, frequency, plots)
+        construct_gdf_file(paths, sim_name, modelling_inputs, port_name, frequency, plots)
         %         if strcmp(sim_name, 'S-parameter')
         %             port_name = modelling_inputs.ports{nes};
         %             construct_s_param_gdf_file(paths.input_file_path, paths.storage_path, modelling_inputs, port_name)

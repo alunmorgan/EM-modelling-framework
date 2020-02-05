@@ -1,4 +1,4 @@
-function construct_gdf_file(paths, modelling_inputs, port_name, frequency, plots)
+function construct_gdf_file(paths, sim_name, modelling_inputs, port_name, frequency, plots)
 % Generate the correct gdf file for the requested simulation.
 
 if strcmp(sim_name, 'S-parameter')
