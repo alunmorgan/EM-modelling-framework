@@ -104,6 +104,24 @@ if plots == 1
         model_file = cat(1, model_file, ['   plotopts = -o temp_data/2Dmodel_cut_',modelling_inputs.cuts{ndw, 1},'_',num2str(modelling_inputs.cuts{ndw, 2}),'.ps -colorps']);
         model_file = cat(1, model_file, 'doit');
     end %for
+%     for wja = 1:size(modelling_inputs.plot_volumes,1)
+%         model_file = reset_bounding_box(model_file);
+%         model_file = cat(1, model_file, ['   bbxlow=',num2str(modelling_inputs.plot_volumes{wja}(1))]);
+%         model_file = cat(1, model_file, ['   bbxhigh=',num2str(modelling_inputs.plot_volumes{wja}(2))]);
+%         model_file = cat(1, model_file, ['   bbylow=',num2str(modelling_inputs.plot_volumes{wja}(3))]);
+%         model_file = cat(1, model_file, ['   bbyhigh=',num2str(modelling_inputs.plot_volumes{wja}(4))]);
+%         model_file = cat(1, model_file, ['   bbzlow=',num2str(modelling_inputs.plot_volumes{wja}(5))]);
+%         model_file = cat(1, model_file, ['   bbzhigh=',num2str(modelling_inputs.plot_volumes{wja}(6))]);
+%         if strcmp(modelling_inputs.cuts{wja}(7),'x')
+%             model_file = cat(1, model_file, '   eyeposition= (1, 0, 0)');
+%         elseif strcmp(modelling_inputs.cuts{wja}(7),'y')
+%             model_file = cat(1, model_file, '   eyeposition= (0, 1, 0)');
+%         elseif strcmp(modelling_inputs.cuts{wja}(7),'z')
+%             model_file = cat(1, model_file, '   eyeposition= (0, 0, 1)');
+%         end %if
+%         model_file = cat(1, model_file, ['   plotopts = -o temp_data/2Dmodel_subvol_cut_',modelling_inputs.cuts{ndw, 1},'_',num2str(modelling_inputs.cuts{ndw, 2}),'.ps -colorps']);
+%         model_file = cat(1, model_file, 'doit');
+%     end %for
     for ndw = 1:size(modelling_inputs.cuts,1)
         model_file = cat(1, model_file, '-volumeplot');
         if strcmp(modelling_inputs.cuts{ndw, 1},'x')
@@ -122,7 +140,7 @@ if plots == 1
         model_file = cat(1, model_file, ['   plotopts = -o temp_data/3Dmodel_cut_',modelling_inputs.cuts{ndw, 1},'_',num2str(modelling_inputs.cuts{ndw, 2}),'.ps -colorps']);
         model_file = cat(1, model_file, 'doit');
     end %for
-        model_file = reset_bounding_box(model_file);
+    model_file = reset_bounding_box(model_file);
     for ndw = 1:size(modelling_inputs.cuts,1)
         model_file = cat(1, model_file, '-cutplot');
         model_file = cat(1, model_file, 'draw= approximated');
