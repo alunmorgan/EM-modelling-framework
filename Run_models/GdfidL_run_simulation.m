@@ -34,7 +34,7 @@ elseif strcmpi(sim_type, 'shunt')
     sim_f_name = 'shunt';
     sim_name = 'Shunt';
 end %if
-skip = strcmp(ow_behaviour, 'no_skip');
+skip = strcmp(ow_behaviour, 'skip');
 % Create the required top leveloutput directories.
 results_storage_location = fullfile(paths.storage_path, modelling_inputs.model_name);
 run_sim = make_data_store(modelling_inputs.model_name, results_storage_location, sim_f_name, skip);
