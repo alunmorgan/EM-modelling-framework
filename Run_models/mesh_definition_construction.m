@@ -27,9 +27,9 @@ mesh_def = cat(1, mesh_def, ['	  pyhigh= ', mesh_data.pyhigh]);
 mesh_def = cat(1, mesh_def, ['    pzlow= ', mesh_data.pzlow]);
 mesh_def = cat(1, mesh_def, ['    pzhigh= ', mesh_data.pzhigh]);
 
-mesh_def = cat(1, mesh_def, '    cxlow= electric, cxhigh= electric');
-mesh_def = cat(1, mesh_def, '    cylow= electric, cyhigh= electric');
-mesh_def = cat(1, mesh_def, '    czlow= electric, czhigh= electric');
+mesh_def = cat(1, mesh_def, ['    cxlow= ',mesh_data.cxlow,', cxhigh= ',mesh_data.cxhigh]);
+mesh_def = cat(1, mesh_def, ['    cylow= ',mesh_data.cylow,', cyhigh= ',mesh_data.cyhigh]);
+mesh_def = cat(1, mesh_def, ['    czlow= ',mesh_data.czlow,', czhigh= ',mesh_data.czhigh]);
 
 for lsf = 1:length(mesh_data.fixed_radii)
 %         calculate the xy value of radius at 45 degrees.
