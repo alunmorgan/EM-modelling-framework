@@ -53,13 +53,13 @@ for hes = 1:size(Port_mat,1) % ports
                 %   clear temp_data
                 temp_data =[];
             end
-        end
+        end %for
         if nsaw == 1
             port_names{ck} = port_names_table{hes};
             ck2 = ck2 + 1;
         else
             port_names{ck} = [port_names_table{hes},'_', num2str(nsaw)];
-        end
+        end %if
         ck = ck +1;
     end
     
