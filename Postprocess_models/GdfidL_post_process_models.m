@@ -144,18 +144,3 @@ delete('pp_link')
 delete('data_link')
 cd(old_loc)
 rmdir(fullfile(tmp_name),'s');
-end % function
-
-function skip = creating_space_for_postprocessing(sim_type, ow_behaviour, model_name)
-skip = 0;
-if exist(fullfile('pp_link', sim_type), 'dir')
-    if strcmp(ow_behaviour, 'no_skip')
-        old_store = ['old_data', datestr(now,30)];
-        mkdir('pp_link', old_store)
-        movefile(fullfile('pp_link', sim_type), fullfile('pp_link', old_store))
-    else
-        disp(['Skipping ', sim_type, ' postprocessing for ',model_name, ' data already exists'])
-        skip = 1;
-    end %if
-end %if
-end %function
