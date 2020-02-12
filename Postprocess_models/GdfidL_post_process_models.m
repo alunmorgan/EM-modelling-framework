@@ -33,13 +33,19 @@ pp_data = struct;
 sim_types = {'wake', 'eigenmode', 'eigenmode_lossy'};
 for oef = 1:length(sim_types)
     if exist(fullfile('data_link', [sim_types{oef},'/']), 'dir')
+        if strcmp(ow_behaviour, 'skip') && exist(fullfile('pp_link', sim_types{oef}), 'dir') == 7
+            run_pp = 0;
+        elseif strcmp(ow_behaviour, 'skip') && exist(fullfile('pp_link', sim_types{oef}), 'dir') == 0
+            run_pp = 1;
+        elseif strcmp(ow_behaviour, 'no_skip')
+            run_pp = 1;
+        else
+            error('Please select skip or no_skip for the postprocessing')
+        end %if
         % Creating sub structure.
         try
-            skip = creating_space_for_postprocessing(sim_types{oef}, ow_behaviour, model_name);
-            if skip == 0
-                [~] = system(['mkdir ', fullfile('pp_link', sim_types{oef})]);
-                % Save input structure
-%                 save(fullfile('pp_link', sim_types{oef}, 'pp_inputs.mat'), 'ppi');
+            creating_space_for_postprocessing(sim_types{oef}, run_pp, model_name);
+            if run_pp == 1
                 % Move files to the post processing folder.
                 copyfile(fullfile('data_link', sim_types{oef}, 'model.gdf'),...
                     fullfile('pp_link', sim_types{oef}, 'model.gdf'));
@@ -87,13 +93,19 @@ end %for
 sim_types = {'s_parameters', 'shunt'};
 for heb = 1:length(sim_types)
     if exist(fullfile('data_link', sim_types{heb}), 'dir')
+        if strcmp(ow_behaviour, 'skip') && exist(fullfile('pp_link', sim_types{heb}), 'dir') == 7
+            run_pp = 0;
+        elseif strcmp(ow_behaviour, 'skip') && exist(fullfile('pp_link', sim_types{heb}), 'dir') == 0
+            run_pp = 1;
+        elseif strcmp(ow_behaviour, 'no_skip')
+            run_pp = 1;
+        else
+            error('Please select skip or no_skip for the postprocessing')
+        end %if
         % Creating sub structure.
         try
-            skip = creating_space_for_postprocessing(sim_types{heb}, ow_behaviour, model_name);
-            if skip == 0
-                [~] = system(['mkdir ', fullfile('pp_link', sim_types{heb})]);
-                % Save input structure
-%                 save(fullfile('pp_link', sim_types{heb}, 'pp_inputs.mat'), 'ppi');
+            creating_space_for_postprocessing(sim_types{heb}, run_pp, model_name);
+            if run_pp == 0
                 % Move files to the post processing folder.
                 copyfile(fullfile('data_link', sim_types{heb}, 'run_inputs.mat'),...
                     fullfile('pp_link', [sim_types{heb}, '/']));
