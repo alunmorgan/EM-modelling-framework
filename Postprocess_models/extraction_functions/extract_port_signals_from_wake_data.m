@@ -12,7 +12,7 @@ end %if
 
 if isfield(pp_data.port, 'data') && isfield(wake_data.port_time_data, 'port_mode_energy')
     [~, max_mode] = max(wake_data.port_time_data.port_mode_energy,[],2);
-    for ens = size(wake_data.port_time_data.port_mode_energy, 1):-1:1 % ports
+    for ens = length(lab_ind):-1:1 % ports
 %         [~, max_mode(ens)] = max(squeeze(wake_data.port_time_data.port_mode_energy{lab_ind(ens)}(:)));
         dominant_modes{ens} =  squeeze(wake_data.port_time_data.port_mode_signals(lab_ind(ens),max_mode(ens), :));     
         for seo = 1:size(wake_data.port_time_data.port_mode_signals, 2) % modes

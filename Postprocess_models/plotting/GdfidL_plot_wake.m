@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 function GdfidL_plot_wake(path_to_data, ppi, range, chosen_wake_length, hfoi)
 % Generate the graphs based on the wake simulation data.
 % Graphs are saved in fig format and png, eps.
@@ -799,13 +798,13 @@ clf(h_wake)
 if isfield(pp_data.port, 'timebase') && ...
         isfield(wake_data.port_time_data, 'port_mode_energy')
     ax(29) = axes('Parent', h_wake);
-    [hwn, ksn] = num_subplots(size(pme,1));
-    for ydh = 1:size(pme,1) % Ports
+    [hwn, ksn] = num_subplots(length(lab_ind));
+    for ydh = 1:length(lab_ind) % Ports
         x_vals = 1:size(pme,2);
 %         x_vals = linspace(1,size(pme),...
 %             length(pme{lab_ind(ydh)}));
         subplot(hwn,ksn,ydh)
-        plot(x_vals, pme(ydh,:),'LineWidth',lw);
+        plot(x_vals, pme(lab_ind(ydh),:),'LineWidth',lw);
         xlabel('mode number')
         title('Energy in port modes')
         ylabel('Energy (nJ)')
