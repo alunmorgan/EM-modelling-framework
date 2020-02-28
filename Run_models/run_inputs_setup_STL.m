@@ -76,7 +76,7 @@ end %for
 % point and then modifies the specific variable of that sweep.
 sim_param_sweeps = {'beam_sigma', 'beam_offset_x', 'beam_offset_y',...
     'mesh_stepsize', 'mesh_density_scaling', 'wakelength', ...
-    'NPMLs', 'precision', 'version'};
+    'NPMLs', 'precision', 'version', 'n_cores'};
 for nw = 1:length(sim_param_sweeps)
     for mss = 2:length(mi.simulation_defs.(sim_param_sweeps{nw}))
         model_num = model_num +1;

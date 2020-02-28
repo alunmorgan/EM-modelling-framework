@@ -4,7 +4,7 @@ base.author = mi.author;
 base.stl_part_mapping = mi.stl_part_mapping;
 base.mat_list = mi.mat_list;
 base.background = mi.background;
-base.n_cores  = mi.simulation_defs.n_cores;
+base.n_cores  = mi.simulation_defs.n_cores{1};
 base.sim_select = mi.simulation_defs.sim_select;
 base.beam = mi.simulation_defs.beam;
 base.volume_fill_factor = mi.simulation_defs.volume_fill_factor(1);
@@ -38,4 +38,7 @@ if isfield(mi.simulation_defs, 's_param_ports')
     base.s_param_excitation_f = mi.simulation_defs.s_param_excitation_f;
     base.s_param_excitation_bw = mi.simulation_defs.s_param_excitation_bw;
     base.s_param_tmax = mi.simulation_defs.s_param_tmax;
+end %if
+if isfield(mi.simulation_defs, 'eigenmode')
+    base.eigenmode = mi.simulation_defs.eigenmode;
 end %if
