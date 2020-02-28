@@ -36,7 +36,7 @@ for sts = 1:length(model_sets)
                 wakelength = wakelength ./2;
             end %for
             %TEST CODE for truncation of beginnig of port signals.
-            for dlw = 1:length(port_truncation)
+            for dlw = 1:length(pp_data.port.data)
                 if size(pp_data.port.data{dlw}, 1) > port_truncation(dlw)
                     pp_data.port.data{dlw}(1:port_truncation(dlw), :) =0;
                 else

@@ -10,7 +10,7 @@ function [port_data] = port_analysis(raw_port_data, overrides)
 % Example: [port_data] = port_analysis(port_data)
 
 if nargin >1 % There are overrides to the number of port modes to be used.
-    for dl = 1:length(overrides)
+    for dl = 1:length(raw_port_data.data)
         if size(raw_port_data.data{dl},2) > overrides(dl)
             raw_port_data.data{dl} = raw_port_data.data{dl}(:,1:overrides(dl));
         end %if
