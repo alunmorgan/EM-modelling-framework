@@ -11,7 +11,7 @@ elseif strcmp(sim_f_name, 'wake')
     arch_out = fullfile(results_storage_location, sim_f_name);
 elseif strcmp(sim_f_name, 'eigenmode')
     arch_out = fullfile(results_storage_location, sim_f_name);
-elseif strcmp(sim_f_name, 'lossy eigenmode')
+elseif strcmp(sim_f_name, 'lossy_eigenmode')
     arch_out = fullfile(results_storage_location, sim_f_name);
 elseif strcmp(sim_f_name, 'shunt')
     % Create the required sub structure output directories.
