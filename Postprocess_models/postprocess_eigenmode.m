@@ -10,8 +10,8 @@ function eigenmode_data = postprocess_eigenmode(modelling_inputs, run_log)
 
 %% EIGENMODE POSTPROCESSING
 % run the eigenmode postprocessor
-pipe_length = get_pipe_length_from_defs(modelling_inputs.defs);
-GdfidL_write_pp_eigenmode_input_file(run_log, 10, pipe_length)
+pipe_length = get_pipe_length_from_defs(modelling_inputs.geometry_defs);
+GdfidL_write_pp_eigenmode_input_file(run_log, size(run_log.eigenmodes.freqs,2), pipe_length)
 temp_files('make')
 [~]=system('gd1.pp < pp_link/eigenmode/model_eigenmode_post_processing > pp_link/eigenmode/model_eigenmode_post_processing_log');
 %% find the location of all the required output files
@@ -23,16 +23,16 @@ temp_files('make')
 [pic_names ,~]= dir_list_gen('.','ps',1);
 for ns = 1:length(pic_names)
     pic_nme = pic_names{ns}(1:end-3);
-    [~] = system(['convert ',pic_nme,'.ps ',pic_nme,'.png']);
+    [~] = system(['convert ',pic_nme,'.ps -rotate -90 ',pic_nme,'.png']);
     [~] = system(['convert ',pic_nme,'.png ',pic_nme,'.eps']);
     movefile([pic_nme,'.png'], 'pp_link/eigenmode');
     movefile([pic_nme,'.eps'], 'pp_link/eigenmode');
     delete([pic_nme,'.ps'])
 end
-z_field = GdfidL_find_output_eigenmode('temp_scratch');
-for shw = 1:length(z_field)
-    z_field_data{shw} = GdfidL_read_graph_datafile( z_field{shw});
-end
+% z_field = GdfidL_find_output_eigenmode('temp_scratch');
+% for shw = 1:length(z_field)
+%     z_field_data{shw} = GdfidL_read_graph_datafile( z_field{shw});
+% end
 
 temp_files('remove')
 delete('POSTP-LOGFILE');
@@ -47,4 +47,4 @@ end
 if isfield(log, 'rqs')
 eigenmode_data.rqs = log.rqs;
 end
-eigenmode_data.z_fields = z_field_data;
+% eigenmode_data.z_fields = z_field_data;
