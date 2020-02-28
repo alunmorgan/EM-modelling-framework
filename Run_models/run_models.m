@@ -68,6 +68,12 @@ for awh = 1:length(modelling_inputs)
         catch ERR
             display_modelling_error(ERR, 'eigenmode')
         end %try
+         try
+            model_name = modelling_inputs{awh}.model_name;
+            GdfidL_post_process_models(mi.paths, model_name, force_pp);
+        catch ERR
+            display_postprocessing_error(ERR, 'eigenmode')
+        end %try
     end %if
     if ~isempty(strfind(mi.simulation_defs.sim_select, 'l'))
         try
