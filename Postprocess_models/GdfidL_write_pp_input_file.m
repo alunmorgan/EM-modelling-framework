@@ -1,4 +1,4 @@
-function tfirst = GdfidL_write_pp_input_file(log, pipe_length, tqw_offset, ver)
+function tfirst = GdfidL_write_pp_input_file(log, tqw_offset, ver)
 % Writes the post processing input file.
 %
 % log is a structure containing the information extracted from the log
