@@ -144,7 +144,18 @@ if isfield(lg, 'mat_losses')
         end
         
         % Write the loss data to the structure.
-        lg.mat_losses.single_mat_data{dat_loc,4} = tmp2;
+        if sum(dat_loc) > 1
+            %If more than one component has the same material then split the
+            %power equally.
+            warning('Multiple parts share he same material. Assuming an even split.')
+            dat_inds =  find(dat_loc ==1);
+            tmp2(:,2) = tmp2(:,2) ./ length(dat_inds);
+            for nwa = 1:length(dat_inds)
+                lg.mat_losses.single_mat_data{dat_inds(nwa),4} = tmp2 ;
+            end %for
+        else
+            lg.mat_losses.single_mat_data{dat_loc,4} = tmp2;
+        end %if
         clear tmp tmp2
         clear  mat_loc single_material dat_loc
     end
@@ -243,7 +254,7 @@ if isempty(port_on_zlow_ind)
     % Does not appear in the log. Assume not PMLs are used.
     lg.pmls_zlow = 0;
 else
-lg.pmls_zlow = str2double(char(num_pmls_zlow{1}));
+    lg.pmls_zlow = str2double(char(num_pmls_zlow{1}));
 end
 port_on_zhigh_ind = find_position_in_cell_lst(regexp(data,'#\s*\.\.\s*The Port is at zhigh'));
 num_pmls_zhigh = regexp(data{port_on_zhigh_ind+1},'#\s*\.\.\s*PML-Thickness\s*:\s*(\d*)', 'tokens');
