@@ -4,13 +4,25 @@ function GdfidL_simulation_core(version, precision)
 % setting the GdfidL version to test
 orig_ver = getenv('GDFIDL_VERSION');
 setenv('GDFIDL_VERSION',version);
+
+shell_contents = {'#! /bin/bash'};
+% This code used to call GdfidL directly using the system command. However some
+% problems were found with differences in the shell vs matlab environment.
+% As a result this code now writes and executes a shell script so that the
+% system environment is reliably used.
 if strcmp(precision, 'single')
-    [status, ~] = system('nice single.gd1 < temp_data/model.gdf > temp_data/model_log');
+    shell_contents = cat(1,shell_contents,'nice single.gd1 < temp_data/model.gdf > temp_data/model_log');
+%     [status, ~] = system('nice single.gd1 < temp_data/model.gdf > temp_data/model_log');
 elseif strcmp(precision, 'double')
-    [status, cmd_output] = system('nice gd1 < temp_data/model.gdf > temp_data/model_log');
+    shell_contents = cat(1,shell_contents,'nice gd1 < temp_data/model.gdf > temp_data/model_log');
+%     [status, cmd_output] = system('nice gd1 < temp_data/model.gdf > temp_data/model_log');
 end %if
+write_out_data( shell_contents, 'temp_data/run_model.sh' )
+[~] = system('chmod +x temp_data/run_model.sh');
+% [status, cmd_output] = system('./temp_data/run_model.sh');
+!./temp_data/run_model.sh
 % restoring the original version.
 setenv('GDFIDL_VERSION',orig_ver);
-if status ~= 0
-    disp(['Look at model log', cmd_output])
-end %if
+% if status ~= 0
+%     disp(['Look at model log', cmd_output])
+% end %if
