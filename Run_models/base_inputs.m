@@ -13,6 +13,7 @@ base.base_model_name = mi.base_model_name;
 base.model_name = base_name;
 base.model_angle = mi.model_angle;
 base.stl_scaling = mi.stl_scaling;
+base.main_axis = mi.main_axis;
 base.cuts = mi.cuts;
 base.mesh = mi.simulation_defs.mesh;
 base.dtsafety = mi.simulation_defs.dtsafety;

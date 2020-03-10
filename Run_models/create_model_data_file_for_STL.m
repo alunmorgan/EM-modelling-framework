@@ -58,14 +58,29 @@ for lrd = 1:length(stls)
     end %if
     model_file = cat(1, model_file, '-stlfile');
     model_file = cat(1, model_file, ['file=', stls{lrd}]);
-    model_file = cat(1, model_file, '# FreeCAD defaults to x as the main axis. GdfidL uses z.');
-    model_file = cat(1, model_file, '# The following two lines rotate the geometry to move');
-    model_file = cat(1, model_file, '# From FreeCAD coordinates, to GdfidL coordinates.');
-    model_file = cat(1, model_file, '# There is also an adjustment in yprime in order.');
-    model_file = cat(1, model_file, '# to rotate the model around the beam axis, to ');
-    model_file = cat(1, model_file, '# adjust port locations.');
-    model_file = cat(1, model_file, 'xprime= (0 ,0 ,-1)');
-    model_file = cat(1, model_file, ['yprime= (',num2str(model_angle/90),',', num2str(1-(model_angle/90)),', 0)']);
+    if strcmpi(modelling_inputs.main_axis, 'x')
+        model_file = cat(1, model_file, '# FreeCAD defaults to x as the main axis. GdfidL uses z.');
+        model_file = cat(1, model_file, '# The following two lines rotate the geometry to move');
+        model_file = cat(1, model_file, '# From FreeCAD coordinates, to GdfidL coordinates.');
+        model_file = cat(1, model_file, '# There is also an adjustment in yprime in order.');
+        model_file = cat(1, model_file, '# to rotate the model around the beam axis, to ');
+        model_file = cat(1, model_file, '# adjust port locations.');
+        model_file = cat(1, model_file, 'xprime= (0 ,0 ,-1)');
+        model_file = cat(1, model_file, ['yprime= (',num2str(model_angle/90),',', num2str(1-(model_angle/90)),', 0)']);
+    elseif strcmpi(modelling_inputs.main_axis, 'y')
+        model_file = cat(1, model_file, '# FreeCAD model beam axis is y. GdfidL uses z.');
+        model_file = cat(1, model_file, '# The following two lines rotate the geometry to move');
+        model_file = cat(1, model_file, '# From FreeCAD coordinates, to GdfidL coordinates.');
+        model_file = cat(1, model_file, '# There is also an adjustment in yprime in order.');
+        model_file = cat(1, model_file, '# to rotate the model around the beam axis, to ');
+        model_file = cat(1, model_file, '# adjust port locations.');
+        model_file = cat(1, model_file, 'xprime= (-1 ,0 ,0)');
+        model_file = cat(1, model_file, ['yprime= (',num2str(model_angle/90),', 0,', num2str(1-(model_angle/90)),')']);
+    elseif strcmpi(modelling_inputs.main_axis, 'y')
+        model_file = cat(1, model_file, '# FreeCAD and GdfidL agree on the main axis. Nothing more to be done.');
+    else
+        error('Please enter x, y, or z for the model beam axis')
+    end %if
     model_file = cat(1, model_file, '# The following three lines account for if the input file scale is not in m.');
     model_file = cat(1, model_file, ['xscale = ', num2str(model_scaling)]);
     model_file = cat(1, model_file, ['yscale = ', num2str(model_scaling)]);
@@ -104,24 +119,24 @@ if plots == 1
         model_file = cat(1, model_file, ['   plotopts = -o temp_data/2Dmodel_cut_',modelling_inputs.cuts{ndw, 1},'_',num2str(modelling_inputs.cuts{ndw, 2}),'.ps -colorps']);
         model_file = cat(1, model_file, 'doit');
     end %for
-%     for wja = 1:size(modelling_inputs.plot_volumes,1)
-%         model_file = reset_bounding_box(model_file);
-%         model_file = cat(1, model_file, ['   bbxlow=',num2str(modelling_inputs.plot_volumes{wja}(1))]);
-%         model_file = cat(1, model_file, ['   bbxhigh=',num2str(modelling_inputs.plot_volumes{wja}(2))]);
-%         model_file = cat(1, model_file, ['   bbylow=',num2str(modelling_inputs.plot_volumes{wja}(3))]);
-%         model_file = cat(1, model_file, ['   bbyhigh=',num2str(modelling_inputs.plot_volumes{wja}(4))]);
-%         model_file = cat(1, model_file, ['   bbzlow=',num2str(modelling_inputs.plot_volumes{wja}(5))]);
-%         model_file = cat(1, model_file, ['   bbzhigh=',num2str(modelling_inputs.plot_volumes{wja}(6))]);
-%         if strcmp(modelling_inputs.cuts{wja}(7),'x')
-%             model_file = cat(1, model_file, '   eyeposition= (1, 0, 0)');
-%         elseif strcmp(modelling_inputs.cuts{wja}(7),'y')
-%             model_file = cat(1, model_file, '   eyeposition= (0, 1, 0)');
-%         elseif strcmp(modelling_inputs.cuts{wja}(7),'z')
-%             model_file = cat(1, model_file, '   eyeposition= (0, 0, 1)');
-%         end %if
-%         model_file = cat(1, model_file, ['   plotopts = -o temp_data/2Dmodel_subvol_cut_',modelling_inputs.cuts{ndw, 1},'_',num2str(modelling_inputs.cuts{ndw, 2}),'.ps -colorps']);
-%         model_file = cat(1, model_file, 'doit');
-%     end %for
+    %     for wja = 1:size(modelling_inputs.plot_volumes,1)
+    %         model_file = reset_bounding_box(model_file);
+    %         model_file = cat(1, model_file, ['   bbxlow=',num2str(modelling_inputs.plot_volumes{wja}(1))]);
+    %         model_file = cat(1, model_file, ['   bbxhigh=',num2str(modelling_inputs.plot_volumes{wja}(2))]);
+    %         model_file = cat(1, model_file, ['   bbylow=',num2str(modelling_inputs.plot_volumes{wja}(3))]);
+    %         model_file = cat(1, model_file, ['   bbyhigh=',num2str(modelling_inputs.plot_volumes{wja}(4))]);
+    %         model_file = cat(1, model_file, ['   bbzlow=',num2str(modelling_inputs.plot_volumes{wja}(5))]);
+    %         model_file = cat(1, model_file, ['   bbzhigh=',num2str(modelling_inputs.plot_volumes{wja}(6))]);
+    %         if strcmp(modelling_inputs.cuts{wja}(7),'x')
+    %             model_file = cat(1, model_file, '   eyeposition= (1, 0, 0)');
+    %         elseif strcmp(modelling_inputs.cuts{wja}(7),'y')
+    %             model_file = cat(1, model_file, '   eyeposition= (0, 1, 0)');
+    %         elseif strcmp(modelling_inputs.cuts{wja}(7),'z')
+    %             model_file = cat(1, model_file, '   eyeposition= (0, 0, 1)');
+    %         end %if
+    %         model_file = cat(1, model_file, ['   plotopts = -o temp_data/2Dmodel_subvol_cut_',modelling_inputs.cuts{ndw, 1},'_',num2str(modelling_inputs.cuts{ndw, 2}),'.ps -colorps']);
+    %         model_file = cat(1, model_file, 'doit');
+    %     end %for
     for ndw = 1:size(modelling_inputs.cuts,1)
         model_file = cat(1, model_file, '-volumeplot');
         if strcmp(modelling_inputs.cuts{ndw, 1},'x')
