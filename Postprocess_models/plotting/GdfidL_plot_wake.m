@@ -47,7 +47,7 @@ cut_off_freqs = pp_data.port.frequency_cutoffs;
 cut_off_freqs = cellfun(@(x) x*1e-9,cut_off_freqs, 'UniformOutput', false);
 
 % setting up some style lists for the graphs.
-cols = {'b','k','m','c','g',[1, 0.5, 0],[0.5, 1, 0],[1, 0, 0.5],[0.5, 0, 1],[0.5, 1, 0] };
+% cols = {'b','k','m','c','g',[1, 0.5, 0],[0.5, 1, 0],[1, 0, 0.5],[0.5, 0, 1],[0.5, 1, 0] };
 l_st ={'--',':','-.','--',':','-.','--',':','-.'};
 
 % Identifying the non replica ports.
@@ -161,7 +161,7 @@ annot = get(f1, 'Annotation');
 set(get(annot{1},'LegendInformation'),'IconDisplayStyle', 'off')
 set(f1(1), 'FaceColor', [0.5 0.5 0.5]);
 for eh = 2:size(py,2)
-    set(f1(eh), 'FaceColor', cols{eh-1});
+    set(f1(eh), 'FaceColor', col_gen(eh-1));
 end %for
 set(ax(1), 'XTickLabels',{'Energy lost from beam', 'Energy accounted for'})
 set(ax(1),'XTickLabelRotation',45)
@@ -189,7 +189,7 @@ if ~isnan(mat_loss)
     % check if both beam ports and signal ports are used.
     col_ofst = size(py,2) -1 - length(plot_data);
     for sh = 1:length(pp)
-        set(pp(sh), 'FaceColor',cols{sh+col_ofst});
+        set(pp(sh), 'FaceColor',col_gen(sh+col_ofst));
     end %for
     legend(ax(2), leg,'Location','EastOutside', 'Interpreter', 'none')
     clear leg
@@ -202,7 +202,7 @@ if ~isnan(m_time{1})
     ax(3) = axes('Parent', h_wake);
     for na = 1:length(m_time)
         hold on
-        plot(ax(3), m_time{na} ,m_data{na}, 'Color', cols{na+col_ofst},'LineWidth',lw)
+        plot(ax(3), m_time{na} ,m_data{na}, 'Color', col_gen(na+col_ofst),'LineWidth',lw)
         leg{na} = model_mat_data{na,2};
         hold off
     end %for
@@ -237,7 +237,7 @@ clf(h_wake)
     hold(ax(5), 'all')
     for ens = 1:length(lab_ind)
         plot(timebase_cs, e_ports_cs(:,lab_ind(ens)),...
-            'Color',cols{ens},'LineWidth',lw, 'LineStyle', l_st{1}, 'Parent', ax(5))
+            'Color',col_gen(ens),'LineWidth',lw, 'LineStyle', l_st{1}, 'Parent', ax(5))
         leg{clk} = port_names{lab_ind(ens)};
         clk = clk +1;
     end %for
