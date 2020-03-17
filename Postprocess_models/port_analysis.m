@@ -33,7 +33,7 @@ port_data.port_mode_energy_time = port_mode_energy_time;
 port_data.port_mode_energy = sum(port_mode_energy_time, 3);
 port_data.port_mode_energy_cumsum = cumsum(port_mode_energy_time, 3);
 port_data.port_energy = sum(sum(port_mode_energy_time, 3), 2);
-port_data.port_energy_cumsum = squeeze(cumsum(sum(port_mode_energy_time,2), 2));
+port_data.port_energy_cumsum = cumsum(squeeze(sum(port_mode_energy_time,2)),2);
 
 % if it errors here check the port multiple settings are correct.
 port_data.total_energy = sum(sum(sum(port_mode_energy_time, 3),2),1);
