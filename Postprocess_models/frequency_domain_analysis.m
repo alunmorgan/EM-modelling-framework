@@ -141,7 +141,7 @@ end
 if ~iscell(port_signals)
     port_impedances = NaN;
 else
-    port_impedances = calculate_port_impedances(port_signals, cut_off_freqs,...
+    [port_impedances, port_mode_fft] = calculate_port_impedances(port_signals, cut_off_freqs,...
         timebase, f_raw, bunch_spectra);
 end
 
@@ -180,7 +180,7 @@ end
     Total_port_spectrum, Total_energy_from_all_ports,...
     raw_port_energy_spectrum] = ...
     find_wlf_and_power_loss(log.charge, timebase, bunch_spectra, ...
-    Wake_Impedance_data, port_impedances);
+    Wake_Impedance_data, port_impedances, port_mode_fft);
 %%%%%%%%%%%
 [peaks, Q, bw] = find_Qs(f_raw, Bunch_loss_energy_spectrum, 25);
 

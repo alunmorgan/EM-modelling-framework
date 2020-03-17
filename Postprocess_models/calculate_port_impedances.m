@@ -1,4 +1,4 @@
-function  port_impedances = calculate_port_impedances(port_data, cut_off_freqs,...
+function  [port_impedances, port_mode_fft] = calculate_port_impedances(port_data, cut_off_freqs,...
     timescale, f_raw, bunch_spectra)
 % Calculates the port impedances from the the bunch spectra and the
 % frequency data.
@@ -32,7 +32,7 @@ for nsf = 1:length(port_data)% number of ports
             % the cumulative sum graphs show some drops.)
             n = 0;
             tmp_ind = tmp_ind +n;
-            if tmp_ind < length(f_raw) +n;
+            if tmp_ind < length(f_raw) +n
                 end_ind = length(f_raw);
                 port_mode_fft{nsf}(1:tmp_ind,  esns) = 0;
                 port_mode_fft{nsf}(end_ind - tmp_ind+2:end_ind,  esns) = 0;
