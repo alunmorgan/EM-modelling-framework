@@ -181,7 +181,7 @@ if ~isnan(mat_loss)
     % add numerical value to label
     leg = {};
     for ena = length(plot_data):-1:1
-        leg{ena} = strcat(model_mat_data{ena,2}, ' (',num2str(round(plot_data(ena)*100)/100),'%)');
+        leg{ena} = strcat(material_names{ena}, ' (',num2str(round(plot_data(ena)*100)/100),'%)');
     end %for
     p = pie(ax(2), plot_data, ones(length(plot_data),1));
     % setting the colours on the pie chart.
@@ -203,7 +203,7 @@ if ~isnan(m_time{1})
     for na = 1:length(m_time)
         hold on
         plot(ax(3), m_time{na} ,m_data{na}, 'Color', col_gen(na+col_ofst),'LineWidth',lw)
-        leg{na} = model_mat_data{na,2};
+        leg{na} = material_names{na};
         hold off
     end %for
     legend(ax(3), leg, 'Location', 'SouthEast')
