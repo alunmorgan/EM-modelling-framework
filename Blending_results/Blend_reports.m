@@ -2,7 +2,7 @@ function Blend_reports(results_loc, chosen_wake_length, frequency_display_limit)
 %Blends some of the output from the individual thermal analysis reports to
 %generate a summary comparison report.
 %
-% Example: Blend_reports( rep_title, base_name , Author, Graphic_path)
+% Example: Blend_reports(results_loc, chosen_wake_length, frequency_display_limit)
 
 [names,~] = dir_list_gen(results_loc, 'dirs', 1);
 %select only those folders whos names start with the base name.
@@ -17,25 +17,28 @@ names = names(strncmp(names, base_name, length(base_name)-4));
 base_name_ind = find_position_in_cell_lst(strfind(names, '_Base'));
 tmp = names;
 tmp(base_name_ind) = [];
-tmp2 = strfind(tmp, '_');
-tmp3 = cell(length(tmp2),1);
-for awk = 1:length(tmp2)
-    if isempty(tmp2{awk})
-        tmp3{awk} = [];
-    else
-        tmp3{awk} = tmp{awk}(tmp2{awk}(1) +1:tmp2{awk}(end) -1);
-    end %if
-end %for
-if ~isempty(tmp2)
-    sweeps = unique(tmp3);
-else
-    sweeps = [];
-end %if
+sweeps = unique(regexprep(tmp, '_sweep_value_.*', '_sweep'));
+
+% tmp2 = strfind(tmp, '_');
+% tmp3 = cell(length(tmp2),1);
+% for awk = 1:length(tmp2)
+%     if isempty(tmp2{awk})
+%         tmp3{awk} = [];
+%     else
+%         tmp3{awk} = tmp{awk}(tmp2{awk}(1) +1:tmp2{awk}(end) -1);
+%     end %if
+% end %for
+% if ~isempty(tmp2)
+%     sweeps = unique(tmp3);
+% else
+%     sweeps = [];
+% end %if
 
 
 for ewh = 1:length(sweeps)
     sweep_ind = find_position_in_cell_lst(strfind(names,sweeps{ewh}));
-    names_in_sweep = names([base_name_ind, sweep_ind]);
+    base_ind = find_position_in_cell_lst(strfind(names,base_name));
+    names_in_sweep = names([base_ind, sweep_ind]);
     good_data = ones(length(names_in_sweep),1);
     for psw = length(names_in_sweep):-1:1
         try
@@ -103,7 +106,7 @@ for ewh = 1:length(sweeps)
     end %if
     if isempty(varying_pars_ind)
         warning('No varying parameters found. Skipping this one.')
-        return
+        continue
     end %if
     
     isn =1;

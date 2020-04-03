@@ -24,7 +24,7 @@ for en = length(data):-1:1
         end %if
         %         end %for
     end %if
-    leg{en} = [report_input.swept_name{1},' = ',report_input.swept_vals{en}];
+    leg{en} = report_input.swept_vals{en};
 end %for
 hold(ax1, 'off')
 % add legend to 2D graph
@@ -45,8 +45,8 @@ setup_graph_for_display(ax1, xlims,...
     [-1,0], [0,data(1).islog,0], ...
     data(1).Xlab, data(1).Ylab,...
     '',...
-    regexprep(report_input.base_name, '_', ' '));
+    regexprep([report_input.swept_name{1}, ' - sweep'], '_', ' '));
 legend(ax1, leg, 'Location', 'EastOutside', 'Box', 'off')
 % save 2D graph
-savemfmt(h1, report_input.output_loc, data(1).out_name)
+savemfmt(h1, report_input.output_loc, data(1).out_name, {'png', 'eps', 'pdf'})
 close(h1)
