@@ -31,8 +31,7 @@ run_sim = make_data_store(results_storage_location, 'wake', skip);
 if run_sim == 1
 %     mkdir(results_storage_location, 'wake')
     % Move into the temporary folder.
-    old_loc = pwd;
-    tmp_location = move_into_tempororary_folder(paths.scratch_path);
+    [old_loc, tmp_location] = move_into_tempororary_folder(paths.scratch_path);
     
     temp_files('make')
     

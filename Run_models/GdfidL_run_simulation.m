@@ -42,8 +42,7 @@ run_sim = make_data_store(modelling_inputs.model_name, results_storage_location,
 if run_sim == 1
 %     mkdir(results_storage_location, sim_f_name)
     % Move into the temporary folder.
-    old_loc = pwd;
-    tmp_location = move_into_tempororary_folder(paths.scratch_path);
+    [old_loc, tmp_location] = move_into_tempororary_folder(paths.scratch_path);
     % If the simulation type is S-paramter then you need a simulation for
     % each excited port. For Shunt you need a simulation for each frequency.
     % For the other types you just need a single simulation.

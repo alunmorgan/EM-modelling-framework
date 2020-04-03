@@ -9,8 +9,7 @@ if nargin <2
 end %if
 
 % storing the original location so that  we can return there at the end.
-old_loc = pwd;
-tmp_name =move_into_tempororary_folder(paths.scratch_path);
+[old_loc, tmp_name] =move_into_tempororary_folder(paths.scratch_path);
 
 if ~exist(fullfile(paths.results_path, model_name), 'dir')
     mkdir(fullfile(paths.results_path, model_name))

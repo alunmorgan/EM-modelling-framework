@@ -43,8 +43,7 @@ end %if
 if skip == 0
     mkdir(results_storage_location, 's_parameters')
     % Move into the temporary folder.
-    old_loc = pwd;
-    tmp_location = move_into_tempororary_folder(paths.scratch_path);
+    [old_loc, tmp_location] = move_into_tempororary_folder(paths.scratch_path);
     
     for nes = 1:length(modelling_inputs.ports)
         port_name = modelling_inputs.ports{nes};
