@@ -11,6 +11,15 @@ model_num = 0;
 %% Building up a set of inputs to be passed to the EM simulator.
 [defs, ~] = construct_defs(mi.material_defs);
 % The geometry variations are already defined,
+
+% This is the locaton of the parameter file for the base model. The code
+% will default to using this if there is no model specific parameter file
+% present. (i.e. if meshing parameters are being changed rather
+% than geometric parameters)
+base_parameter_file_path = fullfile(mi.paths.path_to_models, ...
+    mi.base_model_name,mi.base_model_name,...
+    [mi.base_model_name, '_parameters.txt']);
+
 for fdhs = 1:length(mi.model_names)
     model_num = model_num +1;
     modelling_inputs{model_num} = base_inputs(mi, mi.model_names{fdhs});
@@ -29,11 +38,12 @@ for fdhs = 1:length(mi.model_names)
         
     end %if
     modelling_inputs{model_num}.defs = defs{1};
-     modelling_inputs{model_num}.stl_location = fullfile(mi.paths.path_to_models, ...
+    modelling_inputs{model_num}.stl_location = fullfile(mi.paths.path_to_models, ...
         mi.base_model_name,mi.model_names{fdhs}, 'ascii');
     parameter_file_path = fullfile(mi.paths.path_to_models, ...
         mi.base_model_name,mi.model_names{fdhs},...
         [mi.model_names{fdhs}, '_parameters.txt']);
+    
     if exist(parameter_file_path, 'file') == 2
         modelling_inputs{model_num}.geometry_defs = ...
             get_parameters_from_sidecar_file(parameter_file_path);
@@ -59,13 +69,11 @@ for awh = 2:length(defs)
     modelling_inputs{model_num}.defs = defs{awh};
     modelling_inputs{model_num}.model_name = [...
         mi.base_model_name, '_', def{1}, '_', def{2}];
-     modelling_inputs{model_num}.stl_location = fullfile(mi.paths.path_to_models, ...
+    modelling_inputs{model_num}.stl_location = fullfile(mi.paths.path_to_models, ...
         mi.base_model_name, [mi.base_model_name, '_Base'], 'ascii');
-    if exist(parameter_file_path, 'file') == 2
+    if exist(base_parameter_file_path, 'file') == 2
         modelling_inputs{model_num}.geometry_defs = ...
-            get_parameters_from_sidecar_file(...
-            fullfile(mi.paths.path_to_models, mi.base_model_name, mi.model_names{mi.base_model_ind},...
-            [mi.model_names{mi.base_model_ind}, '_parameters.txt']));
+            get_parameters_from_sidecar_file(base_parameter_file_path);
     else
         modelling_inputs{model_num}.geometry_defs = {};
     end %if
@@ -90,13 +98,11 @@ for nw = 1:length(sim_param_sweeps)
             mi.base_model_name, '_', sim_param_sweeps{nw}, '_', ...
             num2str(modelling_inputs{model_num}.(sim_param_sweeps{nw}))];
         modelling_inputs{model_num}.defs = defs{1};
-             modelling_inputs{model_num}.stl_location = fullfile(mi.paths.path_to_models, ...
-        mi.base_model_name, [mi.base_model_name, '_Base'], 'ascii');
-        if exist(parameter_file_path, 'file') == 2
+        modelling_inputs{model_num}.stl_location = fullfile(mi.paths.path_to_models, ...
+            mi.base_model_name, [mi.base_model_name, '_Base'], 'ascii');
+        if exist(base_parameter_file_path, 'file') == 2
             modelling_inputs{model_num}.geometry_defs = ...
-                get_parameters_from_sidecar_file(...
-                fullfile(mi.paths.path_to_models, mi.base_model_name, mi.model_names{mi.base_model_ind},...
-                [mi.model_names{mi.base_model_ind}, '_parameters.txt']));
+                get_parameters_from_sidecar_file(base_parameter_file_path);
         else
             modelling_inputs{model_num}.geometry_defs = {};
         end %if
@@ -125,13 +131,11 @@ for uned = 2:length(mi.simulation_defs.geometry_fractions)
     temp = regexprep(temp, '\.','p');
     modelling_inputs{model_num}.model_name = temp;
     modelling_inputs{model_num}.defs = defs{1};
-         modelling_inputs{model_num}.stl_location = fullfile(mi.paths.path_to_models, ...
+    modelling_inputs{model_num}.stl_location = fullfile(mi.paths.path_to_models, ...
         mi.base_model_name, [mi.base_model_name, '_Base'], 'ascii');
-    if exist(parameter_file_path, 'file') == 2
+    if exist(base_parameter_file_path, 'file') == 2
         modelling_inputs{model_num}.geometry_defs = ...
-            get_parameters_from_sidecar_file(...
-            fullfile(mi.paths.path_to_models, mi.base_model_name, mi.model_names{mi.base_model_ind},...
-            [mi.model_names{mi.base_model_ind}, '_parameters.txt']));
+            get_parameters_from_sidecar_file(base_parameter_file_path);
     else
         modelling_inputs{model_num}.geometry_defs = {};
     end %if
