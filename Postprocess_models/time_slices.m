@@ -1,4 +1,4 @@
-function time_slices = time_slices(time_domain_data, hfoi)
+function time_slices = time_slices(timebase, wakepotential, hfoi)
 % Slice the time domain wakepotential into sections. FFT each section
 % independently and track the evolution of the peaks across sections.
 % This allows us to see the decay of resonances over time, and get a Q
@@ -8,8 +8,8 @@ function time_slices = time_slices(time_domain_data, hfoi)
 
 
 n_slices = 10;
-slice_length = floor(length(time_domain_data.timebase)/n_slices);
-stepsize = time_domain_data.timebase(3) - time_domain_data.timebase(2);
+slice_length = floor(length(timebase)/n_slices);
+stepsize = timebase(3) - timebase(2);
 % construct the frequency scale corresponding to one slice.
 fscale = (linspace(0,1,slice_length) / stepsize);
 fscale = fscale(1:floor(slice_length./2));
@@ -17,7 +17,7 @@ ind = find(fscale > hfoi,1,'first');
 time_slices.fscale = fscale(1:ind);
 time_slices.n_slices = n_slices;
 time_slices.slice_length = slice_length;
-tmp = time_domain_data.wakepotential;
+tmp = wakepotential;
 tmp = tmp(1:n_slices * slice_length); % trimming to fit slices exactly.
 tmp = reshape(tmp,slice_length,n_slices);
 tmp_fft = fft(tmp);

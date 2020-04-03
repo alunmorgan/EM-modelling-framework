@@ -8,13 +8,13 @@ function [swept_par, freqs, Qs, mags, bws] = find_Q_trends(frequency_domain_data
 %
 % Example: [swept_par, freqs, Qs, mags, bws] = find_Q_trends(frequency_domain_data, range, swept_par)
 
-if nargin <3
-    % Assume that we are sweeping over wake length.
-    swept_par = NaN(length(frequency_domain_data),1);
-    for whs = 1:length(frequency_domain_data)
-        swept_par(whs) = frequency_domain_data{whs}.Wake_length;
-    end
-end
+% if nargin <3
+%     % Assume that we are sweeping over wake length.
+%     swept_par = NaN(length(frequency_domain_data),1);
+%     for whs = 1:length(frequency_domain_data)
+%         swept_par(whs) = frequency_domain_data{whs}.Wake_length;
+%     end
+% end
 
 [swept_par, inds] = sort(swept_par, 'descend');
 % extract the information on the peak frequencies and Qs for different wake

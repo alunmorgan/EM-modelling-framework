@@ -41,7 +41,7 @@ if contains(modelling_inputs.sim_select, 'w')
         [~,chosen_wake_ind] = min(abs((wake_sweep_vals ./ str2double(chosen_wake_length)) - 1));
         warning('Chosen wake length not found. Setting the wakelength to maximum value.')
     end %if
-    wake_data.port_time_data = wake_sweep_data.port_time_data{chosen_wake_ind};
+    wake_data.port_time_data = wake_sweep_data.time_domain_data{chosen_wake_ind}.port_data;
     wake_data.time_domain_data = wake_sweep_data.time_domain_data{chosen_wake_ind};
     wake_data.frequency_domain_data = wake_sweep_data.frequency_domain_data{chosen_wake_ind};
     

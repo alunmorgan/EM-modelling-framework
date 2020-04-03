@@ -8,6 +8,8 @@ function GdfidL_plot_wake(path_to_data, ppi, range, chosen_wake_length, hfoi)
 %
 % Example GdfidL_plot_wake(wake_data, ppi, mi, run_log,  pth, range)
 
+chosen_wake_length = str2double(chosen_wake_length);
+
 pth = fullfile(path_to_data, 'wake');
 load(fullfile(pth, 'run_inputs.mat'), 'modelling_inputs'); 
 load(fullfile(pth,'data_postprocessed.mat'), 'pp_data');
@@ -16,12 +18,12 @@ load(fullfile(pth, 'data_from_run_logs.mat'), 'run_logs')
 for nw = 1:length(wake_sweep_data.raw)
 wake_sweep_vals(nw) = wake_sweep_data.raw{1, nw}.wake_setup.Wake_length;
 end %for
-chosen_wake_ind = find(wake_sweep_vals == str2double(chosen_wake_length));
+chosen_wake_ind = find(wake_sweep_vals == chosen_wake_length);
 if isempty(chosen_wake_ind)
-    [~,chosen_wake_ind] = min(abs((wake_sweep_vals ./ str2double(chosen_wake_length)) - 1));
+    [~,chosen_wake_ind] = min(abs((wake_sweep_vals ./ chosen_wake_length) - 1));
     warning('Chosen wake length not found. Setting the wakelength closest value.')
 end %if
-wake_data.port_time_data = wake_sweep_data.port_time_data{chosen_wake_ind};
+wake_data.port_time_data = wake_sweep_data.time_domain_data{chosen_wake_ind}.port_data;
 wake_data.time_domain_data = wake_sweep_data.time_domain_data{chosen_wake_ind};
 wake_data.frequency_domain_data = wake_sweep_data.frequency_domain_data{chosen_wake_ind};
 
@@ -33,7 +35,7 @@ graph_freq_lim = hfoi * 1e-9;
 cut_freq_ind = find(wake_data.frequency_domain_data.f_raw*1E-9 < graph_freq_lim,1,'last');
 % also find the index for 9GHz for zoomed graphs
 % power_dist_ind = find(wake_data.frequency_domain_data.f_raw > 9E9, 1,'First');
-
+cut_time_ind = find_data_end(wake_data.time_domain_data.timebase, wake_sweep_vals(chosen_wake_ind));
 % location and size of the default figures.
 fig_pos = [10000 678 560 420];
 
@@ -58,7 +60,7 @@ end %for
 % can I just do a search using the original names in raw data?
 
 % Some pre processing to pull out trends.
-[wl, freqs, Qs, mags, bws] = find_Q_trends(wake_sweep_data.frequency_domain_data, range);
+[wl, freqs, Qs, mags, bws] = find_Q_trends(wake_sweep_data.frequency_domain_data, range, run_logs.wake_length);
 % Show the Q values of the resonances shows if the simulation has stablised.
 for ehw = size(freqs,1):-1:1
     Q_leg{ehw} = [num2str(round(freqs(ehw,1)./1e7)./1e2), 'GHz'];
@@ -218,15 +220,15 @@ end %if
 %% Cumulative total energy.
 if ~all(isnan(timebase_port)) && ~all(isnan(port_cumsum))
     ax(4) = axes('Parent', h_wake);
-    plot(timebase_cs, e_total_cs,'b','LineWidth',lw, 'Parent', ax(4))
+    plot(timebase_cs(1:cut_time_ind), e_total_cs(1:cut_time_ind),'b','LineWidth',lw, 'Parent', ax(4))
     graph_add_horizontal_lines(y_lev_t)
     title('Cumulative Energy seen at all ports', 'Parent', ax(4))
     xlabel('Time (ns)', 'Parent', ax(4))
     ylabel('Cumulative Energy (nJ)', 'Parent', ax(4))
     xlim([0 timebase_cs(end)])
-    text(timebase_cs(end), y_lev_t(1), '100%')
-    fr = (e_total_cs(end) / y_lev_t(1)) *100;
-    text(timebase_cs(end), e_total_cs(end), [num2str(round(fr)),'%'])
+    text(timebase_cs(cut_time_ind), y_lev_t(1), '100%')
+    fr = (e_total_cs(cut_time_ind) / y_lev_t(1)) *100;
+    text(timebase_cs(cut_time_ind), e_total_cs(end), [num2str(round(fr)),'%'])
     savemfmt(h_wake, pth,'cumulative_total_energy')
 clf(h_wake)
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -236,7 +238,7 @@ clf(h_wake)
     leg = cell(length(lab_ind),1);
     hold(ax(5), 'all')
     for ens = 1:length(lab_ind)
-        plot(timebase_cs, e_ports_cs(:,lab_ind(ens)),...
+        plot(timebase_cs(1:cut_time_ind), e_ports_cs(1:cut_time_ind, lab_ind(ens)),...
             'Color',col_gen(ens),'LineWidth',lw, 'LineStyle', l_st{1}, 'Parent', ax(5))
         leg{clk} = port_names{lab_ind(ens)};
         clk = clk +1;
@@ -245,7 +247,7 @@ clf(h_wake)
     title('Cumulative energy seen at the ports (nJ)', 'Parent', ax(5))
     xlabel('Time (ns)', 'Parent', ax(5))
     ylabel('Cumulative Energy (nJ)', 'Parent', ax(5))
-    xlim([timebase_cs(1) timebase_cs(end)])
+    xlim([timebase_cs(1) timebase_cs(cut_time_ind)])
     legend(ax(5), regexprep(leg,'_',' '), 'Location', 'SouthEast')
     savemfmt(h_wake, pth,'cumulative_energy')
 clf(h_wake)
@@ -254,12 +256,12 @@ end %if
 %% Wake potential over time.
 ax(6) = axes('Parent', h_wake);
 minxlim = timebase_wp(1);
-maxxlim = timebase_wp(end);
+maxxlim = timebase_wp(cut_time_ind);
 hold(ax(6), 'all')
-plot(timebase_wp, wp,...
+plot(timebase_wp(1:cut_time_ind), wp(1:cut_time_ind),...
     'LineWidth',lw, 'Parent', ax(6))
 minxlim = min([minxlim, timebase_wp(1)]);
-maxxlim = max([maxxlim, timebase_wp(end)]);
+maxxlim = max([maxxlim, timebase_wp(cut_time_ind)]);
 title('Evolution of longitudinal wake potential in the structure', 'Parent', ax(6))
 xlabel('Time (ns)', 'Parent', ax(6))
 xlim([minxlim maxxlim])
@@ -270,12 +272,12 @@ clf(h_wake)
 ax_num=50;
 ax(ax_num) = axes('Parent', h_wake);
 minxlim = timebase_wp(1);
-maxxlim = timebase_wp(end);
+maxxlim = timebase_wp(cut_time_ind);
 hold(ax(ax_num), 'all')
-plot(timebase_wp, wpdx,...
+plot(timebase_wp(1:cut_time_ind), wpdx(1:cut_time_ind),...
     'LineWidth',lw, 'Parent', ax(ax_num))
 minxlim = min([minxlim, timebase_wp(1)]);
-maxxlim = max([maxxlim, timebase_wp(end)]);
+maxxlim = max([maxxlim, timebase_wp(cut_time_ind)]);
 title('Evolution of dipole transverse wake potential in the structure (x)', 'Parent', ax(ax_num))
 xlabel('Time (ns)', 'Parent', ax(ax_num))
 xlim([minxlim maxxlim])
@@ -286,12 +288,12 @@ clf(h_wake)
 ax_num=51;
 ax(ax_num) = axes('Parent', h_wake);
 minxlim = timebase_wp(1);
-maxxlim = timebase_wp(end);
+maxxlim = timebase_wp(cut_time_ind);
 hold(ax(ax_num), 'all')
-plot(timebase_wp, wpdy,...
+plot(timebase_wp(1:cut_time_ind), wpdy(1:cut_time_ind),...
     'LineWidth',lw, 'Parent', ax(ax_num))
 minxlim = min([minxlim, timebase_wp(1)]);
-maxxlim = max([maxxlim, timebase_wp(end)]);
+maxxlim = max([maxxlim, timebase_wp(cut_time_ind)]);
 title('Evolution of dipole transverse wake potential in the structure (y)', 'Parent', ax(ax_num))
 xlabel('Time (ns)', 'Parent', ax(ax_num))
 xlim([minxlim maxxlim])
@@ -302,12 +304,12 @@ clf(h_wake)
 ax_num=52;
 ax(ax_num) = axes('Parent', h_wake);
 minxlim = timebase_wp(1);
-maxxlim = timebase_wp(end);
+maxxlim = timebase_wp(cut_time_ind);
 hold(ax(ax_num), 'all')
-plot(timebase_wp, wpqx,...
+plot(timebase_wp(1:cut_time_ind), wpqx(1:cut_time_ind),...
     'LineWidth',lw, 'Parent', ax(ax_num))
 minxlim = min([minxlim, timebase_wp(1)]);
-maxxlim = max([maxxlim, timebase_wp(end)]);
+maxxlim = max([maxxlim, timebase_wp(cut_time_ind)]);
 title('Evolution of quadrupole transverse wake potential in the structure (x)', 'Parent', ax(ax_num))
 xlabel('Time (ns)', 'Parent', ax(ax_num))
 xlim([minxlim maxxlim])
@@ -318,12 +320,12 @@ clf(h_wake)
 ax_num=53;
 ax(ax_num) = axes('Parent', h_wake);
 minxlim = timebase_wp(1);
-maxxlim = timebase_wp(end);
+maxxlim = timebase_wp(cut_time_ind);
 hold(ax(ax_num), 'all')
-plot(timebase_wp, wpqy,...
+plot(timebase_wp(1:cut_time_ind), wpqy(1:cut_time_ind),...
     'LineWidth',lw, 'Parent', ax(ax_num))
 minxlim = min([minxlim, timebase_wp(1)]);
-maxxlim = max([maxxlim, timebase_wp(end)]);
+maxxlim = max([maxxlim, timebase_wp(cut_time_ind)]);
 title('Evolution of quadrupole transverse wake potential in the structure (y)', 'Parent', ax(ax_num))
 xlabel('Time (ns)', 'Parent', ax(ax_num))
 xlim([minxlim maxxlim])
@@ -507,9 +509,9 @@ clf(h_wake)
         [hwn, ksn] = num_subplots(length(lab_ind));
         for ens = length(lab_ind):-1:1 % ports
             ax_sp(ens) = subplot(hwn,ksn,ens);
-            plot(timebase_port, dominant_modes{ens}, 'b', 'Parent', ax_sp(ens))
+            plot(timebase_port(1:cut_time_ind), dominant_modes{ens}(1:cut_time_ind), 'b', 'Parent', ax_sp(ens))
             title([port_names{lab_ind(ens)}, ' (mode ',num2str(max_mode(ens)),')'], 'Parent', ax_sp(ens))
-            xlim([timebase_port(1) timebase_port(end)])
+            xlim([timebase_port(1) timebase_port(cut_time_ind)])
             xlabel('Time (ns)', 'Parent', ax_sp(ens))
             graph_add_background_patch(pp_data.port.t_start(ens) * 1E9)
             ylabel('', 'Parent', ax_sp(ens))
@@ -523,13 +525,13 @@ clf(h_wake)
             ax_sp2(ens) = subplot(hwn,ksn,ens);
             hold(ax_sp2(ens), 'all')
             for seo = 1:length(modes{ens}) % modes
-                plot(timebase_port, modes{ens}{seo}, 'Parent',ax_sp2(ens))
+                plot(timebase_port(1:cut_time_ind), modes{ens}{seo}(1:cut_time_ind), 'Parent',ax_sp2(ens))
             end %for
             hold(ax_sp2(ens), 'off')
             title(port_names{lab_ind(ens)}, 'Parent', ax_sp2(ens))
             xlabel('Time (ns)', 'Parent', ax_sp2(ens))
             ylabel('', 'Parent', ax_sp2(ens))
-            xlim([timebase_port(1) timebase_port(end)])
+            xlim([timebase_port(1) timebase_port(cut_time_ind)])
             graph_add_background_patch(pp_data.port.t_start(ens) * 1E9)
         end %for
         savemfmt(h_wake, pth,'port_signals')
@@ -891,8 +893,8 @@ savemfmt(h_wake, pth,'tstart_check')
 clf(h_wake)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 for n=length(wake_sweep_data.frequency_domain_data):-1:1
-    ws_wake_length(n) = wake_sweep_data.frequency_domain_data{n}.Wake_length;
-    ws_wake_length_labels{n} = [num2str(wake_sweep_data.frequency_domain_data{n}.Wake_length), 'm'];
+    ws_wake_length(n) = wake_sweep_data.raw{n}.wake_setup.Wake_length;
+    ws_wake_length_labels{n} = [num2str(ws_wake_length(n)), 'm'];
     ws_wlf(n) = wake_sweep_data.frequency_domain_data{n}.wlf;
     ws_Total_bunch_energy_loss(n) = wake_sweep_data.frequency_domain_data{n}.Total_bunch_energy_loss;
     ws_Total_energy_from_signal_ports(n) = wake_sweep_data.frequency_domain_data{n}.Total_energy_from_signal_ports;

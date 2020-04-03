@@ -5,7 +5,7 @@ function [wake_loss_factor, ...
     Total_port_spectrum, Total_energy_from_all_ports,...
     raw_port_energy_spectrum] = ...
     find_wlf_and_power_loss(model_charge, timescale, bunch_spec, ...
-    wakeimpedance, port_impedances, port_mode_fft)
+    wakeimpedance, port_impedances, port_fft)
 % Calculates the power loss and wake loss factor 
 %
 % Example: [wake_loss_factor, ...
@@ -32,7 +32,7 @@ pwr_f(inds) = 0;
 % divide by the number of bunches in 1 sec (as it is power).
 % Alternativly multiply by the simulation time.
 simulation_time = timescale(end) - timescale(1);
-Bunch_loss_energy_spectrum = pwr_f  * simulation_time;
+Bunch_loss_energy_spectrum = pwr_f  .* simulation_time;
 pwr = sum(pwr_f);
 % multiply the power for an infinite train by the simulation time in
 % order to get the energy in one simulation run, i.e.1 bunch.
@@ -54,15 +54,15 @@ if isnan(port_impedances)
     Total_energy_from_signal_ports  = NaN;
     Total_energy_from_all_ports = NaN;
 else
-    port_spectra = port_impedances .* repmat(abs(bunch_spec).^2,[1,size(port_impedances,2)]);
-    port_spectra2 = port_mode_fft;
+%     port_spectra = port_impedances .* repmat(abs(bunch_spec).^2,[1,size(port_impedances,2)]);
+    raw_port_energy_spectrum = abs(port_fft .^ 2) .* simulation_time;
     % The port multiple is to account for the 'missing ports due to the symetry
     % planes in the model.
-    raw_port_energy_spectrum = squeeze(port_spectra);% .*...
+%     raw_port_energy_spectrum = squeeze(port_spectra);% .*...
 %         repmat(port_multiple,[size(port_spectra,1),1]));
 % the port spectrum includes the model charge so additional scaling is not
 % necessary.
-    raw_port_energy_spectrum =  raw_port_energy_spectrum  * simulation_time;   
+%     raw_port_energy_spectrum =  raw_port_energy_spectrum  * simulation_time;   
     beam_port_spectrum = sum(raw_port_energy_spectrum(:,1:2),2);
     signal_port_spectrum = sum(raw_port_energy_spectrum(:,3:end),2);
     Total_port_spectrum = sum(raw_port_energy_spectrum,2);

@@ -9,7 +9,7 @@ function [timebase_cs, e_total_cs, e_ports_cs] =  extract_cumulative_total_energ
 if wake_data.port_time_data.total_energy ~=0
     e_ports_cs = wake_data.port_time_data.port_energy_cumsum' .* 1e9;
     e_total_cs = wake_data.port_time_data.total_energy_cumsum .* 1e9;
-    timebase_cs = wake_data.port_time_data.timebase * 1e9;
+    timebase_cs = wake_data.time_domain_data.timebase * 1e9;
 else
     if isfield(wake_data.port_time_data, 'data')
     e_ports_cs = zeros(1,length(wake_data.port_time_data.data));
