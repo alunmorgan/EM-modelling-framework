@@ -43,15 +43,16 @@ for oef = 1:length(sim_types)
         end %if
         % Creating sub structure.
         try
-            creating_space_for_postprocessing(sim_types{oef}, run_pp, model_name);
+            
             if run_pp == 1
+                creating_space_for_postprocessing(sim_types{oef}, model_name);
                 % Move files to the post processing folder.
                 copyfile(fullfile('data_link', sim_types{oef}, 'model.gdf'),...
                     fullfile('pp_link', sim_types{oef}, 'model.gdf'));
                 copyfile(fullfile('data_link', sim_types{oef}, 'model_log'),...
                     fullfile('pp_link', sim_types{oef}, 'model_log'));
                 copyfile(fullfile('data_link', sim_types{oef}, 'run_inputs.mat'),...
-                    fullfile('pp_link', [sim_types{oef} ,'/']));
+                    fullfile('pp_link', sim_types{oef} ,'run_inputs.mat'));
                 
                 % Load up the original model input parameters.
                 % This contains modelling_inputs.
@@ -80,6 +81,8 @@ for oef = 1:length(sim_types)
                 % restoring the original version.
                 setenv('GDFIDL_VERSION',orig_ver)
                 save(fullfile('pp_link', sim_types{oef}, 'data_postprocessed.mat'), 'pp_data','-v7.3')
+            else
+    disp(['Skipping ', sim_types{oef}, ' postprocessing for ',model_name, ' data already exists'])
             end %if
         catch W_ERR
             display_postprocessing_error(W_ERR, sim_types{oef})
