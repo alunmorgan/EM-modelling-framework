@@ -17,8 +17,8 @@ model_num = 0;
 % present. (i.e. if meshing parameters are being changed rather
 % than geometric parameters)
 base_parameter_file_path = fullfile(mi.paths.path_to_models, ...
-    mi.base_model_name,mi.base_model_name,...
-    [mi.base_model_name, '_parameters.txt']);
+    mi.base_model_name,[mi.base_model_name, '_Base'],...
+    [mi.base_model_name, '_Base_parameters.txt']);
 
 for fdhs = 1:length(mi.model_names)
     model_num = model_num +1;
