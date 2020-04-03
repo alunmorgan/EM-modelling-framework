@@ -1,4 +1,5 @@
-function analyse_pp_data(root_path, model_sets, ppi, port_modes_override, port_truncation_all, analysis_override)
+function analyse_pp_data(root_path, model_sets, ppi, port_modes_override, ...
+    port_truncation_all, analysis_override)
 
 if nargin <5
     analysis_override = 0;
@@ -30,11 +31,12 @@ for sts = 1:length(model_sets)
             modelling_inputs = load(fullfile(current_folder, 'run_inputs.mat'), 'modelling_inputs');
             modelling_inputs = modelling_inputs.modelling_inputs;
             wakelength = str2double(modelling_inputs.wakelength);
-            wake_lengths_to_analyse = [];
-            for ke = 1:6
-                wake_lengths_to_analyse = cat(1, wake_lengths_to_analyse, wakelength);
-                wakelength = wakelength ./2;
-            end %for
+%             wake_lengths_to_analyse = [];
+%             for ke = 1:6
+%                 wake_lengths_to_analyse = cat(1, wake_lengths_to_analyse, wakelength);
+%                 wakelength = wakelength ./2;
+%             end %for
+            wake_lengths_to_analyse = wakelength;
             %TEST CODE for truncation of beginnig of port signals.
             for dlw = 1:length(pp_data.port.data)
                 if size(pp_data.port.data{dlw}, 1) > port_truncation(dlw)
