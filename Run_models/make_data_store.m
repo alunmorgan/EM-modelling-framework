@@ -18,6 +18,8 @@ if exist(fullfile(results_storage_location, sim_type),'dir')
         run_sim = 0;
     end %if
 else
+    if ~exist(fullfile(results_storage_location, sim_type), 'dir')
     mkdir(results_storage_location, sim_type)
+    end %if
     run_sim = 1;
 end %if
