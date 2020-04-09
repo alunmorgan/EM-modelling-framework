@@ -65,7 +65,7 @@ for lrd = 1:length(stls)
         model_file = cat(1, model_file, '# There is also an adjustment in yprime in order.');
         model_file = cat(1, model_file, '# to rotate the model around the beam axis, to ');
         model_file = cat(1, model_file, '# adjust port locations.');
-        model_file = cat(1, model_file, 'xprime= (0 ,0 ,-1)');
+        model_file = cat(1, model_file, 'xprime= (0 ,0 ,1)');
         model_file = cat(1, model_file, ['yprime= (',num2str(model_angle/90),',', num2str(1-(model_angle/90)),', 0)']);
     elseif strcmpi(modelling_inputs.main_axis, 'y')
         model_file = cat(1, model_file, '# FreeCAD model beam axis is y. GdfidL uses z.');
