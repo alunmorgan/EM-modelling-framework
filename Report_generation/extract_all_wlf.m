@@ -21,9 +21,30 @@ for sts = 1:length(model_sets)
 %         wlf(sts,ind) = wake_sweep_data.time_domain_data{end}.wake_loss_factor;
         wlf_bl_sweep = wake_sweep_data.frequency_domain_data{1, end}.extrap_data.beam_sigma_sweep.wlf;
         bl_sweep = wake_sweep_data.frequency_domain_data{1, end}.extrap_data.beam_sigma_sweep.sig_time *3E8;
+        try
+            % simulations are not always run with a 1mm bunch size.
         wlf_1mm(sts,ind) = interp1(bl_sweep, wlf_bl_sweep, 1E-3);
+        catch
+            wlf_1mm(sts,ind) = NaN;
+        end %try
+        try
         wlf_3mm(sts,ind) = interp1(bl_sweep, wlf_bl_sweep, 3E-3);
+        catch
+            try
+            wlf_3mm(sts,ind) = wlf_bl_sweep(bl_sweep > 3E-3-1e-5 & bl_sweep < 3E-3 + 1e-5);
+            catch
+                 wlf_3mm(sts,ind) = NaN;
+            end %try
+        end %try
+        try
         wlf_10mm(sts,ind) = interp1(bl_sweep, wlf_bl_sweep, 10E-3);
+         catch
+            try
+            wlf_10mm(sts,ind) = wlf_bl_sweep(bl_sweep > 10E-3-1e-5 & bl_sweep < 10E-3 + 1e-5);
+            catch
+                 wlf_10mm(sts,ind) = NaN;
+            end %try
+        end %try
         wake_length(sts,ind) = (round(((wake_sweep_data.time_domain_data{1}.timebase(end)) *3e8)*100))/100;
         mesh_density(sts, ind) = modelling_inputs.mesh_stepsize;
         mesh_scaling(sts, ind) = modelling_inputs.mesh_density_scaling;

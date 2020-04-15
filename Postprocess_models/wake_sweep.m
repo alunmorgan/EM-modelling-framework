@@ -27,8 +27,11 @@ r_raw.frequency_series_data.Wake_impedance_trans_quad_Y = raw_data.Wake_impedanc
 r_raw.frequency_series_data.Wake_impedance_trans_dipole_X = raw_data.Wake_impedance_trans_dipole_X;
 r_raw.frequency_series_data.Wake_impedance_trans_dipole_Y = raw_data.Wake_impedance_trans_dipole_Y;
 r_raw.wake_setup = raw_data.wake_setup;
-r_raw.mat_losses = raw_data.mat_losses;
-r_raw.port.labels = raw_data.port.labels;
+if isfield(raw_data, 'mat_losses')
+    % if the model is PEC only then this will not exist.
+    r_raw.mat_losses = raw_data.mat_losses;
+end %if
+    r_raw.port.labels = raw_data.port.labels;
 r_raw.port.labels_table = raw_data.port.labels_table;
 r_raw.port.frequency_cutoffs = raw_data.port.frequency_cutoffs;
 r_raw.port.frequency_cutoffs_all = raw_data.port.frequency_cutoffs_all;
