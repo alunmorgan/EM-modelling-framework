@@ -6,14 +6,11 @@ function Blend_figs(report_input, sub_folder , chosen_wake_length, frequency_dis
 %
 % Example: Blend_figs(report_input, ['s_parameters_S',num2str(hs),num2str(ha)], 0, 2);
 
-% if nargin <7
-%     line_select = 'all';
-% end
 cols = {'b','k','m','c','g',[1, 0.5, 0],[0.5, 1, 0],[0.5, 0, 1],[1, 0, 0.5],[0.5, 1, 0] };
 l_st ={'--',':','-.','--',':','-.','--',':','-.'};
 
 chosen_wake_length = str2double(chosen_wake_length);
-% any_data = 0;
+
 for hse = length(report_input.sources):-1 :1
     load(fullfile(report_input.source_path, report_input.sources{hse}, sub_folder, 'data_analysed_wake.mat'), 'wake_sweep_data');
      for nw = 1:length(wake_sweep_data.raw)
@@ -24,12 +21,8 @@ for hse = length(report_input.sources):-1 :1
         chosen_wake_ind = find(wake_sweep_vals == max(wake_sweep_vals));
         warning('Chosen wake length not found. Setting the wakelength to maximum value.')
     end %if
-    %     graph_name = fullfile(report_input.source_path, report_input.sources{hse}, sub_folder, [fig_nme, '.fig']);
-    %     if exist(graph_name,'file')
-    %         data_out(hse) = extract_from_graph(graph_name, line_select);
-    
+ 
     ind = find_data_end(wake_sweep_data.time_domain_data{chosen_wake_ind}.timebase', wake_sweep_vals(chosen_wake_ind));
-    
     f_disp_ind = find(wake_sweep_data.frequency_domain_data{chosen_wake_ind}.f_raw > frequency_display_range, 1, 'first');
     
     data_out(hse, 1).ydata = wake_sweep_data.time_domain_data{chosen_wake_ind}.wakepotential(1:ind) * 1E-9;
@@ -67,42 +60,8 @@ for hse = length(report_input.sources):-1 :1
     data_out(hse, 5).out_name = 'Energy';
     data_out(hse, 5).linewidth = 1;
     data_out(hse, 5).islog = 1;
-%     if data_out(hse).state == 1
-%         any_data = 1;
-%     end %if
-    %     end %if
 end %for
-% if any_data == 0
-%     state = 0;
-%     return
-% end
-% Zlab = report_input.swept_name;
-% xlims = data_out(1).xlims;
-% ylims = data_out(1).ylims;
-% for ew = 2:length(data_out);
-%     xlims = cat(1, xlims, data_out(ew).xlims);
-%     ylims = cat(1, ylims, data_out(ew).ylims);
-% end %for
 
-% % This section is to remove the levels and other straight line which may be
-% % on the graphs.
-% for hwc = length(data_out):-1:1
-%     if isfield(data_out(hwc), 'xdata') && ~isempty(data_out(hwc).xdata)
-%         for wah = length(data_out(hwc).xdata):-1:1
-%             if ~isempty(data_out(hwc).xdata{wah})
-%                 d_len(hwc, wah) = length(data_out(hwc).xdata{wah});
-%             else
-%                 d_len(hwc, wah) = 0 ;
-%             end %if
-%         end %for
-%     else
-%         d_len(hwc,:) = 0;
-%     end %if
-% end %for
-% 
-% unwanted_lines = all(d_len <3, 1);
-% % Find first wanted line
-% fwl = find(unwanted_lines == 0,1, 'first');
 
 %% Plot graphs
 for egvn = 1:size(data_out,2)

@@ -6,7 +6,6 @@ for en = length(data):-1:1
     if isfield(data(en), 'xdata')
         chk = 0;
         ls_tk = 1;
-        %         for ewh = fwl:length(data(en).xdata)
         if  ~isempty(data(en).xdata)
             if chk == 1
                 h =  plot(data(en).xdata{ewh}, data(en).ydata{ewh},'linestyle',l_st{ls_tk},...
@@ -22,7 +21,6 @@ for en = length(data):-1:1
             plot(NaN, NaN,'linestyle',l_st{1},...
                 'Color',cols{rem(en-1,10)+1}, 'linewidth',data(en).linewidth, 'Parent', ax1);
         end %if
-        %         end %for
     end %if
     leg{en} = report_input.swept_vals{en};
 end %for
@@ -48,5 +46,6 @@ setup_graph_for_display(ax1, xlims,...
     regexprep([report_input.swept_name{1}, ' - sweep'], '_', ' '));
 legend(ax1, leg, 'Location', 'EastOutside', 'Box', 'off')
 % save 2D graph
-savemfmt(h1, report_input.output_loc, data(1).out_name, {'png', 'eps', 'pdf'})
+[~, model_name] = fileparts(report_input.output_loc);
+savemfmt(h1, report_input.output_loc, [model_name, ' - ', data(1).out_name])
 close(h1)

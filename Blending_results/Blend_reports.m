@@ -19,22 +19,6 @@ tmp = names;
 tmp(base_name_ind) = [];
 sweeps = unique(regexprep(tmp, '_sweep_value_.*', '_sweep'));
 
-% tmp2 = strfind(tmp, '_');
-% tmp3 = cell(length(tmp2),1);
-% for awk = 1:length(tmp2)
-%     if isempty(tmp2{awk})
-%         tmp3{awk} = [];
-%     else
-%         tmp3{awk} = tmp{awk}(tmp2{awk}(1) +1:tmp2{awk}(end) -1);
-%     end %if
-% end %for
-% if ~isempty(tmp2)
-%     sweeps = unique(tmp3);
-% else
-%     sweeps = [];
-% end %if
-
-
 for ewh = 1:length(sweeps)
     sweep_ind = find_position_in_cell_lst(strfind(names,sweeps{ewh}));
     base_ind = find_position_in_cell_lst(strfind(names,base_name));
@@ -66,7 +50,6 @@ for ewh = 1:length(sweeps)
         param_vals_tmp = cat(2,sim_param_vals_tmp, geom_param_vals_tmp,...
             modelling_inputs.geometry_fraction, mat_param_vals_tmp );
         
-        %     model_names{psw} =  regexprep(modelling_inputs.('model_name'),'_',' ');
         param_names(psw,1:length(param_names_tmp)) = regexprep(param_names_tmp,'_',' ');
         for ns = 1:length(param_vals_tmp)
             if ~ischar(param_vals_tmp{ns})
@@ -113,12 +96,10 @@ for ewh = 1:length(sweeps)
     %select a single vaying parameter.
     stable_tmp = true(length(stable), 1);
     stable_tmp(varying_pars_ind(isn)) = 0;
-    %     report_name = regexprep(rep_title,'_', ' ');
-    report_input.author = modelling_inputs.author;
+     report_input.author = modelling_inputs.author;
     report_input.date = datestr(now,'dd/mm/yyyy');
     report_input.base_name = base_name;
     report_input.source_path = results_loc;
-%     report_input.graphic = Graphic_path;
     report_input.param_names_common = param_name_list(stable_tmp);
     report_input.param_vals_common = param_val_list(base_name_ind, stable_tmp);
     report_input.swept_name = param_name_list(~stable_tmp);
