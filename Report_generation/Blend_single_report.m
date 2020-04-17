@@ -29,14 +29,14 @@ out_T = add_blend_table(regexprep(report_input.base_name, '_', ' '),...
     ['sweep of ',report_input.swept_name{1}] , report_input.swept_vals, summary);
 ov = cat(1,ov,out_T);
 ov = cat(1,ov,' ');
-for pns = 1:length(report_input.sources)
+for pns = length(report_input.sources):-1:1
     data_name = fullfile(report_input.source_path, report_input.sources{pns}, 'wake',  'data_from_run_logs.mat');
     run_log_data{pns} = load(data_name);
 end %for
 
 for knwe = 1:length(report_input.sources)
     if isfield(run_log_data{knwe}.run_logs, 'mat_losses')
-        for whad = 1:size(run_log_data{knwe}.run_logs.mat_losses.single_mat_data, 1)
+        for whad = size(run_log_data{knwe}.run_logs.mat_losses.single_mat_data, 1):-1:1
             loss_vals(knwe, whad) = run_log_data{knwe}.run_logs.mat_losses.single_mat_data{whad, 4}(end, 2);
             loss_names{knwe,whad} = run_log_data{knwe}.run_logs.mat_losses.single_mat_data{whad, 2};
         end %for
@@ -45,7 +45,7 @@ end %for
 if exist('loss_names', 'var') == 2
     all_loss_names = unique(loss_names);
     for whw = 1:length(all_loss_names)
-        for hwf = 1:length(report_input.sources)
+        for hwf = length(report_input.sources):-1:1
             loc = find(strcmp(loss_names(hwf,:), all_loss_names{whw}));
             loss_vals_sorted(hwf, whw) = loss_vals(hwf, loc);
         end %for
