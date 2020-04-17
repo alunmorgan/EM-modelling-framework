@@ -32,22 +32,6 @@ if ispc ==1
             disp(['Unable to save as ',requested_formats{fhw},' file at ', output_path])
         end %try
     end %for
-    %     try
-    %         saveas(fig_h,name, 'epsc2')
-    %     catch
-    %         disp('Unable to save as eps file')
-    %     end
-    %     try
-    %         saveas(fig_h, name, 'png')
-    %     catch
-    %         disp('Unable to save as png file')
-    %     end
-    %     try
-    %         saveas(fig_h, name, 'pdf')
-    %     catch
-    %         disp('Unable to save as pdf file')
-    %
-    %     end
     cd(old_loc)
 else
     % if on linux use the system convert function as it is faster and more
