@@ -1,4 +1,4 @@
-function GdfidL_run_simulation(sim_type, paths, modelling_inputs, ow_behaviour, plots)
+function GdfidL_run_simulation(sim_type, paths, modelling_inputs, ow_behaviour)
 % Takes the geometry specification, adds the setup for a  simulation and
 % runs the simulation with the desired calculational precision.
 %
@@ -17,7 +17,10 @@ function GdfidL_run_simulation(sim_type, paths, modelling_inputs, ow_behaviour, 
 % will kill performance. So initially write to a local drive and then move
 % it.
 
-if strcmpi(sim_type, 'wake')
+if strcmpi(sim_type, 'geometry')
+    sim_f_name = 'geometry';
+    sim_name = 'Geometry';
+elseif strcmpi(sim_type, 'wake')
     sim_f_name = 'wake';
     sim_name = 'Wake';
 elseif strcmpi(sim_type, 's-parameter') || strcmpi(sim_type, 's_parameter') ||...
@@ -66,7 +69,7 @@ if run_sim == 1
             port_name = modelling_inputs.ports{nes};
         end %if
         arch_out = construct_storage_area_path(results_storage_location, sim_f_name, port_name, frequency);
-        construct_gdf_file(paths, sim_name, modelling_inputs, port_name, frequency, plots)
+        construct_gdf_file(sim_name, modelling_inputs, port_name, frequency)
         disp(['Running ', sim_name,' simulation for ', modelling_inputs.model_name, '.'])
         GdfidL_simulation_core(modelling_inputs.version, modelling_inputs.precision)
         save(fullfile(results_storage_location, sim_f_name, 'run_inputs.mat'), 'paths', 'modelling_inputs')

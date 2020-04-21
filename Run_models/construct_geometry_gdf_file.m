@@ -1,5 +1,5 @@
-function construct_wake_gdf_file(modelling_inputs)
-% Write the input gdf file for an wake simulation of the requested
+function construct_geometry_gdf_file(models_location, modelling_inputs)
+% Write the input gdf file to generate the geometry of the requested
 % model.
 %
 % input_file_path is the path to the geometry model gdf file.
@@ -50,24 +50,8 @@ mesh_def = cat(1,mesh_def, '#');
 mesh_fixed_planes = gdf_write_mesh_fixed_planes(modelling_inputs.beam_offset_x, ...
     modelling_inputs.beam_offset_y);
 data = create_model_data_file_for_STL(modelling_inputs);
-
-% FIXME this assumes one port per side.
-if modelling_inputs.geometry_fraction == 1
-    port_defs = gdf_write_port_definitions( modelling_inputs.ports,...
-        modelling_inputs.port_location, modelling_inputs.port_modes);
-elseif modelling_inputs.geometry_fraction == 0.5
-    port_defs = gdf_write_port_definitions( modelling_inputs.ports(1:3),...
-        modelling_inputs.port_location(1:3), modelling_inputs.port_modes(1:3));
-elseif modelling_inputs.geometry_fraction == 0.25
-    port_defs = gdf_write_port_definitions( modelling_inputs.ports(1:2),...
-        modelling_inputs.port_location(1:2), modelling_inputs.port_modes(1:2));
-else
-    error('invalid geometry fraction')
-end %if
-
-mon = gdf_wake_monitor_construction(...
-    modelling_inputs.wakelength, modelling_inputs.dtsafety, modelling_inputs.mov);
+plots = create_geometry_plots(modelling_inputs);
 % construct the full input file.
 data = cat(1,fs, modelling_inputs.defs', geom, mesh_def, mesh_fixed_planes, ...
-    data, port_defs, mon);
+    data, plots);
 write_out_data( data, 'temp_data/model.gdf' )

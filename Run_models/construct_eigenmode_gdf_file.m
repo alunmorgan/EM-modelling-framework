@@ -1,4 +1,4 @@
-function construct_eigenmode_gdf_file(models_location, modelling_inputs, plots, islossy)
+function construct_eigenmode_gdf_file(modelling_inputs, islossy)
 % Write the input gdf file for an eigenmode simulation of the requested
 % model.
 %
@@ -45,7 +45,7 @@ mesh_def = cat(1,mesh_def, '# by enforcing two meshplanes');
 mesh_def = cat(1,mesh_def, '#');
 mesh_fixed_planes = gdf_write_mesh_fixed_planes(modelling_inputs.beam_offset_x, ...
     modelling_inputs.beam_offset_y);
-data = create_model_data_file_for_STL(modelling_inputs, models_location, plots);
+data = create_model_data_file_for_STL(modelling_inputs);
 
 % data = read_file_full_line(models_location);
 % switch the port descriptions to the eigenvalues section.
@@ -69,15 +69,10 @@ else
     end %if
 end %if
 
-if isfield(modelling_inputs, 'geom_only')
-    mon = {''};
-else
-    
-    mon = gdf_eigenmode_monitor_construction(...
-        modelling_inputs.eigenmode.estimation_frequency, ...
-        modelling_inputs.eigenmode.number_of_solutions, ...
-        islossy, modelling_inputs.eigenmode.f_range);
-end %if
+mon = gdf_eigenmode_monitor_construction(...
+    modelling_inputs.eigenmode.estimation_frequency, ...
+    modelling_inputs.eigenmode.number_of_solutions, ...
+    islossy, modelling_inputs.eigenmode.f_range);
 
 % construct the full input file.
 data = cat(1,fs, modelling_inputs.defs', geom, mesh_def, mesh_fixed_planes, data, port_defs, mon);
