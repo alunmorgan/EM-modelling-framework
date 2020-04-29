@@ -1,4 +1,4 @@
-function construct_geometry_gdf_file(models_location, modelling_inputs)
+function construct_geometry_gdf_file(modelling_inputs)
 % Write the input gdf file to generate the geometry of the requested
 % model.
 %
