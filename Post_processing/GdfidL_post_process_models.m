@@ -1,18 +1,28 @@
-function GdfidL_post_process_models(paths, model_name, ow_behaviour)
+function GdfidL_post_process_models(paths, model_name, varargin)
 % Takes the output of the GdfidL run and postprocesses it to generate
 % reports.
 %
 % Example: pp_log = GdfidL_post_process_models(ppi);
 
-if nargin <2
-    ow_behaviour = 'skip';
-end %if
+p = inputParser;
+p.StructExpand = false;
+   addRequired(p,'paths');
+   addRequired(p,'model_name',@isstring);
+   addOptional(p,'ow_behaviour','skip',@isstring);
+   addParameter(p,'input_data_location',{''},@iscell);
+   parse(paths, model_name, varargin{:});
 
+results_path = p.Results.paths.results_path;
+if ~isempty(p.Results.input_data_location{1})
+    storage_path = p.Results.input_data_location;
+else
+    storage_path = p.Results.paths.storage_path;
+end %if
 % storing the original location so that  we can return there at the end.
 [old_loc, tmp_name] =move_into_tempororary_folder(paths.scratch_path);
 
-if ~exist(fullfile(paths.results_path, model_name), 'dir')
-    mkdir(fullfile(paths.results_path, model_name))
+if ~exist(fullfile(results_path, model_name), 'dir')
+    mkdir(fullfile(results_path, model_name))
 end
 % make soft links to the data folder and output folder into /scratch.
 % this is because the post processor does not handle long paths well.
@@ -23,8 +33,8 @@ end
 if exist('pp_link','dir') ~= 0
     delete('pp_link')
 end
-[~]=system(['ln -s -T ',fullfile(paths.storage_path, model_name), ' data_link']);
-[~]=system(['ln -s -T ',fullfile(paths.results_path, model_name), ' pp_link']);
+[~]=system(['ln -s -T ',fullfile(storage_path, model_name), ' data_link']);
+[~]=system(['ln -s -T ',fullfile(results_path, model_name), ' pp_link']);
 
 disp(['GdfidL_post_process_models: Started analysis of ', model_name])
 pp_data = struct;
