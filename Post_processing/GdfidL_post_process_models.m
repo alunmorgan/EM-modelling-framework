@@ -10,7 +10,7 @@ p.StructExpand = false;
    addRequired(p,'model_name',@isstring);
    addOptional(p,'ow_behaviour','skip',@isstring);
    addParameter(p,'input_data_location',{''},@iscell);
-   parse(paths, model_name, varargin{:});
+   parse(p, paths, model_name, varargin{:});
 
 results_path = p.Results.paths.results_path;
 if ~isempty(p.Results.input_data_location{1})
