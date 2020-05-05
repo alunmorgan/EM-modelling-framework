@@ -1,6 +1,7 @@
-function output_file_locations = postprocess_core(modelling_inputs,sim_type)
+function postprocess_core(modelling_inputs, sim_type)
 
-
+disp(['GdfidL_post_process_models: Post processing ', sim_type, ' data.'])
+temp_files('make')
 % setting the GdfidL version to test
 orig_ver = getenv('GDFIDL_VERSION');
 setenv('GDFIDL_VERSION',modelling_inputs.version);
@@ -21,15 +22,19 @@ for hwa = 1:length(data)
         warning(['Postprocess ',sim_type , ': The post processor has not completed properly'])
     end %if
 end %for
-%% find the location of all the required output files
-output_file_locations = GdfidL_find_ouput('temp_scratch');
 
-%% convert the gld files for the field output images to ps and move them to the output location.
-    gld_files = dir_list_gen('temp_scratch', 'gld', 1);
-    parfor fjh = 1:length(gld_files)
-        [~,name,~] = fileparts(gld_files{fjh});
-        system(['gd1.3dplot -colorps -geometry 800x600 -o ',fullfile('pp_link', sim_type, name), 'ps -i ' , gld_files{fjh}]);
-    end %parfor
 
-    %% move any png files to the output location.
-    movefile('temp_scratch/*.png', fullfile('pp_link', sim_type))
+%% convert the gld files for the field output images to ps.
+gld_files = dir_list_gen('temp_scratch', 'gld', 1);
+parfor fjh = 1:length(gld_files)
+    [~,name,~] = fileparts(gld_files{fjh});
+    system(['gd1.3dplot -colorps -geometry 800x600 -o ',fullfile('temp_scratch', name), 'ps -i ' , gld_files{fjh}]);
+end %parfor
+delete *.gld
+
+%% move any remaining files to the output location.
+movefile('temp_scratch/*', fullfile('pp_link', sim_type))
+
+temp_files('remove')
+delete('POSTP-LOGFILE');
+delete('WHAT-PP-DID-SPIT-OUT');

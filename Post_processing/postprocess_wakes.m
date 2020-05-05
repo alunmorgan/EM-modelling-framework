@@ -9,21 +9,18 @@ function raw_data = postprocess_wakes(modelling_inputs, log)
 %Example: wake_data = postprocess_wakes(ppi, modelling_inputs,log)
 
 %% Write the wake post processing input file
-% find the pipe length
-% pipe_length = get_pipe_length_from_defs(modelling_inputs.defs);
 transverse_quadrupole_wake_offset = '1E-3';
 tstart = GdfidL_write_pp_input_file(log, transverse_quadrupole_wake_offset, str2double(modelling_inputs.version(1:6)));
 
-temp_files('make')
+
 %% run the wake postprocessor
-output_file_locations = postprocess_core(modelling_inputs,sim_type);
+postprocess_core(modelling_inputs, 'wake');
 
 %% Extract the wake data
+output_file_locations = GdfidL_find_ouput(fullfile('pp_link', 'wake'));
 raw_data = extract_wake_data_from_pp_output_files(output_file_locations, log);
 
-temp_files('remove')
-delete('POSTP-LOGFILE');
-delete('WHAT-PP-DID-SPIT-OUT');
+
 
 %% find the gld files for the field output images.
 % gld_list = dir_list_gen('pp_link/wake/', 'gld');
