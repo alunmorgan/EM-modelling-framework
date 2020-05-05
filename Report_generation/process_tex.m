@@ -5,7 +5,11 @@ function process_tex(output_path, file_name)
 old_path = pwd;
 cd(output_path)
 disp(['Processing latex file. ', output_path, '/',file_name])
-latex_cmd = '"C:\Program Files\MiKTeX 2.9\miktex\bin\x64\pdflatex.exe" -etex -interaction nonstopmode -halt-on-error ';
+if ispc == 1
+    latex_cmd = '"C:\Program Files\MiKTeX 2.9\miktex\bin\x64\pdflatex.exe" -etex -interaction nonstopmode -halt-on-error ';
+else
+    latex_cmd = 'pdflatex -interaction nonstopmode -halt-on-error ';
+end %if
 [status(1), ~] = system([latex_cmd, file_name,'.tex']);
 fprintf('.')
 [status(2), ~] = system([latex_cmd, file_name,'.tex']);
