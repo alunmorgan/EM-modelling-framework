@@ -11,7 +11,6 @@ rev = ppi.RF_freq/936;
 gap = 1/ppi.RF_freq;
 % rev_time = (1/ppi.RF_freq) * 936; %time of 1 revolution
 rev_time = (1/ppi.RF_freq) * 50; %time of 10 bunches %TEMP DUE TO MEMORY LIMITS
-% raw_port_data = put_on_reference_timebase(time_domain_data.timebase, raw_data.port);
 r_raw.time_series_data.Energy = raw_data.Energy;
 r_raw.time_series_data.Charge_distribution = raw_data.Charge_distribution;
 r_raw.time_series_data.Wake_potential = raw_data.Wake_potential;
