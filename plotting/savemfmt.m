@@ -36,10 +36,10 @@ if ispc ==1
 else
     % if on linux use the system convert function as it is faster and more
     % robust.
-    if contains(requested_formats, 'fig')
-        saveas(fig_h,fullfile(output_path, [name,'.fig']))
+    if any(contains(requested_formats, 'fig'))
+        saveas(fig_h,fullfile(output_path, name), 'fig')
     end %if
-    saveas(fig_h,fullfile(output_path, [name, '.tif']))
+    saveas(fig_h,fullfile(output_path, name), 'tif')
     % convert from tif in order to get manageble file sizes.
     for nde = 1:length(requested_formats)
         if ~strcmp(requested_formats{nde}, 'fig')
