@@ -40,20 +40,8 @@ r_raw.port.beta = raw_data.port.beta;
 r_raw.port.t_start = raw_data.port.t_start;
 
 for se = length(sweep_lengths):-1:1
-    
-    
-%     trimed_ports = find(raw_data.port.timebase(:,1) <= (sweep_lengths(se) / 3E8), 1, 'last');
-%     if isempty(trimed)
-%         warning(['Sweep length ', num2str(sweep_lengths(se)) ,' not found.'])
-%         continue
-%     end %if
-    %     trimed = round((dsd/n_points)*se);
-    % Construct a replacement structure containing the truncated datasets.
     r_data{se} = r_raw;
     r_names = fieldnames(r_data{se}.time_series_data);
-    % only want time domain data.
-%     r_names(find_position_in_cell_lst(strfind(r_names,'impedance'))) = [];
-    %find the timebase with the smallest time step.
     starttime =  find_earliest_start(r_data{se}.time_series_data);
     timestep =  find_smallest_timestep(r_data{se}.time_series_data);
     r_data{se}.time_series_data.timescale_common = linspace(starttime, rev_time,(rev_time - starttime)/timestep + 1)';
@@ -73,40 +61,8 @@ for se = length(sweep_lengths):-1:1
                 condition_timeseries(temp_data, sweep_lengths(se), starttime, rev_time, timestep);
         end %if
     end %for
-    
-%     r_data{se}.Wake_potential = r_data{se}.Wake_potential(1:trimmed,:);
-%     r_data{se}.Wake_potential_trans_quad_X = r_data{se}.Wake_potential_trans_quad_X(1:trimmed,:);
-%     r_data{se}.Wake_potential_trans_quad_Y = r_data{se}.Wake_potential_trans_quad_Y(1:trimmed,:);
-%     r_data{se}.Wake_potential_trans_dipole_X = r_data{se}.Wake_potential_trans_dipole_X(1:trimmed,:);
-%     r_data{se}.Wake_potential_trans_dipole_Y = r_data{se}.Wake_potential_trans_dipole_Y(1:trimmed,:);
-%     r_data{se}.port.timebase = r_data{se}.port.timebase(1:trimed_ports, :);
-%     for pda = length(r_data{se}.port.data_all):-1:1
-%         r_data{se}.port.data_all{1,pda} = r_data{se}.port.data_all{1,pda}(1:trimed_ports,:);
-%     end %for
-%     for pd = length(r_data{se}.port.data):-1:1
-%         r_data{se}.port.data{1,pd} = r_data{se}.port.data{1,pd}(1:trimed_ports, :);
-%     end %for
     r_data{se}.wake_setup.Wake_length = sweep_lengths(se);
-    %     t_data{se}.timebase = time_domain_data.timebase(1:trimed);
-    %     t_data{se}.wakepotential = time_domain_data.wakepotential(1:trimed);
-    %     t_data{se}.wakepotential_trans_quad_x = time_domain_data.wakepotential_trans_quad_x(1:trimed);
-    %     t_data{se}.wakepotential_trans_quad_y = time_domain_data.wakepotential_trans_quad_y(1:trimed);
-    %     t_data{se}.wakepotential_trans_dipole_x = time_domain_data.wakepotential_trans_dipole_x(1:trimed);
-    %     t_data{se}.wakepotential_trans_dipole_y = time_domain_data.wakepotential_trans_dipole_y(1:trimed);
-    %     t_data{se}.charge_distribution = time_domain_data.charge_distribution(1:trimed);
-    %     pt_data{se}.timebase = time_domain_data.timebase(1:trimed);
-    %% set to common timebase
     
-    
-%     % Pad the time domain data to one revolution length.
-%     
-%     
-%     if iscell(raw_port_data)
-%         [ ~, port_data_bc] = ...
-%             pad_data(time_domain_data.timebase, rev_time, 'time', raw_port_data);
-%     else
-%         port_data_bc = NaN;
-%     end %if
     %% Time domain analysis
     t_data{se} = time_domain_analysis(r_data{se}, log, port_modes_override);
     %% Frequency domain analysis
@@ -122,7 +78,6 @@ for se = length(sweep_lengths):-1:1
         f_data{se} = frequency_domain_analysis(...
             NaN, t_data{se}, NaN, log, ppi.hfoi);
     end %if
-%     f_data{se}.Wake_length = round(r_data{se}.Wake_potential(end,1)*3e8, 2);
     % Material loss
     if isfield(r_raw, 'mat_losses')
         mt_ind = find(r_raw.mat_losses.loss_time < t_data{se}.timebase(end), 1, 'last');
@@ -134,7 +89,6 @@ for se = length(sweep_lengths):-1:1
                 m_data{se}.single_mat_data{shw, 4}(:,1),...
                 m_data{se}.single_mat_data{shw, 4}(:,2),...
                 m_data{se}.loss_time);
-%             m_data{se}.single_mat_data{shw, 4}(1:mt_ind,:);
         end %for
     else
         m_data{se} = NaN;
