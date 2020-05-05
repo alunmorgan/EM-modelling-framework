@@ -2,14 +2,17 @@ function GdfidL_post_process_models(paths, model_name, varargin)
 % Takes the output of the GdfidL run and postprocesses it to generate
 % reports.
 %
-% Example: pp_log = GdfidL_post_process_models(ppi);
+% Example: pp_log = GdfidL_post_process_models(paths, model_name, 'ow_behaviour','skip', 'input_data_location', '/home');
 
 p = inputParser;
 p.StructExpand = false;
-   addRequired(p,'paths');
-   addRequired(p,'model_name',@isstring);
-   addOptional(p,'ow_behaviour','skip',@isstring);
-   addParameter(p,'input_data_location',{''},@iscell);
+    validate_is_char = @(x) ischar(x);
+    validate_is_cell = @(x) iscell(x);
+    validate_is_structure = @(x) isstruct(x);
+   addRequired(p,'paths', validate_is_structure);
+   addRequired(p,'model_name', validate_is_char);
+   addParameter(p,'ow_behaviour','skip', validate_is_char);
+   addParameter(p,'input_data_location',{''}, validate_is_cell);
    parse(p, paths, model_name, varargin{:});
 
 results_path = p.Results.paths.results_path;
