@@ -1,4 +1,4 @@
-function GdfidL_plot_wake(path_to_data, ppi, range, chosen_wake_length, hfoi)
+function GdfidL_plot_wake(path_to_data, ppi, range, chosen_wake_length)
 % Generate the graphs based on the wake simulation data.
 % Graphs are saved in fig format and png, eps.
 % 
@@ -9,6 +9,7 @@ function GdfidL_plot_wake(path_to_data, ppi, range, chosen_wake_length, hfoi)
 % Example GdfidL_plot_wake(wake_data, ppi, mi, run_log,  pth, range)
 
 chosen_wake_length = str2double(chosen_wake_length);
+hfoi = ppi.hfoi;
 
 pth = fullfile(path_to_data, 'wake');
 load(fullfile(pth, 'run_inputs.mat'), 'modelling_inputs'); 
