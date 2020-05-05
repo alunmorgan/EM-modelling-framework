@@ -11,13 +11,15 @@ if isfield(report_input, 'report_name')
     name = report_input.report_name;
 else
     name = report_input.model_name;
-end
+end %if
 
-if ~isempty(strfind(name, '-'))
+name = regexprep(name, '\s*_\s*', ' ');
+
+if contains(name, '-')
     sub_ind = strfind(name, '-');
     sub_title = name(sub_ind +1:end);
     name = name(1:sub_ind -1);
-end
+end %if
 
 dte =datestr(datenum(report_input.date, 'dd/mm/yyyy'),'dd mmmm yyyy');
 ov{1} = '\documentclass[a4paper]{report}';
@@ -29,7 +31,7 @@ ov = cat(1,ov,'\usepackage[encoding, filenameencoding=utf8]{grffile}');
 ov = cat(1,ov,'\usepackage{hyperref}');
 ov = cat(1,ov,'\hypersetup{colorlinks=true, linkcolor=blue}');
 ov = cat(1,ov,'\usepackage{fancyhdr}');
-ov = cat(1,ov,'\usepackage{multirow}');
+%ov = cat(1,ov,'\usepackage{multirow}');
 % Next bit is for enabling rotated headings in the tables. Source was here.
 % http://tex.stackexchange.com/questions/32683/rotated-column-titles-in-tabular
 ov = cat(1,ov,'\usepackage{array}');
