@@ -46,7 +46,7 @@ for sts = 1:length(model_sets)
                 end %if
             end %for
             % TEST CODE
-            wake_sweep_data = wake_sweep(wake_lengths_to_analyse, pp_data, modelling_inputs, ppi, run_logs, port_modes_override);
+            wake_sweep_data = wake_sweep(wake_lengths_to_analyse, pp_data, ppi, run_logs, port_modes_override);
             disp('Analysed ')
             save(fullfile(current_folder, 'data_analysed_wake.mat'), 'wake_sweep_data','-v7.3')
             disp('Saved')  

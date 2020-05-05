@@ -1,4 +1,4 @@
-function wake_sweep_data = wake_sweep(sweep_lengths, raw_data, mi, ppi, log, port_modes_override)
+function wake_sweep_data = wake_sweep(sweep_lengths, raw_data, ppi, log, port_modes_override)
 % Run the frequency domain analysis over data which is increasingly reduced
 % in length (i.e. having different wake lengths).
 %
@@ -30,7 +30,7 @@ if isfield(raw_data, 'mat_losses')
     % if the model is PEC only then this will not exist.
     r_raw.mat_losses = raw_data.mat_losses;
 end %if
-    r_raw.port.labels = raw_data.port.labels;
+r_raw.port.labels = raw_data.port.labels;
 r_raw.port.labels_table = raw_data.port.labels_table;
 r_raw.port.frequency_cutoffs = raw_data.port.frequency_cutoffs;
 r_raw.port.frequency_cutoffs_all = raw_data.port.frequency_cutoffs_all;
@@ -96,10 +96,10 @@ for se = length(sweep_lengths):-1:1
     f_data{se}.time_slices = time_slices(t_data{se}.timebase, ...
         t_data{se}.wakepotential, ppi.hfoi);
     %% Calculating the losses for different bunch lengths
-    f_data{se}.extrap_data.beam_sigma_sweep = variation_with_beam_sigma(mi.beam_sigma, t_data{se}.timebase, ...
-    f_data{se}.Wake_Impedance_data, log.charge, f_data{se}.port_impedances, f_data{se}.port_fft);
+    f_data{se}.extrap_data.beam_sigma_sweep = variation_with_beam_sigma(ppi.bunch_lengths, t_data{se}.timebase, ...
+        f_data{se}.Wake_Impedance_data, log.charge, f_data{se}.port_impedances, f_data{se}.port_fft);
     
-%%    and bunch charges.
+    %% and bunch charges.
     f_data{se}.extrap_data.diff_machine_conds = loss_extrapolation(t_data{se}.timebase, f_data{se}, ppi);
 end %for
 
