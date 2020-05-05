@@ -1,8 +1,8 @@
-function beam_sigma_sweep = variation_with_beam_sigma(beam_sigma, timebase, ...
+function beam_sigma_sweep = variation_with_beam_sigma(beam_sigmas, timebase, ...
     Wake_Impedance_data, charge, port_impedances, port_fft)
 %% Find the variation with increasing beam sigma.
-for odf = 1:5:60
-    pulse_sig = str2double(beam_sigma) ./ 3E8 + (odf-1) * 1E-12;
+for odf = 1:length(beam_sigmas)
+    pulse_sig = str2double(beam_sigmas(odf)) ./ 3E8;
     % generate the time domain signal
     pulse = (1/(sqrt(2*pi)*pulse_sig)) * ...
         exp(-(timebase.^2)/(2*pulse_sig^2));
