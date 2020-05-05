@@ -53,7 +53,7 @@ if run_sim == 1
         disp(['Running ', sim_type,' simulation for ', modelling_inputs.model_name, '.'])
         GdfidL_simulation_core(modelling_inputs.version, modelling_inputs.precision)
         save(fullfile('temp_data', 'run_inputs.mat'), 'paths', 'modelling_inputs')
-        [status, message] = movefile('temp_data', arch_out);
+        [status, message] = movefile('temp_data/*', arch_out);
         if status == 1
             temp_files('remove')
             output_data_location{1, nes} = arch_out;
