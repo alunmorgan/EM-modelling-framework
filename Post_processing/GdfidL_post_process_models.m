@@ -45,15 +45,7 @@ pp_data = struct;
 sim_types = {'wake', 'eigenmode', 'eigenmode_lossy'};
 for oef = 1:length(sim_types)
     if exist(fullfile('data_link', [sim_types{oef},'/']), 'dir')
-        if strcmp(ow_behaviour, 'skip') && exist(fullfile('pp_link', sim_types{oef}), 'dir') == 7
-            run_pp = 0;
-        elseif strcmp(ow_behaviour, 'skip') && exist(fullfile('pp_link', sim_types{oef}), 'dir') == 0
-            run_pp = 1;
-        elseif strcmp(ow_behaviour, 'no_skip')
-            run_pp = 1;
-        else
-            error('Please select skip or no_skip for the postprocessing')
-        end %if
+       run_pp = will_pp_run(sim_types{oef}, p.Results.ow_behaviour);
         % Creating sub structure.
         try
             
@@ -67,23 +59,14 @@ for oef = 1:length(sim_types)
                 copyfile(fullfile('data_link', sim_types{oef}, 'run_inputs.mat'),...
                     fullfile('pp_link', sim_types{oef} ,'run_inputs.mat'));
                 
-                % Load up the original model input parameters.
-                % This contains modelling_inputs.
-                load(fullfile('pp_link', sim_types{oef}, 'run_inputs.mat'))
                 % Reading logs
-                if strcmp(sim_types{oef}, 'wake')
-                    run_logs = GdfidL_read_wake_log(...
-                        fullfile('pp_link', sim_types{oef}, 'model_log'));
-                elseif strcmp(sim_types{oef}, 'eigenmode') || ...
-                        strcmp(sim_types{oef}, 'eigenmode_lossy')
-                    run_logs = GdfidL_read_eigenmode_log(...
-                        fullfile('pp_link', sim_types{oef}, 'model_log'));
-                end %if
+                run_logs = GdfidL_read_logs(sim_types{oef});
                 save(fullfile('pp_link', sim_types{oef}, 'data_from_run_logs.mat'), 'run_logs')
-                disp(['GdfidL_post_process_models: Post processing ', sim_types{oef}, ' data.'])
+                
+                % Load up the original model input parameters.
+                load(fullfile('pp_link', sim_types{oef}, 'run_inputs.mat'), 'modelling_inputs')
+                
                 % Running postprocessor
-                orig_ver = getenv('GDFIDL_VERSION');
-                setenv('GDFIDL_VERSION',run_logs.ver);
                 if strcmp(sim_types{oef}, 'wake')
                     pp_data = postprocess_wakes(modelling_inputs, run_logs);
                 elseif strcmp(sim_types{oef}, 'eigenmode')
@@ -91,8 +74,6 @@ for oef = 1:length(sim_types)
                 elseif strcmp(sim_types{oef}, 'eigenmode_lossy')
                     pp_data = postprocess_eigenmode_lossy(modelling_inputs, run_logs);
                 end %if
-                % restoring the original version.
-                setenv('GDFIDL_VERSION',orig_ver)
                 save(fullfile('pp_link', sim_types{oef}, 'data_postprocessed.mat'), 'pp_data','-v7.3')
             else
     disp(['Skipping ', sim_types{oef}, ' postprocessing for ',model_name, ' data already exists'])
@@ -108,15 +89,7 @@ end %for
 sim_types = {'s_parameters', 'shunt'};
 for heb = 1:length(sim_types)
     if exist(fullfile('data_link', sim_types{heb}), 'dir')
-        if strcmp(ow_behaviour, 'skip') && exist(fullfile('pp_link', sim_types{heb}), 'dir') == 7
-            run_pp = 0;
-        elseif strcmp(ow_behaviour, 'skip') && exist(fullfile('pp_link', sim_types{heb}), 'dir') == 0
-            run_pp = 1;
-        elseif strcmp(ow_behaviour, 'no_skip')
-            run_pp = 1;
-        else
-            error('Please select skip or no_skip for the postprocessing')
-        end %if
+        run_pp = will_pp_run(sim_types{heb}, p.Results.ow_behaviour);
         % Creating sub structure.
         try
             creating_space_for_postprocessing(sim_types{heb}, run_pp, model_name);
@@ -148,15 +121,11 @@ for heb = 1:length(sim_types)
                 
                 disp(['GdfidL_post_process_models: Post processing ', sim_types{heb}, ' data.'])
                 % Running postprocessor
-                orig_ver = getenv('GDFIDL_VERSION');
-                setenv('GDFIDL_VERSION',run_logs.(d_list{1}).ver);
                 if strcmp(sim_types{heb}, 's_parameters')
                     pp_data = postprocess_s_parameters;
                 elseif strcmp(sim_types{heb}, 'shunt')
                     pp_data = postprocess_shunt;
                 end %if
-                % restoring the original version.
-                setenv('GDFIDL_VERSION',orig_ver)
                 save(fullfile('pp_link', sim_types{heb}, 'data_postprocessed.mat'), 'pp_data','-v7.3')
             end %if
         catch ERR

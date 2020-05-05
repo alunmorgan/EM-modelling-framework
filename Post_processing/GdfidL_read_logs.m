@@ -1,0 +1,9 @@
+function run_logs = GdfidL_read_logs(sim_type)
+if strcmp(sim_type, 'wake')
+    run_logs = GdfidL_read_wake_log(...
+        fullfile('pp_link', sim_type, 'model_log'));
+elseif strcmp(sim_type, 'eigenmode') || ...
+        strcmp(sim_type, 'eigenmode_lossy')
+    run_logs = GdfidL_read_eigenmode_log(...
+        fullfile('pp_link', sim_type, 'model_log'));
+end %if
