@@ -64,4 +64,6 @@ if run_sim == 1
         end %if
     end %for
     cd(old_loc)
+else
+    output_data_location = NaN;
 end %if

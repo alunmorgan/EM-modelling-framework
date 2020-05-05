@@ -56,7 +56,15 @@ for awh = 1:length(modelling_inputs)
         end %try
         try
             model_name = modelling_inputs{awh}.model_name;
-            GdfidL_post_process_models(mi.paths, model_name, force_pp);
+            if isnan(simulation_result_locations)
+                %If the simulation results already exist then the location is
+                %NaN.
+            GdfidL_post_process_models(mi.paths, model_name, 'ow_behaviour',force_pp);
+            else
+               GdfidL_post_process_models(mi.paths, model_name, ...
+                   'ow_behaviour',force_pp,...
+                   'input_data_location', simulation_result_locations);
+            end %if
         catch ERR
             display_postprocessing_error(ERR, 'wake')
         end %try
