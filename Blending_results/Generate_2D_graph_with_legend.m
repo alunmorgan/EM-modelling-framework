@@ -2,30 +2,35 @@ function Generate_2D_graph_with_legend(report_input, data, cols, l_st)
 h1 = figure('Position', [ 0 0 1000 400]);
 ax1 = axes('Parent', h1);
 hold(ax1, 'on')
-for en = length(data):-1:1
-    if isfield(data(en), 'xdata')
-        chk = 0;
-        ls_tk = 1;
-        if  ~isempty(data(en).xdata)
-            if chk == 1
-                h =  plot(data(en).xdata{ewh}, data(en).ydata{ewh},'linestyle',l_st{ls_tk},...
-                    'Color',cols{rem(en-1,10)+1}, 'linewidth',data(en).linewidth, 'Parent', ax1);
-                set(get(get(h,'Annotation'), 'LegendInformation'), 'IconDisplayStyle', 'off');
-            else
-                plot(data(en).xdata, data(en).ydata,'linestyle',l_st{ls_tk},...
-                    'Color',cols{rem(en-1,10)+1}, 'linewidth',data(en).linewidth, 'Parent', ax1);
-                chk = 1;
-            end %if
-            ls_tk = ls_tk +1;
-        else
-            plot(NaN, NaN,'linestyle',l_st{1},...
-                'Color',cols{rem(en-1,10)+1}, 'linewidth',data(en).linewidth, 'Parent', ax1);
-        end %if
+
+variation_data = data(~contains(report_input.sources, '_Base'));
+swept_vals = report_input.swept_vals(~contains(report_input.sources, '_Base'));
+ls_tk = 1;
+for en = 1:length(variation_data)
+    if isfield(variation_data(en), 'xdata') && ~isempty(variation_data(en).xdata)
+        plot(variation_data(en).xdata, variation_data(en).ydata,...%'linestyle',l_st{ls_tk},...
+            'Color',cols{rem(en-1,10)+2}, 'linewidth',data(en).linewidth, 'Parent', ax1,...
+            'DisplayName', swept_vals{en});
+%         ls_tk = ls_tk +1;
+    else
+        plot(NaN, NaN,...%'linestyle',l_st{1},...
+            'Color',cols{rem(en-1,10)+2}, 'linewidth',data(en).linewidth, 'Parent', ax1);
     end %if
-    leg{en} = report_input.swept_vals{en};
+%     leg{en} = swept_vals{en};
 end %for
+base_data = data(contains(report_input.sources, '_Base'));
+base_vals = report_input.swept_vals(contains(report_input.sources, '_Base'));
+if isfield(base_data, 'xdata') && ~isempty(base_data.xdata)
+    plot(base_data.xdata, base_data.ydata,...%'linestyle',l_st{1},...
+        'Color',cols{1}, 'linewidth',data(en).linewidth, 'Parent', ax1, 'DisplayName', base_vals{1});
+else
+    plot(NaN, NaN,...%'linestyle',l_st{1},...
+        'Color',cols{1}, 'linewidth',data(en).linewidth, 'Parent', ax1);
+end %if
+% leg{end+1} = base_vals{1};
+
 hold(ax1, 'off')
-% add legend to 2D graph
+
 xlim_min = min(data(1).xdata);
 xlim_max = max(data(1).xdata);
 ylim_min = min(data(1).ydata);
@@ -44,7 +49,7 @@ setup_graph_for_display(ax1, xlims,...
     data(1).Xlab, data(1).Ylab,...
     '',...
     regexprep([report_input.swept_name{1}, ' - sweep'], '_', ' '));
-legend(ax1, leg, 'Location', 'EastOutside', 'Box', 'off')
+legend(ax1, 'Location', 'EastOutside', 'Box', 'off')
 % save 2D graph
 [~, model_name] = fileparts(report_input.output_loc);
 savemfmt(h1, report_input.output_loc, [model_name, ' - ', data(1).out_name])

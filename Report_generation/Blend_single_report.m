@@ -1,5 +1,13 @@
 function Blend_single_report(report_input, chosen_wake_length, frequency_display_limit)
 
+if ~exist(report_input.output_loc, 'dir')
+    mkdir(report_input.output_loc)
+end %if
+
+[~, base_name, ~] = fileparts(report_input.source_path);
+    % replace all spaces with _ as latex has problems with spaces.
+    model_name_for_report = regexprep(report_input.rep_title, '_', ' ');
+    report_input.report_name = model_name_for_report;
 
 % Setting up the latex headers etc.
 ov = latex_add_preamble(report_input);
@@ -25,8 +33,8 @@ ov = cat(1,ov,['To start with, here are the modelling setups and run times ',...
 %%%%%%%%%%%%%%%%%%%% Material Losses section %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % if exist(fullfile(report_input.source_path, report_input.sources{1}, 'wake'), 'dir') == 7
 summary = Blend_summaries(report_input.source_path, report_input.sources, chosen_wake_length);
-out_T = add_blend_table(regexprep(report_input.base_name, '_', ' '),...
-    ['sweep of ',report_input.swept_name{1}] , report_input.swept_vals, summary);
+out_T = add_blend_table(regexprep(base_name, '_', ' '),...
+    ['sweep of ',regexprep(report_input.swept_name{1}, '_', ' ')] , report_input.swept_vals, summary);
 ov = cat(1,ov,out_T);
 ov = cat(1,ov,' ');
 for pns = length(report_input.sources):-1:1
@@ -96,7 +104,10 @@ Blend_figs(report_input, 'wake', chosen_wake_length, frequency_display_limit);
 ov = cat(1,ov,'\chapter{Energy and wakes}');
 ov = cat(1,ov,['The wake loss factor is an indicator of energy loss ',...
     'from the beam. A higher value means more loss']);
-out_wlf = add_wlf_table(regexprep(report_input.base_name, '_', ' '), report_input.swept_name, report_input.swept_vals,summary);
+
+out_wlf = add_wlf_table(regexprep(base_name, '_', ' '),...
+                        regexprep(report_input.swept_name, '_', ' '), ...
+                        report_input.swept_vals,summary);
 ov = cat(1,ov, out_wlf);
 ov = cat(1,ov, '\hspace{0.25cm}');
 ov = cat(1,ov,['Figure \ref{cumulative_total_energy} shows the cumulative energy loss. ',...
