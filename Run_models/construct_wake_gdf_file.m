@@ -2,11 +2,10 @@ function construct_wake_gdf_file(modelling_inputs)
 % Write the input gdf file for an wake simulation of the requested
 % model.
 %
-% input_file_path is the path to the geometry model gdf file.
 % modelling_inputs is the structure containing the input data for a single
 % simulation run.
 %
-% Example: construct_wake_gdf_file(models_location, storage_location, modelling_inputs, plots)
+% Example: construct_wake_gdf_file(modelling_inputs)
 
 if ~isempty(modelling_inputs.mat_list)
     materials = modelling_inputs.mat_list(:,1);

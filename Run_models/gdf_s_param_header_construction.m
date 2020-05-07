@@ -1,4 +1,4 @@
-function fs = gdf_s_param_header_construction(loc, name, npmls, num_threads, mesh, materials, material_labels)
+function fs = gdf_s_param_header_construction(loc, name, npmls, num_threads, mesh, mesh_scaling, materials, material_labels)
 % Constructs the initial part of the gdf input file for GdfidL 
 %
 % fs is
@@ -15,12 +15,16 @@ function fs = gdf_s_param_header_construction(loc, name, npmls, num_threads, mes
 fs = {'###################################################'};
 fs = cat(1,fs,'define(INF, 10000)');
 fs = cat(1,fs,'define(LargeNumber, 1000)');
-fs = cat(1,fs,['define(STPSZE, ',mesh,') # Step size of mesh']);
+fs = cat(1,fs,['define(STPSZE, ',num2str(mesh / mesh_scaling),') # Step size of mesh']);
 fs = cat(1,fs,['define(NPMLs, ',npmls,') # number of perfectly matching layers']);
 fs = cat(1,fs,'define(vacuum, 0)');
 fs = cat(1,fs,'define(PEC, 1)');
-for ks = 1:length(materials)
-   fs = cat(1,fs,['define(',materials{ks},',',num2str(ks+2),')']) ;
+if ~isempty(materials)
+    for ks = 1:length(materials)
+        if ~strcmp(materials{ks}, 'PEC') && ~strcmp(materials{ks}, 'vacuum')
+            fs = cat(1,fs,['define(',materials{ks},',',num2str(ks+2),')']) ;
+        end
+    end
 end
 fs = cat(1,fs,'define(beam_dir, +z)');
 fs = cat(1,fs,' ');
@@ -28,7 +32,7 @@ fs = cat(1,fs,'###################################################');
 fs = cat(1,fs,'-general');
 fs = cat(1,fs,['    outfile= ',loc, name,'_data/']);
 fs = cat(1,fs,['    scratch= ',loc, name,'_scratch/']);
-fs = cat(1,fs,['    nrofthreads= ', num2str(num_threads)]);
+fs = cat(1,fs,['    nrofthreads= ', num_threads]);
 fs = cat(1,fs,['    restartfiles = ',loc, name,'_restart/']);
 fs = cat(1,fs,'    t1restartfiles = 720');
 fs = cat(1,fs,'    dtrestartfiles = 360');

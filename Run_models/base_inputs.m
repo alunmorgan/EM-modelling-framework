@@ -35,7 +35,7 @@ base.ports = mi.simulation_defs.ports;
 base.port_names = mi.simulation_defs.ports; %<-- NEEDED?
 base.port_location = mi.simulation_defs.port_location;
 base.port_modes = mi.simulation_defs.port_modes;
-if isfield(mi.simulation_defs, 's_param_ports')
+if isfield(mi.simulation_defs, 's_param_excitation_f')
     base.s_param_excitation_f = mi.simulation_defs.s_param_excitation_f;
     base.s_param_excitation_bw = mi.simulation_defs.s_param_excitation_bw;
     base.s_param_tmax = mi.simulation_defs.s_param_tmax;

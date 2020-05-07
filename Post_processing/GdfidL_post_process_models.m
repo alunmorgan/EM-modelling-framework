@@ -6,14 +6,14 @@ function GdfidL_post_process_models(paths, model_name, varargin)
 
 p = inputParser;
 p.StructExpand = false;
-    validate_is_char = @(x) ischar(x);
-    validate_is_cell = @(x) iscell(x);
-    validate_is_structure = @(x) isstruct(x);
-   addRequired(p,'paths', validate_is_structure);
-   addRequired(p,'model_name', validate_is_char);
-   addParameter(p,'ow_behaviour','skip', validate_is_char);
-   addParameter(p,'input_data_location',{''}, validate_is_cell);
-   parse(p, paths, model_name, varargin{:});
+validate_is_char = @(x) ischar(x);
+validate_is_cell = @(x) iscell(x);
+validate_is_structure = @(x) isstruct(x);
+addRequired(p,'paths', validate_is_structure);
+addRequired(p,'model_name', validate_is_char);
+addParameter(p,'ow_behaviour','skip', validate_is_char);
+addParameter(p,'input_data_location',{''}, validate_is_cell);
+parse(p, paths, model_name, varargin{:});
 
 results_path = p.Results.paths.results_path;
 if ~isempty(p.Results.input_data_location{1})
@@ -45,7 +45,7 @@ pp_data = struct;
 sim_types = {'wake', 'eigenmode', 'eigenmode_lossy'};
 for oef = 1:length(sim_types)
     if exist(fullfile('data_link', [sim_types{oef},'/']), 'dir')
-       run_pp = will_pp_run(sim_types{oef}, p.Results.ow_behaviour);
+        run_pp = will_pp_run(sim_types{oef}, p.Results.ow_behaviour);
         % Creating sub structure.
         try
             
@@ -76,7 +76,7 @@ for oef = 1:length(sim_types)
                 end %if
                 save(fullfile('pp_link', sim_types{oef}, 'data_postprocessed.mat'), 'pp_data','-v7.3')
             else
-    disp(['Skipping ', sim_types{oef}, ' postprocessing for ',model_name, ' data already exists'])
+                disp(['Skipping ', sim_types{oef}, ' postprocessing for ',model_name, ' data already exists'])
             end %if
         catch W_ERR
             display_postprocessing_error(W_ERR, sim_types{oef})
@@ -92,40 +92,34 @@ for heb = 1:length(sim_types)
         run_pp = will_pp_run(sim_types{heb}, p.Results.ow_behaviour);
         % Creating sub structure.
         try
-            creating_space_for_postprocessing(sim_types{heb}, run_pp, model_name);
-            if run_pp == 0
+            if run_pp == 1
+                creating_space_for_postprocessing(sim_types{heb}, model_name);
                 % Move files to the post processing folder.
-                copyfile(fullfile('data_link', sim_types{heb}, 'run_inputs.mat'),...
-                    fullfile('pp_link', [sim_types{heb}, '/']));
-                [d_list, pth] = dir_list_gen(fullfile('data_link', sim_types{heb}),'dirs', 1);
+                [freq_folders] = dir_list_gen(fullfile('data_link', sim_types{heb}),'dirs', 1);
                 %             d_list = d_list(3:end);
-                copyfile(fullfile(pth, d_list{1},'model.gdf'),...
+                copyfile(fullfile(freq_folders{1},'model.gdf'),...
                     fullfile('pp_link', sim_types{heb}, 'model.gdf'));
-                if exist(fullfile(pth, d_list{1},'model_log'), 'file')
-                    copyfile(fullfile(pth, d_list{1},'model_log'), ...
-                        fullfile('pp_link', sim_types{heb}, 'model_log'));
-                end
-                % Reading logs
-                for js = 1:length(d_list)
-                    if strcmp(sim_types{heb}, 's_parameters')
-                        run_logs.(d_list{js}) = ...
-                            GdfidL_read_s_parameter_log(...
-                            fullfile('data_link', sim_types{heb}, d_list{js},'model_log'));
-                    elseif strcmp(sim_types{heb}, 'shunt')
-                        run_logs.(['f_', d_list{js}]) = ...
-                            GdfidL_read_rshunt_log(fullfile('data_link', ...
-                            sim_types{heb}, d_list{js},'model_log'));
-                    end %if
-                end
-                save(fullfile('pp_link', sim_types{heb}, 'data_from_run_logs.mat'), 'run_logs')
+                copyfile(fullfile(freq_folders{1},'model_log'), ...
+                    fullfile('pp_link', sim_types{heb}, 'model_log'));
+                copyfile(fullfile('data_link', sim_types{heb}, 'run_inputs.mat'),...
+                    fullfile('pp_link', sim_types{heb}, 'run_inputs.mat'));
                 
                 disp(['GdfidL_post_process_models: Post processing ', sim_types{heb}, ' data.'])
-                % Running postprocessor
-                if strcmp(sim_types{heb}, 's_parameters')
-                    pp_data = postprocess_s_parameters;
-                elseif strcmp(sim_types{heb}, 'shunt')
-                    pp_data = postprocess_shunt;
-                end %if
+                % Reading logs and Running postprocessor
+                for js = 1:length(freq_folders)
+                    [~, f_name, ~] = fileparts(freq_folders{js});
+                    if strcmp(sim_types{heb}, 's_parameters')
+                        run_logs.(f_name) = ...
+                            GdfidL_read_s_parameter_log(...
+                            fullfile(freq_folders{js},'model_log'));
+                        pp_data = postprocess_s_parameters;
+                    elseif strcmp(sim_types{heb}, 'shunt')
+                        run_logs.(['f_', f_name]) = ...
+                            GdfidL_read_rshunt_log(fullfile(freq_folders{js},'model_log'));
+                        pp_data = postprocess_shunt;
+                    end %if
+                end %for
+                save(fullfile('pp_link', sim_types{heb}, 'data_from_run_logs.mat'), 'run_logs')
                 save(fullfile('pp_link', sim_types{heb}, 'data_postprocessed.mat'), 'pp_data','-v7.3')
             end %if
         catch ERR
