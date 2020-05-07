@@ -71,7 +71,7 @@ for awh = 1:length(modelling_inputs)
     end %if
     if ~isempty(strfind(mi.simulation_defs.sim_select, 's'))
         try
-            simulation_result_locations = GdfidL_run_simulation('s-parameter', mi.paths, modelling_inputs{awh}, ...
+            simulation_result_locations = GdfidL_run_simulation('s_parameter', mi.paths, modelling_inputs{awh}, ...
                 force_sim);
         catch ERR
             display_modelling_error(ERR, 'S-parameter')
