@@ -1,4 +1,4 @@
-function raw_data = extract_wake_data_from_pp_output_files(output_file_locations, log)
+function raw_data = extract_wake_data_from_pp_output_files(output_file_locations, log, modelling_inputs)
 
 % get the Total energy in the structure
 if iscell(output_file_locations.Energy)
@@ -60,19 +60,16 @@ if ~iscell(output_file_locations.Port_mat)
     warning('postprocess_wakes:No ports to analyse')
     port_names = NaN;
     port_timebase = NaN;
-    port_data_all = NaN;
     port_data = NaN;
-    cutoff_all = NaN;
-    alpha_all = NaN;
-    beta_all = NaN;
+    alpha = NaN;
+    beta = NaN;
     cutoff = NaN;
 else
-    [port_names, port_timebase,  port_data_all, ...
-        cutoff_all, alpha_all, beta_all,...
+    [port_names, port_timebase, alpha, beta,...  
         port_data, cutoff] = read_port_datafiles(output_file_locations.Port_mat, log, ...
         modelling_inputs.port_fill_factor,...
         modelling_inputs.port_multiple,...
-        port_names_table);
+        modelling_inputs.port_names);
 end
 
 %% Wake potentials
@@ -174,15 +171,13 @@ else
     raw_data.Wake_impedance_trans_dipole_Y = NaN(length(wil_data.data),2);
 end
 raw_data.port.timebase = port_timebase;
-raw_data.port.data_all = port_data_all;
+% raw_data.port.data_all = port_data_all;
 raw_data.port.data = port_data;
 raw_data.port.labels = port_names;
-raw_data.port.labels_table = port_names_table;
+raw_data.port.labels_table = port_names;
 raw_data.port.frequency_cutoffs = cutoff;
-raw_data.port.frequency_cutoffs_all = cutoff_all;
-raw_data.port.alpha = alpha_all;
-raw_data.port.beta = beta_all;
-raw_data.port.t_start = tstart;
+raw_data.port.alpha = alpha;
+raw_data.port.beta = beta;
 raw_data.wake_setup.Wake_length = wpl_data.data(end,1) .* 2.99792458E8;
 if isfield(log, 'mat_losses')
     raw_data.mat_losses.loss_time = log.mat_losses.loss_time;

@@ -98,10 +98,14 @@ if length(output_file_locations.port_names) == 1 && isempty(output_file_location
 else
     % put them in a matrix
     output_file_locations.Port_mat = cell(1,1);
-    for hs = 1:length(output_file_locations.Ports)
-        p_ind = find_position_in_cell_lst(strfind(port_names, port_names_list{hs}));
-        if ~isnan(port_modes(hs))
-            output_file_locations.Port_mat{p_ind,port_modes(hs)} = output_file_locations.Ports{hs};
-        end %if
+    for hs = 1:length(output_file_locations.port_names)
+        p_ind = contains(port_names_list, output_file_locations.port_names{hs});
+        %         if ~isnan(port_modes(hs))
+        selected_port_modes = port_modes(p_ind);
+        selected_ports = output_file_locations.Ports(p_ind);
+        for hfe = 1:length(selected_ports)
+            output_file_locations.Port_mat{hs, selected_port_modes(hfe)} = selected_ports{hfe};
+        end %for
+        %         end %if
     end %for
 end %if
