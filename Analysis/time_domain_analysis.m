@@ -43,7 +43,7 @@ time_domain_analysed_data.wake_loss_factor = wake_loss_factor;
 time_domain_analysed_data.loss_from_beam = loss_from_beam;
 
 
-if isempty(raw_data.time_series_data.port_data_all)
+if isempty(raw_data.time_series_data.port_data)
     time_domain_analysed_data.port_data.total_energy = 0;
 else
     %% Port calculations

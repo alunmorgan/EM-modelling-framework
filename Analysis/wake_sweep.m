@@ -19,7 +19,6 @@ r_raw.time_series_data.Wake_potential_trans_quad_Y = raw_data.Wake_potential_tra
 r_raw.time_series_data.Wake_potential_trans_dipole_X = raw_data.Wake_potential_trans_dipole_X;
 r_raw.time_series_data.Wake_potential_trans_dipole_Y = raw_data.Wake_potential_trans_dipole_Y;
 r_raw.time_series_data.port_data = raw_data.port.data;
-r_raw.time_series_data.port_data_all = raw_data.port.data_all;
 r_raw.frequency_series_data.Wake_impedance = raw_data.Wake_impedance;
 r_raw.frequency_series_data.Wake_impedance_trans_quad_X = raw_data.Wake_impedance_trans_quad_X;
 r_raw.frequency_series_data.Wake_impedance_trans_quad_Y = raw_data.Wake_impedance_trans_quad_Y;
@@ -33,7 +32,6 @@ end %if
 r_raw.port.labels = raw_data.port.labels;
 r_raw.port.labels_table = raw_data.port.labels_table;
 r_raw.port.frequency_cutoffs = raw_data.port.frequency_cutoffs;
-r_raw.port.frequency_cutoffs_all = raw_data.port.frequency_cutoffs_all;
 r_raw.port.alpha = raw_data.port.alpha;
 r_raw.port.beta = raw_data.port.beta;
 r_raw.port.t_start = raw_data.port.t_start;
