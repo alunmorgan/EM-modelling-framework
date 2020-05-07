@@ -8,15 +8,17 @@ swept_vals = report_input.swept_vals(~contains(report_input.sources, '_Base'));
 ls_tk = 1;
 for en = 1:length(variation_data)
     if isfield(variation_data(en), 'xdata') && ~isempty(variation_data(en).xdata)
-        plot(variation_data(en).xdata, variation_data(en).ydata,...%'linestyle',l_st{ls_tk},...
-            'Color',cols{rem(en-1,10)+2}, 'linewidth',data(en).linewidth, 'Parent', ax1,...
+        plot(variation_data(en).xdata, variation_data(en).ydata, 'linestyle',l_st{ls_tk},...
+            'Color',cols{rem(en,length(cols))+1}, 'linewidth',data(en).linewidth, 'Parent', ax1,...
             'DisplayName', swept_vals{en});
-%         ls_tk = ls_tk +1;
+        if rem(en,length(cols))+1 == 1
+            ls_tk = ls_tk +1;
+        end %if
     else
-        plot(NaN, NaN,...%'linestyle',l_st{1},...
-            'Color',cols{rem(en-1,10)+2}, 'linewidth',data(en).linewidth, 'Parent', ax1);
+        plot(NaN, NaN, 'linestyle',l_st{1},...
+            'Color',cols{rem(en,length(cols))+1}, 'linewidth',data(en).linewidth, 'Parent', ax1);
     end %if
-%     leg{en} = swept_vals{en};
+    %     leg{en} = swept_vals{en};
 end %for
 base_data = data(contains(report_input.sources, '_Base'));
 base_vals = report_input.swept_vals(contains(report_input.sources, '_Base'));
