@@ -18,8 +18,8 @@ postprocess_core(modelling_inputs, 'wake');
 
 %% Extract the wake data
 output_file_locations = GdfidL_find_ouput(fullfile('pp_link', 'wake'));
-raw_data = extract_wake_data_from_pp_output_files(output_file_locations, log);
-
+raw_data = extract_wake_data_from_pp_output_files(output_file_locations, log, modelling_inputs);
+raw_data.port.t_start = tstart;
 
 
 %% find the gld files for the field output images.
