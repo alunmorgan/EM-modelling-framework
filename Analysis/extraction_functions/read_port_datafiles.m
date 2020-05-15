@@ -40,7 +40,7 @@ for hes = 1:size(Port_mat,1) % simulated ports
 end %for
 % duplicate any required ports
 ck2 = 1;
-for une = 1:length(port_multiple)
+for une = 1:size(Port_mat,1)
     for kea = 1:port_multiple(une)
         alpha(ck2) = alpha_tmp(une);
         beta(ck2) = beta_tmp(une);
