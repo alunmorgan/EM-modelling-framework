@@ -86,7 +86,7 @@ for oef = 1:length(sim_types)
 end %for
 
 %% Post processing S-parameters and shunt
-sim_types = {'s_parameters', 'shunt'};
+sim_types = {'s_parameter', 'shunt'};
 for heb = 1:length(sim_types)
     if exist(fullfile('data_link', sim_types{heb}), 'dir')
         run_pp = will_pp_run(sim_types{heb}, p.Results.ow_behaviour);
@@ -101,27 +101,22 @@ for heb = 1:length(sim_types)
                     fullfile('pp_link', sim_types{heb}, 'model.gdf'));
                 copyfile(fullfile(freq_folders{1},'model_log'), ...
                     fullfile('pp_link', sim_types{heb}, 'model_log'));
-                copyfile(fullfile('data_link', sim_types{heb}, 'run_inputs.mat'),...
+                copyfile(fullfile(freq_folders{1}, 'run_inputs.mat'),...
                     fullfile('pp_link', sim_types{heb}, 'run_inputs.mat'));
                 
                 disp(['GdfidL_post_process_models: Post processing ', sim_types{heb}, ' data.'])
                 % Reading logs and Running postprocessor
-                for js = 1:length(freq_folders)
-                    [~, f_name, ~] = fileparts(freq_folders{js});
-                    if strcmp(sim_types{heb}, 's_parameters')
-                        run_logs.(f_name) = ...
-                            GdfidL_read_s_parameter_log(...
-                            fullfile(freq_folders{js},'model_log'));
-                        pp_data = postprocess_s_parameters;
-                    elseif strcmp(sim_types{heb}, 'shunt')
-                        run_logs.(['f_', f_name]) = ...
-                            GdfidL_read_rshunt_log(fullfile(freq_folders{js},'model_log'));
-                        pp_data = postprocess_shunt;
-                    end %if
-                end %for
-                save(fullfile('pp_link', sim_types{heb}, 'data_from_run_logs.mat'), 'run_logs')
-                save(fullfile('pp_link', sim_types{heb}, 'data_postprocessed.mat'), 'pp_data','-v7.3')
-            end %if
+                if strcmp(sim_types{heb}, 's_parameter')
+                    run_logs= GdfidL_read_s_parameter_log(freq_folders);
+                    pp_data = postprocess_s_parameters;
+                elseif strcmp(sim_types{heb}, 'shunt')
+                    run_logs.(['f_', f_name]) = GdfidL_read_rshunt_log(freq_folders);
+                    pp_data = postprocess_shunt;
+                    
+                end %if
+            end %for
+            save(fullfile('pp_link', sim_types{heb}, 'data_from_run_logs.mat'), 'run_logs')
+            save(fullfile('pp_link', sim_types{heb}, 'data_postprocessed.mat'), 'pp_data','-v7.3')
         catch ERR
             display_postprocessing_error(ERR, sim_types{heb})
         end %try
