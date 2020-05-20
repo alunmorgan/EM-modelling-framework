@@ -1,17 +1,19 @@
-function generate_graphs(path_to_data, ppi, chosen_wake_length)
-load(fullfile(path_to_data, 'wake', 'run_inputs.mat'),'modelling_inputs');
-if contains(modelling_inputs.sim_select, 'w')
-    GdfidL_plot_wake(path_to_data, ppi, 1E7, chosen_wake_length)
+function generate_graphs(dataset, ppi, chosen_wake_length)
+
+% location and size of the default figures.
+fig_pos = [10000 678 560 420];
+if isfield(dataset, 'wake')
+    GdfidL_plot_wake(dataset.wake, ppi, 1E7, chosen_wake_length)
 end %if
-if contains(modelling_inputs.sim_select, 'e')
-    GdfidL_plot_eigenmode(pp_data, path_to_data)
+if isfield(dataset, 'eigenmode')
+    GdfidL_plot_eigenmode(dataset.eigenmode, path_to_data)
 end %if
-if contains(modelling_inputs.sim_select, 'l')
-    GdfidL_plot_eigenmode_lossy(pp_data, path_to_data)
+if isfield(dataset, 'lossy_eigenmode')
+    GdfidL_plot_eigenmode_lossy(dataset.lossy_eigenmode, path_to_data)
 end %if
-if contains(modelling_inputs.sim_select, 's')
-    GdfidL_plot_s_parameters(path_to_data, fig_pos);
+if isfield(dataset, 's_parameter')
+    GdfidL_plot_s_parameters(dataset.s_parameter, fig_pos);
 end %if
-if contains(modelling_inputs.sim_select, 't')
-    GdfidL_plot_shunt(pp_data, path_to_data)
+if isfield(dataset, 'shunt')
+    GdfidL_plot_shunt(dataset.shunt)
 end %if
