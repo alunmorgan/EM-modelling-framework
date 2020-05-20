@@ -7,7 +7,7 @@ end %if
 
 for sts = 1:length(model_sets)
     files = dir_list_gen_tree(fullfile(root_path, model_sets{sts}), 'mat', 1);
-    wanted_files = files(contains(files, 'data_postprocessed.mat'));
+    wanted_files = files(contains(files, ['wake', filesep, 'data_postprocessed.mat']));
     
     for ind = 1:length(wanted_files)
         current_folder = fileparts(wanted_files{ind});
