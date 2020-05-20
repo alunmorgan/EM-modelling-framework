@@ -20,7 +20,8 @@ for hes = 1:size(Port_mat,1) % simulated ports
     ck = 1;
     for wha = 1:size(Port_mat,2) % modes
         if ~isempty(Port_mat{hes,wha})
-            if log.beta{hes}(wha) == 0 % only interested in transmitting modes.
+            if log.alpha{hes}(wha) == 0 % only interested in transmitting modes. 
+%                 If alpha =0 there is no imaginary component
                 temp_data  = GdfidL_read_graph_datafile( Port_mat{hes,wha} );
                 temp_data = temp_data.data(:,2);
                 
