@@ -10,8 +10,8 @@ try
     load(fullfile(results_path, 'wake', 'run_inputs.mat'), 'modelling_inputs');
     
 catch
-    load(fullfile(results_path, 's-parameter', 'data_from_run_logs.mat'), 'run_logs')
-    load(fullfile(results_path, 's-parameter', 'run_inputs.mat'), 'modelling_inputs');
+    load(fullfile(results_path, 's_parameter', 'data_from_run_logs.mat'), 'run_logs')
+    load(fullfile(results_path, 's_parameter', 'run_inputs.mat'), 'modelling_inputs');
     
 end %try
 [mb_param_list, mb_param_vals, ...
