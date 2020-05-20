@@ -46,10 +46,8 @@ sim_types = {'wake', 'eigenmode', 'eigenmode_lossy'};
 for oef = 1:length(sim_types)
     if exist(fullfile('data_link', [sim_types{oef},'/']), 'dir')
         run_pp = will_pp_run(sim_types{oef}, p.Results.ow_behaviour);
-        % Creating sub structure.
-        try
-            
-            if run_pp == 1
+        if run_pp == 1
+            try
                 creating_space_for_postprocessing(sim_types{oef}, model_name);
                 % Move files to the post processing folder.
                 copyfile(fullfile('data_link', sim_types{oef}, 'model.gdf'),...
@@ -75,12 +73,13 @@ for oef = 1:length(sim_types)
                     pp_data = postprocess_eigenmode_lossy(modelling_inputs, run_logs);
                 end %if
                 save(fullfile('pp_link', sim_types{oef}, 'data_postprocessed.mat'), 'pp_data','-v7.3')
-            else
-                disp(['Skipping ', sim_types{oef}, ' postprocessing for ',model_name, ' data already exists'])
-            end %if
-        catch W_ERR
-            display_postprocessing_error(W_ERR, sim_types{oef})
-        end %try
+            catch W_ERR
+                display_postprocessing_error(W_ERR, sim_types{oef})
+            end %try
+        else
+            disp(['Skipping ', sim_types{oef}, ' postprocessing for ',model_name, ' data already exists'])
+        end %if
+        
     end %if
     clear run_logs orig_ver pp_data modelling_inputs
 end %for
@@ -90,9 +89,8 @@ sim_types = {'s_parameter', 'shunt'};
 for heb = 1:length(sim_types)
     if exist(fullfile('data_link', sim_types{heb}), 'dir')
         run_pp = will_pp_run(sim_types{heb}, p.Results.ow_behaviour);
-        % Creating sub structure.
-        try
-            if run_pp == 1
+        if run_pp == 1
+            try
                 creating_space_for_postprocessing(sim_types{heb}, model_name);
                 % Move files to the post processing folder.
                 [freq_folders] = dir_list_gen(fullfile('data_link', sim_types{heb}),'dirs', 1);
@@ -114,12 +112,14 @@ for heb = 1:length(sim_types)
                     pp_data = postprocess_shunt;
                     
                 end %if
-            end %for
-            save(fullfile('pp_link', sim_types{heb}, 'data_from_run_logs.mat'), 'run_logs')
-            save(fullfile('pp_link', sim_types{heb}, 'data_postprocessed.mat'), 'pp_data','-v7.3')
-        catch ERR
-            display_postprocessing_error(ERR, sim_types{heb})
-        end %try
+                save(fullfile('pp_link', sim_types{heb}, 'data_from_run_logs.mat'), 'run_logs')
+                save(fullfile('pp_link', sim_types{heb}, 'data_postprocessed.mat'), 'pp_data','-v7.3')
+            catch ERR
+                display_postprocessing_error(ERR, sim_types{heb})
+            end %try
+        else
+            disp(['Skipping ', sim_types{heb}, ' postprocessing for ',model_name, ' data already exists'])
+        end %if
     end %if
     clear run_logs orig_ver pp_data modelling_inputs
 end %for
