@@ -1,7 +1,7 @@
 function GdfidL_plot_wake(path_to_data, ppi, range, chosen_wake_length)
 % Generate the graphs based on the wake simulation data.
 % Graphs are saved in fig format and png, eps.
-% 
+%
 % path_to_data is where the resulting files are saved to.
 % range is to do with peak identification for Q values, and
 % is the separation peaks have to have to be counted as separate.
@@ -12,12 +12,33 @@ chosen_wake_length = str2double(chosen_wake_length);
 hfoi = ppi.hfoi;
 
 [path_to_data ,~,~] = fileparts(path_to_data);
-load(fullfile(path_to_data, 'run_inputs.mat'), 'modelling_inputs'); 
-load(fullfile(path_to_data,'data_postprocessed.mat'), 'pp_data');
-load(fullfile(path_to_data, 'data_analysed_wake'),'wake_sweep_data');
-load(fullfile(path_to_data, 'data_from_run_logs.mat'), 'run_logs')
+if exist(fullfile(path_to_data, 'run_inputs.mat'), 'file') == 2
+    load(fullfile(path_to_data, 'run_inputs.mat'), 'modelling_inputs');
+else
+    warning(['Unable to load ', fullfile(path_to_data, 'run_inputs.mat')])
+    return
+end %if
+if exist(fullfile(path_to_data,'data_postprocessed.mat'), 'file') == 2
+    load(fullfile(path_to_data,'data_postprocessed.mat'), 'pp_data');
+else
+    warning(['Unable to load ', fullfile(path_to_data,'data_postprocessed.mat')])
+    return
+end %if
+if exist(fullfile(path_to_data, 'data_analysed_wake.mat'), 'file') == 2
+    load(fullfile(path_to_data, 'data_analysed_wake.mat'),'wake_sweep_data');
+else
+    warning(['Unable to load ', fullfile(path_to_data, 'data_analysed_wake.mat')])
+    return
+end %if
+if exist(fullfile(path_to_data, 'data_from_run_logs.mat'), 'file') == 2
+    load(fullfile(path_to_data, 'data_from_run_logs.mat'), 'run_logs')
+else
+    warning(['Unable to load ', fullfile(path_to_data, 'data_from_run_logs.mat')])
+    return
+end %if
+
 for nw = 1:length(wake_sweep_data.raw)
-wake_sweep_vals(nw) = wake_sweep_data.raw{1, nw}.wake_setup.Wake_length;
+    wake_sweep_vals(nw) = wake_sweep_data.raw{1, nw}.wake_setup.Wake_length;
 end %for
 chosen_wake_ind = find(wake_sweep_vals == chosen_wake_length);
 if isempty(chosen_wake_ind)
@@ -198,7 +219,7 @@ if ~isnan(mat_loss)
     clear leg
     title('Losses distribution within the structure', 'Parent', ax(2))
     savemfmt(h_wake, path_to_data,'Thermal_Fractional_Losses_distribution_within_the_structure')
-clf(h_wake)
+    clf(h_wake)
 end %if
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if ~isnan(m_time{1})
@@ -214,7 +235,7 @@ if ~isnan(m_time{1})
     ylabel(ax(3), 'Energy (nJ)')
     title('Material loss over time', 'Parent', ax(3))
     savemfmt(h_wake, path_to_data,'Material_loss_over_time')
-clf(h_wake)
+    clf(h_wake)
     clear leg
 end %if
 
@@ -231,7 +252,7 @@ if ~all(isnan(timebase_port)) && ~all(isnan(port_cumsum))
     fr = (e_total_cs(cut_time_ind) / y_lev_t(1)) *100;
     text(timebase_cs(cut_time_ind), e_total_cs(end), [num2str(round(fr)),'%'])
     savemfmt(h_wake, path_to_data,'cumulative_total_energy')
-clf(h_wake)
+    clf(h_wake)
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %% Cumulative energy seen at each port.
     ax(5) = axes('Parent', h_wake);
@@ -251,7 +272,7 @@ clf(h_wake)
     xlim([timebase_cs(1) timebase_cs(cut_time_ind)])
     legend(ax(5), regexprep(leg,'_',' '), 'Location', 'SouthEast')
     savemfmt(h_wake, path_to_data,'cumulative_energy')
-clf(h_wake)
+    clf(h_wake)
 end %if
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Wake potential over time.
@@ -502,42 +523,42 @@ if isfield(pp_data.port, 'timebase') && ~isnan(wake_data.frequency_domain_data.T
     title({'Comparison of power loss', 'with scaled single bunch', 'and full spectral analysis'}, 'Parent', ax(13))
     legend(ax(13), 'Single bunch', 'Full analysis', 'Location', 'NorthWest')
     savemfmt(h_wake, path_to_data,'power_loss_for_analysis')
-clf(h_wake)
+    clf(h_wake)
     
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %% Port signals
-%     if  iscell(modes)
-        [hwn, ksn] = num_subplots(length(lab_ind));
-        for ens = length(lab_ind):-1:1 % ports
-            ax_sp(ens) = subplot(hwn,ksn,ens);
-            plot(timebase_port(1:cut_time_ind), dominant_modes{ens}(1:cut_time_ind), 'b', 'Parent', ax_sp(ens))
-            title([port_names{lab_ind(ens)}, ' (mode ',num2str(max_mode(ens)),')'], 'Parent', ax_sp(ens))
-            xlim([timebase_port(1) timebase_port(cut_time_ind)])
-            xlabel('Time (ns)', 'Parent', ax_sp(ens))
-            graph_add_background_patch(pp_data.port.t_start(ens) * 1E9)
-            ylabel('', 'Parent', ax_sp(ens))
+    %     if  iscell(modes)
+    [hwn, ksn] = num_subplots(length(lab_ind));
+    for ens = length(lab_ind):-1:1 % ports
+        ax_sp(ens) = subplot(hwn,ksn,ens);
+        plot(timebase_port(1:cut_time_ind), dominant_modes{ens}(1:cut_time_ind), 'b', 'Parent', ax_sp(ens))
+        title([port_names{lab_ind(ens)}, ' (mode ',num2str(max_mode(ens)),')'], 'Parent', ax_sp(ens))
+        xlim([timebase_port(1) timebase_port(cut_time_ind)])
+        xlabel('Time (ns)', 'Parent', ax_sp(ens))
+        graph_add_background_patch(pp_data.port.t_start(ens) * 1E9)
+        ylabel('', 'Parent', ax_sp(ens))
+    end %for
+    savemfmt(h_wake, path_to_data,'dominant_port_signals')
+    clf(h_wake)
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    ax(15) = axes('Parent', h_wake);
+    [hwn, ksn] = num_subplots(length(lab_ind));
+    for ens = length(lab_ind):-1:1 % ports
+        ax_sp2(ens) = subplot(hwn,ksn,ens);
+        hold(ax_sp2(ens), 'all')
+        for seo = 1:length(modes{ens}) % modes
+            plot(timebase_port(1:cut_time_ind), modes{ens}{seo}(1:cut_time_ind), 'Parent',ax_sp2(ens))
         end %for
-        savemfmt(h_wake, path_to_data,'dominant_port_signals')
-        clf(h_wake)
-        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        ax(15) = axes('Parent', h_wake);
-        [hwn, ksn] = num_subplots(length(lab_ind));
-        for ens = length(lab_ind):-1:1 % ports
-            ax_sp2(ens) = subplot(hwn,ksn,ens);
-            hold(ax_sp2(ens), 'all')
-            for seo = 1:length(modes{ens}) % modes
-                plot(timebase_port(1:cut_time_ind), modes{ens}{seo}(1:cut_time_ind), 'Parent',ax_sp2(ens))
-            end %for
-            hold(ax_sp2(ens), 'off')
-            title(port_names{lab_ind(ens)}, 'Parent', ax_sp2(ens))
-            xlabel('Time (ns)', 'Parent', ax_sp2(ens))
-            ylabel('', 'Parent', ax_sp2(ens))
-            xlim([timebase_port(1) timebase_port(cut_time_ind)])
-            graph_add_background_patch(pp_data.port.t_start(ens) * 1E9)
-        end %for
-        savemfmt(h_wake, path_to_data,'port_signals')
-clf(h_wake)
-    end %if
+        hold(ax_sp2(ens), 'off')
+        title(port_names{lab_ind(ens)}, 'Parent', ax_sp2(ens))
+        xlabel('Time (ns)', 'Parent', ax_sp2(ens))
+        ylabel('', 'Parent', ax_sp2(ens))
+        xlim([timebase_port(1) timebase_port(cut_time_ind)])
+        graph_add_background_patch(pp_data.port.t_start(ens) * 1E9)
+    end %for
+    savemfmt(h_wake, path_to_data,'port_signals')
+    clf(h_wake)
+end %if
 % end %if
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Comparison of bunch losses vs port signals on a per frequency basis.
@@ -589,7 +610,7 @@ if wake_data.port_time_data.total_energy ~=0
         xlim([0 graph_freq_lim])
     end %if
     savemfmt(h_wake, path_to_data,'Energy_loss_distribution')
-clf(h_wake)
+    clf(h_wake)
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     ax(17) = axes('Parent', h_wake);
     % the factor of 2 comes from the fact that we need to sum across both sides
@@ -608,7 +629,7 @@ clf(h_wake)
         xlim([0 graph_freq_lim])
     end %if
     savemfmt(h_wake, path_to_data,'cumulative_energy_loss_distribution')
-clf(h_wake)
+    clf(h_wake)
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     ax(18) = axes('Parent', h_wake);
     fig_max = max(abs(beam_port_spectrum));
@@ -629,9 +650,9 @@ clf(h_wake)
     ylabel('Energy (nJ)')
     xlim([0 graph_freq_lim])
     savemfmt(h_wake, path_to_data,'energy_loss_port_types')
-%     xlim([0 frequency_scale_ports(power_dist_ind)])
-%     savemfmt(h(18), pth,'energy_loss_distribution_ports')
-clf(h_wake)
+    %     xlim([0 frequency_scale_ports(power_dist_ind)])
+    %     savemfmt(h(18), pth,'energy_loss_distribution_ports')
+    clf(h_wake)
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     ax(19) = axes('Parent', h_wake);
     % the factor of 2 comes from the fact that we need to sum across both sides
@@ -653,9 +674,9 @@ clf(h_wake)
     ylabel('Cumlative sum of Energy (nJ)')
     xlim([0 graph_freq_lim])
     savemfmt(h_wake, path_to_data,'cumulative_energy_loss_port_types')
-%     xlim([0 frequency_scale_ports(power_dist_ind)])
-%     savemfmt(h(19), pth,'cumulative_energy_loss_distribution_ports')
-clf(h_wake)
+    %     xlim([0 frequency_scale_ports(power_dist_ind)])
+    %     savemfmt(h(19), pth,'cumulative_energy_loss_distribution_ports')
+    clf(h_wake)
 end %if
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Displaying some logfile information
@@ -804,8 +825,8 @@ if isfield(pp_data.port, 'timebase') && ...
     [hwn, ksn] = num_subplots(length(lab_ind));
     for ydh = 1:length(lab_ind) % Ports
         x_vals = 1:size(pme,2);
-%         x_vals = linspace(1,size(pme),...
-%             length(pme{lab_ind(ydh)}));
+        %         x_vals = linspace(1,size(pme),...
+        %             length(pme{lab_ind(ydh)}));
         subplot(hwn,ksn,ydh)
         plot(x_vals, pme(lab_ind(ydh),:),'LineWidth',lw);
         xlabel('mode number')
@@ -814,7 +835,7 @@ if isfield(pp_data.port, 'timebase') && ...
         title(port_names{lab_ind(ydh)})
     end %for
     savemfmt(h_wake, path_to_data,'energy_in_port_modes')
-clf(h_wake)
+    clf(h_wake)
 end %if
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Showing the overlap of the bunch spectra and the wake impedance.
@@ -964,7 +985,7 @@ clf(h_wake)
 
 for dhj = 1:length(port_names)
     subplot(ceil(length(port_names)/2),2,dhj)
-        hold on
+    hold on
     for nne = 1:length(wake_sweep_data.frequency_domain_data)
         plot(ws_frequency_scales{nne}*1e-9, squeeze(ws_port_impedances(nne,1:ws_n_samples(nne),dhj)))
     end %for
@@ -1002,7 +1023,7 @@ if isfield(pp_data.port, 'timebase') &&...
     legend('cumsum', 'F domain max', 'T domain max','hfoi','Location','SouthEast')
     title('Sanity check for ports')
     savemfmt(h_wake, path_to_data,'port_cumsum_check')
-clf(h_wake)
+    clf(h_wake)
 end %if
 %from beam
 ax(38) = axes('Parent', h_wake);
