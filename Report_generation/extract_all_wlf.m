@@ -1,4 +1,4 @@
-function [model_names, wlf, wake_length, mesh_density, mesh_scaling, n_cores, simulation_time] = extract_all_wlf(root_path, model_sets)
+function [extracted_data] = extract_all_wlf(root_path, model_sets)
 
 
 for sts = 1:length(model_sets)
@@ -17,45 +17,17 @@ for sts = 1:length(model_sets)
         load(fullfile(current_folder, 'data_analysed_wake'),'wake_sweep_data');
         load(fullfile(current_folder, 'run_inputs'), 'modelling_inputs');
         load(fullfile(current_folder, 'data_from_run_logs.mat'), 'run_logs');
-        model_names{sts,ind} = split_str{ind}{end - 2};
-        wlf(sts,ind) = wake_sweep_data.time_domain_data{end}.wake_loss_factor;
-%         wlf_bl_sweep = wake_sweep_data.frequency_domain_data{1, end}.extrap_data.beam_sigma_sweep.wlf;
-%         bl_sweep = wake_sweep_data.frequency_domain_data{1, end}.extrap_data.beam_sigma_sweep.sig_time *3E8;
-%         try
-%             % simulations are not always run with a 1mm bunch size.
-%         wlf_1mm(sts,ind) = interp1(bl_sweep, wlf_bl_sweep, 1E-3);
-%         catch
-%             wlf_1mm(sts,ind) = NaN;
-%         end %try
-%         try
-%         wlf_3mm(sts,ind) = interp1(bl_sweep, wlf_bl_sweep, 3E-3);
-%         catch
-%             try
-%             wlf_3mm(sts,ind) = wlf_bl_sweep(bl_sweep > 3E-3-1e-5 & bl_sweep < 3E-3 + 1e-5);
-%             catch
-%                  wlf_3mm(sts,ind) = NaN;
-%             end %try
-%         end %try
-%         try
-%         wlf_10mm(sts,ind) = interp1(bl_sweep, wlf_bl_sweep, 10E-3);
-%          catch
-%             try
-%             wlf_10mm(sts,ind) = wlf_bl_sweep(bl_sweep > 10E-3-1e-5 & bl_sweep < 10E-3 + 1e-5);
-%             catch
-%                  wlf_10mm(sts,ind) = NaN;
-%             end %try
-%         end %try
-        wake_length(sts,ind) = (round(((wake_sweep_data.time_domain_data{1}.timebase(end)) *3e8)*100))/100;
-        mesh_density(sts, ind) = modelling_inputs.mesh_stepsize;
-        mesh_scaling(sts, ind) = modelling_inputs.mesh_density_scaling;
-        n_cores(sts, ind) = str2num(modelling_inputs.n_cores);
-%         mesh_scaling(sts, ind) = 1;
-        pling = max(abs(pp_data.Wake_potential(:,2)));
-        % now looking at the last ~10ps of data
-        tail = max(abs(pp_data.Wake_potential(end-600:end,2)));
-%         decay_to(sts,ind) = mean(abs(tail));
-        simulation_time(sts, ind) = run_logs.wall_time;
-        clear pp_data wake_data
+        extracted_data.model_names{sts,ind} = split_str{ind}{end - 2};
+        extracted_data.wlf(sts,ind) = wake_sweep_data.time_domain_data{end}.wake_loss_factor;
+        extracted_data.wake_length(sts,ind) = wake_sweep_data.raw{1, 1}.wake_setup.Wake_length;
+        extracted_data.mesh_density(sts, ind) = modelling_inputs.mesh_stepsize;
+        extracted_data.mesh_scaling(sts, ind) = modelling_inputs.mesh_density_scaling;
+        extracted_data.n_cores(sts, ind) = str2num(modelling_inputs.n_cores);
+        extracted_data.simulation_time(sts, ind) = run_logs.wall_time;
+        extracted_data.number_of_cells(sts, ind) = run_logs.Ncells;
+        extracted_data.timestep(sts, ind) = run_logs.Timestep;
+        extracted_data.memory_usage(sts, ind) = run_logs.memory;
+        extracted_data.beam_sigma(sts, ind) = run_logs.beam_sigma;
+        clear pp_data wake_sweep_data run_logs modelling_inputs
     end %for
 end %for
-
