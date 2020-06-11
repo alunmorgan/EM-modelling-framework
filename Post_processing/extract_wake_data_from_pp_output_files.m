@@ -1,4 +1,4 @@
-function raw_data = extract_wake_data_from_pp_output_files(output_file_locations, log, modelling_inputs)
+function raw_data = extract_wake_data_from_pp_output_files(output_file_locations, log, modelling_inputs, tstart)
 
 % get the Total energy in the structure
 if iscell(output_file_locations.Energy)
@@ -59,17 +59,16 @@ end %if
 if ~iscell(output_file_locations.Port_mat)
     warning('postprocess_wakes:No ports to analyse')
     port_names = NaN;
-    port_timebase = NaN;
     port_data = NaN;
     alpha = NaN;
     beta = NaN;
     cutoff = NaN;
 else
-    [port_names, port_timebase, alpha, beta,...  
-        port_data, cutoff] = read_port_datafiles(output_file_locations.Port_mat, log, ...
-        modelling_inputs.port_fill_factor,...
-        modelling_inputs.port_multiple,...
-        modelling_inputs.port_names);
+    [port_timebase, alpha, beta, port_data, cutoff] = read_port_datafiles(output_file_locations.Port_mat, log, ...
+        modelling_inputs.port_fill_factor);
+    [port_names,alpha, beta, port_data, cutoff, tstart] = duplicate_ports(...
+        modelling_inputs.port_multiple, output_file_locations.Port_mat,...
+        modelling_inputs.port_names, alpha, beta, port_data, cutoff, tstart);
 end
 
 %% Wake potentials
@@ -118,10 +117,12 @@ end
 if ~isempty(output_file_locations.WI_y)
     witqy_data = GdfidL_read_graph_datafile(output_file_locations.WI_y{1} );
 end
-if ~isempty(output_file_locations.WI_x)
+if ~isempty(output_file_locations.WI_x) && length(output_file_locations.WI_x) >1
+    % the second check is to cope with symetry planes.
     witdx_data = GdfidL_read_graph_datafile(output_file_locations.WI_x{2} );
 end
-if ~isempty(output_file_locations.WI_y)
+if ~isempty(output_file_locations.WI_y) && length(output_file_locations.WI_y) >1
+    % the second check is to cope with symetry planes.
     witdy_data = GdfidL_read_graph_datafile(output_file_locations.WI_y{2} );
 end
 
@@ -144,7 +145,7 @@ else
     raw_data.Wake_potential_trans_dipole_X = NaN(length(wpl_data.data),2);
 end
 if exist('wptdy_data','var')
-    raw_data.Wake_potential_trans_dipole_Y = wptqy_data.data;
+    raw_data.Wake_potential_trans_dipole_Y = wptdy_data.data;
 else
     raw_data.Wake_potential_trans_dipole_Y = NaN(length(wpl_data.data),2);
 end
@@ -178,6 +179,7 @@ raw_data.port.labels_table = port_names;
 raw_data.port.frequency_cutoffs = cutoff;
 raw_data.port.alpha = alpha;
 raw_data.port.beta = beta;
+raw_data.port.t_start = tstart;
 raw_data.wake_setup.Wake_length = wpl_data.data(end,1) .* 2.99792458E8;
 if isfield(log, 'mat_losses')
     raw_data.mat_losses.loss_time = log.mat_losses.loss_time;

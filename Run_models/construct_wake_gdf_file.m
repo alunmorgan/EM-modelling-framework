@@ -50,19 +50,9 @@ mesh_fixed_planes = gdf_write_mesh_fixed_planes(modelling_inputs.beam_offset_x, 
     modelling_inputs.beam_offset_y);
 data = create_model_data_file_for_STL(modelling_inputs);
 
-% FIXME this assumes one port per side.
-if modelling_inputs.geometry_fraction == 1
-    port_defs = gdf_write_port_definitions( modelling_inputs.ports,...
-        modelling_inputs.port_location, modelling_inputs.port_modes);
-elseif modelling_inputs.geometry_fraction == 0.5
-    port_defs = gdf_write_port_definitions( modelling_inputs.ports(1:3),...
-        modelling_inputs.port_location(1:3), modelling_inputs.port_modes(1:3));
-elseif modelling_inputs.geometry_fraction == 0.25
-    port_defs = gdf_write_port_definitions( modelling_inputs.ports(1:2),...
-        modelling_inputs.port_location(1:2), modelling_inputs.port_modes(1:2));
-else
-    error('invalid geometry fraction')
-end %if
+port_selection = modelling_inputs.port_multiple ~=0;
+port_defs = gdf_write_port_definitions( modelling_inputs.ports,...
+    modelling_inputs.port_location, modelling_inputs.port_modes, port_selection);
 
 mon = gdf_wake_monitor_construction(...
     modelling_inputs.wakelength, modelling_inputs.dtsafety, modelling_inputs.mov);

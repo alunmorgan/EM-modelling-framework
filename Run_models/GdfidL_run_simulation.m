@@ -33,21 +33,24 @@ if run_sim == 1
     % For the other types you just need a single simulation.
     f_range = 1.3E9:5E7:1.9E9; % FIXME This needs to become a parameter
     if strcmp(sim_type, 's_parameter')
-        n_cycles = length(modelling_inputs.ports);
+        n_cycles = sum(modelling_inputs.port_multiple ~= 0) -2; %the -2 to remove the beam ports from the count.
+        active_port_inds = find(modelling_inputs.port_multiple ~= 0); 
+        active_port_inds = active_port_inds(3:end); % removing the beam ports form the list.
+        active_ports = modelling_inputs.ports(active_port_inds);
     elseif strcmp(sim_type, 'shunt')
         n_cycles = length(f_range);
+        for hew = 1:n_cycles
+            active_ports{hew} = 'NULL';
+        end %for
     else
         n_cycles = 1;
+        active_ports = {'NULL'};
     end %if
     output_data_location = cell(1,n_cycles);
     for nes = 1:n_cycles
         temp_files('make')
-        frequency = num2str(f_range(nes));
-        if isempty(modelling_inputs.ports)
-            port_name = 'NULL';
-        else
-            port_name = modelling_inputs.ports{nes};
-        end %if
+        frequency = num2str(f_range(nes));       
+        port_name = active_ports{nes};
         arch_out = construct_storage_area_path(results_storage_location, sim_type, port_name, frequency);
         construct_gdf_file(sim_type, modelling_inputs, port_name, frequency)
         disp(['Running ', sim_type,' simulation for ', modelling_inputs.model_name, '.'])
