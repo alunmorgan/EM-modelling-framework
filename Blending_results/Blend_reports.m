@@ -65,8 +65,12 @@ for jse = 1:length(sets)
             report_input.port_fill_factor = modelling_inputs.port_fill_factor;
             report_input.volume_fill_factor = modelling_inputs.volume_fill_factor;
         end %if
+        if ~exist(report_input.output_loc, 'dir')
+            mkdir(report_input.output_loc)
+        end %if
         s_parameter_extract_single_frequency_data(report_input, [0, 125E6, 250E6, 500E6]);
-        Blend_single_report(report_input, chosen_wake_lengths{jse}, frequency_display_limit)
+        Blend_figs(report_input, 'wake', chosen_wake_lengths{jse}, frequency_display_limit);
+        Blend_single_report(report_input, chosen_wake_lengths{jse})
         clear param_names param_vals
     end %for
 end %for
