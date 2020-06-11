@@ -47,11 +47,12 @@ for se = length(sweep_lengths):-1:1
         if iscell(temp_data)
             for bsw =1:size(temp_data,2)
                 for wda =1:size(temp_data{bsw},2)
-                    tmp_cell(:,wda) = condition_timeseries(...
-                        cat(2, raw_data.port.timebase, temp_data{bsw}(:,wda)), ...
-                        sweep_lengths(se), starttime, rev_time, timestep);
+                    port_mode_temp = cat(2, raw_data.port.timebase, temp_data{bsw}(:,wda));
+                    tmp_cell(:,wda) = ...
+                        condition_timeseries(port_mode_temp, sweep_lengths(se), starttime, rev_time, timestep);
                 end %for
                 r_data{se}.time_series_data.(r_names{ple}){bsw} = tmp_cell;
+                clear tmp_cell
             end %for
         else
             r_data{se}.time_series_data.(r_names{ple}) = ...
