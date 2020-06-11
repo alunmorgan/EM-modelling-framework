@@ -57,6 +57,7 @@ for lrd = 1:length(stls)
             'between the STL files and the mapping to part names.'])
     end %if
     model_file = cat(1, model_file, '-stlfile');
+    model_file = cat(1, model_file, 'xfixed= yes, yfixed= yes, zfixed= yes');
     model_file = cat(1, model_file, ['file=', stls{lrd}]);
     if strcmpi(modelling_inputs.main_axis, 'x')
         model_file = cat(1, model_file, '# FreeCAD defaults to x as the main axis. GdfidL uses z.');
