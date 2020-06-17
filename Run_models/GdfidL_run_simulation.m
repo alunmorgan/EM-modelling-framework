@@ -37,6 +37,12 @@ if run_sim == 1
         active_port_inds = find(modelling_inputs.port_multiple ~= 0); 
         active_port_inds = active_port_inds(3:end); % removing the beam ports form the list.
         active_ports = modelling_inputs.ports(active_port_inds);
+        % add multiple port excitation
+        active_ports{end+1} = {'signal_2', 'signal_3'};
+        n_cycles = n_cycles + 1; % FIXME this is hard coded.
+        % TEMP FOR TESTING
+        active_ports = active_ports(end);
+        n_cycles = 1;
     elseif strcmp(sim_type, 'shunt')
         n_cycles = length(f_range);
         for hew = 1:n_cycles
