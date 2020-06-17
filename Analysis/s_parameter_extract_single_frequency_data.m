@@ -9,7 +9,7 @@ for kds = 1:length(top_of_range)
         %         data_out{hew}(:,:,jef) = cellfun(@(x)x(1,freq_ind),pp_data.data);
         %     end %for
         range_ind = find(pp_data.scale > (top_of_range(kds) - 1e6), 1, 'first');
-        data_out2(:,:,jef) = cellfun(@(x)x(1,1:range_ind),pp_data.data, 'UniformOutput',false);
+        data_out2(1:length(pp_data.port_list),1:length(pp_data.all_ports),jef) = cellfun(@(x)x(1,1:range_ind),pp_data.data, 'UniformOutput',false);
         scale_out(:,jef) = pp_data.scale(1:range_ind);
         clear pp_data
     end %for
@@ -39,8 +39,10 @@ for kds = 1:length(top_of_range)
             title([regexprep(report_input.swept_name, '_', ' '), ' - ', plot_names{kse}])
             x_data = squeeze(scale_out(:,hrg)) * 1E-6;
             y_data = 20* log10(data_out2{1,data_loc(kse),hrg});
-            plot(x_data, y_data, 'DisplayName', num2str(report_input.swept_vals{hrg}),...
-                'LineWidth', 2)
+            if ~isempty(y_data)
+                plot(x_data(:), y_data(:), 'DisplayName', num2str(report_input.swept_vals{hrg}),...
+                    'LineWidth', 2)
+            end %if
             hold on
         end %for
         hold off
