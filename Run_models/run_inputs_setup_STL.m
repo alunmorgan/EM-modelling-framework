@@ -140,3 +140,35 @@ for uned = 2:length(mi.simulation_defs.geometry_fractions)
         modelling_inputs{model_num}.geometry_defs = {};
     end %if
 end %for
+
+% Now setup different port excitations to use
+for unej = 2:length(mi.simulation_defs.wake.port_excitation)
+    model_num = model_num +1;
+    modelling_inputs{model_num} = base_inputs(mi, mi.model_names{mi.base_model_ind});
+    modelling_inputs{model_num}.mov = 0; %Default to no movie
+    if strcmpi(mi.movie_flag, 'All')
+        modelling_inputs{model_num}.mov = 1;
+    end %if
+    modelling_inputs{model_num}.port_excitation_wake.excitation_name = mi.simulation_defs.wake.port_excitation{unej}.excitation_name;
+    modelling_inputs{model_num}.port_excitation_wake.port_names = mi.simulation_defs.wake.port_excitation{unej}.port_names;
+    modelling_inputs{model_num}.port_excitation_wake.amplitude = mi.simulation_defs.wake.port_excitation{unej}.amplitude;
+    modelling_inputs{model_num}.port_excitation_wake.phase = mi.simulation_defs.wake.port_excitation{unej}.phase;
+    modelling_inputs{model_num}.port_excitation_wake.mode = mi.simulation_defs.wake.port_excitation{unej}.mode;
+    modelling_inputs{model_num}.port_excitation_wake.frequency = mi.simulation_defs.wake.port_excitation{unej}.frequency;
+    modelling_inputs{model_num}.port_excitation_wake.risetime = mi.simulation_defs.wake.port_excitation{unej}.risetime;
+    modelling_inputs{model_num}.port_excitation_wake.bandwidth = mi.simulation_defs.wake.port_excitation{unej}.bandwidth;
+    temp = [...
+        mi.base_model_name, '_', 'port_excitation', '_sweep_value_', ...
+        mi.simulation_defs.wake.port_excitation{unej}.excitation_name];
+    temp = regexprep(temp, '\.','p');
+    modelling_inputs{model_num}.model_name = temp;
+    modelling_inputs{model_num}.defs = defs{1};
+    modelling_inputs{model_num}.stl_location = fullfile(mi.paths.path_to_models, ...
+        mi.base_model_name, [mi.base_model_name, '_Base'], 'ascii');
+    if exist(base_parameter_file_path, 'file') == 2
+        modelling_inputs{model_num}.geometry_defs = ...
+            get_parameters_from_sidecar_file(base_parameter_file_path);
+    else
+        modelling_inputs{model_num}.geometry_defs = {};
+    end %if
+end %for

@@ -46,3 +46,13 @@ end %if
 if isfield(mi.simulation_defs, 'eigenmode')
     base.eigenmode = mi.simulation_defs.eigenmode;
 end %if
+base.port_excitation_wake.name = mi.simulation_defs.wake.port_excitation{1}.port_name;
+if ~isempty(mi.simulation_defs.wake.port_excitation{1}.port_name{1})
+    base.port_excitation_wake.excitation_name = mi.simulation_defs.wake.port_excitation{1}.excitation_name;
+    base.port_excitation_wake.amplitude = mi.simulation_defs.wake.port_excitation{1}.amplitude;
+    base.port_excitation_wake.phase = mi.simulation_defs.wake.port_excitation{1}.phase;
+    base.port_excitation_wake.mode = mi.simulation_defs.wake.port_excitation{1}.mode;
+    base.port_excitation_wake.frequency = mi.simulation_defs.wake.port_excitation{1}.frequency;
+    base.port_excitation_wake.risetime = mi.simulation_defs.wake.port_excitation{1}.risetime;
+    base.port_excitation_wake.bandwidth = mi.simulation_defs.wake.port_excitation{1}.bandwidth;
+end %if
