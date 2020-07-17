@@ -90,8 +90,10 @@ for nr = 1:length(output_file_locations.Ports)
     port_modes(nr) = str2double(output_file_locations.Ports{nr}(nme_end{nr}+13:mode_end{nr}-1));
 end %for
 % find the unique port names
-output_file_locations.port_names = unique(port_names_list);
-if length(output_file_locations.port_names) == 1 && isempty(output_file_locations.port_names{1})
+port_names_temp = unique(port_names_list);
+empty_names_ind = cellfun(@isempty, (port_names_temp));
+output_file_locations.port_names = port_names_temp(~empty_names_ind);
+if isempty(output_file_locations.port_names)
     warning('No Port data - This is a problem')
     output_file_locations.Port_mat = NaN;
     output_file_locations.port_names = NaN;
@@ -100,12 +102,12 @@ else
     output_file_locations.Port_mat = cell(1,1);
     for hs = 1:length(output_file_locations.port_names)
         p_ind = contains(port_names_list, output_file_locations.port_names{hs});
-        %         if ~isnan(port_modes(hs))
-        selected_port_modes = port_modes(p_ind);
-        selected_ports = output_file_locations.Ports(p_ind);
-        for hfe = 1:length(selected_ports)
-            output_file_locations.Port_mat{hs, selected_port_modes(hfe)} = selected_ports{hfe};
-        end %for
-        %         end %if
+%         if ~isnan(port_modes(hs))
+            selected_port_modes = port_modes(p_ind);
+            selected_ports = output_file_locations.Ports(p_ind);
+            for hfe = 1:length(selected_ports)
+                output_file_locations.Port_mat{hs, selected_port_modes(hfe)} = selected_ports{hfe};
+            end %for
+%         end %if
     end %for
 end %if
