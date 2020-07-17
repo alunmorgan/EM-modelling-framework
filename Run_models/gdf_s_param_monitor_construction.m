@@ -1,4 +1,4 @@
-function fs = gdf_s_param_monitor_construction(port_name, frequency, bandwidth, tmax)
+function fs = gdf_s_param_monitor_construction(port_name, frequency, bandwidth, amplitude, tmax)
 % Constructs the initial part of the gdf input file for GdfidL
 %
 % port_name (cell array of strings):  the names of the ports to be excited.
@@ -17,7 +17,7 @@ for kds = 1:length(port_name)
         fs = cat(1,fs,['frequency = ',num2str(frequency)]);
         fs = cat(1,fs,['bandwidth = ', num2str(bandwidth)]);
     end %if
-    fs = cat(1,fs,'amplitude = 1');
+    fs = cat(1,fs,['amplitude = ', num2str(amplitude)]);
     fs = cat(1,fs,'    nextport');
 end %for
 fs = cat(1,fs,'###################################################');

@@ -33,32 +33,38 @@ if run_sim == 1
     % For the other types you just need a single simulation.
     f_range = 1.3E9:5E7:1.9E9; % FIXME This needs to become a parameter
     if strcmp(sim_type, 's_parameter')
-        n_cycles = sum(modelling_inputs.port_multiple ~= 0) -2; %the -2 to remove the beam ports from the count.
-        active_port_inds = find(modelling_inputs.port_multiple ~= 0); 
+        active_port_inds = find(modelling_inputs.port_multiple ~= 0);
         active_port_inds = active_port_inds(3:end); % removing the beam ports form the list.
         active_ports = modelling_inputs.ports(active_port_inds);
-        % add multiple port excitation
-        active_ports{end+1} = {'signal_2', 'signal_3'};
-        n_cycles = n_cycles + 1; % FIXME this is hard coded.
-        % TEMP FOR TESTING
-        active_ports = active_ports(end);
-        n_cycles = 1;
+        if strcmpi(modelling_inputs.model_name(end-3:end), 'Base')
+            s_sets = length(modelling_inputs.s_param);
+            n_cycles = length(active_ports) * s_sets;
+            sparameter_set = repmat(1:s_sets, length(active_ports),1);
+            sparameter_set = sparameter_set(:);
+            active_ports = repmat(active_ports, 1, s_sets);
+        else
+            n_cycles = length(active_ports);
+            sparameter_set = ones(length(active_ports),1);
+        end %if
     elseif strcmp(sim_type, 'shunt')
         n_cycles = length(f_range);
         for hew = 1:n_cycles
             active_ports{hew} = 'NULL';
         end %for
+        sparameter_set = NaN;
     else
         n_cycles = 1;
         active_ports = {'NULL'};
+        sparameter_set = NaN;
     end %if
+    
     output_data_location = cell(1,n_cycles);
     for nes = 1:n_cycles
         temp_files('make')
-        frequency = num2str(f_range(nes));       
-        port_name = active_ports{nes};
-        arch_out = construct_storage_area_path(results_storage_location, sim_type, port_name, frequency);
-        construct_gdf_file(sim_type, modelling_inputs, port_name, frequency)
+        frequency = num2str(f_range(nes));
+        %         port_name = active_ports(nes);
+        arch_out = construct_storage_area_path(results_storage_location, sim_type, active_ports{nes}, sparameter_set(nes), frequency);
+        construct_gdf_file(sim_type, modelling_inputs, active_ports(nes), sparameter_set(nes), frequency)
         disp(['Running ', sim_type,' simulation for ', modelling_inputs.model_name, '.'])
         GdfidL_simulation_core(modelling_inputs.version, modelling_inputs.precision)
         save(fullfile('temp_data', 'run_inputs.mat'), 'paths', 'modelling_inputs')

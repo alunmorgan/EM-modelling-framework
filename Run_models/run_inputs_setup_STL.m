@@ -157,6 +157,7 @@ for unej = 2:length(mi.simulation_defs.wake.port_excitation)
     modelling_inputs{model_num}.port_excitation_wake.frequency = mi.simulation_defs.wake.port_excitation{unej}.frequency;
     modelling_inputs{model_num}.port_excitation_wake.risetime = mi.simulation_defs.wake.port_excitation{unej}.risetime;
     modelling_inputs{model_num}.port_excitation_wake.bandwidth = mi.simulation_defs.wake.port_excitation{unej}.bandwidth;
+    modelling_inputs{model_num}.port_excitation_wake.beam_offset_z = mi.simulation_defs.wake.port_excitation{unej}.beam_offset_z;
     temp = [...
         mi.base_model_name, '_', 'port_excitation', '_sweep_value_', ...
         mi.simulation_defs.wake.port_excitation{unej}.excitation_name];
@@ -172,3 +173,31 @@ for unej = 2:length(mi.simulation_defs.wake.port_excitation)
         modelling_inputs{model_num}.geometry_defs = {};
     end %if
 end %for
+% 
+% % Now setup different S-parameter settings to use
+% for unpj = 2:length(mi.simulation_defs.s_param)
+%     model_num = model_num +1;
+%     modelling_inputs{model_num} = base_inputs(mi, mi.model_names{mi.base_model_ind});
+%     modelling_inputs{model_num}.mov = 0; %Default to no movie
+%     if strcmpi(mi.movie_flag, 'All')
+%         modelling_inputs{model_num}.mov = 1;
+%     end %if
+%      modelling_inputs{model_num}.s_param_excitation_f = mi.simulation_defs.s_param{unpj}.excitation_f;
+%     modelling_inputs{model_num}.s_param_excitation_bw = mi.simulation_defs.s_param{unpj}.excitation_bw;
+%     modelling_inputs{model_num}.s_param_excitation_amp = mi.simulation_defs.s_param{unpj}.excitation_amp;
+%     modelling_inputs{model_num}.s_param_tmax = mi.simulation_defs.s_param{unpj}.tmax;
+%    
+%     temp = [...
+%         mi.base_model_name, '_', 's_param', '_sweep_value_', num2str(unpj)];
+%     temp = regexprep(temp, '\.','p');
+%     modelling_inputs{model_num}.model_name = temp;
+%     modelling_inputs{model_num}.defs = defs{1};
+%     modelling_inputs{model_num}.stl_location = fullfile(mi.paths.path_to_models, ...
+%         mi.base_model_name, [mi.base_model_name, '_Base'], 'ascii');
+%     if exist(base_parameter_file_path, 'file') == 2
+%         modelling_inputs{model_num}.geometry_defs = ...
+%             get_parameters_from_sidecar_file(base_parameter_file_path);
+%     else
+%         modelling_inputs{model_num}.geometry_defs = {};
+%     end %if
+% end %for
