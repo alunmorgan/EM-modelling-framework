@@ -14,6 +14,10 @@ end
 fs = {'-fdtd'};
 fs = cat(1,fs,'       -time');
 fs = cat(1,fs,['       dtsafety = ',dtsafety]);
+fs = cat(1,fs,'       -fmonitor');
+fs = cat(1,fs,'       name = EfieldatZero');
+fs = cat(1,fs,'       whattosave = ecomponents');
+fs = cat(1,fs,'       doit');
 fs = cat(1,fs,'       -pmonitor');
 fs = cat(1,fs,'       name = TEIS');
 fs = cat(1,fs,'       whattosave = energy');
