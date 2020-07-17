@@ -28,6 +28,14 @@ for sts = 1:length(model_sets)
         extracted_data.timestep(sts, ind) = run_logs.Timestep;
         extracted_data.memory_usage(sts, ind) = run_logs.memory;
         extracted_data.beam_sigma(sts, ind) = run_logs.beam_sigma;
+        extracted_data.fractional_loss_beam_ports(sts, ind) = wake_sweep_data.frequency_domain_data{end}.fractional_loss_beam_ports;
+        extracted_data.fractional_loss_signal_ports(sts, ind) = wake_sweep_data.frequency_domain_data{end}.fractional_loss_signal_ports;
+        extracted_data.fractional_loss_structure(sts, ind) = wake_sweep_data.frequency_domain_data{end}.fractional_loss_structure;
+        port_energy = wake_sweep_data.time_domain_data{end}.port_data.port_energy;
+        total_energy = wake_sweep_data.time_domain_data{end}.loss_from_beam;
+        extracted_data.beam_port_loss(sts, ind) = (port_energy(1) + port_energy(2)) / total_energy;
+        extracted_data.signal_port_loss(sts, ind) = sum(port_energy(3:end)) / total_energy;
+        extracted_data.structure_loss(sts, ind) = (total_energy - sum(port_energy(1:end))) / total_energy;
         clear pp_data wake_sweep_data run_logs modelling_inputs
     end %for
 end %for
