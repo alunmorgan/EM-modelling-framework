@@ -4,37 +4,11 @@ function wake_sweep_data = wake_sweep(sweep_lengths, raw_data, ppi, log, port_mo
 %
 % Example: wake_sweeps = wake_sweep(time_domain_data, port_data)
 
-% dsd = length(time_domain_data.timebase);
-% Set the number of wake lengths to do.
 %% pad to 1 revolution length
-rev = ppi.RF_freq/936;
-gap = 1/ppi.RF_freq;
 % rev_time = (1/ppi.RF_freq) * 936; %time of 1 revolution
 rev_time = (1/ppi.RF_freq) * 50; %time of 10 bunches %TEMP DUE TO MEMORY LIMITS
-r_raw.time_series_data.Energy = raw_data.Energy;
-r_raw.time_series_data.Charge_distribution = raw_data.Charge_distribution;
-r_raw.time_series_data.Wake_potential = raw_data.Wake_potential;
-r_raw.time_series_data.Wake_potential_trans_quad_X = raw_data.Wake_potential_trans_quad_X;
-r_raw.time_series_data.Wake_potential_trans_quad_Y = raw_data.Wake_potential_trans_quad_Y;
-r_raw.time_series_data.Wake_potential_trans_dipole_X = raw_data.Wake_potential_trans_dipole_X;
-r_raw.time_series_data.Wake_potential_trans_dipole_Y = raw_data.Wake_potential_trans_dipole_Y;
-r_raw.time_series_data.port_data = raw_data.port.data;
-r_raw.frequency_series_data.Wake_impedance = raw_data.Wake_impedance;
-r_raw.frequency_series_data.Wake_impedance_trans_quad_X = raw_data.Wake_impedance_trans_quad_X;
-r_raw.frequency_series_data.Wake_impedance_trans_quad_Y = raw_data.Wake_impedance_trans_quad_Y;
-r_raw.frequency_series_data.Wake_impedance_trans_dipole_X = raw_data.Wake_impedance_trans_dipole_X;
-r_raw.frequency_series_data.Wake_impedance_trans_dipole_Y = raw_data.Wake_impedance_trans_dipole_Y;
-r_raw.wake_setup = raw_data.wake_setup;
-if isfield(raw_data, 'mat_losses')
-    % if the model is PEC only then this will not exist.
-    r_raw.mat_losses = raw_data.mat_losses;
-end %if
-r_raw.port.labels = raw_data.port.labels;
-r_raw.port.labels_table = raw_data.port.labels_table;
-r_raw.port.frequency_cutoffs = raw_data.port.frequency_cutoffs;
-r_raw.port.alpha = raw_data.port.alpha;
-r_raw.port.beta = raw_data.port.beta;
-r_raw.port.t_start = raw_data.port.t_start;
+
+r_raw = rearrange_input_structure(raw_data);
 
 for se = length(sweep_lengths):-1:1
     r_data{se} = r_raw;
@@ -44,16 +18,8 @@ for se = length(sweep_lengths):-1:1
     r_data{se}.time_series_data.timescale_common = linspace(starttime, rev_time,(rev_time - starttime)/timestep + 1)';
     for ple =  1:length(r_names)
         temp_data = r_data{se}.time_series_data.(r_names{ple});
-        if iscell(temp_data)
-            for bsw =1:size(temp_data,2)
-                for wda =1:size(temp_data{bsw},2)
-                    port_mode_temp = cat(2, raw_data.port.timebase, temp_data{bsw}(:,wda));
-                    tmp_cell(:,wda) = ...
-                        condition_timeseries(port_mode_temp, sweep_lengths(se), starttime, rev_time, timestep);
-                end %for
-                r_data{se}.time_series_data.(r_names{ple}){bsw} = tmp_cell;
-                clear tmp_cell
-            end %for
+        if strcmp(r_names{ple}, 'port_data')
+            r_data{se}.time_series_data.port_data = truncate_port_timeseries(temp_data, raw_data.port.timebase, sweep_lengths(se), starttime, rev_time, timestep);
         else
             r_data{se}.time_series_data.(r_names{ple}) = ...
                 condition_timeseries(temp_data, sweep_lengths(se), starttime, rev_time, timestep);
@@ -106,3 +72,51 @@ wake_sweep_data.raw = r_data;
 wake_sweep_data.frequency_domain_data = f_data;
 wake_sweep_data.time_domain_data = t_data;
 wake_sweep_data.mat_losses = m_data;
+end %function
+
+function port_data_out = truncate_port_timeseries(temp_data, original_timebase, data_length, starttime, rev_time, timestep)
+for bsw =1:size(temp_data,2)
+    if all(temp_data{bsw} == 0)
+%         port_mode_temp = cat(2, original_timebase,zeros(length(original_timebase),1));
+        port_data_out{bsw}(:,1) = condition_timeseries(NaN, data_length, starttime, rev_time, timestep);
+        clear port_mode_temp
+    else
+        %  There is at least one transmitting mode.
+        for wda =1:size(temp_data{bsw},2)
+            port_mode_temp = cat(2, original_timebase, temp_data{bsw}(:,wda));
+            port_data_out{bsw}(:,wda) = ...
+                condition_timeseries(port_mode_temp, data_length, starttime, rev_time, timestep);
+            clear port_mode_temp
+        end %for
+    end %if
+end %for
+end %function
+
+function r_raw = rearrange_input_structure(raw_data)
+% rearranging the raw data structure into a form which is more useful for
+% later analysis and plotting.
+r_raw.time_series_data.Energy = raw_data.Energy;
+r_raw.time_series_data.Charge_distribution = raw_data.Charge_distribution;
+r_raw.time_series_data.Wake_potential = raw_data.Wake_potential;
+r_raw.time_series_data.Wake_potential_trans_quad_X = raw_data.Wake_potential_trans_quad_X;
+r_raw.time_series_data.Wake_potential_trans_quad_Y = raw_data.Wake_potential_trans_quad_Y;
+r_raw.time_series_data.Wake_potential_trans_dipole_X = raw_data.Wake_potential_trans_dipole_X;
+r_raw.time_series_data.Wake_potential_trans_dipole_Y = raw_data.Wake_potential_trans_dipole_Y;
+r_raw.time_series_data.port_data = raw_data.port.data;
+r_raw.frequency_series_data.Wake_impedance = raw_data.Wake_impedance;
+r_raw.frequency_series_data.Wake_impedance_trans_quad_X = raw_data.Wake_impedance_trans_quad_X;
+r_raw.frequency_series_data.Wake_impedance_trans_quad_Y = raw_data.Wake_impedance_trans_quad_Y;
+r_raw.frequency_series_data.Wake_impedance_trans_dipole_X = raw_data.Wake_impedance_trans_dipole_X;
+r_raw.frequency_series_data.Wake_impedance_trans_dipole_Y = raw_data.Wake_impedance_trans_dipole_Y;
+r_raw.wake_setup = raw_data.wake_setup;
+if isfield(raw_data, 'mat_losses')
+    % if the model is PEC only then this will not exist.
+    r_raw.mat_losses = raw_data.mat_losses;
+end %if
+r_raw.port.labels = raw_data.port.labels;
+r_raw.port.labels_table = raw_data.port.labels_table;
+r_raw.port.frequency_cutoffs = raw_data.port.frequency_cutoffs;
+r_raw.port.alpha = raw_data.port.alpha;
+r_raw.port.beta = raw_data.port.beta;
+r_raw.port.t_start = raw_data.port.t_start;
+end %function
