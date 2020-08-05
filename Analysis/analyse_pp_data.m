@@ -1,5 +1,5 @@
 function analyse_pp_data(root_path, model_sets, ppi, port_modes_override, ...
-    port_truncation_all, analysis_override)
+    analysis_override)
 
 if nargin <5
     analysis_override = 0;
@@ -17,13 +17,13 @@ for sts = 1:length(model_sets)
             test = regexp(test, filesep, 'split')';
             wake_ind = find(cellfun(@isempty,(strfind(test, 'wake')))==0);
             model_variant = regexprep(test{wake_ind -1}, [model_sets{sts}, '_'],'');
-            port_truncation_ind = find(contains(port_truncation_all(:,1), model_variant));
-            if isempty(port_truncation_ind)
-                %variant not found just use Base.
-                port_truncation_ind = find(contains(port_truncation_all(:,1), 'Base'));
-                disp('Bespoke port signal truncation not found for this variant... defaulting to Base.')
-            end %if
-            port_truncation = port_truncation_all{port_truncation_ind, 2};
+            %             port_truncation_ind = find(contains(port_truncation_all(:,1), model_variant));
+            %             if isempty(port_truncation_ind)
+            %                 %variant not found just use Base.
+            %                 port_truncation_ind = find(contains(port_truncation_all(:,1), 'Base'));
+            %                 disp('Bespoke port signal truncation not found for this variant... defaulting to Base.')
+            %             end %if
+            %             port_truncation = port_truncation_all{port_truncation_ind, 2};
             pp_data = load(fullfile(current_folder, 'data_postprocessed'), 'pp_data');
             pp_data = pp_data.pp_data;
             run_logs = load(fullfile(current_folder, 'data_from_run_logs.mat'), 'run_logs');
@@ -31,25 +31,36 @@ for sts = 1:length(model_sets)
             modelling_inputs = load(fullfile(current_folder, 'run_inputs.mat'), 'modelling_inputs');
             modelling_inputs = modelling_inputs.modelling_inputs;
             wakelength = str2double(modelling_inputs.wakelength);
-%             wake_lengths_to_analyse = [];
-%             for ke = 1:6
-%                 wake_lengths_to_analyse = cat(1, wake_lengths_to_analyse, wakelength);
-%                 wakelength = wakelength ./2;
-%             end %for
+            %             wake_lengths_to_analyse = [];
+            %             for ke = 1:6
+            %                 wake_lengths_to_analyse = cat(1, wake_lengths_to_analyse, wakelength);
+            %                 wakelength = wakelength ./2;
+            %             end %for
             wake_lengths_to_analyse = wakelength;
-            %TEST CODE for truncation of beginnig of port signals.
+            % truncation of begining of port signals.
             for dlw = 1:length(pp_data.port.data)
-                if size(pp_data.port.data{dlw}, 1) > port_truncation(dlw)
-                    pp_data.port.data{dlw}(1:port_truncation(dlw), :) =0;
+                for shf = 1:size(pp_data.port.data{dlw}, 2)
+                    [cut_inds(shf)]= separate_bunch_from_remenent_field(...
+                        pp_data.port.timebase, pp_data.port.data{dlw}(:,shf), modelling_inputs.beam_sigma , 4);
+                end %for
+                % The earliest one shoudl be due to the bunch. 
+                cut_ind = min(cut_inds);
+                pp_data.port.bunch_signal{dlw} = pp_data.port.data{dlw};
+                if size(pp_data.port.data{dlw}, 1) > cut_ind
+                    pp_data.port.data{dlw}(1:cut_ind, :) = 0;
+                    pp_data.port.bunch_signal{dlw}(cut_ind + 1:end, :) = 0;
                 else
-                    pp_data.port.data{dlw}(:, :) =0;
+                    pp_data.port.data{dlw}(:, :) = 0;
                 end %if
+                [~,I] = max(abs(pp_data.port.bunch_signal{dlw}), [], 1);
+                for hxf = 1:length(I)
+                    pp_data.port.bunch_amplitude{dlw}(hxf) = pp_data.port.bunch_signal{dlw}(I(hxf), hxf);
+                end %for  
             end %for
-            % TEST CODE
             wake_sweep_data = wake_sweep(wake_lengths_to_analyse, pp_data, ppi, run_logs, port_modes_override);
-            disp('Analysed ')
+            disp('Analysed ... Saving...')
             save(fullfile(current_folder, 'data_analysed_wake.mat'), 'wake_sweep_data','-v7.3')
-            disp('Saved')  
+            disp('Saved')
             clear 'pp_data' 'run_logs' 'modelling_inputs' 'wake_sweep_data' 'current_folder'
         else
             disp(['Analysis for ', current_folder, ' already exists... Skipping'])
