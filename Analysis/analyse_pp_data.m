@@ -40,11 +40,15 @@ for sts = 1:length(model_sets)
             % truncation of begining of port signals.
             for dlw = 1:length(pp_data.port.data)
                 for shf = 1:size(pp_data.port.data{dlw}, 2)
-                    [cut_inds(shf)]= separate_bunch_from_remenent_field(...
+                    [cut_inds(shf), first_peak_amplitude(shf)]= separate_bunch_from_remenent_field(...
                         pp_data.port.timebase, pp_data.port.data{dlw}(:,shf), modelling_inputs.beam_sigma , 4);
                 end %for
-                % The earliest one shoudl be due to the bunch. 
-                cut_ind = min(cut_inds);
+                % The find the delay corresponding to the largest peak.
+                % Originally tried just taking the earliest, however small
+                % reversals around zero made this unreliable.
+                [~, I] = max(first_peak_amplitude);
+                cut_ind = cut_inds(I);
+                clear 'cut_inds' 'first_peak_amplitude'
                 pp_data.port.bunch_signal{dlw} = pp_data.port.data{dlw};
                 if size(pp_data.port.data{dlw}, 1) > cut_ind
                     pp_data.port.data{dlw}(1:cut_ind, :) = 0;

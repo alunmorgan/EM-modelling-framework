@@ -1,4 +1,4 @@
-function cut_ind = separate_bunch_from_remenent_field(timescale, data, bunch_sigma, n_sigmas)
+function [cut_ind, first_peak_amplitude] = separate_bunch_from_remenent_field(timescale, data, bunch_sigma, n_sigmas)
 % find the location of the first peak in the signal. 
 %   Args:
 %       timescale (vector of floats): 
@@ -18,6 +18,7 @@ crossings_down = find(flips == 1 & shifted_flips == -1);
 crossings_up = find(flips == -1 & shifted_flips == 1);
 crossings = union(crossings_up, crossings_down);
 first_peak_ind = crossings(1);
+first_peak_amplitude = data(first_peak_ind);
 time_of_first_peak = timescale(first_peak_ind);
 cut_time = time_of_first_peak + n_sigmas * str2double(bunch_sigma) / 3E8;
 cut_ind = find(timescale > cut_time, 1, 'first');
