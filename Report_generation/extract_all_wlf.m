@@ -13,7 +13,7 @@ for sts = 1:length(model_sets)
     split_str = regexp(wanted_files, ['\',filesep], 'split');
     for ind = 1:length(wanted_files)
         current_folder = fileparts(wanted_files{ind});
-        load(fullfile(current_folder, 'data_postprocessed'), 'pp_data');
+%         load(fullfile(current_folder, 'data_postprocessed'), 'pp_data');
         load(fullfile(current_folder, 'data_analysed_wake'),'wake_sweep_data');
         load(fullfile(current_folder, 'run_inputs'), 'modelling_inputs');
         load(fullfile(current_folder, 'data_from_run_logs.mat'), 'run_logs');
@@ -22,7 +22,7 @@ for sts = 1:length(model_sets)
         extracted_data.wake_length(sts,ind) = wake_sweep_data.raw{1, 1}.wake_setup.Wake_length;
         extracted_data.mesh_density(sts, ind) = modelling_inputs.mesh_stepsize;
         extracted_data.mesh_scaling(sts, ind) = modelling_inputs.mesh_density_scaling;
-        extracted_data.n_cores(sts, ind) = str2num(modelling_inputs.n_cores);
+        extracted_data.n_cores(sts, ind) = str2double(modelling_inputs.n_cores);
         extracted_data.simulation_time(sts, ind) = run_logs.wall_time;
         extracted_data.number_of_cells(sts, ind) = run_logs.Ncells;
         extracted_data.timestep(sts, ind) = run_logs.Timestep;
@@ -36,6 +36,15 @@ for sts = 1:length(model_sets)
         extracted_data.beam_port_loss(sts, ind) = (port_energy(1) + port_energy(2)) / total_energy;
         extracted_data.signal_port_loss(sts, ind) = sum(port_energy(3:end)) / total_energy;
         extracted_data.structure_loss(sts, ind) = (total_energy - sum(port_energy(1:end))) / total_energy;
-        clear pp_data wake_sweep_data run_logs modelling_inputs
+        all_bunch_signals = wake_sweep_data.raw{end}.port.bunch_amplitude;
+        for hwhs = 1:length(all_bunch_signals)
+            for nse = 1:length(all_bunch_signals{hwhs})
+                [~, extracted_data.port{sts, ind}.dominant_modes(hwhs)] = max(abs(all_bunch_signals{hwhs}));
+                extracted_data.port{sts, ind}.dominant_signal_amplitudes(hwhs) = ...
+                    all_bunch_signals{hwhs}(extracted_data.port{sts, ind}.dominant_modes(hwhs));
+            end %for
+        end %for
+        extracted_data.port{sts, ind}.labels = wake_sweep_data.raw{end}.port.labels;
+        clear pp_data wake_sweep_data run_logs modelling_inputs all_bunch_signals
     end %for
 end %for
