@@ -11,7 +11,7 @@ for ind = 1:length(datasets)
     if override == 1 || ~exist(fullfile(datasets{ind}.path_to_data, 'Report.pdf'), 'file') == 0
         disp(['Generating a report for ', datasets{ind}.model_name])
 %         generate_graphs(path_to_data, ppi, input_settings{4})
-        Report_setup(datasets{ind}.path_to_data, ppi, input_settings{2}, input_settings{4})
+        Report_setup(datasets{ind}.path_to_data, ppi, input_settings{2}, input_settings{3})
     else
         disp(['Report already exists for ', datasets{ind}.model_name, ' and no override is set. Skipping...'])
     end %if
