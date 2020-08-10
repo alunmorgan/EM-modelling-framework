@@ -289,7 +289,7 @@ clear leg
 %% Energy left in the structure on a per frequency basis.
 if isfield(pp_data.port, 'timebase')
     if ~isempty(cut_off_freqs)
-        power_diff = bls - pes;
+        power_diff = bls(:) - pes(:);
     else
         power_diff = bls ;
     end %if
