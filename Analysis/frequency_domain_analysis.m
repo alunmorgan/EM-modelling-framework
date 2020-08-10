@@ -60,15 +60,6 @@ if nargin >5 % There are overrides to the number of port modes to be used.
     end %for
 end %if
 
-% finding where the index of the "end" of the charge is
-% [max_charge, max_charge_index] = max(time_domain_data.charge_distribution);
-% charge_end_index_temp = find(time_domain_data.charge_distribution(max_charge_index:end) < max_charge ./1E4, 1,'first');
-% charge_end_index = charge_end_index_temp + max_charge_index;
-% wakepotential_temp = time_domain_data.wakepotential;
-% wakepotential_tqx_temp = time_domain_data.wakepotential_trans_quad_x;
-% wakepotential_tqy_temp = time_domain_data.wakepotential_trans_quad_y;
-% wakepotential_tdx_temp = time_domain_data.wakepotential_trans_dipole_x;
-% wakepotential_tdy_temp = time_domain_data.wakepotential_trans_dipole_y;
 % %Taking away the mean value to reduce the DC component -- IS this valid?
 % % If there is a large DC offset then padding with zeros causes strong
 % % ringing in the impedance data.
@@ -78,15 +69,6 @@ end %if
 % wakepotential_tqy_temp = time_domain_data.wakepotential_trans_quad_y - mean(time_domain_data.wakepotential_trans_quad_y(charge_end_index:end));
 % wakepotential_tdx_temp = time_domain_data.wakepotential_trans_dipole_x - mean(time_domain_data.wakepotential_trans_dipole_x(charge_end_index:end));
 % wakepotential_tdy_temp = time_domain_data.wakepotential_trans_dipole_y - mean(time_domain_data.wakepotential_trans_dipole_y(charge_end_index:end));
-
-% % blanking out the period where the bunch is in the structure
-% % for the wake we are more interested in the response after the bunch has
-% % left.
-% wakepotential_temp(1:charge_end_index) = 0;
-% wakepotential_tqx_temp(1:charge_end_index) = 0;
-% wakepotential_tqy_temp(1:charge_end_index) = 0;
-% wakepotential_tdx_temp(1:charge_end_index) = 0;
-% wakepotential_tdy_temp(1:charge_end_index) = 0;
 
 % % in order to reduce artifacts we want to end the blanking at a zero
 % % crossing point.
@@ -154,32 +136,30 @@ else
         time_domain_data.timebase, f_raw, bunch_spectra);
 end
 
-% Remove all data above the highest frequency of interest (hfoi).
-
 % scaling for the bunch spectra
 % Could either take the appropriate section from both the upper and lower
 % side of the FFT, or just multiply by sqrt(2) as it is an amplitude.
 % (and ignore the small error due to counting DC twice).
 bunch_spectra = bunch_spectra .* sqrt(2);
 
-
-[Wake_Impedance_data, ~] = trim_to_hfoi(Wake_Impedance_data, f_raw,  hfoi);
-[Wake_Impedance_data_im, ~] = trim_to_hfoi(Wake_Impedance_data_im, f_raw,  hfoi);
-[Wake_Impedance_data_quad_X, ~] = trim_to_hfoi(Wake_Impedance_data_quad_X, f_raw,  hfoi);
-[Wake_Impedance_data_im_quad_X, ~] = trim_to_hfoi(Wake_Impedance_data_im_quad_X, f_raw,  hfoi);
-[Wake_Impedance_data_quad_Y, ~] = trim_to_hfoi(Wake_Impedance_data_quad_Y, f_raw,  hfoi);
-[Wake_Impedance_data_im_quad_Y, ~] = trim_to_hfoi(Wake_Impedance_data_im_quad_Y, f_raw,  hfoi);
-[Wake_Impedance_data_dipole_X, ~] = trim_to_hfoi(Wake_Impedance_data_dipole_X, f_raw,  hfoi);
-[Wake_Impedance_data_im_dipole_X, ~] = trim_to_hfoi(Wake_Impedance_data_im_dipole_X, f_raw,  hfoi);
-[Wake_Impedance_data_dipole_Y, ~] = trim_to_hfoi(Wake_Impedance_data_dipole_Y, f_raw,  hfoi);
-[Wake_Impedance_data_im_dipole_Y, ~] = trim_to_hfoi(Wake_Impedance_data_im_dipole_Y, f_raw,  hfoi);
+% Remove all data above the highest frequency of interest (hfoi).
+Wake_Impedance_data = trim_to_hfoi(Wake_Impedance_data, f_raw,  hfoi);
+Wake_Impedance_data_im = trim_to_hfoi(Wake_Impedance_data_im, f_raw,  hfoi);
+Wake_Impedance_data_quad_X = trim_to_hfoi(Wake_Impedance_data_quad_X, f_raw,  hfoi);
+Wake_Impedance_data_im_quad_X = trim_to_hfoi(Wake_Impedance_data_im_quad_X, f_raw,  hfoi);
+Wake_Impedance_data_quad_Y = trim_to_hfoi(Wake_Impedance_data_quad_Y, f_raw,  hfoi);
+Wake_Impedance_data_im_quad_Y = trim_to_hfoi(Wake_Impedance_data_im_quad_Y, f_raw,  hfoi);
+Wake_Impedance_data_dipole_X = trim_to_hfoi(Wake_Impedance_data_dipole_X, f_raw,  hfoi);
+Wake_Impedance_data_im_dipole_X = trim_to_hfoi(Wake_Impedance_data_im_dipole_X, f_raw,  hfoi);
+Wake_Impedance_data_dipole_Y = trim_to_hfoi(Wake_Impedance_data_dipole_Y, f_raw,  hfoi);
+Wake_Impedance_data_im_dipole_Y = trim_to_hfoi(Wake_Impedance_data_im_dipole_Y, f_raw,  hfoi);
 if ~isnan(port_impedances)
     if  sum(size(port_impedances) == [1, 1]) == 0
-        [port_impedances, ~] = trim_to_hfoi(port_impedances, f_raw,  hfoi);
-        [port_fft, ~] = trim_to_hfoi(port_fft, f_raw,  hfoi);
+        port_impedances = trim_to_hfoi(port_impedances, f_raw,  hfoi);
+        port_fft = trim_to_hfoi(port_fft, f_raw,  hfoi);
     end
 end
-[bunch_spectra, f_raw] = trim_to_hfoi(bunch_spectra, f_raw,  hfoi);
+bunch_spectra = trim_to_hfoi(bunch_spectra, f_raw,  hfoi);
 
 % The outputs from this function are for the model charge.
 % except for the wake loss factor which is V/C
