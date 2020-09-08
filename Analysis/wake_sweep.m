@@ -116,7 +116,7 @@ if isfield(raw_data, 'mat_losses')
     r_raw.mat_losses = raw_data.mat_losses;
 end %if
 r_raw.port.labels = raw_data.port.labels;
-r_raw.port.labels_table = raw_data.port.labels_table;
+% r_raw.port.labels_table = raw_data.port.labels_table;
 r_raw.port.frequency_cutoffs = raw_data.port.frequency_cutoffs;
 r_raw.port.alpha = raw_data.port.alpha;
 r_raw.port.beta = raw_data.port.beta;
