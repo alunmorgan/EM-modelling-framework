@@ -1,7 +1,7 @@
 function plot_energy_graphs(h_wake, path_to_data, m_time, m_data, ...
     material_names, col_ofst, timebase_port, port_cumsum,...
     e_ports_cs,...
-    timebase_cs, e_total_cs, cut_time_ind, y_lev_t, lw, l_st, port_names, lab_ind)
+    timebase_cs, e_total_cs, cut_time_ind, y_lev_t, lw, l_st, port_names)
 
 clf(h_wake)
 if ~isnan(m_time{1})
@@ -39,10 +39,10 @@ if ~all(isnan(timebase_port)) && ~all(isnan(port_cumsum))
     %% Cumulative energy seen at each port.
     ax(5) = axes('Parent', h_wake);
     hold(ax(5), 'all')
-    for ens = 1:length(lab_ind)
-        plot(timebase_cs(1:cut_time_ind), e_ports_cs(1:cut_time_ind, lab_ind(ens)),...
+    for ens = 1:length(port_names)
+        plot(timebase_cs(1:cut_time_ind), e_ports_cs(1:cut_time_ind, ens),...
             'Color',col_gen(ens),'LineWidth',lw, 'LineStyle', l_st{1}, ...
-            'Parent', ax(5), 'DisplayName', regexprep(port_names{lab_ind(ens)},'_',' '))
+            'Parent', ax(5), 'DisplayName', regexprep(port_names{ens},'_',' '))
     end %for
     hold(ax(5), 'off')
     title('Cumulative energy seen at the ports (nJ)', 'Parent', ax(5))
