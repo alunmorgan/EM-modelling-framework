@@ -43,4 +43,8 @@ else
     %% Port calculations
     time_domain_analysed_data.port_data = port_analysis(raw_data.time_series_data.timescale_common, ...
         raw_data.time_series_data.port_data, mode_overrides);
+    time_domain_analysed_data.alpha = raw_data.port.alpha;
+    time_domain_analysed_data.beta = raw_data.port.beta;
+    time_domain_analysed_data.frequency_cutoffs = raw_data.port.frequency_cutoffs;
+    time_domain_analysed_data.port_lables = raw_data.port.labels;
 end

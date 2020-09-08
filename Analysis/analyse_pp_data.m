@@ -16,7 +16,7 @@ for sts = 1:length(model_sets)
             test = regexprep(current_folder, root_path, '');
             test = regexp(test, filesep, 'split')';
             wake_ind = find(cellfun(@isempty,(strfind(test, 'wake')))==0);
-%             model_variant = regexprep(test{wake_ind -1}, [model_sets{sts}, '_'],'');
+            %             model_variant = regexprep(test{wake_ind -1}, [model_sets{sts}, '_'],'');
             pp_data = load(fullfile(current_folder, 'data_postprocessed'), 'pp_data');
             pp_data = pp_data.pp_data;
             run_logs = load(fullfile(current_folder, 'data_from_run_logs.mat'), 'run_logs');
@@ -24,6 +24,16 @@ for sts = 1:length(model_sets)
             modelling_inputs = load(fullfile(current_folder, 'run_inputs.mat'), 'modelling_inputs');
             modelling_inputs = modelling_inputs.modelling_inputs;
             wakelength = str2double(modelling_inputs.wakelength);
+            [pp_data.port.alpha, pp_data.port.beta, pp_data.port.data, ...
+                pp_data.port.frequency_cutoffs] = port_data_conditioning(...
+                pp_data.port.data, run_logs, modelling_inputs.port_fill_factor);
+            % Replicate the port signals as required.
+            [pp_data.port.labels, pp_data.port.alpha, pp_data.port.beta,...
+                pp_data.port.data, pp_data.port.frequency_cutoffs, ...
+                pp_data.port.t_start] = duplicate_ports(...
+                modelling_inputs.port_multiple, ...
+                pp_data.port.labels, pp_data.port.alpha, pp_data.port.beta, ...
+                pp_data.port.data, pp_data.port.frequency_cutoffs, pp_data.port.t_start);
             %             wake_lengths_to_analyse = [];
             %             for ke = 1:6
             %                 wake_lengths_to_analyse = cat(1, wake_lengths_to_analyse, wakelength);

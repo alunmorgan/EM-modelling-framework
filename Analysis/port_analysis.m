@@ -39,3 +39,5 @@ port_analysed_data.port_energy_cumsum = cumsum(squeeze(sum(port_mode_energy_time
 port_analysed_data.total_energy = sum(sum(sum(port_mode_energy_time, 3),2),1);
 port_analysed_data.total_energy_cumsum = squeeze(cumsum(sum(sum(port_mode_energy_time, 2),1),3));
 
+
+
