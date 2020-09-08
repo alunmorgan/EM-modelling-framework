@@ -17,7 +17,11 @@ shifted_flips = circshift(flips,1,1);
 crossings_down = find(flips == 1 & shifted_flips == -1);
 crossings_up = find(flips == -1 & shifted_flips == 1);
 crossings = union(crossings_up, crossings_down);
-first_peak_ind = crossings(1);
+if isempty(crossings)
+    first_peak_ind = 1;
+else
+    first_peak_ind = crossings(1);
+end %if
 first_peak_amplitude = data(first_peak_ind);
 time_of_first_peak = timescale(first_peak_ind);
 cut_time = time_of_first_peak + n_sigmas * str2double(bunch_sigma) / 3E8;
