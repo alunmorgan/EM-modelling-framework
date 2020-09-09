@@ -201,16 +201,40 @@ lg.mesh_step_size = str2double(char(mesh_step_size{1}));
 
 % find the line containing the charge info
 lcharges_ind = find_position_in_cell_lst(strfind(data,'lcharges>'));
+nextcharge_ind = find_position_in_cell_lst(strfind(data,'nextcharge'));
+nextcharge_ind = intersect(nextcharge_ind,lcharges_ind);
 charge_ind = find_position_in_cell_lst(regexp(data,'charge\s*=\s*'));
 charge_ind = intersect(charge_ind,lcharges_ind);
+if length(charge_ind) == 1
 charge = regexprep(data{charge_ind},'.*charge\s*=\s*','');
 charge = regexprep(charge,'"','');
 lg.charge = str2double(charge);
+elseif length(charge_ind) > 1
+  % find the last set charge before the nextcharge command. 
+  for nes = 1:length(nextcharge_ind)
+      temp_charge_ind = charge_ind(find(charge_ind < nextcharge_ind(nes),1,'last'));
+      temp_charge = regexprep(data{temp_charge_ind},'.*charge\s*=\s*','');
+      temp_charge = regexprep(temp_charge,'"','');
+      temp_charge_num(nes) = str2double(temp_charge);
+  end %for
+  lg.charge = sum(temp_charge_num);
+end %if
+
 
 % find the set beam sigma.
 beam_sigma_ind = find_position_in_cell_lst(regexp(data,'lcharges>\s*sigma\s*=\s*'));
+if length(beam_sigma_ind) == 1
 beam_sigma = regexp(data{beam_sigma_ind},'lcharges>\s*sigma\s*=\s*([^,]*)(?:\s*,|\s*$)', 'tokens');
 lg.beam_sigma = str2double(char(beam_sigma{1}));
+elseif length(beam_sigma_ind) > 1
+  % find the last set charge before the nextcharge command. 
+  for nes = 1:length(nextcharge_ind)
+      temp_beam_sigma_ind = beam_sigma_ind(find(beam_sigma_ind < nextcharge_ind(nes),1,'last'));
+      temp_beam_sigma = regexp(data{temp_beam_sigma_ind},'lcharges>\s*sigma\s*=\s*([^,]*)(?:\s*,|\s*$)', 'tokens');
+      temp_beam_sigma_num(nes) = str2double(temp_beam_sigma{1});
+  end %for
+  lg.beam_sigma = temp_beam_sigma_num(1); %FIXME - is there a better way than just taking the first value?
+end %if
 %find the memory usage
 memory_ind = find_position_in_cell_lst(strfind(data,'The Memory Usage is at least'));
 memory = regexprep(data{memory_ind},'The Memory Usage is at least','');

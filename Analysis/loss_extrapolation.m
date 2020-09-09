@@ -143,10 +143,10 @@ for cur_ind = 1:length(ppi.current)
             % setting any powers which are larger than the loss for that frequency
             % to zero. This means that the power into the structure is an over
             % estimate.
-            tmp = find(beam_port_spectrum > Bunch_loss_energy_spectrum);
+            tmp = find(beam_port_spectrum > Bunch_loss_energy_spectrum');
             beam_port_spectrum(tmp) = 0;
             Total_energy_from_beam_ports = sum(beam_port_spectrum);
-            tmp2 = find(signal_port_spectrum > Bunch_loss_energy_spectrum);
+            tmp2 = find(signal_port_spectrum > Bunch_loss_energy_spectrum');
             signal_port_spectrum(tmp2) = 0;
             Total_energy_from_signal_ports = sum(signal_port_spectrum);
             diff_machine_conds.bunch_spec{cur_ind, btl_ind, rf_ind} = bunch_spec_bc;

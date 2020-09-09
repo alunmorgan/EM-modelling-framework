@@ -53,10 +53,11 @@ data = create_model_data_file_for_STL(modelling_inputs);
 port_selection = modelling_inputs.port_multiple ~=0;
 port_defs = gdf_write_port_definitions( modelling_inputs.ports,...
     modelling_inputs.port_location, modelling_inputs.port_modes, port_selection);
-
+excitation = gdf_wake_port_excitation(modelling_inputs.port_excitation_wake,...
+    modelling_inputs.wakelength);
 mon = gdf_wake_monitor_construction(...
     modelling_inputs.wakelength, modelling_inputs.dtsafety, modelling_inputs.mov);
 % construct the full input file.
 data = cat(1,fs, modelling_inputs.defs', geom, mesh_def, mesh_fixed_planes, ...
-    data, port_defs, mon);
+    data, port_defs, excitation, mon);
 write_out_data( data, 'temp_data/model.gdf' )

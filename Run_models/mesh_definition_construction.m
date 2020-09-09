@@ -9,7 +9,7 @@ mesh_def = cat(1, mesh_def, '    perfectmesh= no');
 mesh_def = cat(1, mesh_def, '    xperiodic= no');
 mesh_def = cat(1, mesh_def, '    yperiodic= no');
 mesh_def = cat(1, mesh_def, '    zperiodic= no');
-
+% graded= yes, qfgraded= 1.2, dmaxgraded= 2*STPSZE
 mesh_def = cat(1, mesh_def, ['    xgraded= ', mesh_data.xgraded]);
 mesh_def = cat(1, mesh_def, ['    xqfgraded= ', mesh_data.xqfgraded]);
 mesh_def = cat(1, mesh_def, ['    xdmaxgraded= ', mesh_data.xdmaxgraded]);
