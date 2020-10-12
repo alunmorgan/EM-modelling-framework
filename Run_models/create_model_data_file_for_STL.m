@@ -77,7 +77,7 @@ for lrd = 1:length(stls)
         model_file = cat(1, model_file, '# adjust port locations.');
         model_file = cat(1, model_file, 'xprime= (-1 ,0 ,0)');
         model_file = cat(1, model_file, ['yprime= (',num2str(model_angle/90),', 0,', num2str(1-(model_angle/90)),')']);
-    elseif strcmpi(modelling_inputs.main_axis, 'y')
+    elseif strcmpi(modelling_inputs.main_axis, 'z')
         model_file = cat(1, model_file, '# FreeCAD and GdfidL agree on the main axis. Nothing more to be done.');
     else
         error('Please enter x, y, or z for the model beam axis')
