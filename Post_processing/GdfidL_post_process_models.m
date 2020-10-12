@@ -95,22 +95,7 @@ for heb = 1:length(sim_types)
         if exist(fullfile('data_link', sim_types{heb}), 'dir')
             run_pp = will_pp_run(sim_types{heb}, p.Results.ow_behaviour);
             if run_pp == 1
-                %             try
-                %                 [freq_folders] = dir_list_gen(fullfile('data_link', sim_types{heb}),'dirs', 1);
-                %                 data_directory = freq_folders{1};
-                %                 pp_directory = fullfile('pp_link', sim_types{heb});
-                %                  creating_space_for_postprocessing(pp_directory, sim_types{heb}, model_name);
-                %                 % Move files to the post processing folder.
-                %
-                %                 copyfile(fullfile(data_directory,'model.gdf'),...
-                %                     fullfile(pp_directory, 'model.gdf'));
-                %                 copyfile(fullfile(data_directory,'model_log'), ...
-                %                     fullfile(pp_directory, 'model_log'));
-                %                 copyfile(fullfile(data_directory, 'run_inputs.mat'),...
-                %                     fullfile(pp_directory, 'run_inputs.mat'));
-                %                                % Load up the original model input parameters.
-                %                 load(fullfile(pp_directory, 'run_inputs.mat'), 'modelling_inputs')
-                
+                %             try                
                 disp(['GdfidL_post_process_models: Post processing ', sim_types{heb}, ' data.'])
                 % Reading logs and Running postprocessor
                 if strcmp(sim_types{heb}, 's_parameter')

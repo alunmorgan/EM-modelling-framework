@@ -2,7 +2,7 @@ function postprocess_model_sets(model_names, force_pp, pp_type)
 % model_names: the name of the model set you wish to simulate.
 % force_pp: sets whether the GdfidL postprocessing is rerun for existing
 % simulations. values are 'skip' and 'no_skip'.
-
+% pptype: 'all', 'wake', 'eigenmode', 'eigenmode_lossy','s_parameter', 'shunt'
 orig_loc = pwd;
 
 for hew = 1:length(model_names)

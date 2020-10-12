@@ -3,7 +3,7 @@ function output_data_location = GdfidL_run_simulation(sim_type, paths, modelling
 % runs the simulation with the desired calculational precision.
 %
 % Args:
-%       sim_type (str): wake or s-parameter
+%       sim_type (str): geometry, wake or s-parameter
 %       paths (structure): Contains all the paths and file locations.
 %       modelling_inputs (structure): Contains the setting for a specific modelling run.
 %       ow_behaviour (string): optional. If set to 'no_skip' any existant data
