@@ -68,6 +68,18 @@ if run_sim == 1
         disp(['Running ', sim_type,' simulation for ', modelling_inputs.model_name, '.'])
         GdfidL_simulation_core(modelling_inputs.version, modelling_inputs.precision)
         save(fullfile('temp_data', 'run_inputs.mat'), 'paths', 'modelling_inputs')
+        if strcmp(sim_type, 'geometry')
+            % Converting the images from ps to eps via png to reduce the file
+            % size. For larger models keeping the ps files can break the
+            % filesystem.
+            [pic_names ,~]= dir_list_gen('.','ps',1);
+            for ns = 1:length(pic_names)
+                pic_nme = pic_names{ns}(1:end-3);
+                [~] = system(['convert ',pic_nme,'.ps ',pic_nme,'.png']);
+                [~] = system(['convert ',pic_nme,'.png ',pic_nme,'.eps']);
+                delete([pic_nme,'.ps'])
+            end
+        end %if
         [status, message] = movefile('temp_data/*', arch_out);
         if status == 1
             temp_files('remove')
