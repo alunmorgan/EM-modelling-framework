@@ -2,26 +2,31 @@ function raw_data = extract_wake_data_from_pp_output_files(output_file_locations
 
 % get the Total energy in the structure
 if iscell(output_file_locations.Energy)
-    [ total_energy_data ] = GdfidL_read_graph_datafile(output_file_locations.Energy{1});
+    total_energy_data = GdfidL_read_graph_datafile(output_file_locations.Energy{1});
 else
     total_energy_data.data = NaN;
 end %if
 
 %% Material losses
-if isfield(log, 'mat_losses') && iscell(output_file_locations.Energy_in_ceramics)
+if iscell(output_file_locations.Energy_in_ceramics)
     % get the energy in the ceramics.
     energy_ceramics_data = GdfidL_read_graph_datafile(output_file_locations.Energy_in_ceramics{1});
     % The original data is the energy sampled at a point in time. What I want
     % is the total energy over time. So cumsum it and scale with the timestep
     loss_in_ceramics = cumsum(energy_ceramics_data.data(:,2)) .* ...
         (energy_ceramics_data.data(2,1)-energy_ceramics_data.data(1,1));
+    if sum(loss_in_ceramics) == 0
+         loss_in_ceramics = 0;
+         if ~isfield(log.mat_losses, 'loss_time')
+             log.mat_losses.loss_time = 0;
+         end %if
+    else
     % In order to combine with the other material losses I can interpolate (as
     % I have already done the scaling with timestep.)
     loss_in_ceramics = interp1(energy_ceramics_data.data(:,1), ...
         loss_in_ceramics, log.mat_losses.loss_time);
-else
-    loss_in_ceramics = 0;
-end
+    end %if
+end %if
 
 % scale the total energy values of the simulated volume to the full volume
 % of the structure.
@@ -99,8 +104,7 @@ end
 
 if ~isempty(output_file_locations.WI_s)
     % Returns the longitudinal wake impedance
-    % and the charge distribution with the integral scaled to 1C
-    [ wil_data] = GdfidL_read_graph_datafile(output_file_locations.WI_s{1} );
+    wil_data = GdfidL_read_graph_datafile(output_file_locations.WI_s{1} );
 end
 % Get the transverse wake potientials.
 if ~isempty(output_file_locations.WI_x)
@@ -142,34 +146,37 @@ else
     raw_data.Wake_potential_trans_dipole_Y = NaN(length(wpl_data.data),2);
 end
 raw_data.Charge_distribution = cd_data.data;
-raw_data.Wake_impedance = wil_data.data;
+if exist('wil_data','var')
+    raw_data.Wake_impedance = wil_data.data;
+else
+    raw_data.Wake_impedance = NaN(length(wpl_data.data),2);
+    warning('Missing impedance graph')
+end
 if exist('witqx_data','var')
     raw_data.Wake_impedance_trans_quad_X = witqx_data.data;
 else
-    raw_data.Wake_impedance_trans_quad_X = NaN(length(wil_data.data),2);
+    raw_data.Wake_impedance_trans_quad_X = NaN(size(raw_data.Wake_impedance));
 end
 if exist('witqy_data','var')
     raw_data.Wake_impedance_trans_quad_Y = witqy_data.data;
 else
-    raw_data.Wake_impedance_trans_quad_Y = NaN(length(wil_data.data),2);
+    raw_data.Wake_impedance_trans_quad_Y = NaN(size(raw_data.Wake_impedance));
 end
 if exist('witdx_data','var')
     raw_data.Wake_impedance_trans_dipole_X = witdx_data.data;
 else
-    raw_data.Wake_impedance_trans_dipole_X = NaN(length(wil_data.data),2);
+    raw_data.Wake_impedance_trans_dipole_X = NaN(size(raw_data.Wake_impedance));
 end
 if exist('witdy_data','var')
     raw_data.Wake_impedance_trans_dipole_Y = witdy_data.data;
 else
-    raw_data.Wake_impedance_trans_dipole_Y = NaN(length(wil_data.data),2);
+    raw_data.Wake_impedance_trans_dipole_Y = NaN(size(raw_data.Wake_impedance));
 end
 raw_data.port.timebase = port_timebase;
 raw_data.port.data = port_data;
 raw_data.port.labels = modelling_inputs.port_names;
 raw_data.port.t_start = tstart;
 raw_data.wake_setup.Wake_length = wpl_data.data(end,1) .* 2.99792458E8;
-if isfield(log, 'mat_losses')
-    raw_data.mat_losses.loss_time = log.mat_losses.loss_time;
-    raw_data.mat_losses.total_loss = total_loss;
-    raw_data.mat_losses.single_mat_data = log.mat_losses.single_mat_data;
-end
+raw_data.mat_losses.loss_time = log.mat_losses.loss_time;
+raw_data.mat_losses.total_loss = total_loss;
+raw_data.mat_losses.single_mat_data = log.mat_losses.single_mat_data;
