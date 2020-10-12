@@ -34,13 +34,14 @@ end %if
 
 
 ax(1) = axes('Parent', h_wake);
+bar_cols = col_gen(size(py,2));
 f1 = bar(ax(1), py,'stacked');
 % turn off the energy for the energy loss annotation
 annot = get(f1, 'Annotation');
 set(get(annot{1},'LegendInformation'),'IconDisplayStyle', 'off')
 set(f1(1), 'FaceColor', [0.5 0.5 0.5]);
 for eh = 2:size(py,2)
-    set(f1(eh), 'FaceColor', col_gen(eh-1));
+    set(f1(eh), 'FaceColor', bar_cols(eh,:));
 end %for
 set(ax(1), 'XTickLabels',{'Energy lost from beam', 'Energy accounted for'})
 set(ax(1),'XTickLabelRotation',45)
@@ -52,6 +53,7 @@ clear leg
 
 if ~isnan(mat_loss)
     ax(2) = axes('Parent', h_wake);
+    
     plot_data = mat_loss/sum(mat_loss) *100;
     % matlab will ignore any values of zero which messes up the maping of the
     % lables. This just makes any zero values a very small  positive value to avoid
@@ -67,12 +69,15 @@ if ~isnan(mat_loss)
     pp = findobj(p, 'Type', 'patch');
     % check if both beam ports and signal ports are used.
     col_ofst = size(py,2) -1 - length(plot_data);
+    pie_cols = col_gen(length(pp) + col_ofst);
     for sh = 1:length(pp)
-        set(pp(sh), 'FaceColor',col_gen(sh+col_ofst));
+        set(pp(sh), 'FaceColor',pie_cols(sh+col_ofst,:));
     end %for
     legend(ax(2), leg,'Location','EastOutside', 'Interpreter', 'none')
     clear leg
     title('Losses distribution within the structure', 'Parent', ax(2))
     savemfmt(h_wake, path_to_data,'Thermal_Fractional_Losses_distribution_within_the_structure')
     clf(h_wake)
+else
+    col_ofst = size(py,2) -1;
 end %if
