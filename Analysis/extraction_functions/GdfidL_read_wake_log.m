@@ -37,6 +37,12 @@ clear del_ind cmnt_ind
 %% Analyse the data
 
 % Find the user defines variables.
+user_defined_variable_list = {'PEC', 'steel', 'carbon', 'copper'}; %FIXME this should not be hard coded
+variable_regexp = '.*(define\(.*,([.\d -e+z]+';
+for hs = 1:length(user_defined_variable_list)
+    variable_regexp =strcat(variable_regexp, '|\s*', user_defined_variable_list{hs}, '.*');
+end %for
+variable_regexp =strcat(variable_regexp, ')?\).*)"');
 define_ind = find_position_in_cell_lst(regexp(data,'\s*#\s*was:\s*"\s*define\(.*,.*\)'));
 sec_ind = find_position_in_cell_lst(regexp(data,'\s*material>.*'));
 if ~isempty(sec_ind)
@@ -45,7 +51,7 @@ if ~isempty(sec_ind)
     defines = data(define_ind);
     ajs = 1;
     for aj = 1:length(defines)
-        tmd = regexp(defines{aj},'.*(define\(.*,([.\d -e+z]+|\s*steel.*|\s*carbon.*|\s*copper.*|\s*PEC.*)?\).*)"', 'tokens');
+        tmd = regexp(defines{aj},variable_regexp, 'tokens');
         if ~isempty(tmd)
             tmd = tmd{1}{1};
             lg.defs{ajs} = tmd;
@@ -78,12 +84,12 @@ for nse = length(total_loss_inds):-1:1
     lg.mat_losses.total_loss(nse) = temp(2);
 end
 clear nse temp
+
+% find the loss for each metal.
+metal_loss_inds = find_position_in_cell_lst(strfind(data,'IntegratedSumPowerMat'));
 % If no material losses have been recorded then there is no point doing
 % anything with ceramics or metals.
-if isfield(lg, 'mat_losses')
-    
-    % find the loss for each metal.
-    metal_loss_inds = find_position_in_cell_lst(strfind(data,'IntegratedSumPowerMat'));
+if ~isempty(metal_loss_inds)
     metals = data(metal_loss_inds);
     for jse = length(metals):-1:1
         tmp = regexp(metals{jse},'IntegratedSumPowerMat(\d\d\d)\s*[\[J\]]{0,1}','tokens');
@@ -206,42 +212,46 @@ nextcharge_ind = intersect(nextcharge_ind,lcharges_ind);
 charge_ind = find_position_in_cell_lst(regexp(data,'charge\s*=\s*'));
 charge_ind = intersect(charge_ind,lcharges_ind);
 if length(charge_ind) == 1
-charge = regexprep(data{charge_ind},'.*charge\s*=\s*','');
-charge = regexprep(charge,'"','');
-lg.charge = str2double(charge);
+    charge = regexprep(data{charge_ind},'.*charge\s*=\s*','');
+    charge = regexprep(charge,'"','');
+    lg.charge = str2double(charge);
 elseif length(charge_ind) > 1
-  % find the last set charge before the nextcharge command. 
-  for nes = 1:length(nextcharge_ind)
-      temp_charge_ind = charge_ind(find(charge_ind < nextcharge_ind(nes),1,'last'));
-      temp_charge = regexprep(data{temp_charge_ind},'.*charge\s*=\s*','');
-      temp_charge = regexprep(temp_charge,'"','');
-      temp_charge_num(nes) = str2double(temp_charge);
-  end %for
-  lg.charge = sum(temp_charge_num);
+    % find the last set charge before the nextcharge command.
+    for nes = 1:length(nextcharge_ind)
+        temp_charge_ind = charge_ind(find(charge_ind < nextcharge_ind(nes),1,'last'));
+        temp_charge = regexprep(data{temp_charge_ind},'.*charge\s*=\s*','');
+        temp_charge = regexprep(temp_charge,'"','');
+        temp_charge_num(nes) = str2double(temp_charge);
+    end %for
+    lg.charge = sum(temp_charge_num);
 end %if
 
 
 % find the set beam sigma.
 beam_sigma_ind = find_position_in_cell_lst(regexp(data,'lcharges>\s*sigma\s*=\s*'));
 if length(beam_sigma_ind) == 1
-beam_sigma = regexp(data{beam_sigma_ind},'lcharges>\s*sigma\s*=\s*([^,]*)(?:\s*,|\s*$)', 'tokens');
-lg.beam_sigma = str2double(char(beam_sigma{1}));
+    beam_sigma = regexp(data{beam_sigma_ind},'lcharges>\s*sigma\s*=\s*([^,]*)(?:\s*,|\s*$)', 'tokens');
+    lg.beam_sigma = str2double(char(beam_sigma{1}));
 elseif length(beam_sigma_ind) > 1
-  % find the last set charge before the nextcharge command. 
-  for nes = 1:length(nextcharge_ind)
-      temp_beam_sigma_ind = beam_sigma_ind(find(beam_sigma_ind < nextcharge_ind(nes),1,'last'));
-      temp_beam_sigma = regexp(data{temp_beam_sigma_ind},'lcharges>\s*sigma\s*=\s*([^,]*)(?:\s*,|\s*$)', 'tokens');
-      temp_beam_sigma_num(nes) = str2double(temp_beam_sigma{1});
-  end %for
-  lg.beam_sigma = temp_beam_sigma_num(1); %FIXME - is there a better way than just taking the first value?
+    % find the last set charge before the nextcharge command.
+    for nes = 1:length(nextcharge_ind)
+        temp_beam_sigma_ind = beam_sigma_ind(find(beam_sigma_ind < nextcharge_ind(nes),1,'last'));
+        temp_beam_sigma = regexp(data{temp_beam_sigma_ind},'lcharges>\s*sigma\s*=\s*([^,]*)(?:\s*,|\s*$)', 'tokens');
+        temp_beam_sigma_num(nes) = str2double(temp_beam_sigma{1});
+    end %for
+    lg.beam_sigma = temp_beam_sigma_num(1); %FIXME - is there a better way than just taking the first value?
 end %if
 %find the memory usage
 memory_ind = find_position_in_cell_lst(strfind(data,'The Memory Usage is at least'));
-memory = regexprep(data{memory_ind},'The Memory Usage is at least','');
-memory = regexprep(memory,'##','');
-memory = regexprep(memory,'MBytes','');
-memory = regexprep(memory,'\.','');
-lg.memory = str2double(memory);
+if ~isempty(memory_ind)
+    memory = regexprep(data{memory_ind},'The Memory Usage is at least','');
+    memory = regexprep(memory,'##','');
+    memory = regexprep(memory,'MBytes','');
+    memory = regexprep(memory,'\.','');
+    lg.memory = str2double(memory);
+else
+    lg.memory = NaN;
+end %if
 
 % find the meshing extent.
 mesh_extent_zlow_ind = find_position_in_cell_lst(regexp(data,'mesh>\s*pzlow\s*=\s*'));
@@ -256,13 +266,6 @@ mesh_extent_xlow = regexp(data{mesh_extent_xlow_ind},'mesh>\s*pxlow\s*=\s*(.*)',
 mesh_extent_xhigh = regexp(data{mesh_extent_xhigh_ind},'mesh>\s*pxhigh\s*=\s*(.*)', 'tokens');
 mesh_extent_ylow = regexp(data{mesh_extent_ylow_ind},'mesh>\s*pylow\s*=\s*(.*)', 'tokens');
 mesh_extent_yhigh = regexp(data{mesh_extent_yhigh_ind},'mesh>\s*pyhigh\s*=\s*(.*)', 'tokens');
-% mesh_extent_zlow = regexp(data{mesh_extent_zlow_ind},'mesh>\s*pzlow\s*=\s*([^,#]*)(?:\s*,|\s*#|\s*$)', 'tokens');
-% mesh_extent_zhigh = regexp(data{mesh_extent_zhigh_ind},'mesh>\s*(?:[^,#]*\s*,)?\s*pzhigh\s*=\s*(.*)', 'tokens');
-% mesh_extent_xlow = regexp(data{mesh_extent_xlow_ind},'mesh>\s*pxlow\s*=\s*([^,#]*)(?:\s*,|\s*#|\s*$)', 'tokens');
-% mesh_extent_xhigh = regexp(data{mesh_extent_xhigh_ind},'mesh>\s*(?:[^,#]*\s*,)?\s*pxhigh\s*=\s*(.*)', 'tokens');
-% mesh_extent_ylow = regexp(data{mesh_extent_ylow_ind},'mesh>\s*pylow\s*=\s*([^,#]*)(?:\s*,|\s*#|\s*$)', 'tokens');
-% mesh_extent_yhigh = regexp(data{mesh_extent_yhigh_ind},'mesh>\s*(?:[^,#]*\s*,)?\s*pyhigh\s*=\s*(.*)', 'tokens');
-
 
 lg.mesh_extent_zlow = eval(char(mesh_extent_zlow{1}{1}));
 lg.mesh_extent_zhigh = eval(char(mesh_extent_zhigh{1}{1}));
@@ -282,7 +285,11 @@ else
 end
 port_on_zhigh_ind = find_position_in_cell_lst(regexp(data,'#\s*\.\.\s*The Port is at zhigh'));
 num_pmls_zhigh = regexp(data{port_on_zhigh_ind+1},'#\s*\.\.\s*PML-Thickness\s*:\s*(\d*)', 'tokens');
-lg.pmls_zhigh = str2double(char(num_pmls_zhigh{1}));
+if ~isempty(num_pmls_zhigh)
+    lg.pmls_zhigh = str2double(char(num_pmls_zhigh{1}));
+else
+    lg.pmls_zhigh = NaN;
+end %if
 % find symetry planes
 % assume any magnetic boundary is also a symetry plane.
 boundaries_ind1 = find_position_in_cell_lst(regexp(data,'mesh>\s*c[xyz]low\s*= '));
@@ -328,7 +335,11 @@ end
 
 % find the number of mesh cells
 Ncells_ind = find_position_in_cell_lst(strfind(data,'Cell-Numbers'));
-lg.Ncells = str2double(regexprep(data{Ncells_ind},'.*= ',''));
+if ~isempty(Ncells_ind)
+    lg.Ncells = str2double(regexprep(data{Ncells_ind},'.*= ',''));
+else
+    lg.Ncells = NaN;
+end %if
 
 % find the timestep
 Timestep_ind = find_position_in_cell_lst(strfind(data,'The paranoid Timestep'));
@@ -363,9 +374,15 @@ if isempty(solver_time_ind)
     %     If the simulation has not yet finished that will not be available. In this
     %     case find the latest time output.
     solver_time_ind = find_position_in_cell_lst(strfind(data,'CPU Time'));
-    solver_time = regexp(data{solver_time_ind(end)},'.*CPU[_\s][tT]ime\s*:\s*(\d+)\s*Seconds', 'tokens');
+    if ~isempty(solver_time_ind)
+        solver_time = regexp(data{solver_time_ind(end)},'.*CPU[_\s][tT]ime\s*:\s*(\d+)\s*Seconds', 'tokens');
+    end %if
 end
-lg.CPU_time = str2double(char(solver_time{1}));
+if ~isempty(solver_time)
+    lg.CPU_time = str2double(char(solver_time{1}));
+else
+    lg.CPU_time = NaN;
+end %if
 
 % find the mesher time
 mesher_time_ind = find_position_in_cell_lst(strfind(data,'Mesher: total CPU Seconds:'));
@@ -381,21 +398,33 @@ for hs = 1:length(port_name)
     %     this is the top of the section containing data on this port
     port_sec_ind_temp = find_position_in_cell_lst(regexp(data, ['# I am computing the Port[m|M]odes for Port : "',port_name{hs},'"']));
     % this is the bottom
-    port_sec_ind_temp_b = hash_ind(hash_ind >port_sec_ind_temp);
-    port_sec_ind_temp_b = port_sec_ind_temp_b(1);
-    port_data_sec = data(port_sec_ind_temp:port_sec_ind_temp_b - 1);
-    port_data_sec = port_data_sec(find_position_in_cell_lst(regexp(port_data_sec,'cutoff= ')));
-    [toks, ~] = regexp(port_data_sec,'.*\(\s*(.*),\s*(.*)\s*\).*cutoff=\s*(.*) \[Hz\]', 'tokens');
-    tmp = reduce_cell_depth(reduce_cell_depth(toks));
-    tmp = cellfun(@str2num, tmp);
-    % anything below 1E-12 is considered numerical noise and set to zero.
-    tmp(abs(tmp) < 1E-12) = 0;
-    % using the definition e^(yx) where y= alpha + ibeta.
-    % alpha is the attenuation constant
-    % beta is the phase constant or propagation constant.
-    lg.alpha{hs} = tmp(:,2);
-    lg.beta{hs} = tmp(:,1);
-    lg.cutoff{hs} = tmp(:,3);
+    if ~isempty(port_sec_ind_temp)
+        port_sec_ind_temp_b = hash_ind(hash_ind >port_sec_ind_temp);
+        if ~isempty(port_sec_ind_temp_b)
+            port_sec_ind_temp_b = port_sec_ind_temp_b(1);
+            port_data_sec = data(port_sec_ind_temp:port_sec_ind_temp_b - 1);
+            port_data_sec = port_data_sec(find_position_in_cell_lst(regexp(port_data_sec,'cutoff= ')));
+            [toks, ~] = regexp(port_data_sec,'.*\(\s*(.*),\s*(.*)\s*\).*cutoff=\s*(.*) \[Hz\]', 'tokens');
+            tmp = reduce_cell_depth(reduce_cell_depth(toks));
+            tmp = cellfun(@str2num, tmp);
+            % anything below 1E-12 is considered numerical noise and set to zero.
+            tmp(abs(tmp) < 1E-12) = 0;
+            % using the definition e^(yx) where y= alpha + ibeta.
+            % alpha is the attenuation constant
+            % beta is the phase constant or propagation constant.
+            lg.alpha{hs} = tmp(:,2);
+            lg.beta{hs} = tmp(:,1);
+            lg.cutoff{hs} = tmp(:,3);
+        else
+            lg.alpha{hs} = NaN;
+            lg.beta{hs} = NaN;
+            lg.cutoff{hs} = NaN;
+        end %if
+    else
+        lg.alpha{hs} = NaN;
+        lg.beta{hs} = NaN;
+        lg.cutoff{hs} = NaN;
+    end %if
 end
 lg.port_name = port_name;
 
