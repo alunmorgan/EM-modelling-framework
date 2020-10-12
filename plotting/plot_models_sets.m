@@ -10,11 +10,12 @@ if strcmp(p.Results.skip_plotting, 'skip')
 elseif strcmp(p.Results.skip_plotting, 'no_skip')
     override = 1;
 end %if
-[report_root, names, analysis_library] = analysis_model_settings_library;
+load_local_paths
+[names, analysis_library] = analysis_model_settings_library;
 ppi = analysis_settings;
 
 for nw = 1:length(model_sets)
       mse = strcmp(names, model_sets{nw}) == 1;
     input_settings = analysis_library{mse};
-    plot_model(report_root, ppi, input_settings, override);
+    plot_model(results_loc, ppi, input_settings, override);
 end %for

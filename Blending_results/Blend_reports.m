@@ -3,10 +3,10 @@ function Blend_reports(sets, chosen_wake_lengths, frequency_display_limit)
 %generate a summary comparison report.
 %
 % Example: Blend_reports(results_loc, chosen_wake_length, frequency_display_limit)
-[report_root, ~, ~] = analysis_model_settings_library;
+load_local_paths
 
 for jse = 1:length(sets)
-    results_loc = fullfile(report_root, sets{jse});
+    results_loc = fullfile(results_loc, sets{jse});
     [names,~] = dir_list_gen(results_loc, 'dirs', 1);
     %select only those folders whos names start with the base name.
     [~,name_common,~] = fileparts(results_loc);
