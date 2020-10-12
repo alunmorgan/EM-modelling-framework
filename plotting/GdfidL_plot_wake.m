@@ -59,7 +59,11 @@ cut_freq_ind = find(wake_data.frequency_domain_data.f_raw*1E-9 < graph_freq_lim,
 % power_dist_ind = find(wake_data.frequency_domain_data.f_raw > 9E9, 1,'First');
 cut_time_ind = find_data_end(wake_data.time_domain_data.timebase, wake_sweep_vals(chosen_wake_ind));
 % location and size of the default figures.
-fig_pos = [10000 678 560 420];
+fig_width = 800;
+fig_height = 600;
+fig_left = 10560 - fig_width;
+fig_bottom = 1098 - fig_height;
+fig_pos = [fig_left fig_bottom fig_width fig_height];
 
 % Set the level vector to show the total energy loss on graphs (nJ).
 y_lev_t = [wake_data.time_domain_data.loss_from_beam *1e9,...
