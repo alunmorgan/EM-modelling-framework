@@ -25,24 +25,27 @@ end %if
 %% Cumulative total energy.
 if ~all(isnan(timebase_port)) && ~all(isnan(port_cumsum))
     ax(4) = axes('Parent', h_wake);
-    plot(timebase_cs(1:cut_time_ind), e_total_cs(1:cut_time_ind),'b','LineWidth',lw, 'Parent', ax(4))
-    graph_add_horizontal_lines(y_lev_t)
-    title('Cumulative Energy seen at all ports', 'Parent', ax(4))
-    xlabel('Time (ns)', 'Parent', ax(4))
-    ylabel('Cumulative Energy (nJ)', 'Parent', ax(4))
-    xlim([0 timebase_cs(end)])
-    text(timebase_cs(cut_time_ind), y_lev_t(1), '100%')
-    fr = (e_total_cs(cut_time_ind) / y_lev_t(1)) *100;
-    text(timebase_cs(cut_time_ind), e_total_cs(end), [num2str(round(fr)),'%'])
+    if ~isempty(cut_time_ind)
+        plot(timebase_cs(1:cut_time_ind), e_total_cs(1:cut_time_ind),'b','LineWidth',lw, 'Parent', ax(4))
+        graph_add_horizontal_lines(y_lev_t)
+        title('Cumulative Energy seen at all ports', 'Parent', ax(4))
+        xlabel('Time (ns)', 'Parent', ax(4))
+        ylabel('Cumulative Energy (nJ)', 'Parent', ax(4))
+        xlim([0 timebase_cs(end)])
+        text(timebase_cs(cut_time_ind), y_lev_t(1), '100%')
+        fr = (e_total_cs(cut_time_ind) / y_lev_t(1)) *100;
+        text(timebase_cs(cut_time_ind), e_total_cs(end), [num2str(round(fr)),'%'])
+    end %if
     savemfmt(h_wake, path_to_data,'cumulative_total_energy')
     clf(h_wake)
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %% Cumulative energy seen at each port.
     ax(5) = axes('Parent', h_wake);
     hold(ax(5), 'all')
+    cport_cols = col_gen(length(port_names));
     for ens = 1:length(port_names)
         plot(timebase_cs(1:cut_time_ind), e_ports_cs(1:cut_time_ind, ens),...
-            'Color',col_gen(ens),'LineWidth',lw, 'LineStyle', l_st{1}, ...
+            'Color',cport_cols(ens,:),'LineWidth',lw, 'LineStyle', l_st{1}, ...
             'Parent', ax(5), 'DisplayName', regexprep(port_names{ens},'_',' '))
     end %for
     hold(ax(5), 'off')
