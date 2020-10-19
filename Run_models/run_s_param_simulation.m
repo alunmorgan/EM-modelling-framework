@@ -1,6 +1,6 @@
 function run_s_param_simulation(paths, modelling_inputs, ow_behaviour, stl_flag)
-% Takes the geometry specification, adds the setup for a wake simulation and
-% runs a wake field simulation with the desired calculational precision.
+% Takes the geometry specification, adds the setup for any s-parameter simulations and
+% runs a series of s-parameter simulations over the requested frequency ranges.
 %
 % paths (structure) : Contains all the paths and file locations.
 % modelling_inputs (structure): Contains the setting for a specific modelling run.
@@ -26,14 +26,15 @@ skip = 0;
 results_storage_location = fullfile(paths.storage_path, modelling_inputs.model_name);
 if exist(fullfile(results_storage_location, 's_parameters'),'dir')
     if nargin ==3 && strcmp(ow_behaviour, 'no_skip')
-        old_store = ['old_data', datestr(now,30)];
-        mkdir(results_storage_location, old_store)
-        movefile(fullfile(results_storage_location, 's_parameters'),...
-            fullfile(results_storage_location, old_store))
-        disp(['S-parameter data already exists for ',...
-            modelling_inputs.model_name, ...
-            '. However the overwrite flag is set so the simulation will be run anyway. Old data moved to ',...
-            fullfile(results_storage_location, old_store)])
+            archive_old_data(results_storage_location, modelling_inputs.model_name, 's_parameters')
+%         old_store = ['old_data', datestr(now,30)];
+%         mkdir(results_storage_location, old_store)
+%         movefile(fullfile(results_storage_location, 's_parameters'),...
+%             fullfile(results_storage_location, old_store))
+%         disp(['S-parameter data already exists for ',...
+%             modelling_inputs.model_name, ...
+%             '. However the overwrite flag is set so the simulation will be run anyway. Old data moved to ',...
+%             fullfile(results_storage_location, old_store)])
     else
         disp(['Skipping ', modelling_inputs.model_name, '. S-parameter data already exists'])
         skip = 1;
