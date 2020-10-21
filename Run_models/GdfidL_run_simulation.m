@@ -34,18 +34,18 @@ if run_sim == 1
     f_range = 1.3E9:5E7:1.9E9; % FIXME This needs to become a parameter
     if strcmp(sim_type, 's_parameter')
         active_port_inds = find(modelling_inputs.port_multiple ~= 0);
-        active_port_inds = active_port_inds(3:end); % removing the beam ports form the list.
+        active_port_inds = active_port_inds(3:end); % removing the beam ports from the list.
         active_ports = modelling_inputs.ports(active_port_inds);
-        if strcmpi(modelling_inputs.model_name(end-3:end), 'Base')
-            s_sets = length(modelling_inputs.s_param);
-            n_cycles = length(active_ports) * s_sets;
-            sparameter_set = repmat(1:s_sets, length(active_ports),1);
-            sparameter_set = sparameter_set(:);
-            active_ports = repmat(active_ports, 1, s_sets);
-        else
-            n_cycles = length(active_ports);
-            sparameter_set = ones(length(active_ports),1);
-        end %if
+        %         if strcmpi(modelling_inputs.model_name(end-3:end), 'Base')
+        s_sets = length(modelling_inputs.s_param);
+        n_cycles = length(active_ports) * s_sets;
+        sparameter_set = repmat(1:s_sets, length(active_ports),1);
+        sparameter_set = sparameter_set(:);
+        active_ports = repmat(active_ports, 1, s_sets);
+        %         else
+        %             n_cycles = length(active_ports);
+        %             sparameter_set = ones(length(active_ports),1);
+        %         end %if
     elseif strcmp(sim_type, 'shunt')
         n_cycles = length(f_range);
         for hew = 1:n_cycles
