@@ -15,7 +15,7 @@ plot_s_param_graph(pp_data, cols_sep, fig_pos, pth, lower_cutoff, linewidth)
 
 if size(pp_data.all_ports,1) > 3
     % Only generate the transmission graphs if there is more than 1 signal port.
-    plot_s_param_transmission_graphs_modes(pp_data, cols_sep, lines, fig_pos, pth, lower_cutoff, linewidth)
+    plot_s_param_transmission_graphs_modes(pp_data, cols_sep, lines, fig_pos, pth, lower_cutoff, linewidth) % START HERE
 end %if
 
 if size(pp_data.all_ports,1) > 3
