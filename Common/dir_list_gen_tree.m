@@ -7,57 +7,60 @@ function [a ,dir_paths] =dir_list_gen_tree(root_dir, type, quiet)
 %
 % Example: [a dir_paths] =dir_list_gen_tree(root_dir, 'png', 1)
 
+a = {};
+dir_paths = {};
+
+
 if nargin < 3
     quiet = 0;
 end
 
-if strcmp(root_dir(end-1),':')==0
-    if strcmp(root_dir(end),'\') == 1 | strcmp(root_dir(end),'/') == 1
-        root_dir = root_dir(1:end-1);
-    end %if
-end%if
+if strcmp(root_dir(end), filesep) == 1 & strcmp(root_dir(end-1),':')==0
+    root_dir = root_dir(1:end-1);
+end %if
 
-% returns a list of files in the current directory
-[full_name]=dir_list_gen(root_dir,type, quiet);
-sub_dir = sub_directories(root_dir);
-if isempty(full_name) == 1 && isempty(sub_dir) == 1
-    a = {};
-    dir_paths = {};
+% returns a list of files of the requested type in the current directory.
+full_names = dir_list_gen(root_dir,type, quiet);
+% returns a list of directories in the current directory.
+[sub_dir,~] = dir_list_gen(root_dir, 'dirs', quiet);
+
+
+if isempty(full_names) == 1 && isempty(sub_dir) == 1
     return
-end
+end %if
 
 if isempty(sub_dir) == 0
     for sejh = 1:length(sub_dir)
         sub_dir_path = fullfile(root_dir, sub_dir{sejh});
-        % check if there is substructure
-        if isempty(sub_directories(root_dir))==0
-            %         if so recursively call itself
-            full_name_sub = dir_list_gen_tree(sub_dir_path,type, quiet);
-        end
-        if isempty(full_name_sub) == 0
-            if isempty(full_name) == 0
-                full_name = cat(1,full_name,full_name_sub);
+        % recursively call itself
+        full_names_sub = dir_list_gen_tree(sub_dir_path, type, quiet);
+        if isempty(full_names_sub) == 0
+            if isempty(full_names) == 0
+                full_names = cat(1,full_names, full_names_sub);
             else
-                full_name = full_name_sub;
-            end
-        end
-    end
-end
-if isempty(full_name) == 1
-    a = {};
-    dir_paths = {};
+                full_names = full_names_sub;
+            end %if
+        end %if
+    end %for
+end %if
+
+if isempty(full_names) == 1
     return
-end
-for pao =1:size(full_name,1)
-    [pathstr,name,ext] = fileparts(full_name{pao}); 
-    dir_paths{pao} = pathstr;
-    f_names{pao} = [name, ext];
-end
+end %if
+
+dir_paths = cell(size(full_names,1));
+f_names = cell(size(full_names,1));
+for pao =1:size(full_names,1)
+    nmd = full_names{pao};
+    ks = find(nmd == filesep,1,'last');
+    dir_paths{pao} = nmd(1:ks);
+    f_names{pao} = nmd(ks+1:end);
+end %for
 dir_paths = dir_paths';
 f_names = f_names';
 if nargout == 1
     % making the file path absolute
-    a = full_name;
+    a = full_names;
 elseif nargout == 2
     a = f_names;
 else
