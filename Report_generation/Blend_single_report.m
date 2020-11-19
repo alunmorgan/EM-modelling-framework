@@ -1,8 +1,4 @@
-function Blend_single_report(report_input, chosen_wake_length, frequency_display_limit)
-
-if ~exist(report_input.output_loc, 'dir')
-    mkdir(report_input.output_loc)
-end %if
+function Blend_single_report(report_input, chosen_wake_length)
 
 [~, base_name, ~] = fileparts(report_input.source_path);
     % replace all spaces with _ as latex has problems with spaces.
@@ -100,7 +96,7 @@ if exist('loss_names', 'var') == 2
     ov = cat(1,ov,ov1);
 end %if
 %%%%%%%%%%%%%%%%%%% Energy and Wakes section %%%%%%%%%%%%%%%%%%%%%%%%%%
-Blend_figs(report_input, 'wake', chosen_wake_length, frequency_display_limit);
+% Blend_figs(report_input, 'wake', chosen_wake_length, frequency_display_limit);
 ov = cat(1,ov,'\chapter{Energy and wakes}');
 ov = cat(1,ov,['The wake loss factor is an indicator of energy loss ',...
     'from the beam. A higher value means more loss']);

@@ -7,4 +7,8 @@ wls = wakelength / 3e8; % convert to seconds.;
 % find the index of time zero (the data may start at negative time).
 zero_ind = find(diff(sign(timebase))~=0);
 timestep = abs(timebase(2) - timebase(1));
-ind = floor(wls / timestep) + zero_ind;
+if isempty(zero_ind)
+    ind = floor(wls / timestep);
+else
+    ind = floor(wls / timestep) + zero_ind;
+end %if

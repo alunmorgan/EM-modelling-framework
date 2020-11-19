@@ -36,7 +36,7 @@ Bunch_loss_energy_spectrum = pwr_f  .* simulation_time;
 pwr = sum(pwr_f);
 % multiply the power for an infinite train by the simulation time in
 % order to get the energy in one simulation run, i.e.1 bunch.
-Total_bunch_energy_loss = pwr * simulation_time;
+Total_bunch_energy_loss = pwr ./ 2 .* simulation_time;
 
 % Wake loss factor is V/C or J/C^2
 wake_loss_factor =   Total_bunch_energy_loss;
@@ -54,15 +54,7 @@ if isnan(port_impedances)
     Total_energy_from_signal_ports  = NaN;
     Total_energy_from_all_ports = NaN;
 else
-%     port_spectra = port_impedances .* repmat(abs(bunch_spec).^2,[1,size(port_impedances,2)]);
     raw_port_energy_spectrum = abs(port_fft .^ 2) .* simulation_time;
-    % The port multiple is to account for the 'missing ports due to the symetry
-    % planes in the model.
-%     raw_port_energy_spectrum = squeeze(port_spectra);% .*...
-%         repmat(port_multiple,[size(port_spectra,1),1]));
-% the port spectrum includes the model charge so additional scaling is not
-% necessary.
-%     raw_port_energy_spectrum =  raw_port_energy_spectrum  * simulation_time;   
     beam_port_spectrum = sum(raw_port_energy_spectrum(:,1:2),2);
     signal_port_spectrum = sum(raw_port_energy_spectrum(:,3:end),2);
     Total_port_spectrum = sum(raw_port_energy_spectrum,2);

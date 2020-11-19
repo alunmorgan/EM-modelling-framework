@@ -1,4 +1,4 @@
-function construct_s_param_gdf_file(modelling_inputs, port_name)
+function construct_s_param_gdf_file(modelling_inputs, port_name, sparameter_set)
 % Write the input gdf file for an S-paramter simulation of the requested
 % model.
 %
@@ -44,24 +44,15 @@ mesh_fixed_planes = gdf_write_mesh_fixed_planes(modelling_inputs.beam_offset_x, 
     modelling_inputs.beam_offset_y);
 data = create_model_data_file_for_STL(modelling_inputs);
 
-% FIXME this assumes one port per side.
-if modelling_inputs.geometry_fraction == 1
-    port_defs = gdf_write_port_definitions( modelling_inputs.ports,...
-        modelling_inputs.port_location, modelling_inputs.port_modes);
-elseif modelling_inputs.geometry_fraction == 0.5
-    port_defs = gdf_write_port_definitions( modelling_inputs.ports(1:3),...
-        modelling_inputs.port_location(1:3), modelling_inputs.port_modes(1:3));
-elseif modelling_inputs.geometry_fraction == 0.25
-    port_defs = gdf_write_port_definitions( modelling_inputs.ports(1:2),...
-        modelling_inputs.port_location(1:2), modelling_inputs.port_modes(1:2));
-else
-    error('invalid geometry fraction')
-end %if
+port_selection = modelling_inputs.port_multiple ~=0;
+port_defs = gdf_write_port_definitions( modelling_inputs.ports,...
+    modelling_inputs.port_location, modelling_inputs.port_modes, port_selection);
 
 mon = gdf_s_param_monitor_construction(port_name,...
-    modelling_inputs.s_param_excitation_f, ...
-    modelling_inputs.s_param_excitation_bw, ...
-    modelling_inputs.s_param_tmax);
+    modelling_inputs.s_param{sparameter_set}.excitation_f, ...
+    modelling_inputs.s_param{sparameter_set}.excitation_bw, ...
+    modelling_inputs.s_param{sparameter_set}.excitation_amp, ...
+    modelling_inputs.s_param{sparameter_set}.tmax);
 % construct the full input file.
 data = cat(1,fs, modelling_inputs.defs', geom, mesh_def, mesh_fixed_planes,...
     data, port_defs, mon);

@@ -1,16 +1,50 @@
 function [param_names, param_vals, good_data, modelling_inputs] = params_in_simulation(simulation_name)
 good_data = 1;
 if exist(fullfile(simulation_name, 'wake'),'dir') == 7
-    load(fullfile(simulation_name,'wake','run_inputs.mat'), 'modelling_inputs')
-    load(fullfile(simulation_name, 'wake', 'data_from_run_logs.mat'), 'run_logs')
+    if exist(fullfile(simulation_name, 'wake','run_inputs.mat'), 'file') == 2
+        load(fullfile(simulation_name,'wake','run_inputs.mat'), 'modelling_inputs')
+    else
+        warning(['missing modelling_inputs for ', simulation_name])
+        good_data = 0;
+        param_names = {NaN};
+        param_vals = {NaN};
+        modelling_inputs = NaN;
+        return
+    end %if
+    if exist(fullfile(simulation_name, 'wake','data_from_run_logs.mat'), 'file') == 2
+        load(fullfile(simulation_name, 'wake', 'data_from_run_logs.mat'), 'run_logs')
+    else
+        warning(['missing data files for ', simulation_name])
+        good_data = 0;
+        param_names = {NaN};
+        param_vals = {NaN};
+        return
+    end %if
 elseif exist(fullfile(simulation_name, 's_parameter'),'dir') == 7
-    load(fullfile(simulation_name, 's_parameter', 'data_from_run_logs.mat'), 'run_logs')
-    load(fullfile(simulation_name,'s_parameter','run_inputs.mat'), 'modelling_inputs')
+    if exist(fullfile(simulation_name, 's_parameter','run_inputs.mat'), 'file') == 2
+        load(fullfile(simulation_name,'s_parameter','run_inputs.mat'), 'modelling_inputs')
+    else
+        warning(['missing modelling_inputs for ', simulation_name])
+        good_data = 0;
+        param_names = {NaN};
+        param_vals = {NaN};
+        modelling_inputs = NaN;
+        return
+    end %if
+    if exist(fullfile(simulation_name, 's_parameter','data_from_run_logs.mat'), 'file') == 2
+        load(fullfile(simulation_name, 's_parameter', 'data_from_run_logs.mat'), 'run_logs')
+    else
+        warning(['missing data files for ', simulation_name])
+        good_data = 0;
+        param_names = {NaN};
+        param_vals = {NaN};
+        return
+    end %if
 else
-    warning(['No data files found for ', simulation_name])
+    warning(['No data folder found for ', simulation_name])
     good_data = 0;
-    param_names = NaN;
-    param_vals = NaN;
+    param_names = {NaN};
+    param_vals = {NaN};
     return
 end %if
 [sim_param_names_tmp, sim_param_vals_tmp, ...

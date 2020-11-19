@@ -1,4 +1,7 @@
 function plot_s_param_transmission_graphs_modes(pp_data, cols, lines, fig_pos, pth, lower_cutoff, linewidth)
+
+sets = (unique(pp_data.set));
+
 h = figure('Position',fig_pos);
 ax = axes('Parent', h);
 
@@ -40,6 +43,15 @@ for law = 1:length(sets)
             end %if
         end %for
     end %for
+    
+    legend(ax, 'Location', 'EastOutside')
+    ylim([lower_cutoff 0])
+    xlabel('Frequency (GHz)')
+    ylabel('S parameters (dB)')
+    title('Transmission')
+    % xlim(ppi.display_range)
+    savemfmt(h, fullfile(pth, ['set_', sets{nsz}]),'s_parameters_transmission_mode_1')
+    clf(h);
 end %for
 
 legend(ax, 'Location', 'EastOutside')

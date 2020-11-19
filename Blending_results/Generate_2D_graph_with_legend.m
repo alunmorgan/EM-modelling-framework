@@ -1,10 +1,10 @@
-function Generate_2D_graph_with_legend(report_input, data, cols, l_st)
+function Generate_2D_graph_with_legend(graph_metadata, data, cols, l_st)
 h1 = figure('Position', [ 0 0 1000 400]);
 ax1 = axes('Parent', h1);
 hold(ax1, 'on')
 
-variation_data = data(~contains(report_input.sources, '_Base'));
-swept_vals = report_input.swept_vals(~contains(report_input.sources, '_Base'));
+variation_data = data(~contains(graph_metadata.sources, '_Base'));
+swept_vals = graph_metadata.swept_vals(~contains(graph_metadata.sources, '_Base'));
 ls_tk = 1;
 for en = 1:length(variation_data)
     if isfield(variation_data(en), 'xdata') && ~isempty(variation_data(en).xdata)
@@ -20,8 +20,8 @@ for en = 1:length(variation_data)
     end %if
     %     leg{en} = swept_vals{en};
 end %for
-base_data = data(contains(report_input.sources, '_Base'));
-base_vals = report_input.swept_vals(contains(report_input.sources, '_Base'));
+base_data = data(contains(graph_metadata.sources, '_Base'));
+base_vals = graph_metadata.swept_vals(contains(graph_metadata.sources, '_Base'));
 if isfield(base_data, 'xdata') && ~isempty(base_data.xdata)
     plot(base_data.xdata, base_data.ydata,...%'linestyle',l_st{1},...
         'Color',cols{1}, 'linewidth',data(en).linewidth, 'Parent', ax1, 'DisplayName', base_vals{1});
@@ -50,9 +50,9 @@ setup_graph_for_display(ax1, xlims,...
     [-1,0], [0,data(1).islog,0], ...
     data(1).Xlab, data(1).Ylab,...
     '',...
-    regexprep([report_input.swept_name{1}, ' - sweep'], '_', ' '));
+    regexprep([graph_metadata.swept_name{1}, ' - sweep'], '_', ' '));
 legend(ax1, 'Location', 'EastOutside', 'Box', 'off')
 % save 2D graph
-[~, model_name] = fileparts(report_input.output_loc);
-savemfmt(h1, report_input.output_loc, [model_name, ' - ', data(1).out_name])
+[~, model_name] = fileparts(graph_metadata.output_loc);
+savemfmt(h1, graph_metadata.output_loc, [model_name, ' - ', data(1).out_name])
 close(h1)
