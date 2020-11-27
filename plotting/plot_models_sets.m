@@ -3,6 +3,7 @@ function plot_models_sets(model_sets, varargin)
 p = inputParser;
    addRequired(p,'model_sets',@iscell);
    addOptional(p,'skip_plotting','skip',@ischar);
+   addOptional(p,'plotting_types',{'all'},@iscell);
 parse(p, model_sets, varargin{:});
 
 if strcmp(p.Results.skip_plotting, 'skip')
@@ -17,5 +18,5 @@ ppi = analysis_settings;
 for nw = 1:length(model_sets)
       mse = strcmp(names, model_sets{nw}) == 1;
     input_settings = analysis_library{mse};
-    plot_model(results_loc, ppi, input_settings, override);
+    plot_model(results_loc, ppi, input_settings, override, p.Results.plotting_types);
 end %for
