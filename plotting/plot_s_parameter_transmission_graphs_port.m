@@ -22,8 +22,8 @@ for law = 1:length(sets)
                             x_data = temp_scale{es,n}(mode,1:end-2) * 1e-9;
                             y_data = 20* log10(temp_data{es,n}(mode,1:end-2));
                             % Trimming off the end 10% as this often contains artifacts.
-                start_ind = ceil(length(x_data)/10);
-                final_ind = floor(length(x_data) - length(x_data) /10);
+                            start_ind = ceil(length(x_data)/10);
+                            final_ind = floor(length(x_data) - length(x_data) /10);
                             if min(y_data) < min_y(s_in)
                                 min_y(s_in) = min(y_data);
                             end %if
@@ -47,6 +47,9 @@ for ke = 1:length(pp_data.all_ports)
     if ishandle(h(ke))
         figure(h(ke))
         legend('Location', 'EastOutside')
+        if min_y(ke) == 0
+            min_y(ke) = -1;
+        end %if
         ylim([min_y(ke) 0])
         xlabel('Frequency (GHz)')
         ylabel('S parameters (dB)')

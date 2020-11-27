@@ -43,19 +43,13 @@ for law = 1:length(sets)
             end %if
         end %for
     end %for
-    
-    legend(ax, 'Location', 'EastOutside')
-    ylim([lower_cutoff 0])
-    xlabel('Frequency (GHz)')
-    ylabel('S parameters (dB)')
-    title('Transmission')
-    % xlim(ppi.display_range)
-    savemfmt(h, fullfile(pth, ['set_', sets{nsz}]),'s_parameters_transmission_mode_1')
-    clf(h);
 end %for
 
 legend(ax, 'Location', 'EastOutside')
 set(legend, 'NumColumns', 2)
+if min_y == 0
+    min_y = -1;
+end %if
 ylim([min_y 0])
 xlabel('Frequency (GHz)')
 ylabel('S parameters (dB)')
