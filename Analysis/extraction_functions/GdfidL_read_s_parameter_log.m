@@ -10,7 +10,12 @@ for js = 1:length(freq_folders)
     [~, f_name, ~] = fileparts(freq_folders{js});
     log_file =  fullfile(freq_folders{js},'model_log');
     %% read in the file put the data into a cell array.
+    if exist(log_file, 'file') == 2 
     data = read_in_text_file(log_file);
+    else
+        warning(['Missing log file in ' freq_folders{js}]);
+        continue
+    end %if
     
     %% Remove the commented out parts of the input file
     cmnt_ind = find_position_in_cell_lst(regexp(data,'.*>\W*#'));
@@ -141,11 +146,11 @@ for js = 1:length(freq_folders)
     % find the solver time
     wall_time_ind = find_position_in_cell_lst(strfind(data,'Wall Clock Time:'));
     if ~isempty(wall_time_ind)
-        wall_time = regexp(data{wall_time_ind(end)},'.*Wall Clock Time\s*:\s*(\d+)\s*Seconds\s*,\s+diff:\s+[0-9]+\s*,\s*[A-Z]Flop/s\s*:\s+\d+.*\d+', 'tokens');
+        wall_time = regexp(data{wall_time_ind(end)},'.*Wall Clock Time\s*:\s*(\d+)\s*Seconds\s*,\s+diff:\s+[-]*[0-9]+\s*,\s*[A-Z]Flop/s\s*:\s+\d+.*\d+', 'tokens');
         wall_time = find_val_in_cell_nest(wall_time);
         log.wall_time = str2num(wall_time);
         for hse = 1:length(wall_time_ind)
-            wall_rate = regexp(data{wall_time_ind(hse)},'.*Wall Clock Time\s*:\s*\d+\s*Seconds\s*,\s+diff:\s+[0-9]+\s*,\s*([A-Z])Flop/s\s*:\s+(\d+.*\d+)', 'tokens');
+            wall_rate = regexp(data{wall_time_ind(hse)},'.*Wall Clock Time\s*:\s*\d+\s*Seconds\s*,\s+diff:\s+[-]*[0-9]+\s*,\s*([A-Z])Flop/s\s*:\s+(\d+.*\d+)', 'tokens');
             wall_rate = wall_rate{1};
             wall_multiplier = wall_rate{1};
             wall_rate = str2num(wall_rate{2});

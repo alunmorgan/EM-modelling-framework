@@ -22,7 +22,11 @@ all_ports = regexprep(temp, 'Port=','');
 
 for osw = 1:length(s_names)
     data_directory = fullfile(pth, s_names{osw});
-s_parameter_output_directory = fullfile('pp_link', 's_parameter', s_names{osw});
+    s_parameter_output_directory = fullfile('pp_link', 's_parameter', s_names{osw});
+    if exist(fullfile(data_directory,'model_log'), 'file') ~= 2
+        warning(['Missing log file in ' data_directory]);
+        continue
+    end %if
     [~] = system(['mkdir ', s_parameter_output_directory]);
     copyfile(fullfile(data_directory,'model.gdf'),...
         fullfile(s_parameter_output_directory, 'model.gdf'));
@@ -37,24 +41,14 @@ s_parameter_output_directory = fullfile('pp_link', 's_parameter', s_names{osw});
     excite = excite{1}{1};
     s_set = regexp([pth, s_names{osw}], 'set_(.*)_port_.*_excitation', 'tokens');
     s_set = s_set{1}{1};
-%     s_parameter_output_directory = fullfile('pp_link', 's_parameter',['model_s_param_set_',s_set,'_',excite,'_post_processing']);
-
     s_port{osw} = excite;
     set{osw} = s_set;
     pp_s_input_file = GdfidL_write_pp_s_param_input_file(s_set, excite);
     write_out_data(pp_s_input_file, fullfile(s_parameter_output_directory ,['model_s_param_set_',s_set, '_',excite,'_post_processing_input_file']) )
     
     postprocess_core(s_parameter_output_directory, modelling_inputs.version, 's_parameter', s_set, excite);
-    %     temp_files('make')
-    %     [~]=system(['gd1.pp < ', ...
-    %         fullfile(s_parameter_output_directory, ['model_s_param_',excite,'_post_processing_input_file']), ' > ',...
-    %         fullfile(s_parameter_output_directory, ['model_s_param_',excite,'_post_processing_log'])]);
-    %     %% find the location of all the required output files
     s_mat = GdfidL_find_s_parameter_ouput(s_parameter_output_directory);
     [s_scale(osw,:),  s_data(osw,:)] = read_s_param_datafiles(s_mat);
-    %     temp_files('remove')
-    %     delete('POSTP-LOGFILE');
-    %     delete('WHAT-PP-DID-SPIT-OUT');
 end
 
 s_parameter_data.all_ports = all_ports;
