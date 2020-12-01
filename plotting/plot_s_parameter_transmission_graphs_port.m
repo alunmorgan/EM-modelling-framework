@@ -1,4 +1,4 @@
-function plot_s_parameter_transmission_graphs_port(pp_data, cols, lines, fig_pos, pth, lower_cutoff, linewidth)
+function plot_s_parameter_transmission_graphs_port(pp_data, beam_present, cols, lines, fig_pos, pth, lower_cutoff, linewidth)
 
 mode=1;
 sets = unique(pp_data.set);
@@ -18,24 +18,10 @@ for law = 1:length(sets)
             if ~isempty(temp_data{es,n})
                 if max(20* log10(temp_data{es,n}(1,1:end-2))) > lower_cutoff
                     if s_in ~= n
-                        if n ~= 1 && n ~= 2 % dont show the beam pipe ports.
-                            x_data = temp_scale{es,n}(mode,1:end-2) * 1e-9;
-                            y_data = 20* log10(temp_data{es,n}(mode,1:end-2));
-                            % Trimming off the end 10% as this often contains artifacts.
-                            start_ind = ceil(length(x_data)/10);
-                            final_ind = floor(length(x_data) - length(x_data) /10);
-                            if min(y_data) < min_y(s_in)
-                                min_y(s_in) = min(y_data);
-                            end %if
-                            hl = plot(x_data(start_ind:final_ind), y_data(start_ind:final_ind),...
-                                'Linestyle',lines{rem(n,length(lines))+1},...
-                                'Color', cols{rem(s_in,length(cols))+1},...
-                                'LineWidth',  linewidth,...
-                                'DisplayName', strcat('S',num2str(n), num2str(s_in), '(1)'));
-                            if law > 1
-                                set(get(get(hl,'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
-                            end %if
-                            hold all;
+                        if strcmp(beam_present, 'yes') && n ~= 1 && n ~= 2 % dont show the beam pipe ports.
+                            min_y = add_data_to_transmission_port_graph(temp_scale, temp_data, mode, min_y, lines, cols, linewidth, es, n, s_in, law);
+                        elseif strcmp(beam_present, 'no')
+                            min_y = add_data_to_transmission_port_graph(temp_scale, temp_data, mode, min_y, lines, cols, linewidth, es, n, s_in, law);
                         end %if
                     end %if
                 end %if
@@ -58,3 +44,25 @@ for ke = 1:length(pp_data.all_ports)
         close(h(ke))
     end %if
 end %for
+end %function
+
+function min_y = add_data_to_transmission_port_graph(temp_scale, temp_data, mode, min_y, lines, cols, linewidth, es, n, s_in, law)
+hold on
+x_data = temp_scale{es,n}(mode,1:end-2) * 1e-9;
+y_data = 20* log10(temp_data{es,n}(mode,1:end-2));
+% Trimming off the end 10% as this often contains artifacts.
+start_ind = ceil(length(x_data)/10);
+final_ind = floor(length(x_data) - length(x_data) /10);
+if min(y_data) < min_y(s_in)
+    min_y(s_in) = min(y_data);
+end %if
+hl = plot(x_data(start_ind:final_ind), y_data(start_ind:final_ind),...
+    'Linestyle',lines{rem(n,length(lines))+1},...
+    'Color', cols{rem(s_in,length(cols))+1},...
+    'LineWidth',  linewidth,...
+    'DisplayName', strcat('S',num2str(n), num2str(s_in), '(1)'));
+if law > 1
+    set(get(get(hl,'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
+end %if
+hold off
+end %function
