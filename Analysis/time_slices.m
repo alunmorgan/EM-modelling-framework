@@ -3,7 +3,7 @@ function time_slices = time_slices(timebase, wakepotential, hfoi)
 % independently and track the evolution of the peaks across sections.
 % This allows us to see the decay of resonances over time, and get a Q
 % value for them.
-% 
+%
 % Example time_slices = time_slices(time_domain_data)
 
 
@@ -27,21 +27,28 @@ time_slices.timestep = stepsize;
 if isempty(tmp_fft)
     % usually this happens when the wakepotential is so short that
     % each slice contains only one point.
-    time_slices.peaks = [];
+    time_slices.peaks_start = [];
+    time_slices.peaks_end = [];
 else
     if size(tmp,1) <5
-        time_slices.peaks = [];
+        time_slices.peaks_start = [];
+        time_slices.peaks_end = [];
     else
-        tmp_peaks = findpeaks_n_point(time_slices.fscale,abs(tmp_fft(:,end)),5,5);
-        if isempty(tmp_peaks)
-            time_slices.peaks = [];
+        tmp_peaks_start = findpeaks_n_point(time_slices.fscale,abs(tmp_fft(:,1)),5,5);
+        if isempty(tmp_peaks_start)
+            time_slices.peaks_start = [];
         else
-        time_slices.peaks = ...
-            tmp_peaks(tmp_peaks(:,2)> max(tmp_peaks(:,2)) .* 0.05,:);
+            time_slices.peaks_start = ...
+                tmp_peaks_start(tmp_peaks_start(:,2)> max(tmp_peaks_start(:,2)) .* 0.05,:);
+        end
+        tmp_peaks_end = findpeaks_n_point(time_slices.fscale,abs(tmp_fft(:,end)),5,5);
+        if isempty(tmp_peaks_end)
+            time_slices.peaks_end = [];
+        else
+            time_slices.peaks_end = ...
+                tmp_peaks_end(tmp_peaks_end(:,2)> max(tmp_peaks_end(:,2)) .* 0.05,:);
         end
     end
 end
 
-
-end
 
