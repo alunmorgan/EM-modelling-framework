@@ -6,6 +6,7 @@ for kfn = 1:length(extracted_data)
     names = regexprep(extracted_data{kfn}.model_names, [extracted_data{kfn}.basename '_'], '');
     sweeps = unique(regexprep(names, '_sweep_value_.*', ''));
     sweeps(strcmp(sweeps, 'Base')) = [];
+    sweeps(strncmp(sweeps, 'old_data', 8)) = [];
     sweep_values = regexprep(names, '.*_sweep_value_', '');
     base_ind = contains(names, 'Base');
          makeBaseSummaryTable(extracted_data{kfn}, model_sets{kfn}, results_loc, base_ind)
