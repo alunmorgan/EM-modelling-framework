@@ -41,7 +41,7 @@ for law = 1:length(sets)
                 end %if
             end %for
             if np == 1
-                clf(h(s_in, es))
+%                 clf(h(s_in, es))
                 continue
             end %if
             hold off
