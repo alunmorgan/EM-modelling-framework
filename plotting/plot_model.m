@@ -7,7 +7,7 @@ for ind = 1:length(datasets)
     % location and size of the default figures.
     fig_pos = [10000 678 560 420];
     if isfield(datasets{ind}, 'wake')
-        if contains(p_types, 'wake')
+        if contains(p_types, 'wake') || contains(p_types, 'all')
             if override == 1 || isempty(dir_list_gen(fullfile(datasets{ind}.path_to_data, 'wake'), 'png',1))
                 disp(['Generating wake graphs for ', datasets{ind}.model_name])
                 GdfidL_plot_wake(datasets{ind}.wake, ppi, 1E7, input_settings{4})
@@ -18,7 +18,7 @@ for ind = 1:length(datasets)
     end %if
     
     if isfield(datasets{ind}, 'eigenmode')
-        if contains(p_types, 'eigenmode')
+        if contains(p_types, 'eigenmode')|| contains(p_types, 'all')
             if override == 1 || isempty(dir_list_gen(fullfile(datasets{ind}.path_to_data, 'eigenmode'), 'png',1))
                 disp(['Generating eigenmode graphs for ', datasets{ind}.model_name])
                 GdfidL_plot_eigenmode(datasets{ind}.eigenmode, path_to_data)
@@ -29,7 +29,7 @@ for ind = 1:length(datasets)
     end %if
     
     if isfield(datasets{ind}, 'lossy_eigenmode')
-        if contains(p_types, 'lossy_eigenmode')
+        if contains(p_types, 'lossy_eigenmode')|| contains(p_types, 'all')
             if override == 1 || isempty(dir_list_gen(fullfile(datasets{ind}.path_to_data, 'lossy_eigenmode'), 'png',1))
                 disp(['Generating lossy eigenmode graphs for ', datasets{ind}.model_name])
                 GdfidL_plot_eigenmode_lossy(datasets{ind}.lossy_eigenmode, path_to_data)
@@ -40,7 +40,7 @@ for ind = 1:length(datasets)
     end %if
     
     if isfield(datasets{ind}, 's_parameter')
-        if contains(p_types, 's_parameter')
+        if contains(p_types, 's_parameter')|| contains(p_types, 'all')
             if override == 1 || isempty(dir_list_gen(fullfile(datasets{ind}.path_to_data, 's_parameter'), 'png', 1))
                 disp(['Generating s_parameter graphs for ', datasets{ind}.model_name])
                 GdfidL_plot_s_parameters(datasets{ind}.s_parameter, fig_pos);
@@ -51,7 +51,7 @@ for ind = 1:length(datasets)
     end %if
     
     if isfield(datasets{ind}, 'shunt')
-        if contains(p_types, 'shunt')
+        if contains(p_types, 'shunt')|| contains(p_types, 'all')
             if override == 1 || isempty(dir_list_gen(fullfile(datasets{ind}.path_to_data, 'shunt'), 'png', 1))
                 disp(['Generating shunt graphs for ', datasets{ind}.model_name])
                 GdfidL_plot_shunt(datasets{ind}.shunt)
