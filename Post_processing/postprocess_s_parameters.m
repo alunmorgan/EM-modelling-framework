@@ -16,7 +16,7 @@ creating_space_for_postprocessing(fullfile('pp_link', 's_parameter'), 's_paramet
 % s_names(ind_tmp) = [];
 s_port = cell(length(s_names),1);
 % finding the names of all the ports.
-[temp, ~]  = dir_list_gen([pth, s_names{1}], '', 1);
+[temp, ~]  = dir_list_gen([pth, s_names{1}], 'dirs', 1);
 temp = temp( find_position_in_cell_lst((strfind(temp, 'Port='))));
 all_ports = regexprep(temp, 'Port=','');
 
