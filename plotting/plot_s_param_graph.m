@@ -1,4 +1,4 @@
-function plot_s_param_graph(pp_data, cols_sep, fig_pos, pth, lower_cutoff, linewidth)
+function plot_s_param_graph(pp_data, beam_present, cols_sep, fig_pos, pth, lower_cutoff, linewidth)
 % plots the s parameter results.
 %
 % Example: plot_s_param_graph(s, cols_sep, fig_pos, pth)
@@ -41,7 +41,7 @@ for law = 1:length(sets)
                 end %if
             end %for
             if np == 1
-                clf(h(s_in, es))
+%                 clf(h(s_in, es))
                 continue
             end %if
             hold off
@@ -54,7 +54,12 @@ for law = 1:length(sets)
         end %for
     end %for
 end %for
-for fe = 3:size(h,1)
+if strcmp(beam_present, 'no')
+    start_port = 1;
+else
+    start_port = 3;
+end %if
+for fe = start_port:size(h,1)
     for js = 1:size(h,2)
             savemfmt(h(fe, js), pth,['s_parameters_S',num2str(fe),num2str(js)])
         close(h(fe, js))

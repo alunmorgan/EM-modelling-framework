@@ -48,20 +48,16 @@ if isempty(full_names) == 1
     return
 end %if
 
-dir_paths = cell(size(full_names,1));
-f_names = cell(size(full_names,1));
-for pao =1:size(full_names,1)
-    nmd = full_names{pao};
-    ks = find(nmd == filesep,1,'last');
-    dir_paths{pao} = nmd(1:ks);
-    f_names{pao} = nmd(ks+1:end);
-end %for
-dir_paths = dir_paths';
-f_names = f_names';
 if nargout == 1
     % making the file path absolute
     a = full_names;
 elseif nargout == 2
+    dir_paths = cell(size(full_names,1), 1);
+    f_names = cell(size(full_names,1), 1);
+    for pao =1:size(full_names,1)
+        [dir_paths{pao}, f_names_t,ext] = fileparts(full_names{pao});
+        f_names{pao} = [f_names_t, ext];
+    end %for
     a = f_names;
 else
     error('Wrong number of outputs (should be 1 or 2)')

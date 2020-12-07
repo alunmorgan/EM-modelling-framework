@@ -123,6 +123,9 @@ end %if
 [frequency_scale_wi, wi_re, wi_im] = ...
     extract_longitudinal_wake_impedance_from_wake_data(wake_data, cut_freq_ind);
 
+[peaks, Q, bw] = find_Qs(frequency_scale_wi*1e9, wi_re, 0.1, 'single_sided');
+R_over_Q = peaks(:,2) ./ Q;
+
 [wi_quad_x, wi_quad_y, wi_dipole_x, wi_dipole_y] = ...
     extract_transverse_wake_impedance_from_wake_data(pp_data, wake_data);
 
@@ -141,7 +144,7 @@ end %if
     signal_port_spectrum, port_energy_spectra] = ...
     extract_port_spectra_from_wake_data(pp_data, wake_data, cut_freq_ind);
 
-[frequency_scale_ts, spectra_ts, peaks_ts, n_slices, ...
+[frequency_scale_ts, spectra_ts, peaks_start_ts, peaks_end_ts, n_slices, ...
     slice_length, slice_timestep] =  ...
     extract_time_slice_results_from_wake_data(wake_data);
 
@@ -172,13 +175,38 @@ plot_wake_impedance(h_wake, path_to_data, pp_data, ...
     frequency_scale_wi, wi_re, graph_freq_lim, wi_im, ...
     wi_quad_x, wi_quad_y,wi_quad_x_comp, wi_quad_y_comp,...
     wi_dipole_x, wi_dipole_y,  wi_dipole_x_comp, wi_dipole_y_comp)
-
+ax(09) = axes('Parent', h_wake);
+hold on;
+[~, Q_sort_inds] = sort(Q);
+plot(peaks(:,1)*1E-9, R_over_Q, '*b');
+plot(peaks(Q_sort_inds(1:5),1) * 1E-9, R_over_Q(Q_sort_inds(1:5)), '*r')
+for hs = 1:size(peaks,1)
+    text(peaks(hs,1)*1E-9, R_over_Q(hs), ['Q=',num2str(round(Q(hs)))])
+end %for
+xlabel('Frequency (GHz)')
+ylabel('R/Q')
+hold off
+savemfmt(h_wake, path_to_data, 'R_over_Q_from_wake')
+clf(h_wake)
+ax(10) = axes('Parent', h_wake);
+hold on;
+[~, R_over_Q_sort_inds] = sort(R_over_Q);
+plot(peaks(:,1)*1E-9, Q, '*b');
+plot(peaks(R_over_Q_sort_inds(1:5),1) * 1E-9, Q(R_over_Q_sort_inds(1:5)), '*r')
+for hs = 1:size(peaks,1)
+    text(peaks(hs,1)*1E-9, Q(hs), ['R/Q=',num2str(round(R_over_Q(hs)*10)/10)])
+end %for
+xlabel('Frequency (GHz)')
+ylabel('Q')
+hold off
+savemfmt(h_wake, path_to_data, 'Q_from_wake')
+clf(h_wake)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Port signals
 if isfield(pp_data.port, 'timebase') && ~isnan(wake_data.frequency_domain_data.Total_energy_from_ports)
-plot_port_signals(h_wake, path_to_data, ...
-    cut_time_ind, max_mode, ...
-    dominant_modes,port_names, timebase_port, modes)
+    plot_port_signals(h_wake, path_to_data, ...
+        cut_time_ind, max_mode, ...
+        dominant_modes,port_names, timebase_port, modes)
 end %if
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Extrapolating the wake loss factor for longer bunches.
@@ -447,7 +475,7 @@ clf(h_wake)
 ax(24) = axes('Parent', h_wake);
 if isempty(bws) == 0
     plot(wl,bws, ':*','LineWidth',lw)
-     legend(Q_leg, 'Location', 'EastOutside')
+    legend(Q_leg, 'Location', 'EastOutside')
 end %if
 title({'Change in bandwidth',' over the sweep'})
 xlabel('Wake length (m)')
@@ -478,9 +506,9 @@ clf(h_wake)
 ax(27) = axes('Parent', h_wake);
 plot(frequency_scale_ts, abs(spectra_ts(:,end)), 'DisplayName', 'Data')
 hold(ax(27), 'on')
-for mers = 1:size(peaks_ts,1)
-     leg = [num2str(round(peaks_ts(mers,1) .* 10)./10), ' GHz'];
-    plot(peaks_ts(mers,1), peaks_ts(mers,2),'*r','LineWidth',lw, 'DisplayName', leg)
+for mers = 1:size(peaks_end_ts,1)
+    leg = [num2str(round(peaks_end_ts(mers,1) .* 10)./10), ' GHz'];
+    plot(peaks_ts(mers,1), peaks_end_ts(mers,2),'*r','LineWidth',lw, 'DisplayName', leg)
 end %for
 hold(ax(27), 'off')
 xlabel('Frequency (GHz)')
@@ -490,11 +518,11 @@ savemfmt(h_wake, path_to_data,'time_slices_endfft')
 clf(h_wake)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 ax(28) = axes('Parent', h_wake);
-for wana = 1:size(peaks_ts,1)
+for wana = 1:size(peaks_start_ts,1)
     if wana >1
         hold(ax(28), 'all')
     end %if
-    f_ind = frequency_scale_ts == peaks_ts(wana,1);
+    f_ind = frequency_scale_ts == peaks_start_ts(wana,1);
     %length of a time slice.
     lts = slice_length * slice_timestep;
     num_slices_gap = size(spectra_ts,2);
@@ -502,8 +530,8 @@ for wana = 1:size(peaks_ts,1)
     y1 = log10(abs(spectra_ts(f_ind,end - num_slices_gap +1)));
     y2 = log10(abs(spectra_ts(f_ind,end)));
     tau =  - x2 ./(y2 - y1);
-    Q_graph = pi .* peaks_ts(wana,1)*1E9 .* tau;
-    leg = [num2str(round(peaks_ts(wana,1) .* 10)./10), ' GHz   :Q: ',num2str(round(Q_graph))];
+    Q_graph = pi .* peaks_start_ts(wana,1)*1E9 .* tau;
+    leg = [num2str(round(peaks_start_ts(wana,1) .* 10)./10), ' GHz   :Q: ',num2str(round(Q_graph))];
     semilogy((abs(spectra_ts(f_ind,:))),'LineWidth',lw, 'DisplayName', leg);
     
 end %for
@@ -599,9 +627,9 @@ if ~isnan(energy)
     xlim([minxlim maxxlim])
     title('Energy over time');
     xlabel('Time (ns)')
-%     for ies = 1:length(t_start)
-%         graph_add_background_patch(t_start(ies) * 1E9)
-%     end %for
+    %     for ies = 1:length(t_start)
+    %         graph_add_background_patch(t_start(ies) * 1E9)
+    %     end %for
 end %if
 savemfmt(h_wake, path_to_data,'Energy')
 if max(t_start) ~=0

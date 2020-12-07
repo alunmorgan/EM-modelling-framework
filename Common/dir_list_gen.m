@@ -94,6 +94,9 @@ if strcmp(file_type,'dirs')
             disp([num2str(size(names,1)) ' directories found']);
         end %if
     end %if
+elseif strcmp(file_type,'')
+    % Need to remove directories from the list
+    names = names(dir_state ~= 1);
 else
     if isempty(file_type)
         ind = regexpi(names,'.$');
