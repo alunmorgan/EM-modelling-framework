@@ -1,5 +1,5 @@
 function run_models(mi, force_sim)
-
+% Runs all the geometric and simulation variations set up.
 
 if ispc ==1
     error('This needs to be run on the linux modelling machine')
@@ -9,12 +9,6 @@ modelling_inputs = run_inputs_setup_STL(mi);
 
 % Running the different simulators for each model.
 for awh = 1:length(modelling_inputs)
-    %     % Making the directory to store the run data in.
-    %     if ~exist(fullfile(mi.paths.storage_path, modelling_inputs{awh}.model_name),'file')
-    %         mkdir(fullfile(mi.paths.storage_path, modelling_inputs{awh}.model_name))
-    %     end %if
-    %     ow_behaviour = '';
-    % Write update to the command line
     disp(datestr(now))
     disp(['Running ',num2str(awh), ' of ',...
         num2str(length(modelling_inputs)), ' simulations'])
