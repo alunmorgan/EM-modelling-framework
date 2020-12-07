@@ -25,9 +25,6 @@ results_storage_location = fullfile(paths.storage_path, modelling_inputs.model_n
 run_sim = make_data_store(modelling_inputs.model_name, results_storage_location, sim_type, skip);
 
 if run_sim == 1
-    %     mkdir(results_storage_location, sim_f_name)
-    % Move into the temporary folder.
-    [old_loc, tmp_location] = move_into_tempororary_folder(paths.scratch_path);
     % If the simulation type is S-paramter then you need a simulation for
     % each excited port. For Shunt you need a simulation for each frequency.
     % For the other types you just need a single simulation.
@@ -60,9 +57,9 @@ if run_sim == 1
     
     output_data_location = cell(1,n_cycles);
     for nes = 1:n_cycles
+        [old_loc, tmp_location] = move_into_tempororary_folder(paths.scratch_path);
         temp_files('make')
         frequency = num2str(f_range(nes));
-        %         port_name = active_ports(nes);
         arch_out = construct_storage_area_path(results_storage_location, sim_type, active_ports{nes}, sparameter_set(nes), frequency);
         construct_gdf_file(sim_type, modelling_inputs, active_ports(nes), sparameter_set(nes), frequency)
         disp(['Running ', sim_type,' simulation for ', modelling_inputs.model_name, '.'])
@@ -86,13 +83,15 @@ if run_sim == 1
             output_data_location{1, nes} = arch_out;
             fileID = fopen(fullfile(arch_out, 'simulation_complete.txt'),'w');
             fclose(fileID);
+            cd(old_loc)
+            rmdir(tmp_location, 's')
         elseif status == 0
             disp(['Error in file transfer - data left in ', tmp_location])
             disp(message)
             output_data_location{1, nes} = tmp_location;
+            cd(old_loc)
         end %if
     end %for
-    cd(old_loc)
 else
     output_data_location = {NaN};
 end %if
