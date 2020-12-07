@@ -84,6 +84,8 @@ if run_sim == 1
         if status == 1
             temp_files('remove')
             output_data_location{1, nes} = arch_out;
+            fileID = fopen(fullfile(arch_out, 'simulation_complete.txt'),'w');
+            fclose(fileID);
         elseif status == 0
             disp(['Error in file transfer - data left in ', tmp_location])
             disp(message)
