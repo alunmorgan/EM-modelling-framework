@@ -59,7 +59,11 @@ if run_sim == 1
     for nes = 1:n_cycles
         [old_loc, tmp_location] = move_into_tempororary_folder(paths.scratch_path);
         temp_files('make')
+        if strcmp(sim_type, 'shunt')
         frequency = num2str(f_range(nes));
+        else
+            frequency = NaN;
+        end %if
         arch_out = construct_storage_area_path(results_storage_location, sim_type, active_ports{nes}, sparameter_set(nes), frequency);
         construct_gdf_file(sim_type, modelling_inputs, active_ports(nes), sparameter_set(nes), frequency)
         disp(['Running ', sim_type,' simulation for ', modelling_inputs.model_name, '.'])
