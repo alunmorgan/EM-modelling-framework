@@ -84,7 +84,11 @@ if isfield(report_input, 'param_names_common')
             op = num2str(eval(op));
         end
         op = regexprep(op, '\\mu{}', '$\\mu{}$');
+        if isstr(report_input.param_names_common{esk})
         ov = cat(1,ov,['\emph{',regexprep(report_input.param_names_common{esk},'_',' '),'} & ',op,'\\']);
+        else
+            ov = cat(1,ov, 'ERROR');
+        end %if
     end
     %     if length(report_input.swept_name) == 1
     ov = cat(1,ov,['\emph{',regexprep(report_input.swept_name{1},'_',' '),'} & Swept\\']);
