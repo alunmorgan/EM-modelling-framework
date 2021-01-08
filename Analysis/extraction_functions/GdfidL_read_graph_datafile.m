@@ -99,7 +99,7 @@ else
         % scale so that the integral is 1C
         cur_int = sum(plot_data2.data(:,2) .* (plot_data2.data(2,1) - plot_data2.data(1,1)));
         if cur_int == 0
-            warning('No bunch charge!')
+            disp('No bunch charge!')
         else
         plot_data2.data(:,2) = plot_data2.data(:,2) ./ cur_int;
         end

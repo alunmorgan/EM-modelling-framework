@@ -41,7 +41,7 @@ for psw = length(names_in_sweep):-1:1
         [sim_param_names_tmp, sim_param_vals_tmp, ...
             geom_param_names_tmp, geom_param_vals_tmp] = extract_parameters(run_logs);
     catch
-        warning(['No data files found for ', names_in_sweep{psw}])
+        disp(['No data files found for ', names_in_sweep{psw}])
         good_data(psw) = 0;
         continue
     end %try
@@ -58,7 +58,7 @@ for psw = length(names_in_sweep):-1:1
     param_vals(psw,1:length(param_vals_tmp)) = param_vals_tmp;
 end %for
 if sum(good_data) ==0
-    warning('No valid data. Skipping report generation')
+    disp('No valid data. Skipping report generation')
     return
 end %if
 
@@ -123,10 +123,10 @@ for sha = size(param_val_list_good,2):-1:1
 end %for
 varying_pars_ind = find(stable ==0);
 if length(varying_pars_ind) >1
-    warning('More than one variable changing during the sweep. Only using the first one.')
+    disp('More than one variable changing during the sweep. Only using the first one.')
 end %if
 if isempty(varying_pars_ind)
-    warning('No varying parameters found. Skipping this one.')
+    disp('No varying parameters found. Skipping this one.')
     return
 end %if
 

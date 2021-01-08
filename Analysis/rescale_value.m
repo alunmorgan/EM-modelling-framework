@@ -31,7 +31,7 @@ end
 try
 scale = scales{sel};
 catch
-    warning('rescale_value: scaling range exceeded')
+    disp('rescale_value: scaling range exceeded')
 end %try
 if strcmp(scale, '0')
     scale = '';

@@ -28,7 +28,7 @@ for ke = 1:size(report_settings.individual_reports,1)
     try
         sources = find_sources(doc_root, report_settings.model, rep_var, date_range, report_settings.defaults, report_settings.ignore_list);
     catch
-        warning([rep_var, ' has problems'])
+        disp([rep_var, ' has problems'])
         continue
     end
     Blend_reports(rep_title, [doc_root, report_settings.model,slh], sources{1}, report_settings.author, report_settings.individual_reports{ke,2});

@@ -24,7 +24,7 @@ for osw = 1:length(s_names)
     data_directory = fullfile(pth, s_names{osw});
     s_parameter_output_directory = fullfile('pp_link', 's_parameter', s_names{osw});
     if exist(fullfile(data_directory,'model_log'), 'file') ~= 2
-        warning(['Missing log file in ' data_directory]);
+        disp(['Missing log file in ' data_directory]);
         continue
     end %if
     [~] = system(['mkdir ', s_parameter_output_directory]);

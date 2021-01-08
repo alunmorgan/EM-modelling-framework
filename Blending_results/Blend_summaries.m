@@ -15,7 +15,7 @@ for hse = 1:length(names)
         chosen_wake_ind = find(wake_sweep_vals == str2double(chosen_wake_length));
         if isempty(chosen_wake_ind)
             chosen_wake_ind = find(wake_sweep_vals == max(wake_sweep_vals));
-            warning('Chosen wake length not found. Setting the wakelength to maximum value.')
+            disp('Chosen wake length not found. Setting the wakelength to maximum value.')
         end %if
         %         load(fullfile(doc_root, names{hse}, 'wake', 'pp_inputs.mat'), 'ppi');
         summary.wlf{hse} = [num2str(wake_sweep_data.time_domain_data{chosen_wake_ind}.wake_loss_factor * 1e-12), '~V/pC' ];
@@ -34,7 +34,7 @@ for hse = 1:length(names)
         summary.mesh_spacing{hse} = [num2str(run_logs.mesh_step_size * 1E6), '\mu{}m'];
         summary.name{hse} = [];
     catch
-        warning(['Summary not available for ', num2str(names{hse})])
+        disp(['Summary not available for ', num2str(names{hse})])
         summary.wlf{hse} = '';
         summary.date{hse} = '';
         summary.soft_ver{hse} = '';

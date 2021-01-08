@@ -29,7 +29,7 @@ for hse = length(good_data):-1 :1
         chosen_wake_ind = find(wake_sweep_vals == chosen_wake_length);
         if isempty(chosen_wake_ind)
             chosen_wake_ind = find(wake_sweep_vals == max(wake_sweep_vals));
-            warning('Chosen wake length not found. Setting the wakelength to maximum value.')
+            disp('Chosen wake length not found. Setting the wakelength to maximum value.')
         end %if
         
         ind = find_data_end(wake_sweep_data.time_domain_data{chosen_wake_ind}.timebase', wake_sweep_vals(chosen_wake_ind));

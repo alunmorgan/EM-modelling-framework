@@ -55,7 +55,7 @@ if ~isempty(inds)
     output_file_locations.Energy = run_list(inds(1));
     output_file_locations.Energy_in_ceramics = run_list(inds(2));
 else
-    warning('No Energy graphs - This is a problem')
+    disp('No Energy graphs - This is a problem')
     output_file_locations.Energy = NaN;
     output_file_locations.Energy_in_ceramics = NaN;
 end
@@ -94,7 +94,7 @@ port_names_temp = unique(port_names_list);
 empty_names_ind = cellfun(@isempty, (port_names_temp));
 output_file_locations.port_names = port_names_temp(~empty_names_ind);
 if isempty(output_file_locations.port_names)
-    warning('No Port data - This is a problem')
+    disp('No Port data - This is a problem')
     output_file_locations.Port_mat = NaN;
     output_file_locations.port_names = NaN;
 else

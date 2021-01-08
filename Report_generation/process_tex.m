@@ -20,13 +20,13 @@ file_ID = fopen([file_name, '_latex_log'], 'w');
 fwrite(file_ID,log);
 fclose(file_ID);
 if sum(status) >0
-    warning(['Error in latex processing. See ', output_path, '/', file_name, '_latex_log for details'])
+    disp(['Error in latex processing. See ', output_path, '/', file_name, '_latex_log for details'])
 end
 if exist([file_name, '.dvi'],'file') ~= 0
     [conversion_status, ~] = system(['dvipdf ', file_name,'.dvi']);
     fprintf('. ')
     if conversion_status >0
-        warning('Error in converting dvi to pdf')
+        disp('Error in converting dvi to pdf')
     end
 end %if
 disp('Cleaning up')

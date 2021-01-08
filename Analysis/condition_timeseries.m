@@ -5,7 +5,7 @@ if ~all(isnan(temp_data))
     % find the data length required.
     trimmed = find(tmp_timebase <= (sweep_length / 3E8), 1, 'last');
     if isempty(trimmed)
-        warning(['Sweep length ', num2str(sweep_length) ,' not found.'])
+        disp(['Sweep length ', num2str(sweep_length) ,' not found.'])
     end %if
     tmp_timebase = tmp_timebase(1:trimmed);
     data = interp1(temp_data(:,1), temp_data(:,2),tmp_timebase ) ;

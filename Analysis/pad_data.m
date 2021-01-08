@@ -14,7 +14,7 @@ elseif length(new_lengths) == 2
     data_start = new_lengths(1);
     data_end = new_lengths(2);
 else
-    warning('Too many lengths to pad data with')
+    disp('Too many lengths to pad data with')
 end
 
 %% zero pad the time domain.

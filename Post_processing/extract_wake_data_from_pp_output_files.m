@@ -62,7 +62,7 @@ end %if
 
 %% Ports
 if ~iscell(output_file_locations.Port_mat)
-    warning('postprocess_wakes:No ports to analyse')
+    disp('postprocess_wakes:No ports to analyse')
     port_data = NaN;
 else
     [port_timebase, port_data] = read_port_datafiles(output_file_locations.Port_mat);
@@ -150,7 +150,7 @@ if exist('wil_data','var')
     raw_data.Wake_impedance = wil_data.data;
 else
     raw_data.Wake_impedance = NaN(length(wpl_data.data),2);
-    warning('Missing impedance graph')
+    disp('Missing impedance graph')
 end
 if exist('witqx_data','var')
     raw_data.Wake_impedance_trans_quad_X = witqx_data.data;

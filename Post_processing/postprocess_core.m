@@ -1,6 +1,6 @@
 function postprocess_core(pp_data_directory, version, sim_type, s_set, excitation)
 
-disp(['GdfidL_post_process_models: Post processing ', sim_type, ' data.'])
+% disp(['Post processing ', sim_type, ' data.'])
 if strcmpi(sim_type, 'wake') || strcmpi(sim_type, 'eigenmode')
 %     pp_data_directory = fullfile('pp_link',sim_type);
     pp_input_file = ['model_', sim_type, '_post_processing'];
@@ -24,11 +24,11 @@ setenv('GDFIDL_VERSION',orig_ver);
 data = read_file_full_line(fullfile(pp_data_directory , pp_log_file));
 for hwa = 1:length(data)
     if ~isempty(strfind(data{hwa},'The End of File is reached'))
-        disp(['Postprocess ',sim_type , ': The post processor has run to completion'])
+        disp(['Postprocess ',sim_type , ': The post processor core has run to completion'])
         break
     end %if
     if hwa == length(data)
-        warning(['Postprocess ',sim_type , ': The post processor has not completed properly'])
+        disp(['Postprocess ',sim_type , ': The post processor core has not completed properly'])
     end %if
 end %for
 

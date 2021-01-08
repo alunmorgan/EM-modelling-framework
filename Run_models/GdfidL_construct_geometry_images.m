@@ -13,7 +13,7 @@ elseif exist([source_loc,'/s_parameters_model_log'],'file')
 elseif exist([source_loc,'/eigenmode_model_log'],'file')
     tmep_data = read_in_text_file([source_loc,'/eigenmode_model_log']);
 else
-    warning('GdfidL_construct_geometry_images: No logs found. Unable to generate geometry images');
+    disp('GdfidL_construct_geometry_images: No logs found. Unable to generate geometry images');
     return
 end
 % find the location of any defines.

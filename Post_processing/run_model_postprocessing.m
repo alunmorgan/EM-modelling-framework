@@ -8,7 +8,7 @@ end %if
 modelling_inputs = run_inputs_setup_STL(mi);
 
 for awh = 1:length(modelling_inputs)
-    disp(datestr(now))
+    disp(['<strong>', datestr(now), '</strong>'])
     disp(['Postprocessing ',num2str(awh), ' of ',...
         num2str(length(modelling_inputs)), ' simulations'])
     
@@ -26,7 +26,8 @@ for awh = 1:length(modelling_inputs)
                 'type_selection', pp_type);
         end %if
     catch ERR
-        display_postprocessing_error(ERR)
+        disp('Problem with postprocessing.')
+        display_error_message(ERR)
     end %try
 end %for
 

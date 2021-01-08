@@ -15,25 +15,25 @@ hfoi = ppi.hfoi;
 if exist(fullfile(path_to_data, 'run_inputs.mat'), 'file') == 2
     load(fullfile(path_to_data, 'run_inputs.mat'), 'modelling_inputs');
 else
-    warning(['Unable to load ', fullfile(path_to_data, 'run_inputs.mat')])
+    disp(['Unable to load ', fullfile(path_to_data, 'run_inputs.mat')])
     return
 end %if
 if exist(fullfile(path_to_data,'data_postprocessed.mat'), 'file') == 2
     load(fullfile(path_to_data,'data_postprocessed.mat'), 'pp_data');
 else
-    warning(['Unable to load ', fullfile(path_to_data,'data_postprocessed.mat')])
+    disp(['Unable to load ', fullfile(path_to_data,'data_postprocessed.mat')])
     return
 end %if
 if exist(fullfile(path_to_data, 'data_analysed_wake.mat'), 'file') == 2
     load(fullfile(path_to_data, 'data_analysed_wake.mat'),'wake_sweep_data');
 else
-    warning(['Unable to load ', fullfile(path_to_data, 'data_analysed_wake.mat')])
+    disp(['Unable to load ', fullfile(path_to_data, 'data_analysed_wake.mat')])
     return
 end %if
 if exist(fullfile(path_to_data, 'data_from_run_logs.mat'), 'file') == 2
     load(fullfile(path_to_data, 'data_from_run_logs.mat'), 'run_logs')
 else
-    warning(['Unable to load ', fullfile(path_to_data, 'data_from_run_logs.mat')])
+    disp(['Unable to load ', fullfile(path_to_data, 'data_from_run_logs.mat')])
     return
 end %if
 
@@ -43,7 +43,7 @@ end %for
 chosen_wake_ind = find(wake_sweep_vals == chosen_wake_length);
 if isempty(chosen_wake_ind)
     [~,chosen_wake_ind] = min(abs((wake_sweep_vals ./ chosen_wake_length) - 1));
-    warning('Chosen wake length not found. Setting the wakelength closest value.')
+    disp('Chosen wake length not found. Setting the wakelength closest value.')
 end %if
 wake_data.port_time_data = wake_sweep_data.time_domain_data{chosen_wake_ind}.port_data;
 wake_data.time_domain_data = wake_sweep_data.time_domain_data{chosen_wake_ind};

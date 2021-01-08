@@ -49,7 +49,7 @@ for jse = 1:length(sets)
             end %if
         end %for
         if sum(good_data) ==0
-            warning('No valid data. Skipping report generation')
+            disp('No valid data. Skipping report generation')
             return
         end %if
         % Remove bad data
@@ -66,10 +66,10 @@ for jse = 1:length(sets)
         end %for
         varying_pars_ind = find(stable ==0);
         if length(varying_pars_ind) >1
-            warning('More than one variable changing during the sweep. Only using the first one.')
+            disp('More than one variable changing during the sweep. Only using the first one.')
         end %if
         if isempty(varying_pars_ind)
-            warning('No varying parameters found. Skipping this one.')
+            disp('No varying parameters found. Skipping this one.')
             continue
         end %if
         

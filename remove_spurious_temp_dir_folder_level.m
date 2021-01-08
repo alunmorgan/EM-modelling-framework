@@ -16,7 +16,7 @@ for hs = 3:length(output_paths)
             for nsw = 1:length(data_to_move)
                 [status, msg] = movefile(data_to_move{nsw}, simulation_type_folders{ne});
                 if status ~= 1
-                    warning(msg)
+                    disp(msg)
                 end %if
             end %for
         end

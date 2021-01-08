@@ -9,7 +9,7 @@ function lg  = GdfidL_read_wake_log( log_file )
 %% read in the file put the data into a cell array.
 data = read_in_text_file(log_file);
 if strcmp(data{end}, ' rc:  -1')
-    warning('Wake simulation did not exit cleanly')
+    disp('Wake simulation did not exit cleanly')
     lg = data;
     return
 end
@@ -153,7 +153,7 @@ if ~isempty(metal_loss_inds)
         if sum(dat_loc) > 1
             %If more than one component has the same material then split the
             %power equally.
-            warning('Multiple parts share he same material. Assuming an even split.')
+            disp('Multiple parts share he same material. Assuming an even split.')
             dat_inds =  find(dat_loc ==1);
             tmp2(:,2) = tmp2(:,2) ./ length(dat_inds);
             for nwa = 1:length(dat_inds)

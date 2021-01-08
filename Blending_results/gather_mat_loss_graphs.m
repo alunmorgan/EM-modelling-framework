@@ -7,7 +7,7 @@ for hse = length(source_reps):-1:1
     try
     copyfile(source, dest)
     catch
-        warning(['Thermal loss graph is not available for ', num2str(source_reps{hse})])
+        disp(['Thermal loss graph is not available for ', num2str(source_reps{hse})])
         nme{hse} = [];
         continue
     end

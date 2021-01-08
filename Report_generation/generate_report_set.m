@@ -12,6 +12,7 @@ for hwa = 1:length(model_iterations)
 %     model_name_for_report = regexprep(iteration_name, '_', ' ');
     Report_setup(Author, output_loc)
     catch ME
-        warning(['Report generation for ', iteration_name, ' Failed'])
+        disp(['Report generation for ', iteration_name, ' Failed'])
+        display_error_message(ME)
     end %try
 end %for

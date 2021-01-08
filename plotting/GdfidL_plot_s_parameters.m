@@ -8,7 +8,7 @@ function GdfidL_plot_s_parameters(path_to_data, fig_pos)
  if exist(fullfile(set_dirs{1}, 'run_inputs.mat'), 'file') == 2
     load(fullfile(set_dirs{1}, 'run_inputs.mat'), 'modelling_inputs');
 else
-    warning(['Unable to load ', fullfile(set_dirs{1}, 'run_inputs.mat')])
+    disp(['Unable to load ', fullfile(set_dirs{1}, 'run_inputs.mat')])
     return
 end %if
 load(fullfile(fullfile(pth,'data_postprocessed.mat')), 'pp_data'); % contains pp_data

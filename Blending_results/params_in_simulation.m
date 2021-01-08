@@ -4,7 +4,7 @@ if exist(fullfile(simulation_name, 'wake'),'dir') == 7
     if exist(fullfile(simulation_name, 'wake','run_inputs.mat'), 'file') == 2
         load(fullfile(simulation_name,'wake','run_inputs.mat'), 'modelling_inputs')
     else
-        warning(['missing modelling_inputs for ', simulation_name])
+        disp(['missing modelling_inputs for ', simulation_name])
         good_data = 0;
         param_names = {NaN};
         param_vals = {NaN};
@@ -14,7 +14,7 @@ if exist(fullfile(simulation_name, 'wake'),'dir') == 7
     if exist(fullfile(simulation_name, 'wake','data_from_run_logs.mat'), 'file') == 2
         load(fullfile(simulation_name, 'wake', 'data_from_run_logs.mat'), 'run_logs')
     else
-        warning(['missing data files for ', simulation_name])
+        disp(['missing data files for ', simulation_name])
         good_data = 0;
         param_names = {NaN};
         param_vals = {NaN};
@@ -24,7 +24,7 @@ elseif exist(fullfile(simulation_name, 's_parameter'),'dir') == 7
     if exist(fullfile(simulation_name, 's_parameter','run_inputs.mat'), 'file') == 2
         load(fullfile(simulation_name,'s_parameter','run_inputs.mat'), 'modelling_inputs')
     else
-        warning(['missing modelling_inputs for ', simulation_name])
+        disp(['missing modelling_inputs for ', simulation_name])
         good_data = 0;
         param_names = {NaN};
         param_vals = {NaN};
@@ -34,14 +34,14 @@ elseif exist(fullfile(simulation_name, 's_parameter'),'dir') == 7
     if exist(fullfile(simulation_name, 's_parameter','data_from_run_logs.mat'), 'file') == 2
         load(fullfile(simulation_name, 's_parameter', 'data_from_run_logs.mat'), 'run_logs')
     else
-        warning(['missing data files for ', simulation_name])
+        disp(['missing data files for ', simulation_name])
         good_data = 0;
         param_names = {NaN};
         param_vals = {NaN};
         return
     end %if
 else
-    warning(['No data folder found for ', simulation_name])
+    disp(['No data folder found for ', simulation_name])
     good_data = 0;
     param_names = {NaN};
     param_vals = {NaN};

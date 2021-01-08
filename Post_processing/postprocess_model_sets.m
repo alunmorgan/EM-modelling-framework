@@ -7,14 +7,14 @@ orig_loc = pwd;
 
 for hew = 1:length(model_names)
     try
+        disp(['<strong>Post processing model set ', model_names{hew}, '</strong>'])
         cd(fullfile(orig_loc, model_names{hew}))
         run_inputs = feval(model_names{hew});
         run_model_postprocessing(run_inputs, NaN, force_pp, pp_type)
         cd(orig_loc)
     catch ME
         cd(orig_loc)
-        warning('postprocess_model_sets: Problem with models.')
-                  rethrow(ME)
-
+        disp('<strong>Problem with models.</strong>')
+        display_error_message(ME)
     end %try
 end %for

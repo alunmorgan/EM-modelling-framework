@@ -40,7 +40,7 @@ end
 [~]=system(['ln -s -T ',fullfile(storage_path, model_name), ' data_link']);
 [~]=system(['ln -s -T ',fullfile(results_path, model_name), ' pp_link']);
 
-disp(['GdfidL_post_process_models: Started post processing of ', model_name])
+disp(['Started post processing of <strong>', model_name,'</strong>'])
 pp_data = struct;
 %% Post processing wakes, eigenmode and lossy eigenmode
 sim_types = {'wake', 'eigenmode', 'eigenmode_lossy'};
@@ -50,6 +50,7 @@ for oef = 1:length(sim_types)
             run_pp = will_pp_run(sim_types{oef}, p.Results.ow_behaviour);
             if run_pp == 1
                 try
+                    disp(['Post processing ', sim_types{oef}, ' data.'])
                     data_directory = fullfile('data_link', sim_types{oef});
                     pp_directory = fullfile('pp_link', sim_types{oef});
                     creating_space_for_postprocessing(pp_directory, sim_types{oef}, model_name);
@@ -78,10 +79,11 @@ for oef = 1:length(sim_types)
                     end %if
                     save(fullfile('pp_link', sim_types{oef}, 'data_postprocessed.mat'), 'pp_data','-v7.3')
                 catch W_ERR
-                    display_postprocessing_error(W_ERR, sim_types{oef})
+                    disp( ['<strong>', sim_types{oef}, ' Error</strong>'])
+                    display_error_message(W_ERR)
                 end %try
             else
-                disp(['Skipping ', sim_types{oef}, ' postprocessing for ',model_name, ' data already exists'])
+                disp(['Skipping ', sim_types{oef}, ' postprocessing data already exists'])
             end %if
         end %if
     end %if
@@ -96,7 +98,7 @@ for heb = 1:length(sim_types)
             run_pp = will_pp_run(sim_types{heb}, p.Results.ow_behaviour);
             if run_pp == 1
                 %             try                
-                disp(['GdfidL_post_process_models: Post processing ', sim_types{heb}, ' data.'])
+                disp(['Post processing ', sim_types{heb}, ' data.'])
                 % Reading logs and Running postprocessor
                 if strcmp(sim_types{heb}, 's_parameter')
                     [freq_folders] = dir_list_gen(fullfile('data_link', sim_types{heb}),'dirs', 1);
@@ -109,11 +111,8 @@ for heb = 1:length(sim_types)
                 end %if
                 save(fullfile('pp_link', sim_types{heb}, 'data_from_run_logs.mat'), 'run_logs')
                 save(fullfile('pp_link', sim_types{heb}, 'data_postprocessed.mat'), 'pp_data','-v7.3')
-                %             catch ERR
-                %                 display_postprocessing_error(ERR, sim_types{heb})
-                %             end %try
             else
-                disp(['Skipping ', sim_types{heb}, ' postprocessing for ',model_name, ' data already exists'])
+                disp(['Skipping ', sim_types{heb}, ' postprocessing data already exists'])
             end %if
         end %if
     end %if
