@@ -25,27 +25,24 @@ results_storage_location = fullfile(paths.storage_path, modelling_inputs.model_n
 run_sim = make_data_store(modelling_inputs.model_name, results_storage_location, sim_type, skip);
 
 if run_sim == 1
-    %     mkdir(results_storage_location, sim_f_name)
-    % Move into the temporary folder.
-    [old_loc, tmp_location] = move_into_tempororary_folder(paths.scratch_path);
     % If the simulation type is S-paramter then you need a simulation for
     % each excited port. For Shunt you need a simulation for each frequency.
     % For the other types you just need a single simulation.
     f_range = 1.3E9:5E7:1.9E9; % FIXME This needs to become a parameter
     if strcmp(sim_type, 's_parameter')
         active_port_inds = find(modelling_inputs.port_multiple ~= 0);
-        active_port_inds = active_port_inds(3:end); % removing the beam ports from the list.
+        if strcmp(modelling_inputs.beam, 'yes')
+            active_port_inds = active_port_inds(3:end); % removing the beam ports from the list.
+        end %if
+        if isempty(active_port_inds)
+            warning('no active ports found. Have you correctly set the presence of beam?')
+        end %if
         active_ports = modelling_inputs.ports(active_port_inds);
-        %         if strcmpi(modelling_inputs.model_name(end-3:end), 'Base')
         s_sets = length(modelling_inputs.s_param);
         n_cycles = length(active_ports) * s_sets;
         sparameter_set = repmat(1:s_sets, length(active_ports),1);
         sparameter_set = sparameter_set(:);
         active_ports = repmat(active_ports, 1, s_sets);
-        %         else
-        %             n_cycles = length(active_ports);
-        %             sparameter_set = ones(length(active_ports),1);
-        %         end %if
     elseif strcmp(sim_type, 'shunt')
         n_cycles = length(f_range);
         for hew = 1:n_cycles
@@ -60,9 +57,9 @@ if run_sim == 1
     
     output_data_location = cell(1,n_cycles);
     for nes = 1:n_cycles
+        [old_loc, tmp_location] = move_into_tempororary_folder(paths.scratch_path);
         temp_files('make')
         frequency = num2str(f_range(nes));
-        %         port_name = active_ports(nes);
         arch_out = construct_storage_area_path(results_storage_location, sim_type, active_ports{nes}, sparameter_set(nes), frequency);
         construct_gdf_file(sim_type, modelling_inputs, active_ports(nes), sparameter_set(nes), frequency)
         disp(['Running ', sim_type,' simulation for ', modelling_inputs.model_name, '.'])
@@ -86,13 +83,15 @@ if run_sim == 1
             output_data_location{1, nes} = arch_out;
             fileID = fopen(fullfile(arch_out, 'simulation_complete.txt'),'w');
             fclose(fileID);
+            cd(old_loc)
+            rmdir(tmp_location, 's')
         elseif status == 0
             disp(['Error in file transfer - data left in ', tmp_location])
             disp(message)
             output_data_location{1, nes} = tmp_location;
+            cd(old_loc)
         end %if
     end %for
-    cd(old_loc)
 else
     output_data_location = {NaN};
 end %if
