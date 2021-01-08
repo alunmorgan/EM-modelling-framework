@@ -2,7 +2,16 @@ function [param_names, param_vals, good_data, modelling_inputs] = params_in_simu
 good_data = 1;
 if exist(fullfile(simulation_name, 'wake'),'dir') == 7
     if exist(fullfile(simulation_name, 'wake','run_inputs.mat'), 'file') == 2
-        load(fullfile(simulation_name,'wake','run_inputs.mat'), 'modelling_inputs')
+        try
+            load(fullfile(simulation_name,'wake','run_inputs.mat'), 'modelling_inputs')
+        catch
+            disp(['corrupted run_inputs file for ', simulation_name])
+            good_data = 0;
+            param_names = {NaN};
+            param_vals = {NaN};
+            modelling_inputs = NaN;
+            return
+        end %try
     else
         disp(['missing modelling_inputs for ', simulation_name])
         good_data = 0;
@@ -18,6 +27,7 @@ if exist(fullfile(simulation_name, 'wake'),'dir') == 7
         good_data = 0;
         param_names = {NaN};
         param_vals = {NaN};
+        modelling_inputs = NaN;
         return
     end %if
 elseif exist(fullfile(simulation_name, 's_parameter'),'dir') == 7
@@ -38,6 +48,7 @@ elseif exist(fullfile(simulation_name, 's_parameter'),'dir') == 7
         good_data = 0;
         param_names = {NaN};
         param_vals = {NaN};
+        modelling_inputs = NaN;
         return
     end %if
 else
@@ -45,6 +56,7 @@ else
     good_data = 0;
     param_names = {NaN};
     param_vals = {NaN};
+    modelling_inputs = NaN;
     return
 end %if
 [sim_param_names_tmp, sim_param_vals_tmp, ...
