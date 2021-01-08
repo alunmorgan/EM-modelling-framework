@@ -11,7 +11,7 @@ out = cat(1,out,['\multicolumn{2}{ |c| }{',model_name,' - sweep of ', swept_name
 out = cat(1,out,'\hline');
 out = cat(1,out,'Swept value & Wake loss factor \\');
 out = cat(1,out,'\hline');
-for hea = 1:length(swept_vals)
+for hea = 1:size(swept_vals,1)
     % adding in the maths environment wrapping
     swept_val_temp = swept_vals{hea};
     if isempty(swept_val_temp)
