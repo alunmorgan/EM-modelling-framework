@@ -30,18 +30,20 @@ for law = 1:length(sets)
     end %for
 end %for
 for ke = 1:length(pp_data.all_ports)
-    if ishandle(h(ke))
-        figure(h(ke))
-        legend('Location', 'EastOutside')
-        if min_y(ke) == 0
-            min_y(ke) = -1;
+    if ke <= length(h)
+        if ishandle(h(ke))
+            figure(h(ke))
+            legend('Location', 'EastOutside')
+            if min_y(ke) == 0
+                min_y(ke) = -1;
+            end %if
+            ylim([min_y(ke) 0])
+            xlabel('Frequency (GHz)')
+            ylabel('S parameters (dB)')
+            title(['Port ',num2str(ke),' excitation'])
+            savemfmt(h(ke), pth,['s_parameters_transmission_excitation_port_',num2str(ke)])
+            close(h(ke))
         end %if
-        ylim([min_y(ke) 0])
-        xlabel('Frequency (GHz)')
-        ylabel('S parameters (dB)')
-        title(['Port ',num2str(ke),' excitation'])
-        savemfmt(h(ke), pth,['s_parameters_transmission_excitation_port_',num2str(ke)])
-        close(h(ke))
     end %if
 end %for
 end %function
