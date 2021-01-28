@@ -14,6 +14,15 @@ function fs = gdf_eigenmode_header_construction(loc, name, npmls, ...
 %
 % Example: fs = gdf_eigenmode_header_construction(loc, name, num_threads, mesh, materials, material_labels)
 
+% TEMP knock out PEC and vacuum from the list as it is already dealt with.
+% there is probably a better place to put it.
+ind = find(strcmp(materials, 'PEC')==1);
+materials(ind) = [];
+material_labels(ind) = [];
+ind = find(strcmp(materials, 'vacuum')==1);
+materials(ind) = [];
+material_labels(ind) = [];
+
 fs = {'###################################################'};
 fs = cat(1,fs,'define(INF, 10000)');
 fs = cat(1,fs,'define(LargeNumber, 1000)');
