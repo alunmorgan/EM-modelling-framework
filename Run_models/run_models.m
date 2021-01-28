@@ -32,7 +32,7 @@ for awh = 1:length(modelling_inputs)
         s_ck = s_ck +1;
     end %if
     if contains(mi.simulation_defs.sim_select, 'l')
-        sims{s_ck} = 'lossy eigenmode';
+        sims{s_ck} = 'lossy_eigenmode';
         s_ck = s_ck +1;
     end %if
     if contains(mi.simulation_defs.sim_select, 'r')
@@ -45,7 +45,21 @@ for awh = 1:length(modelling_inputs)
                 force_sim);
         catch ERR
             display_modelling_error(ERR, sims{ksbi})
+            cd(simulation_result_locations{1, 1})
+            if strcmp(sims{ksbi}, 's_parameter')
+                cd ..
+            end %if
+            fileID = fopen(fullfile(mi.paths.results_path,modelling_inputs{awh}.model_name, [sims{ksbi},'_simulation_incomplete.txt']),'w');
+            fprintf(fileID, message);
+            fclose(fileID);
+            continue
         end %try
+%         cd(simulation_result_locations{1,1})
+%         if strcmp(sims{ksbi}, 's_parameter')
+%             cd ..
+%         end %if
+%         fileID = fopen(fullfile(mi.paths.results_path,modelling_inputs{awh}.model_name, [sims{ksbi},'_simulation_complete.txt']),'w');
+%         fclose(fileID);
     end %for
 end %for
 
