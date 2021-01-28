@@ -15,9 +15,9 @@ eyepos.threedyeyepos = '   eyeposition= (-0.5, 1, 2.3)';
 eyepos.threedzeyepos = '   eyeposition= (-1, 2.3, 0.5)';
 
 model_file_vols = create_volume_plots(modelling_inputs, eyepos);
-% model_file_cutplots = create_cut_plot_plots (modelling_inputs, eyepos);
+model_file_cutplots = create_cut_plot_plots (modelling_inputs, eyepos);
 model_file = cat(1, model_file, model_file_vols);
-% model_file = cat(1, model_file, model_file_cutplots);
+model_file = cat(1, model_file, model_file_cutplots);
 model_file = cat(1, model_file, '###################################################');
 
 end %function
