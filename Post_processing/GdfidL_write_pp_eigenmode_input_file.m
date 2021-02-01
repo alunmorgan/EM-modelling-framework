@@ -1,4 +1,4 @@
-function GdfidL_write_pp_eigenmode_input_file(log, n_modes, pipe_length)
+function GdfidL_write_pp_eigenmode_input_file(log, n_mode_range)
 % Writes the postprocessing input file for an eigenmode simulation.
 % 
 % n_modes is the number of modes to consider.
@@ -18,31 +18,27 @@ ov = cat(1,ov,'    nrofthreads = 25');
 ov = cat(1,ov,'    ');
 ov = cat(1,ov,'-3darrowplot');
 ov = cat(1,ov,'    onlyplotfiles = no');
-ov = cat(1,ov,['	 bbzhigh = ',num2str(log.mesh_extent_zhigh),' - ',num2str(pipe_length)]);
-ov = cat(1,ov,['	 bbzlow = ',num2str(log.mesh_extent_zlow),' + ',num2str(pipe_length)]);
-% ov = cat(1,ov,'	 roty= -90');
-% ov = cat(1,ov,'	 rotz=-90');
-% ov = cat(1,ov,'	 eyeposition = (1, 1E-8, 1E-8)');
-% ov = cat(1,ov,'	 nlscale= yes');
+ov = cat(1,ov,['	 bbzhigh = ',num2str(log.mesh_extent_zhigh)]);
+ov = cat(1,ov,['	 bbzlow = ',num2str(log.mesh_extent_zlow)]);
 ov = cat(1,ov,'	 lenarrows= 0');
 ov = cat(1,ov,'	 nlexp=1');
 ov = cat(1,ov,'	 scale = 1.5');
 ov = cat(1,ov,'	 fonmaterials = yes');
 ov = cat(1,ov,'    quantity = e');
-for jrd = 1:n_modes
-    ov = cat(1,ov, ['	 plotopts = -colorps -o eigenmode',num2str(jrd),'_plot.ps']);
+for jrd = n_mode_range(1):n_mode_range(2)
+    ov = cat(1,ov, ['	 plotopts = -colorps -o temp_scratch/eigenmode',num2str(jrd),'_plot.ps']);
     ov = cat(1,ov,['    solution = ',num2str(jrd)]);
     ov = cat(1,ov,'    doit');
 end
-% ov = cat(1,ov,'	 bbzlow = 0');
-% ov = cat(1,ov,'	 bbzhigh = 0');
-% ov = cat(1,ov,'	 scale = 2');
-% ov = cat(1,ov,'	 eyeposition = (1, 1E-8, 1E-8)');
-% for jrd = 1:n_modes
-%     ov = cat(1,ov, ['	 plotopts = -colorps -o eigenmode',num2str(jrd),'_z_cut_plot.ps']);
-%     ov = cat(1,ov,['    solution = ',num2str(jrd)]);
-%     ov = cat(1,ov,'    doit');
-% end
+ov = cat(1,ov,'	 bbzlow = 0');
+ov = cat(1,ov,'	 bbzhigh = 0');
+ov = cat(1,ov,'	 scale = 2');
+ov = cat(1,ov,'	 eyeposition = (1E-8, 1E-8, 1)');
+for jrd = n_mode_range(1):n_mode_range(2)
+    ov = cat(1,ov, ['	 plotopts = -colorps -o temp_scratch/eigenmode',num2str(jrd),'_z_cut_plot.ps']);
+    ov = cat(1,ov,['    solution = ',num2str(jrd)]);
+    ov = cat(1,ov,'    doit');
+end
 % ov = cat(1,ov,'	 bbzlow = 22.5e-3');
 % ov = cat(1,ov,'	 bbzhigh = 22.5E-3');
 % ov = cat(1,ov,'	 scale = 2');
@@ -52,17 +48,17 @@ end
 %     ov = cat(1,ov,['    solution = ',num2str(jrd)]);
 %     ov = cat(1,ov,'    doit');
 % end
-% ov = cat(1,ov,['	 bbzhigh = ',num2str(log.mesh_extent_zhigh),' - ',num2str(pipe_length)]);
-% ov = cat(1,ov,['	 bbzlow = ',num2str(log.mesh_extent_zlow),' + ',num2str(pipe_length)]);
-% ov = cat(1,ov,'	 bbxlow = 0');
-% ov = cat(1,ov,'	 bbxhigh = 0');
-% ov = cat(1,ov,'	 scale = 5');
-% ov = cat(1,ov,'	 eyeposition = (1E-8, 1, 1E-8)');
-% for jrd = 1:n_modes
-%     ov = cat(1,ov, ['	 plotopts = -colorps -o eigenmode',num2str(jrd),'_x_cut_plot.ps']);
-%     ov = cat(1,ov,['    solution = ',num2str(jrd)]);
-%     ov = cat(1,ov,'    doit');
-% end
+ov = cat(1,ov,['	 bbzhigh = ',num2str(log.mesh_extent_zhigh)]);
+ov = cat(1,ov,['	 bbzlow = ',num2str(log.mesh_extent_zlow)]);
+ov = cat(1,ov,'	 bbxlow = 0');
+ov = cat(1,ov,'	 bbxhigh = 0');
+ov = cat(1,ov,'	 scale = 5');
+ov = cat(1,ov,'	 eyeposition = (1, 1E-8, 1E-8)');
+for jrd = n_mode_range(1):n_mode_range(2)
+    ov = cat(1,ov, ['	 plotopts = -colorps -o temp_scratch/eigenmode',num2str(jrd),'_x_cut_plot.ps']);
+    ov = cat(1,ov,['    solution = ',num2str(jrd)]);
+    ov = cat(1,ov,'    doit');
+end
 % for jrd = 1:n_modes
 %     ov = cat(1,ov,'	 bbzhigh = 30E-3');
 %     ov = cat(1,ov,'	 bbzlow = -30E-3');
@@ -83,19 +79,19 @@ end
 %     ov = cat(1,ov,'    doit');
 % end
 % 
-% ov = cat(1,ov,['	 bbzhigh = ',num2str(log.mesh_extent_zhigh),' - ',num2str(pipe_length)]);
-% ov = cat(1,ov,['	 bbzlow = ',num2str(log.mesh_extent_zlow),' + ',num2str(pipe_length)]);
-% ov = cat(1,ov,['	 bbxlow = ',num2str(log.mesh_extent_xlow)]);
-% ov = cat(1,ov,['	 bbxhigh = ',num2str(log.mesh_extent_xhigh)]);
-% ov = cat(1,ov,'	 bbylow = 0');
-% ov = cat(1,ov,'	 bbyhigh = 0');
-% ov = cat(1,ov,'	 scale = 5');
-% ov = cat(1,ov,'	 eyeposition = (1E-8, 1E-8, 1)');
-% for jrd = 1:n_modes
-%     ov = cat(1,ov, ['	 plotopts = -colorps -o eigenmode',num2str(jrd),'_y_cut_plot.ps']);
-%     ov = cat(1,ov,['    solution = ',num2str(jrd)]);
-%     ov = cat(1,ov,'    doit');
-% end
+ov = cat(1,ov,['	 bbzhigh = ',num2str(log.mesh_extent_zhigh)]);
+ov = cat(1,ov,['	 bbzlow = ',num2str(log.mesh_extent_zlow)]);
+ov = cat(1,ov,['	 bbxlow = ',num2str(log.mesh_extent_xlow)]);
+ov = cat(1,ov,['	 bbxhigh = ',num2str(log.mesh_extent_xhigh)]);
+ov = cat(1,ov,'	 bbylow = 0');
+ov = cat(1,ov,'	 bbyhigh = 0');
+ov = cat(1,ov,'	 scale = 5');
+ov = cat(1,ov,'	 eyeposition = (1E-8, 1, 1E-8)');
+for jrd = n_mode_range(1):n_mode_range(2)
+    ov = cat(1,ov, ['	 plotopts = -colorps -o temp_scratch/eigenmode',num2str(jrd),'_y_cut_plot.ps']);
+    ov = cat(1,ov,['    solution = ',num2str(jrd)]);
+    ov = cat(1,ov,'    doit');
+end
 % 
 % ov = cat(1,ov,'-lineplot');
 % ov = cat(1,ov,'    onlyplotfiles = yes');
@@ -213,7 +209,7 @@ ov = cat(1,ov,'endmacro');
 
 
 % Run macros
-for hd = 1:n_modes
+for hd = n_mode_range(1):n_mode_range(2)
     ov = cat(1,ov,['call QValue(',num2str(hd),')']);
     ov = cat(1,ov,['call rshunt(',num2str(hd),')']');
 end

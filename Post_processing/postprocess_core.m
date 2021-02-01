@@ -2,11 +2,11 @@ function postprocess_core(pp_data_directory, version, sim_type, s_set, excitatio
 
 % disp(['Post processing ', sim_type, ' data.'])
 if strcmpi(sim_type, 'wake') || strcmpi(sim_type, 'eigenmode')
-%     pp_data_directory = fullfile('pp_link',sim_type);
+    %     pp_data_directory = fullfile('pp_link',sim_type);
     pp_input_file = ['model_', sim_type, '_post_processing'];
     pp_log_file = ['model_', sim_type ,'_post_processing_log'];
 elseif strcmpi(sim_type, 's_parameter')
-%     pp_data_directory = fullfile('pp_link', 's_parameter',['model_s_param_set_',s_set,'_',excitation,'_post_processing']);
+    %     pp_data_directory = fullfile('pp_link', 's_parameter',['model_s_param_set_',s_set,'_',excitation,'_post_processing']);
     pp_input_file = ['model_s_param_set_',s_set, '_',excitation,'_post_processing_input_file'];
     pp_log_file = ['model_s_param_set_',s_set, '_',excitation,'_post_processing_log'];
 end %if
@@ -32,14 +32,24 @@ for hwa = 1:length(data)
     end %if
 end %for
 
+if ~strcmp(sim_type, 'eigenmode')
+    %% convert the gld files for the field output images to ps.
+    gld_files = dir_list_gen('temp_scratch', 'gld', 1);
+    parfor fjh = 1:length(gld_files)
+        [~,name,~] = fileparts(gld_files{fjh});
+        system(['gd1.3dplot -colorps -geometry 800x600 -o ',fullfile('temp_scratch', name), 'ps -i ' , gld_files{fjh}]);
+    end %parfor
+end %if
+delete temp_scratch/*.gld
+[pic_names ,~]= dir_list_gen('temp_scratch','ps',1);
+for eh = 1:length(pic_names)
+    pName = pic_names{eh}(1:end-3);
+    [sFlag, ~] = system(['convert ',fullfile('temp_scratch', pName),'.ps -rotate -90 ',fullfile('temp_scratch', pName),'.png']);
+    if sFlag == 0
+        delete(fullfile('temp_scratch', [pName,'.ps'] ))
+    end %if
+end %for
 
-%% convert the gld files for the field output images to ps.
-gld_files = dir_list_gen('temp_scratch', 'gld', 1);
-parfor fjh = 1:length(gld_files)
-    [~,name,~] = fileparts(gld_files{fjh});
-    system(['gd1.3dplot -colorps -geometry 800x600 -o ',fullfile('temp_scratch', name), 'ps -i ' , gld_files{fjh}]);
-end %parfor
-delete *.gld
 
 %% move any remaining files to the output location.
 movefile('temp_scratch/*', pp_data_directory)
