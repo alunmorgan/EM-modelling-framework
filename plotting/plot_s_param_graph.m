@@ -24,13 +24,15 @@ for law = 1:length(sets)
                 x_data = temp_scale{nre, es}(m,1:end-2) * 1e-9;
                 y_data = 20* log10(tmp_data(m, 1:end-2));
                 % Trimming off the end 10% as this often contains artifacts.
-                start_ind = ceil(length(x_data)/10);
-                final_ind = floor(length(x_data) - length(x_data) /10);
+%                 start_ind = ceil(length(x_data)/10);
+%                 final_ind = floor(length(x_data) - length(x_data) /10);
+%                 x_data = x_data(start_ind:final_ind);
+%                 y_data = y_data(start_ind:final_ind);
                 if max(y_data) > lower_cutoff
                     if min(y_data) < min_y(s_in, es)
                         min_y(s_in, es) = min(y_data);
                     end %if
-                    hl = plot(x_data(start_ind:final_ind), y_data(start_ind:final_ind), '-',...
+                    hl = plot(x_data, y_data, '-',...
                         'Color', cols_sep{rem(m,length(cols_sep))+1}, ...
                         'Linewidth', linewidth,...
                         'DisplayName',strcat('S',num2str(s_in), num2str(es), '(',num2str(m), ')'));
