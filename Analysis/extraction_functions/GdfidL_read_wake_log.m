@@ -8,6 +8,10 @@ function lg  = GdfidL_read_wake_log( log_file )
 
 %% read in the file put the data into a cell array.
 data = read_in_text_file(log_file);
+if isempty(data)
+    disp('Wake log file is empty... aborting')
+    return
+end %if
 if strcmp(data{end}, ' rc:  -1')
     disp('Wake simulation did not exit cleanly')
     lg = data;

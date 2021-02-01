@@ -37,9 +37,11 @@ end
 if exist('pp_link','dir') ~= 0
     delete('pp_link')
 end
-[~]=system(['ln -s -T ',fullfile(storage_path, model_name), ' data_link']);
-[~]=system(['ln -s -T ',fullfile(results_path, model_name), ' pp_link']);
-
+[stat_datalink, ~]=system(['ln -s -T ',fullfile(storage_path, model_name), ' data_link']);
+[stat_pplink, ~]=system(['ln -s -T ',fullfile(results_path, model_name), ' pp_link']);
+if stat_datalink ~= 0 || stat_pplink ~= 0
+    disp('<strong>Error creating soft links... aborting postprocessing</strong>')
+end %if
 disp(['Started post processing of <strong>', model_name,'</strong>'])
 pp_data = struct;
 %% Post processing wakes, eigenmode and lossy eigenmode

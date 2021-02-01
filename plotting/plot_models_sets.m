@@ -19,12 +19,12 @@ for nw = 1:length(model_sets)
     mse = strcmp(names, model_sets{nw}) == 1;
     if sum(mse) > 0
         input_settings = analysis_library{mse};
-        try
+%         try
             plot_model(results_loc, ppi, input_settings, override, p.Results.plotting_types);
-        catch ME
-            disp([model_sets{nw}, ' Problem with plotting'])
-            display_error_message(ME)
-        end %try
+%         catch ME
+%             disp([model_sets{nw}, ' Problem with plotting'])
+%             display_error_message(ME)
+%         end %try
     else
         disp([model_sets{nw}, ' Input file not matched with analysis library'])
     end %if
