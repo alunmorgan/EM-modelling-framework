@@ -40,7 +40,11 @@ for sts = 1:length(model_sets)
         extracted_data{sts}.fractional_loss_beam_ports(ind) = wake_sweep_data.frequency_domain_data{end}.fractional_loss_beam_ports;
         extracted_data{sts}.fractional_loss_signal_ports(ind) = wake_sweep_data.frequency_domain_data{end}.fractional_loss_signal_ports;
         extracted_data{sts}.fractional_loss_structure(ind) = wake_sweep_data.frequency_domain_data{end}.fractional_loss_structure;
-        port_energy = wake_sweep_data.time_domain_data{end}.port_data.port_energy;
+        try
+            port_energy = wake_sweep_data.time_domain_data{end}.port_data.port_energy;
+        catch
+            port_energy = wake_sweep_data.port_time_data{end}.port_energy;
+        end%try
         total_energy = wake_sweep_data.time_domain_data{end}.loss_from_beam;
         extracted_data{sts}.beam_port_loss(ind) = (port_energy(1) + port_energy(2)) / total_energy;
         extracted_data{sts}.signal_port_loss(ind) = sum(port_energy(3:end)) / total_energy;
