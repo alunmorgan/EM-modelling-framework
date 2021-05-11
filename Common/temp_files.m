@@ -1,4 +1,4 @@
-function temp_files(in)
+function temp_files(in, restart_files_path)
 % make or remove sets of temp folders for GdfidL output.
 %
 % in is either 'make' or 'remove'
@@ -12,8 +12,8 @@ if strcmp(in,'make')
     if ~exist('temp_data','dir')
         mkdir('temp_data');
     end
-    if ~exist('temp_restart','dir')
-        mkdir('temp_restart');
+    if ~exist(fullfile(restart_files_path,'temp_restart'),'dir')
+        mkdir(fullfile(restart_files_path,'temp_restart'));
     end
 elseif strcmp(in,'remove')
     if exist('temp_scratch','dir')
@@ -22,8 +22,8 @@ elseif strcmp(in,'remove')
     if exist('temp_data','dir')
         rmdir('temp_data','s');
     end
-    if exist('temp_restart','dir')
-        rmdir('temp_restart','s');
+    if exist(fullfile(restart_files_path,'temp_restart'),'dir')
+        rmdir(fullfile(restart_files_path,'temp_restart'),'s');
     end
 end
 % Sometimes the filesystems take time to propogate the update

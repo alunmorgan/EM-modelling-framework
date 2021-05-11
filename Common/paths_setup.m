@@ -43,6 +43,8 @@ run_inputs.paths.storage_path = store;
 run_inputs.paths.results_path = results_path;
 % Location of static graphics used in the reports.
 run_inputs.paths.graphics_path = graphic_loc;
+% Location of restart files. Useful safety next for long running simulations.
+run_inputs.paths.restart_files_path = restart_files_path;
 
 %% Adding list of model names to run.
 [run_inputs.model_names, ~] = dir_list_gen(fullfile(run_inputs.paths.path_to_models, model_name), 'dirs',1);
