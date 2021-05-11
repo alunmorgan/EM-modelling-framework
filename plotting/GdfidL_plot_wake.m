@@ -178,8 +178,13 @@ plot_wake_impedance(h_wake, path_to_data, pp_data, ...
 ax(09) = axes('Parent', h_wake);
 hold on;
 [~, Q_sort_inds] = sort(Q);
-plot(peaks(:,1)*1E-9, R_over_Q, '*b');
-plot(peaks(Q_sort_inds(1:5),1) * 1E-9, R_over_Q(Q_sort_inds(1:5)), '*r')
+if length(peaks) > 5
+    plot(peaks(:,1)*1E-9, R_over_Q, '*b');
+    plot(peaks(Q_sort_inds(1:5),1) * 1E-9, R_over_Q(Q_sort_inds(1:5)), '*r')
+else
+    plot(peaks(:,1)*1E-9, R_over_Q, '*r');
+end %if
+
 for hs = 1:size(peaks,1)
     text(peaks(hs,1)*1E-9, R_over_Q(hs), ['Q=',num2str(round(Q(hs)))])
 end %for
@@ -191,8 +196,12 @@ clf(h_wake)
 ax(10) = axes('Parent', h_wake);
 hold on;
 [~, R_over_Q_sort_inds] = sort(R_over_Q);
+if length(peaks) > 5
 plot(peaks(:,1)*1E-9, Q, '*b');
 plot(peaks(R_over_Q_sort_inds(1:5),1) * 1E-9, Q(R_over_Q_sort_inds(1:5)), '*r')
+else
+    plot(peaks(:,1)*1E-9, Q, '*r');
+end %if
 for hs = 1:size(peaks,1)
     text(peaks(hs,1)*1E-9, Q(hs), ['R/Q=',num2str(round(R_over_Q(hs)*10)/10)])
 end %for
