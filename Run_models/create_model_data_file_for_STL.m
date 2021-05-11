@@ -42,8 +42,8 @@ model_file = cat(1, model_file, 'doit');
 model_file = cat(1, model_file, '###################################################');
 stls = dir_list_gen(modelling_inputs.stl_location, 'stl',1);
 for lwdc = 1:size(stls,1)
-        [~, stl_list_from_directory{lwdc},~] = fileparts(stls{lwdc});
-    end %for
+    [~, stl_list_from_directory{lwdc},~] = fileparts(stls{lwdc});
+end %for
 t1 = squeeze(modelling_inputs.stl_part_mapping(:,1));
 for lwfc = 1:length(stl_list_from_directory)
     nd = find(strcmp(stl_list_from_directory, t1{lwfc}));
