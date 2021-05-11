@@ -1,4 +1,4 @@
-function log = GdfidL_read_eigenmode_log( log_file )
+function log = GdfidL_read_eigenmode_log( log_file, sim_type )
 %Reads in the eigenmode log file and extracts parameter data from it.
 %
 % Example: log = GdfidL_read_eigenmode_log( log_file )
@@ -138,7 +138,7 @@ if isempty(solver_time_ind)
     if isempty(solver_time_ind)
         solver_time{1} = '0';
     else
-    solver_time = regexp(data{solver_time_ind(end)},'.*CPU[_\s][tT]ime\s*:\s*(\d+)\s*Seconds', 'tokens');
+        solver_time = regexp(data{solver_time_ind(end)},'.*CPU[_\s][tT]ime\s*:\s*(\d+)\s*Seconds', 'tokens');
     end
     
 end
@@ -153,32 +153,31 @@ port_name_ind = find_position_in_cell_lst(regexp(data,'-ports>\W*name = '));
 port_name = regexprep(regexprep(data(port_name_ind),'.*name = ',''),'"','');
 
 % find the eigenvalues
-eigenvalues_ind = find_position_in_cell_lst(strfind(data,'# "grep" for me'));
+res_sec_ind =  find_position_in_cell_lst(strfind(data,' The Eigensolutions are determined. I am writing the Results.'));
+eigenvalues_ind = find_position_in_cell_lst(strfind(data(res_sec_ind+1:end),'# "grep" for me'));
 % if eigenvalues_ind is empty this indicates there has probably been an
 % error. However it may be possible to extract some of the data.
-if isempty(eigenvalues_ind)
-    res_sec_ind =  find_position_in_cell_lst(strfind(data,' The Eigensolutions are determined. I am writing the Results.'));
-    eigenvalues_ind = res_sec_ind+1:length(data);
-    kx = 1;
+if ~isempty(eigenvalues_ind)
     for ja = 1:length(eigenvalues_ind)
-        toks_tmp = regexp(data{eigenvalues_ind(ja)},'\s*(\d+)\s+([\d.eE+-]+)\s+([\d.eE+-]+)\s+([\d.eE+-]+)\s+([\d.eE+-]+).*','tokens');
-        if ~isempty(toks_tmp)
-            log.eigenmodes.nums(kx) = str2num(toks_tmp{1}{1});
-            log.eigenmodes.freqs(kx) = str2num(toks_tmp{1}{4});
-            log.eigenmodes.acc(kx) = str2num(toks_tmp{1}{3});
-            log.eigenmodes.cont(kx) = str2num(toks_tmp{1}{5});
-            kx = kx +1;
-        end
-    end
-else
-    for ja = 1:length(eigenvalues_ind)
-        toks_tmp = regexp(data{eigenvalues_ind(ja)},'\s*(\d+)\s+([\d.eE+-]+)\s+([\d.eE+-]+)\s+([\d.eE+-]+)\s.*','tokens');
-        log.eigenmodes.nums(ja) = str2num(toks_tmp{1}{1});
-        log.eigenmodes.freqs(ja) = str2num(toks_tmp{1}{2});
-        log.eigenmodes.acc(ja) = str2num(toks_tmp{1}{3});
-        log.eigenmodes.cont(ja) = str2num(toks_tmp{1}{4});
-    end
-end
+        eigenmode_check = '\s*(\d+)\s+([\d.eE+-]+)\s+([\d.eE+-]+)\s+([\d.eE+-]+)\s.*';
+        lossy_eigenmode_check = '\s*(\d+)\s+\(\s*([\d.eE+-]+)\s*,\s*(\s*[\d.eE+-]+)\s*\)\s+([\d.eE+-]+)\s+([\d.eE+-]+)\s+([\d.eE+-]+)\s.*';
+        if strcmpi(sim_type, 'eigenmode')
+            toks_tmp = regexp(data{eigenvalues_ind(ja) +res_sec_ind},eigenmode_check,'tokens');
+            log.eigenmodes.nums(ja) = str2double(toks_tmp{1}{1});
+            log.eigenmodes.freqs(ja) = str2double(toks_tmp{1}{2});
+            log.eigenmodes.acc(ja) = str2double(toks_tmp{1}{3});
+            log.eigenmodes.cont(ja) = str2double(toks_tmp{1}{4});
+        elseif strcmpi(sim_type, 'lossy_eigenmode')
+            toks_tmp = regexp(data{eigenvalues_ind(ja) +res_sec_ind},lossy_eigenmode_check,'tokens');
+            log.eigenmodes.nums(ja) = str2double(toks_tmp{1}{1});
+            log.eigenmodes.freqs(ja) = complex(str2double(toks_tmp{1}{2}),...
+                                               str2double(toks_tmp{1}{3})); 
+            log.eigenmodes.Q(ja) = str2double(toks_tmp{1}{4});
+            log.eigenmodes.acc(ja) = str2double(toks_tmp{1}{5});
+            log.eigenmodes.cont(ja) = str2double(toks_tmp{1}{6});
+        end %if
+    end %for
+end %if
 
 % Find the user defines variables.
 define_ind = find_position_in_cell_lst(regexp(data,'\s*#\s*was:\s*"\s*define\(.*,.*\)'));

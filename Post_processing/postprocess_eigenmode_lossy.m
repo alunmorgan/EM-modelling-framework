@@ -6,7 +6,7 @@ function eigenmode_data = postprocess_eigenmode_lossy(modelling_inputs, run_log)
 %  postprocessor
 % eigenmode_data is 
 %
-%Example: eigenmode_data = postprocess_eigenmode_lossy(pp_inputs)
+%Example: eigenmode_data = postprocess_eigenmode_lossy(modelling_inputs, run_log)
 
 %% EIGENMODE POSTPROCESSING
 % run the eigenmode postprocessor
@@ -39,7 +39,7 @@ delete('POSTP-LOGFILE');
 delete('WHAT-PP-DID-SPIT-OUT');
 
 %% Extract parameters from the log.
-eigenmode_data = GdfidL_read_eigenmode_log('data_link/eigenmode_lossy/model_log' );
+eigenmode_data = GdfidL_read_eigenmode_log('data_link/eigenmode_lossy/model_log', 'lossy_eigenmode');
 log = GdfidL_read_eigenmode_postprocessing_log( 'pp_link/lossy_eigenmode/model_eigenmode_lossy_post_processing_log');
 if isfield(log, 'qs')
 eigenmode_data.qs = log.qs;

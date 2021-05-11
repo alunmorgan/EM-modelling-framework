@@ -45,7 +45,7 @@ end %if
 disp(['Started post processing of <strong>', model_name,'</strong>'])
 pp_data = struct;
 %% Post processing wakes, eigenmode and lossy eigenmode
-sim_types = {'wake', 'eigenmode', 'eigenmode_lossy'};
+sim_types = {'wake', 'eigenmode', 'lossy_eigenmode'};
 for oef = 1:length(sim_types)
     if any(contains(p.Results.type_selection, sim_types{oef})) || any(contains(p.Results.type_selection, 'all'))
         if exist(fullfile('data_link', [sim_types{oef},'/']), 'dir')
@@ -75,9 +75,9 @@ for oef = 1:length(sim_types)
                     if strcmp(sim_types{oef}, 'wake')
                         pp_data = postprocess_wakes(modelling_inputs, run_logs);
                     elseif strcmp(sim_types{oef}, 'eigenmode')
-                        pp_data = postprocess_eigenmode(modelling_inputs, run_logs);
-                    elseif strcmp(sim_types{oef}, 'eigenmode_lossy')
-                        pp_data = postprocess_eigenmode_lossy(modelling_inputs, run_logs);
+                        pp_data = postprocess_eigenmode(modelling_inputs, run_logs, 'eigenmode');
+                    elseif strcmp(sim_types{oef}, 'lossy_eigenmode')
+                        pp_data = postprocess_eigenmode(modelling_inputs, run_logs, 'lossy_eigenmode');
                     end %if
                     save(fullfile('pp_link', sim_types{oef}, 'data_postprocessed.mat'), 'pp_data','-v7.3')
                 catch W_ERR

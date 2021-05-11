@@ -1,7 +1,7 @@
 function postprocess_core(pp_data_directory, version, sim_type, s_set, excitation)
 
 % disp(['Post processing ', sim_type, ' data.'])
-if strcmpi(sim_type, 'wake') || strcmpi(sim_type, 'eigenmode')
+if strcmpi(sim_type, 'wake') || strcmpi(sim_type, 'eigenmode')|| strcmpi(sim_type, 'lossy_eigenmode')
     %     pp_data_directory = fullfile('pp_link',sim_type);
     pp_input_file = ['model_', sim_type, '_post_processing'];
     pp_log_file = ['model_', sim_type ,'_post_processing_log'];
@@ -10,7 +10,7 @@ elseif strcmpi(sim_type, 's_parameter')
     pp_input_file = ['model_s_param_set_',s_set, '_',excitation,'_post_processing_input_file'];
     pp_log_file = ['model_s_param_set_',s_set, '_',excitation,'_post_processing_log'];
 end %if
-temp_files('make')
+temp_files('make', '.')
 % setting the GdfidL version to test
 orig_ver = getenv('GDFIDL_VERSION');
 setenv('GDFIDL_VERSION',version);
@@ -23,7 +23,9 @@ setenv('GDFIDL_VERSION',orig_ver);
 % Check that the post processor has completed
 data = read_file_full_line(fullfile(pp_data_directory , pp_log_file));
 for hwa = 1:length(data)
-    if ~isempty(strfind(data{hwa},'The End of File is reached'))
+    if ~isempty(strfind(data{hwa},'The End of File is reached')) ||...
+            ~isempty(strfind(data{hwa},'The End of the File is reached')) ||...
+            ~isempty(strfind(data{hwa},'This is the normal End'))
         disp(['Postprocess ',sim_type , ': The post processor core has run to completion'])
         break
     end %if
@@ -32,7 +34,7 @@ for hwa = 1:length(data)
     end %if
 end %for
 
-if ~strcmp(sim_type, 'eigenmode')
+if ~strcmpi(sim_type, 'eigenmode') && ~strcmpi(sim_type, 'lossy_eigenmode')
     %% convert the gld files for the field output images to ps.
     gld_files = dir_list_gen('temp_scratch', 'gld', 1);
     parfor fjh = 1:length(gld_files)
@@ -54,6 +56,6 @@ end %for
 %% move any remaining files to the output location.
 movefile('temp_scratch/*', pp_data_directory)
 
-temp_files('remove')
+temp_files('remove', '.')
 delete('POSTP-LOGFILE');
 delete('WHAT-PP-DID-SPIT-OUT');
