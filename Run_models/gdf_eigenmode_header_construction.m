@@ -1,4 +1,4 @@
-function fs = gdf_eigenmode_header_construction(loc, name, npmls, ...
+function fs = gdf_eigenmode_header_construction(loc, restart_files_loc, name, npmls, ...
     num_threads, mesh, mesh_scaling, materials, material_labels)
 
 % Constructs the initial part of the gdf input file for GdfidL 
@@ -40,9 +40,9 @@ fs = cat(1,fs,'-general');
 fs = cat(1,fs,['    outfile= ',loc, name,'_data/']);
 fs = cat(1,fs,['    scratch= ',loc, name,'_scratch/']);
 fs = cat(1,fs,['    nrofthreads= ', num_threads]);
-fs = cat(1,fs,['    restartfiles = ',loc, name,'_restart/']);
-fs = cat(1,fs,'    t1restartfiles = 720');
-fs = cat(1,fs,'    dtrestartfiles = 360');
+fs = cat(1,fs,['    restartfiles = ',restart_files_loc]);
+fs = cat(1,fs,'    t1restartfiles = 1440');
+fs = cat(1,fs,'    dtrestartfiles = 1440');
 fs = cat(1,fs,'    stopafterrestartfiles=1000000');
 fs = cat(1,fs,'###################################################');
 fs = cat(1,fs,'#Material definitions');

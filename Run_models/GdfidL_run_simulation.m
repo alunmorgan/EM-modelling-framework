@@ -1,4 +1,4 @@
-function output_data_location = GdfidL_run_simulation(sim_type, paths, modelling_inputs, ow_behaviour)
+function output_data_location = GdfidL_run_simulation(sim_type, paths, modelling_inputs, ow_behaviour, restart)
 % Takes the geometry specification, adds the setup for a  simulation and
 % runs the simulation with the desired calculational precision.
 %
@@ -58,16 +58,18 @@ if run_sim == 1
     output_data_location = cell(1,n_cycles);
     for nes = 1:n_cycles
         [old_loc, tmp_location] = move_into_tempororary_folder(paths.scratch_path);
-        temp_files('make')
+        temp_files('make', paths.restart_files_path)
         if strcmp(sim_type, 'shunt')
         frequency = num2str(f_range(nes));
         else
             frequency = NaN;
         end %if
         arch_out = construct_storage_area_path(results_storage_location, sim_type, active_ports{nes}, sparameter_set(nes), frequency);
-        construct_gdf_file(sim_type, modelling_inputs, active_ports(nes), sparameter_set(nes), frequency)
+        restart_root = fullfile(paths.restart_files_path, modelling_inputs.base_model_name, modelling_inputs.model_name);
+        restart_out = construct_storage_area_path(restart_root, sim_type, active_ports{nes}, sparameter_set(nes), frequency);
+        construct_gdf_file(paths, sim_type, modelling_inputs, active_ports(nes), sparameter_set(nes), frequency, restart_out)
         disp(['Running ', sim_type,' simulation for ', modelling_inputs.model_name, '.'])
-        GdfidL_simulation_core(modelling_inputs.version, modelling_inputs.precision)
+        GdfidL_simulation_core(modelling_inputs.version, modelling_inputs.precision, restart)
         save(fullfile('temp_data', 'run_inputs.mat'), 'paths', 'modelling_inputs')
         if strcmp(sim_type, 'geometry')
             % Converting the images from ps to png to reduce the file
@@ -82,14 +84,15 @@ if run_sim == 1
         end %if
         [status, message] = movefile('temp_data/*', arch_out);
         if status == 1
-            temp_files('remove')
+            temp_files('remove', paths.restart_files_path)
             output_data_location{1, nes} = arch_out;
             fileID = fopen(fullfile(arch_out, 'simulation_complete.txt'),'w');
             fclose(fileID);
             cd(old_loc)
             rmdir(tmp_location, 's')
         elseif status == 0
-            disp(['Error in file transfer - data left in ', tmp_location])
+            disp(['<strong>Error in file transfer</strong> - data left in ', tmp_location])
+            disp(['restart files left in ', paths.restart_files_path])
             disp(message)
             fileID = fopen(fullfile(arch_out, 'simulation_incomplete.txt'),'w');
             fprintf(fileID, message);

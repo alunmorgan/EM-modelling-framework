@@ -1,4 +1,4 @@
-function GdfidL_simulation_core(version, precision)
+function GdfidL_simulation_core(version, precision, restart)
 % This runs the core simulation code.
 
 % setting the GdfidL version to test
@@ -11,10 +11,10 @@ shell_contents = {'#! /bin/bash'};
 % As a result this code now writes and executes a shell script so that the
 % system environment is reliably used.
 if strcmp(precision, 'single')
-    shell_contents = cat(1,shell_contents,'nice single.gd1 < temp_data/model.gdf > temp_data/model_log');
+    shell_contents = cat(1,shell_contents,['single.gd1 ',restart,'< temp_data/model.gdf > temp_data/model_log']);
 %     [status, ~] = system('nice single.gd1 < temp_data/model.gdf > temp_data/model_log');
 elseif strcmp(precision, 'double')
-    shell_contents = cat(1,shell_contents,'nice gd1 < temp_data/model.gdf > temp_data/model_log');
+    shell_contents = cat(1,shell_contents,['gd1 ',restart,'< temp_data/model.gdf > temp_data/model_log']);
 %     [status, cmd_output] = system('nice gd1 < temp_data/model.gdf > temp_data/model_log');
 end %if
 % shell_contents = cat(1,shell_contents,'for szFile in temp_data/*.ps');
