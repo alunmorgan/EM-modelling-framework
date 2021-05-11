@@ -11,10 +11,10 @@ function ov = generate_latex_for_wake_analysis(pp_data, wake_data, mi, ppi, port
 
 % port_overrides = port_overrides{1};
 
-alpha = pp_data.port.alpha;
-beta = pp_data.port.beta;
-cutoff = pp_data.port.frequency_cutoffs_all;
-port_labels = pp_data.port.labels;
+alpha = wake_data.time_domain_data.alpha;
+beta = wake_data.time_domain_data.beta;
+cutoff = wake_data.time_domain_data.frequency_cutoffs;
+port_labels = wake_data.time_domain_data.port_lables;
 % Applying post processing overrides to the number of modes used for each
 % port.
 % Note: If using fractional geometry then not all overrides will be used.

@@ -1,4 +1,4 @@
-function Report_setup(results_path, ppi, port_overrides, chosen_wake_length)
+function Report_setup(results_path, ppi, input_settings)
 % Generates a single report. Data is loaded in from files found in the
 % results path.
 %
@@ -42,7 +42,7 @@ if contains(modelling_inputs.sim_select, 's')
 end %if
 
 if contains(modelling_inputs.sim_select, 'w')
-    [w_ltx, w_appnd] = report_chapter_wake(fullfile(results_path, 'wake'), ppi, port_overrides, chosen_wake_length);
+    [w_ltx, w_appnd] = report_chapter_wake(fullfile(results_path, 'wake'), ppi, input_settings.wake.portOverrides, input_settings.wake.wakelength);
 end %if
 
 %% Finish the latex document.
