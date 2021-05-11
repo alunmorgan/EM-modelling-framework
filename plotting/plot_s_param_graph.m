@@ -1,4 +1,4 @@
-function plot_s_param_graph(pp_data, beam_present, cols_sep, fig_pos, pth, lower_cutoff, linewidth)
+function plot_s_param_graph(pp_data, beam_present, cols_sep, fig_pos, pth, lower_cutoff, linewidth, trim_fraction)
 % plots the s parameter results.
 %
 % Example: plot_s_param_graph(s, cols_sep, fig_pos, pth)
@@ -23,11 +23,9 @@ for law = 1:length(sets)
             for m=1:size(tmp_data,1) % Iterate over modes
                 x_data = temp_scale{nre, es}(m,1:end-2) * 1e-9;
                 y_data = 20* log10(tmp_data(m, 1:end-2));
-                % Trimming off the end 10% as this often contains artifacts.
-%                 start_ind = ceil(length(x_data)/10);
-%                 final_ind = floor(length(x_data) - length(x_data) /10);
-%                 x_data = x_data(start_ind:final_ind);
-%                 y_data = y_data(start_ind:final_ind);
+                [start_ind,final_ind] = get_trim_inds(x_data, trim_fraction);
+                x_data = x_data(start_ind:final_ind);
+                y_data = y_data(start_ind:final_ind);
                 if max(y_data) > lower_cutoff
                     if min(y_data) < min_y(s_in, es)
                         min_y(s_in, es) = min(y_data);

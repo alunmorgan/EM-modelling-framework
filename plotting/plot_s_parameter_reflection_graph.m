@@ -1,4 +1,4 @@
-function plot_s_parameter_reflection_graph(pp_data, cols, lines, fig_pos, pth, lower_cutoff, linewidth)
+function plot_s_parameter_reflection_graph(pp_data, cols, lines, fig_pos, pth, lower_cutoff, linewidth,trim_fraction)
 
 mode = 1;
 h = figure('Position',fig_pos);
@@ -15,9 +15,7 @@ for law = 1:length(sets)
                 if max(20* log10(temp_data{es,s_in}(1,1:end-2))) > lower_cutoff
                     x_data = temp_scale{es,s_in}(mode, 1:end-2) * 1e-9;
                     y_data = 20* log10(temp_data{es,s_in}(mode, 1:end-2));
-                    % Trimming off the end 10% as this often contains artifacts.
-                start_ind = ceil(length(x_data)/10);
-                final_ind = floor(length(x_data) - length(x_data) /10);
+                    [start_ind,final_ind] = get_trim_inds(x_data,trim_fraction);
                     if min(y_data) < min_y
                         min_y = min(y_data);
                     end %if

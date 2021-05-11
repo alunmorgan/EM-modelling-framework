@@ -1,4 +1,4 @@
-function plot_s_param_transmission_graphs_modes(pp_data, beam_present, cols, lines, fig_pos, pth, lower_cutoff, linewidth)
+function plot_s_param_transmission_graphs_modes(pp_data, beam_present, cols, lines, fig_pos, pth, lower_cutoff, linewidth, trim_fraction)
 
 
 h = figure('Position',fig_pos);
@@ -20,9 +20,9 @@ for law = 1:length(sets)
                 if max(20* log10(pp_data.data{es,n}(1,1:end-2))) > lower_cutoff
                     if s_in ~= n
                         if strcmp(beam_present, 'yes') && n ~= 1 && n ~= 2 % dont show the beam pipe ports.
-                            min_y = add_data_to_transmission_modes_graph(ax, temp_scale, temp_data, mode, min_y, lines, cols, linewidth, es, n, s_in, law);
+                            min_y = add_data_to_transmission_modes_graph(ax, temp_scale, temp_data, mode, min_y, lines, cols, linewidth, es, n, s_in, law, trim_fraction);
                         elseif strcmp(beam_present, 'no')
-                            min_y = add_data_to_transmission_modes_graph(ax, temp_scale, temp_data, mode, min_y, lines, cols, linewidth, es, n, s_in, law);
+                            min_y = add_data_to_transmission_modes_graph(ax, temp_scale, temp_data, mode, min_y, lines, cols, linewidth, es, n, s_in, law, trim_fraction);
                         end %if
                     end %if
                 end %if
@@ -44,12 +44,12 @@ savemfmt(h, pth,'s_parameters_transmission_mode_1')
 close(h)
 end %function
 
-function min_y = add_data_to_transmission_modes_graph(ax, temp_scale, temp_data, mode, min_y, lines, cols, linewidth, es, n, s_in, law)
+function min_y = add_data_to_transmission_modes_graph(ax, temp_scale, temp_data, mode, min_y, lines, cols, linewidth, es, n, s_in, law, trim_fraction)
+% Trim fraction controls how much data is trimmed from teh ends. This is often required as it contains artifacts.
 hold on
 x_data = temp_scale{es,n}(mode,1:end-2) * 1e-9;
 y_data = 20* log10(temp_data{es,n}(mode, 1:end-2));
-start_ind = ceil(length(x_data)/10);
-final_ind = floor(length(x_data) - length(x_data) /10);
+[start_ind,final_ind] = get_trim_inds(x_data,trim_fraction);
 if min(y_data) < min_y
     min_y = min(y_data);
 end %if
