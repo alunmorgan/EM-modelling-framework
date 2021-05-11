@@ -28,22 +28,22 @@ fs = cat(1,fs,'        name = TEC');
 fs = cat(1,fs,'        whattosave = pdielectrics');
 fs = cat(1,fs,'        doit');
 fs = cat(1,fs,'');
-fs = cat(1,fs,'    -storefieldsat');
-fs = cat(1,fs,'        name= ED');
-fs = cat(1,fs,'        whattosave = e-fields');
-% reducing the wake length as sometimes the simulation stops just before
-% the defined wake length, and then the power monitors are not triggered.
-fs = cat(1,fs,['           firstsaved= ',num2str(str2double(wake_length)-0.2),' / @clight']);
-fs = cat(1,fs,'           lastsaved= INF');
-fs = cat(1,fs,'           distance= 10 / @clight');
-fs = cat(1,fs,'        doit');
-fs = cat(1,fs,'    -storefieldsat');
-fs = cat(1,fs,'        name= EF');
-fs = cat(1,fs,'        whattosave = both');
-fs = cat(1,fs,['           firstsaved= (',num2str(str2double(wake_length)),' / @clight - 1e-9)']);
-fs = cat(1,fs,'           lastsaved= INF');
-fs = cat(1,fs,'           distance= 100e-12');
-fs = cat(1,fs,'        doit');
+% fs = cat(1,fs,'    -storefieldsat');
+% fs = cat(1,fs,'        name= ED');
+% fs = cat(1,fs,'        whattosave = e-fields');
+% % reducing the wake length as sometimes the simulation stops just before
+% % the defined wake length, and then the power monitors are not triggered.
+% fs = cat(1,fs,['           firstsaved= ',num2str(str2double(wake_length)-0.2),' / @clight']);
+% fs = cat(1,fs,'           lastsaved= INF');
+% fs = cat(1,fs,'           distance= 10 / @clight');
+% fs = cat(1,fs,'        doit');
+% fs = cat(1,fs,'    -storefieldsat');
+% fs = cat(1,fs,'        name= EF');
+% fs = cat(1,fs,'        whattosave = both');
+% fs = cat(1,fs,['           firstsaved= (',num2str(str2double(wake_length)),' / @clight - 1e-9)']);
+% fs = cat(1,fs,'           lastsaved= INF');
+% fs = cat(1,fs,'           distance= 100e-12');
+% fs = cat(1,fs,'        doit');
 if mov == 1
 %     fs = cat(1,fs,' define( PMLCOMPENSATION, 51e-3  / @clight )'); % for 40 PMLS
     fs = cat(1,fs,' define( FIRSTSAV, 1e-3  / @clight )');
