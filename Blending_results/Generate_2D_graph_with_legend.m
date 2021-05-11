@@ -3,14 +3,25 @@ h1 = figure('Position', [ 0 0 1000 400]);
 ax1 = axes('Parent', h1);
 hold(ax1, 'on')
 
+base_data = data(contains(graph_metadata.sources, '_Base'));
+base_vals = graph_metadata.swept_vals(contains(graph_metadata.sources, '_Base'));
 variation_data = data(~contains(graph_metadata.sources, '_Base'));
 swept_vals = graph_metadata.swept_vals(~contains(graph_metadata.sources, '_Base'));
+
+% adjusting for the multiple set bases scenario.
+if length(base_data) > 1 && isempty(variation_data)
+    variation_data = base_data(2:end);
+swept_vals = base_vals(2:end);
+base_data = base_data(1);
+base_vals = base_vals(1);
+end %if
+
 ls_tk = 1;
 for en = 1:length(variation_data)
     if isfield(variation_data(en), 'xdata') && ~isempty(variation_data(en).xdata)
         plot(variation_data(en).xdata, variation_data(en).ydata, 'linestyle',l_st{ls_tk},...
             'Color',cols{rem(en,length(cols))+1}, 'linewidth',data(en).linewidth, 'Parent', ax1,...
-            'DisplayName', swept_vals{en});
+            'DisplayName', regexprep(swept_vals{en},'_', ' '));
         if rem(en,length(cols))+1 == 1
             ls_tk = ls_tk +1;
         end %if
@@ -18,13 +29,11 @@ for en = 1:length(variation_data)
         plot(NaN, NaN, 'linestyle',l_st{1},...
             'Color',cols{rem(en,length(cols))+1}, 'linewidth',data(en).linewidth, 'Parent', ax1);
     end %if
-    %     leg{en} = swept_vals{en};
 end %for
-base_data = data(contains(graph_metadata.sources, '_Base'));
-base_vals = graph_metadata.swept_vals(contains(graph_metadata.sources, '_Base'));
+
 if isfield(base_data, 'xdata') && ~isempty(base_data.xdata)
     plot(base_data.xdata, base_data.ydata,...%'linestyle',l_st{1},...
-        'Color',cols{1}, 'linewidth',data(en).linewidth, 'Parent', ax1, 'DisplayName', base_vals{1});
+        'Color',cols{1}, 'linewidth',data(en).linewidth, 'Parent', ax1, 'DisplayName', regexprep(base_vals{1},'_', ' '));
 else
     plot(NaN, NaN,...%'linestyle',l_st{1},...
         'Color',cols{1}, 'linewidth',data(en).linewidth, 'Parent', ax1);
