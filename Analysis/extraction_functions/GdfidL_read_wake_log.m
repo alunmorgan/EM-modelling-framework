@@ -288,6 +288,9 @@ else
     lg.pmls_zlow = str2double(char(num_pmls_zlow{1}));
 end
 port_on_zhigh_ind = find_position_in_cell_lst(regexp(data,'#\s*\.\.\s*The Port is at zhigh'));
+if length(port_on_zhigh_ind) >1
+    port_on_zhigh_ind = port_on_zhigh_ind(1);
+end % if
 num_pmls_zhigh = regexp(data{port_on_zhigh_ind+1},'#\s*\.\.\s*PML-Thickness\s*:\s*(\d*)', 'tokens');
 if ~isempty(num_pmls_zhigh)
     lg.pmls_zhigh = str2double(char(num_pmls_zhigh{1}));
