@@ -11,9 +11,9 @@ end %for
 path_to_data = unique(path_to_data);
 for hef = 1:length(path_to_data)
     temp  = wanted_files(contains(wanted_files, path_to_data{hef}));
-%     if any(contains(temp, 'wake'))
-%         datasets{hef}.wake = temp{contains(temp, 'wake')};
-%     end %if
+    if any(contains(temp, 'wake'))
+        datasets{hef}.wake = temp{contains(temp, 'wake')};
+    end %if
     if any(contains(temp, 's_parameter'))
         datasets{hef}.s_parameter = temp{contains(temp, 's_parameter')};
     end %if
