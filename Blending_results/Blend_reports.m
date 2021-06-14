@@ -1,4 +1,4 @@
-function Blend_reports(sets, chosen_wake_length, upper_frequency)
+function Blend_reports(sets, chosen_wake_length, upper_frequency, use_names)
 %Blends some of the output from the individual thermal analysis reports to
 %generate a summary comparison report.
 %
@@ -118,12 +118,19 @@ else
         [~,test{ks},~]=fileparts(names{ks});
     end %for
     Schar = char(test(:));
-    end_of_common = find(diff(Schar) ~= 0, 1, 'first') -1;
+    end_of_common = find(sum(diff(Schar)) ~= 0, 1, 'first') -1;
     underscores = strfind(test{1}(1:end_of_common), '_');
-    rep_title = [Schar(1, 1:underscores(end) - 1), ' - ',Schar(1, underscores(end)+1:end)];
-    for jd = 2:length(test)
-        rep_title = strcat(rep_title , '_vs_', Schar(jd, underscores(end)+1:end));
-    end %for
+    if isempty(underscores)
+        rep_title = ['Comparison - ',Schar(1, 1:end)];
+        for jd = 2:length(test)
+            rep_title = strcat(rep_title , '_vs_', Schar(jd, 1:end));
+        end %for
+    else
+        rep_title = [Schar(1, 1:underscores(end) - 1), ' - ',Schar(1, underscores(end)+1:end)];
+        for jd = 2:length(test)
+            rep_title = strcat(rep_title , '_vs_', Schar(jd, underscores(end)+1:end));
+        end %for
+    end %if
     [report_loc,~,~] = fileparts(set_results_loc);
     report_input.rep_title = [rep_title, ' - Blended'];
     report_input.output_loc = fullfile(report_loc, report_input.rep_title);
@@ -175,12 +182,17 @@ else
     report_input.source_path = '';
     report_input.param_names_common = param_names(1, stable);
     report_input.param_vals_common = param_vals(1, stable);
+    if use_names == 1
+        report_input.swept_name = {'Model names'};
+        report_input.swept_vals = test;
+    else
     if length(varying_pars_ind) >1
         report_input.swept_name = {'Group of variables'};
         report_input.swept_vals = param_vals(:,varying_pars_ind(1));
     else
         report_input.swept_name = param_names(1, varying_pars_ind);
         report_input.swept_vals = param_vals(:,varying_pars_ind);
+    end %if
     end %if
     
     if ~exist(report_input.output_loc, 'dir')
