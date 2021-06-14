@@ -20,5 +20,5 @@ if ~isnan(wake_data.frequency_domain_data.raw_port_energy_spectrum)
         port_energy_spectra{ns} = wake_data.frequency_domain_data.raw_port_energy_spectrum(1:cut_ind,ns)*1e9; %nJ
     end %for
 else
-    port_energy_spectra{ns} = NaN(size(wake_data.frequency_domain_data.raw_port_energy_spectrum, 2),1);
+    port_energy_spectra{1} = NaN(size(wake_data.frequency_domain_data.raw_port_energy_spectrum, 2),1);
 end %if

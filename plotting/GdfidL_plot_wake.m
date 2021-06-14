@@ -197,8 +197,8 @@ ax(10) = axes('Parent', h_wake);
 hold on;
 [~, R_over_Q_sort_inds] = sort(R_over_Q);
 if length(peaks) > 5
-plot(peaks(:,1)*1E-9, Q, '*b');
-plot(peaks(R_over_Q_sort_inds(1:5),1) * 1E-9, Q(R_over_Q_sort_inds(1:5)), '*r')
+    plot(peaks(:,1)*1E-9, Q, '*b');
+    plot(peaks(R_over_Q_sort_inds(1:5),1) * 1E-9, Q(R_over_Q_sort_inds(1:5)), '*r')
 else
     plot(peaks(:,1)*1E-9, Q, '*r');
 end %if
@@ -381,9 +381,11 @@ if wake_data.port_time_data.total_energy ~=0
     ax(18) = axes('Parent', h_wake);
     fig_max = max(abs(beam_port_spectrum));
     hold(ax(18), 'on')
-    for ns = 1:length(port_energy_spectra)
-        plot(frequency_scale_ports, port_energy_spectra{ns},'LineWidth',lw, 'DisplayName', port_names{ns})
-    end %for
+    if ~isnan(port_energy_spectra{1})
+        for ns = 1:length(port_energy_spectra)
+            plot(frequency_scale_ports, port_energy_spectra{ns},'LineWidth',lw, 'DisplayName', port_names{ns})
+        end %for
+    end %if
     hold(ax(18), 'off')
     graph_add_vertical_lines(cuts_temp)
     legend('Location','Best')
@@ -407,10 +409,12 @@ if wake_data.port_time_data.total_energy ~=0
     % each other so you can just cumsum up half the frequency range and
     % multiply by 2.
     hold(ax(19), 'all')
-    for ns = 1:length(port_energy_spectra)
-        plot(frequency_scale_ports,...
-            cumsum(port_energy_spectra{ns}).*2,'LineWidth',lw, 'DisplayName', port_names{ns})
-    end %for
+    if ~isnan(port_energy_spectra{1})
+        for ns = 1:length(port_energy_spectra)
+            plot(frequency_scale_ports,...
+                cumsum(port_energy_spectra{ns}).*2,'LineWidth',lw, 'DisplayName', port_names{ns})
+        end %for
+    end %if
     hold(ax(19), 'off')
     graph_add_vertical_lines(cuts_temp)
     legend('Location', 'NorthWest')
