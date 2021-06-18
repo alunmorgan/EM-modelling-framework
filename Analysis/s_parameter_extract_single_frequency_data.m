@@ -37,19 +37,22 @@ else
     trace_names{D} = [num2str(str2double(report_input.swept_vals{D})*1000), 'mm'];
 end %if
 ck = 1;
+h(1, 1) = figure('Position', [0, 0, 800, 800]);
+h(1, 2) = figure('Position', [0, 0, 800, 800]);
 for jef = 1:length(good_data)
     if good_data(jef) == 1
         load(fullfile(report_input.source_path, report_input.sources{jef}, 's_parameter', 'data_postprocessed.mat'), 'pp_data')
         trace_name = trace_names{jef};
         sets = unique(pp_data.set);
-        if ck == 1
             n_ports = length(pp_data.all_ports);
+            old_size_h = size(h);
             for kse = 1:n_ports
                 for hsw = 1:n_ports
-                    h(kse, hsw) = figure('Position', [0, 0, 800, 800]);
+                    if old_size_h(1) < kse || old_size_h(2) < hsw
+                        h(kse, hsw) = figure('Position', [0, 0, 800, 800]);
+                    end %if
                 end %for
             end %for
-        end %if
         
         %             range_ind = find(pp_data.scale{1}(1,:) > (top_of_range(kds) - 1e6), 1, 'first');
         for law = 1:length(sets)
@@ -64,12 +67,13 @@ for jef = 1:length(good_data)
                     for m=1:1%size(tmp_data,1) % Iterate over modes
                         x_data = temp_scale{nre, es}(m,1:end-2) * 1e-9;
                         y_data = 20* log10(tmp_data(m, 1:end-2));
-                        % Trimming off the end 10% as this often contains artifacts.
-                        start_ind = ceil(length(x_data)/10);
-                        final_ind = floor(length(x_data) - length(x_data) /10);
+%                         % Trimming off the end 10% as this often contains artifacts.
+%                         start_ind = ceil(length(x_data)/10);
+%                         final_ind = floor(length(x_data) - length(x_data) /10);
                         figure(h(s_in,es))
                         hold on
-                        hl = plot(x_data(start_ind:final_ind), y_data(start_ind:final_ind), '-',...
+%                         hl = plot(x_data(start_ind:final_ind), y_data(start_ind:final_ind), '-',...
+                        hl = plot(x_data, y_data, '-',...
                             'Color', cols_sep{rem(ck,length(cols_sep))+1}, ...
                             'Linewidth', linewidth,...
                             'DisplayName',trace_name);
