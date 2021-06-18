@@ -9,7 +9,7 @@ end %if
 
 figure_setup_bounding_box(fig_h)
 
-if strcmp(name(end-3),'.')
+if length(name) > 5 && strcmp(name(end-3),'.')
     % Has an existing file type. Remove this before trying to save.
     name = name(1:end-4);
 end
