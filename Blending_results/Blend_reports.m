@@ -116,23 +116,52 @@ else
     end %for
     for ks = 1:length(names)
         [~,test{ks},~]=fileparts(names{ks});
+        test{ks} = regexprep(test{ks}, '_Base', '');
+        sections{ks,:} = regexp(test{ks},'_','split');
     end %for
-    Schar = char(test(:));
-    end_of_common = find(sum(diff(Schar)) ~= 0, 1, 'first') -1;
-    underscores = strfind(test{1}(1:end_of_common), '_');
-    if isempty(underscores)
-        rep_title = ['Comparison - ',Schar(1, 1:end)];
-        for jd = 2:length(test)
-            rep_title = strcat(rep_title , '_vs_', Schar(jd, 1:end));
-        end %for
-    else
-        rep_title = [Schar(1, 1:underscores(end) - 1), ' - ',Schar(1, underscores(end)+1:end)];
-        for jd = 2:length(test)
-            rep_title = strcat(rep_title , '_vs_', Schar(jd, underscores(end)+1:end));
-        end %for
-    end %if
+    sections = flatten_nest(sections);
+    for nes = 1:size(sections, 2)
+        word = sections{1,nes};
+        if ~isempty(word)
+            locations_of_word = strcmpi(word,sections);
+            if all(sum(locations_of_word,2))
+                if nes == 1
+                    words_to_remove = locations_of_word;
+                else
+                    words_to_remove = words_to_remove | location_of_word;
+                end %if
+                
+            end %if
+        end %if
+    end %for
+    words_to_remove(1,:) = 0;
+    words_to_remove(:,end+1) = 0;
+    sections(:,end+1) = {'vs'};
+    sections = sections';
+    words_to_remove = words_to_remove';
+    sections(words_to_remove == 1) = '';
+    rep_title = ['Comparison - ', sections{1}];
+    for ks = 2:length(sections) -1
+        if ~isempty(sections{ks})
+            rep_title = strcat(rep_title , '_', sections{ks});
+        end %if
+    end %for
+%     Schar = char(test(:));
+%     end_of_common = find(sum(diff(Schar)) ~= 0, 1, 'first') -1;
+%     underscores = strfind(test{1}(1:end_of_common), '_');
+%     if isempty(underscores)
+%         rep_title = ['Comparison - ',Schar(1, 1:end)];
+%         for jd = 2:length(test)
+%             rep_title = strcat(rep_title , '_vs_', Schar(jd, 1:end));
+%         end %for
+%     else
+%         rep_title = [Schar(1, 1:underscores(end) - 1), ' - ',Schar(1, underscores(end)+1:end)];
+%         for jd = 2:length(test)
+%             rep_title = strcat(rep_title , '_vs_', Schar(jd, underscores(end)+1:end));
+%         end %for
+%     end %if
     [report_loc,~,~] = fileparts(set_results_loc);
-    report_input.rep_title = [rep_title, ' - Blended'];
+    report_input.rep_title = rep_title;
     report_input.output_loc = fullfile(report_loc, report_input.rep_title);
     for psw = length(names):-1:1
         [param_names_temp, param_vals_temp, good_data(psw), modelling_inputs{psw}] = ...
@@ -186,13 +215,13 @@ else
         report_input.swept_name = {'Model names'};
         report_input.swept_vals = test;
     else
-    if length(varying_pars_ind) >1
-        report_input.swept_name = {'Group of variables'};
-        report_input.swept_vals = param_vals(:,varying_pars_ind(1));
-    else
-        report_input.swept_name = param_names(1, varying_pars_ind);
-        report_input.swept_vals = param_vals(:,varying_pars_ind);
-    end %if
+        if length(varying_pars_ind) >1
+            report_input.swept_name = {'Group of variables'};
+            report_input.swept_vals = param_vals(:,varying_pars_ind(1));
+        else
+            report_input.swept_name = param_names(1, varying_pars_ind);
+            report_input.swept_vals = param_vals(:,varying_pars_ind);
+        end %if
     end %if
     
     if ~exist(report_input.output_loc, 'dir')
