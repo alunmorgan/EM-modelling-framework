@@ -1,4 +1,4 @@
-function [frequency_scale, wi_re, wi_im] = extract_longitudinal_wake_impedance_from_wake_data(wake_data, cut_ind)
+function [wi_re, wi_im] = extract_longitudinal_wake_impedance_from_wake_data(wake_data, cut_ind)
 % wake data (structure): contains all the data from the wake postprocessing
 %
 %timebase (vector): timebase in ns.
@@ -7,6 +7,5 @@ function [frequency_scale, wi_re, wi_im] = extract_longitudinal_wake_impedance_f
 %
 % Example: [timebase, wi_re, wi_im] = extract_wake_impedance_from_wake_data(wake_data, cut_ind)
 
-frequency_scale = wake_data.frequency_domain_data.f_raw(1:cut_ind)*1E-9;
   wi_re = wake_data.frequency_domain_data.Wake_Impedance_data(1:cut_ind);
   wi_im = wake_data.frequency_domain_data.Wake_Impedance_data_im(1:cut_ind);

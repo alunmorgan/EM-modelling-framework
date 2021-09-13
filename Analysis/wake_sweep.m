@@ -17,12 +17,32 @@ for se = length(sweep_lengths):-1:1
     timestep =  find_smallest_timestep(r_data{se}.time_series_data);
     r_data{se}.time_series_data.timescale_common = linspace(starttime, rev_time,(rev_time - starttime)/timestep + 1)';
     for ple =  1:length(r_names)
-        temp_data = r_data{se}.time_series_data.(r_names{ple});
         if strcmp(r_names{ple}, 'port_data')
-            r_data{se}.time_series_data.port_data = condition_port_timeseries(temp_data, raw_data.port.timebase, sweep_lengths(se), starttime, rev_time, timestep);
-        elseif strcmp(r_names{ple}, 'bunch_signal')
-            r_data{se}.time_series_data.bunch_signal = condition_port_timeseries(temp_data, raw_data.port.timebase, sweep_lengths(se), starttime, rev_time, timestep);
+            substructure = fieldnames(r_data{se}.time_series_data.port_data.data.time);
+            for whs = 1:length(substructure)
+                r_data{se}.time_series_data.port_data.data.time.(substructure{whs}).data =...
+                    condition_port_timeseries(...
+                    r_data{se}.time_series_data.port_data.data.time.(substructure{whs}).data,...
+                    r_data{se}.time_series_data.port_data.timebase',...
+                    sweep_lengths(se), starttime, rev_time, timestep); %W
+                if isfield(r_data{se}.time_series_data.port_data.data.time.(substructure{whs}), 'bunch_signal')
+                    r_data{se}.time_series_data.port_data.data.time.(substructure{whs}).bunch_signal =...
+                        condition_port_timeseries(...
+                        r_data{se}.time_series_data.port_data.data.time.(substructure{whs}).bunch_signal,...
+                        r_data{se}.time_series_data.port_data.timebase',...
+                        sweep_lengths(se), starttime, rev_time, timestep); %W
+                end %if
+                if isfield(r_data{se}.time_series_data.port_data.data.time.(substructure{whs}), 'remnant_signal')
+                    r_data{se}.time_series_data.port_data.data.time.(substructure{whs}).remnant_signal =...
+                        condition_port_timeseries(...
+                        r_data{se}.time_series_data.port_data.data.time.(substructure{whs}).remnant_signal,...
+                        r_data{se}.time_series_data.port_data.timebase',...
+                        sweep_lengths(se), starttime, rev_time, timestep); %W
+                end %if
+            end %for
+            r_raw.time_series_data.port_data = rmfield(r_raw.time_series_data.port_data,'timebase');
         else
+            temp_data = r_data{se}.time_series_data.(r_names{ple});
             r_data{se}.time_series_data.(r_names{ple}) = ...
                 condition_timeseries(temp_data, sweep_lengths(se), starttime, rev_time, timestep);
         end %if
@@ -32,19 +52,8 @@ for se = length(sweep_lengths):-1:1
     %% Time domain analysis
     t_data{se} = time_domain_analysis(r_data{se}, log, port_modes_override);
     %% Frequency domain analysis
-    if isfield(t_data{1, se}, 'port_data')
-        % Run the frequency analysis.
-        f_data{se} = frequency_domain_analysis(...
-            r_data{se}.port.frequency_cutoffs, ...
-            t_data{se},...
-            r_data{se}.time_series_data.port_data,...
-            log, ppi.hfoi);
-    else
-        % Run the frequency analysis.
-        f_data{se} = frequency_domain_analysis(...
-            NaN, t_data{se}, NaN, log, ppi.hfoi);
-    end %if
-    % Material loss
+        f_data{se} = frequency_domain_analysis(t_data{se},r_data{se}.time_series_data.port_data.data.frequency.power_port.data, log, ppi.hfoi);
+    %% Material loss
     if isfield(r_raw, 'mat_losses')
         mt_ind = find(r_raw.mat_losses.loss_time < t_data{se}.timebase(end), 1, 'last');
         m_data{se}.loss_time = r_raw.mat_losses.loss_time(1:mt_ind);
@@ -59,18 +68,18 @@ for se = length(sweep_lengths):-1:1
     else
         m_data{se} = NaN;
     end %if
-    %% Generating data for time slices
-    f_data{se}.time_slices = time_slices(t_data{se}.timebase, ...
-        t_data{se}.wakepotential, ppi.hfoi);
-    %% Calculating the losses for different bunch lengths
-    f_data{se}.extrap_data.beam_sigma_sweep = variation_with_beam_sigma(ppi.bunch_lengths, t_data{se}.timebase, ...
-        f_data{se}.Wake_Impedance_data, log.charge, f_data{se}.port_impedances, f_data{se}.port_fft);
-    
-    %% and bunch charges.
-    f_data{se}.extrap_data.diff_machine_conds = loss_extrapolation(t_data{se}.timebase, f_data{se}, ppi);
+%     %% Generating data for time slices
+%     f_data{se}.time_slices = time_slices(t_data{se}.timebase, ...
+%         t_data{se}.wakepotential, ppi.hfoi);
+%     %% Calculating the losses for different bunch lengths
+%     f_data{se}.extrap_data.beam_sigma_sweep = variation_with_beam_sigma(ppi.bunch_lengths, t_data{se}.timebase, ...
+%         f_data{se}.Wake_Impedance_data, log.charge, f_data{se}.port_impedances, f_data{se}.port_fft);
+%     
+%     %% and bunch charges.
+%     f_data{se}.extrap_data.diff_machine_conds = loss_extrapolation(t_data{se}.timebase, f_data{se}, ppi);
 end %for
 
-wake_sweep_data.raw = r_data;
+% wake_sweep_data.raw = r_data;
 wake_sweep_data.frequency_domain_data = f_data;
 wake_sweep_data.time_domain_data = t_data;
 wake_sweep_data.mat_losses = m_data;
@@ -103,8 +112,7 @@ r_raw.time_series_data.Wake_potential_trans_quad_X = raw_data.Wake_potential_tra
 r_raw.time_series_data.Wake_potential_trans_quad_Y = raw_data.Wake_potential_trans_quad_Y;
 r_raw.time_series_data.Wake_potential_trans_dipole_X = raw_data.Wake_potential_trans_dipole_X;
 r_raw.time_series_data.Wake_potential_trans_dipole_Y = raw_data.Wake_potential_trans_dipole_Y;
-r_raw.time_series_data.port_data = raw_data.port.data;
-r_raw.time_series_data.bunch_signal = raw_data.port.bunch_signal;
+r_raw.time_series_data.port_data = raw_data.port; %W
 r_raw.frequency_series_data.Wake_impedance = raw_data.Wake_impedance;
 r_raw.frequency_series_data.Wake_impedance_trans_quad_X = raw_data.Wake_impedance_trans_quad_X;
 r_raw.frequency_series_data.Wake_impedance_trans_quad_Y = raw_data.Wake_impedance_trans_quad_Y;
@@ -115,11 +123,4 @@ if isfield(raw_data, 'mat_losses')
     % if the model is PEC only then this will not exist.
     r_raw.mat_losses = raw_data.mat_losses;
 end %if
-r_raw.port.labels = raw_data.port.labels;
-% r_raw.port.labels_table = raw_data.port.labels_table;
-r_raw.port.frequency_cutoffs = raw_data.port.frequency_cutoffs;
-r_raw.port.alpha = raw_data.port.alpha;
-r_raw.port.beta = raw_data.port.beta;
-r_raw.port.t_start = raw_data.port.t_start;
-r_raw.port.bunch_amplitude = raw_data.port.bunch_amplitude;
 end %function
