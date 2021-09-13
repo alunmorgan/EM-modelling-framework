@@ -61,7 +61,7 @@ if isfield(log, 'mat_losses')
 end %if
 
 %% Ports
-if ~iscell(output_file_locations.Port_mat)
+if ~isfield(output_file_locations, 'Port_mat')
     disp('postprocess_wakes:No ports to analyse')
     port_data = NaN;
 else
