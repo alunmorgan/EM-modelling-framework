@@ -128,7 +128,7 @@ else
                 if nes == 1
                     words_to_remove = locations_of_word;
                 else
-                    words_to_remove = words_to_remove | location_of_word;
+                    words_to_remove = words_to_remove | locations_of_word;
                 end %if
                 
             end %if
