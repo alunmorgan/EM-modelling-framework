@@ -34,8 +34,8 @@ test= regexp(data, variable_regexp, 'tokens');
 test_ind = cellfun(@isempty,test);
 test2=test(~test_ind);
 for hs = 1:length(test2)
-    test3{hs,1} = test2{hs,1}{1}{1};
-    test3{hs,2} = test2{hs}{1}{2};
+    val_name_temp = regexprep(test2{hs,1}{1}{1}, '@', '');
+    lg.(val_name_temp)= test2{hs}{1}{2};
 end %for
 % tfirsts
 tfirst_regexp = 'sparameter>\s+tfirst\s*=\s*(.*)';
