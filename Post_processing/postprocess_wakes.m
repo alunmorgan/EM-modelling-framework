@@ -10,7 +10,7 @@ function data = postprocess_wakes(modelling_inputs, log)
 
 %% Write the wake post processing input file
 transverse_quadrupole_wake_offset = '1E-3';
-tstart = GdfidL_write_pp_input_file(log, transverse_quadrupole_wake_offset, str2double(modelling_inputs.version(1:6)));
+tstart = GdfidL_write_pp_input_file(log, transverse_quadrupole_wake_offset);
 
 
 %% run the wake postprocessor

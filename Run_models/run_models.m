@@ -16,7 +16,9 @@ for awh = 1:length(modelling_inputs)
     sims = cell(1,1);
     restart = cell(1,1);
     s_ck = 1;
-    if contains(mi.simulation_defs.sim_select, 'g')
+    if contains(mi.simulation_defs.sim_select, 'g') ...
+            && str2double(modelling_inputs{awh}.beam_offset_x) == 0 ...
+            && str2double(modelling_inputs{awh}.beam_offset_y) == 0
         sims{s_ck} = 'geometry';
         restart_loc_tmp =fullfile(restart_root, modelling_inputs{awh}.base_model_name, modelling_inputs{awh}.model_name, 'geometry', '.iMod-1');
         if exist(restart_loc_tmp)
@@ -36,7 +38,9 @@ for awh = 1:length(modelling_inputs)
         end %if
         s_ck = s_ck +1;
     end %if
-    if contains(mi.simulation_defs.sim_select, 's')
+    if contains(mi.simulation_defs.sim_select, 's') ...
+            && str2double(modelling_inputs{awh}.beam_offset_x) == 0 ...
+            && str2double(modelling_inputs{awh}.beam_offset_y) == 0
         sims{s_ck} = 's_parameter';
         restart_loc_tmp =fullfile(restart_root, modelling_inputs{awh}.base_model_name, modelling_inputs{awh}.model_name, 's_parameter', '.iMod-1');
         if exist(restart_loc_tmp)

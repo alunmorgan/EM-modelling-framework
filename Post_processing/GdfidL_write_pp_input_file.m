@@ -1,4 +1,4 @@
-function tfirst = GdfidL_write_pp_input_file(log, tqw_offset, ver)
+function tfirst = GdfidL_write_pp_input_file(log, tqw_offset)
 % Writes the post processing input file.
 %
 % log is a structure containing the information extracted from the log
@@ -14,14 +14,19 @@ function tfirst = GdfidL_write_pp_input_file(log, tqw_offset, ver)
 
 
 %determine the values for tfirst.
-% 9 sigmas is enough for the input charge to have fully passed through the
+% 8 sigmas is usually enough for the input charge to have fully passed through the
 % port. If you do not leave enough time then there is an enhancement in
 % what is accounted for. And a sharp pling which messes up the FFT later in
 % the processing chain.
-% These are now set to 0 as this truncation is done as a postprocessing
-    % step.
-tfirst = 0;
 
+% However for some models (e.g. BPMs) this quiet period needs to be extended.
+tfirst{1} = '2E-9';%'8 * SIGMA / 3e8'; % input beam port
+tfirst{2} = '2E-9';%'( @zmax - @zmin + 8 * SIGMA ) / 3e8'; % output beam port
+for kd = 3:length(log.port_name)
+    % For the signal ports you WANT to include the effect of the beam signal
+    %     as that is what you are trying to measure
+    tfirst{kd} = '0';
+end %for
 
 ov{1} = '';
 ov = cat(1,ov,'-general');
@@ -32,16 +37,19 @@ ov = cat(1,ov,'    plotopts = -geometry 1024x768');
 ov = cat(1,ov,'    nrofthreads = 25');
 ov = cat(1,ov,'    ');
 ov = cat(1,ov,'-wakes');
-ov = cat(1,ov,'    watq = yes');
+ov = cat(1,ov,'    watq = no');
 ov = cat(1,ov,'    awtatq = yes');
 ov = cat(1,ov,'    impedances = yes');
 % ov = cat(1,ov,'    peroffset = yes');
 % ov = cat(1,ov,'    window = no');
-ov = cat(1,ov,['    wxatxy = (-', tqw_offset,',', tqw_offset,')']);
-ov = cat(1,ov,['    wyatxy = (-', tqw_offset,',', tqw_offset,')']);
+ov = cat(1,ov,'    watxy = (0,0)');
+ov = cat(1,ov,'    wxatxy = (0,0)');
+ov = cat(1,ov,'    wyatxy = (0,0)');
+% ov = cat(1,ov,['    wxatxy = (-', tqw_offset,',', tqw_offset,')']);
+% ov = cat(1,ov,['    wyatxy = (-', tqw_offset,',', tqw_offset,')']);
 ov = cat(1,ov,'    showchargemax = yes');
 ov = cat(1,ov,'    onlyplotfiles = yes');
-ov = cat(1,ov,'    watsfiles = yes');
+ov = cat(1,ov,'    watsfiles = no');
 ov = cat(1,ov,'    doit');
 ov = cat(1,ov,'');
 ov = cat(1,ov,'-pmonitor');
@@ -90,6 +98,30 @@ ov = cat(1,ov,'    doit');
 ov = cat(1,ov,'-sparameter, showeh=no');
 ov = cat(1,ov,'    doit');
 % end
+
+
+% showeh = {'no', 'yes'};
+% % showeh =yes gives good output power graphs, while showeh=no gives output
+% % voltage graphs which can be used to reconstruct the frequency domain after
+% % truncating the wake/ time slicing etc.
+% for ens = 1:2
+%     for lae = 1:length(log.port_name)
+%         ov = cat(1,ov,'-general');
+%         ov = cat(1,ov,strcat('    scratchbase = temp_scratch/',log.port_name{lae}, '-'));
+%         ov = cat(1,ov,'-sparameter');
+%         ov = cat(1,ov,strcat('    ports = ', log.port_name{lae}));
+%         ov = cat(1,ov,'    modes = all');
+%         ov = cat(1,ov,strcat('showeh   = ', showeh{ens}));
+%         ov = cat(1,ov,'    timedata = yes');
+%         ov = cat(1,ov,'    ignoreexc = yes');
+%         ov = cat(1,ov,strcat('    tfirst = ',tfirst{lae}));
+%         ov = cat(1,ov,'    tsumpower = yes');
+%         ov = cat(1,ov,'    tintpower = yes');
+%         ov = cat(1,ov,'    fintpower = yes');
+%         ov = cat(1,ov,'    onlyplotfiles = yes');
+%         ov = cat(1,ov,'    doit');
+%     end   
+% end %for
 
 % find the first stored field after the bunch has passed out of the
 % structure

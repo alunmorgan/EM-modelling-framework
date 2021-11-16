@@ -1,7 +1,6 @@
 function plot_energy_graphs(h_wake, path_to_data, m_time, m_data, ...
-    material_names, col_ofst, timebase_port, port_cumsum,...
-    e_ports_cs,...
-    timebase_cs, e_total_cs, cut_time_ind, y_lev_t, lw, l_st, port_names)
+    material_names, col_ofst, timebase, port_cumsum,...
+    e_ports_cs, e_total_cs, cut_time_ind, y_lev_t, lw, l_st, port_names)
 
 clf(h_wake)
 if ~isnan(m_time{1})
@@ -23,18 +22,18 @@ if ~isnan(m_time{1})
 end %if
 
 %% Cumulative total energy.
-if ~all(isnan(timebase_port)) && ~all(isnan(port_cumsum))
+if ~all(isnan(timebase)) && ~all(isnan(port_cumsum))
     ax(4) = axes('Parent', h_wake);
     if ~isempty(cut_time_ind)
-        plot(timebase_cs(1:cut_time_ind), e_total_cs(1:cut_time_ind),'b','LineWidth',lw, 'Parent', ax(4))
+        plot(timebase(1:cut_time_ind), e_total_cs(1:cut_time_ind),'b','LineWidth',lw, 'Parent', ax(4))
         graph_add_horizontal_lines(y_lev_t)
         title('Cumulative Energy seen at all ports', 'Parent', ax(4))
         xlabel('Time (ns)', 'Parent', ax(4))
         ylabel('Cumulative Energy (nJ)', 'Parent', ax(4))
-        xlim([0 timebase_cs(end)])
-        text(timebase_cs(cut_time_ind), y_lev_t(1), '100%')
+        xlim([0 timebase(end)])
+        text(timebase(cut_time_ind), y_lev_t(1), '100%')
         fr = (e_total_cs(cut_time_ind) / y_lev_t(1)) *100;
-        text(timebase_cs(cut_time_ind), e_total_cs(end), [num2str(round(fr)),'%'])
+        text(timebase(cut_time_ind), e_total_cs(end), [num2str(round(fr)),'%'])
     end %if
     savemfmt(h_wake, path_to_data,'cumulative_total_energy')
     clf(h_wake)
@@ -44,7 +43,7 @@ if ~all(isnan(timebase_port)) && ~all(isnan(port_cumsum))
     hold(ax(5), 'all')
     cport_cols = col_gen(length(port_names));
     for ens = 1:length(port_names)
-        plot(timebase_cs(1:cut_time_ind), e_ports_cs(1:cut_time_ind, ens),...
+        plot(timebase(1:cut_time_ind), e_ports_cs(1:cut_time_ind, ens),...
             'Color',cport_cols(ens,:),'LineWidth',lw, 'LineStyle', l_st{1}, ...
             'Parent', ax(5), 'DisplayName', regexprep(port_names{ens},'_',' '))
     end %for
@@ -52,7 +51,7 @@ if ~all(isnan(timebase_port)) && ~all(isnan(port_cumsum))
     title('Cumulative energy seen at the ports (nJ)', 'Parent', ax(5))
     xlabel('Time (ns)', 'Parent', ax(5))
     ylabel('Cumulative Energy (nJ)', 'Parent', ax(5))
-    xlim([timebase_cs(1) timebase_cs(cut_time_ind)])
+    xlim([timebase(1) timebase(cut_time_ind)])
     legend(ax(5), 'Location', 'SouthEast')
     savemfmt(h_wake, path_to_data,'cumulative_energy')
     clf(h_wake)

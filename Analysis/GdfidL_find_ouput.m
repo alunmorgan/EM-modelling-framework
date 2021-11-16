@@ -62,52 +62,151 @@ end
 
 % Find list of ports.
 inds = find_position_in_cell_lst(strfind(run_list, 'Port='));
-output_file_locations.Ports = run_list(inds);
+power_inds = find_position_in_cell_lst(strfind(run_list, '-h_amp_of_mode='));
+voltage_inds = find_position_in_cell_lst(strfind(run_list, '-e_amp_of_mode='));
+output_file_locations.Ports.power = run_list(intersect(inds ,power_inds));
+output_file_locations.Ports.voltage = run_list(intersect(inds ,voltage_inds));
 % Put the paths into a grid of port vs mode
 
 % first find the port names.
-nme_start = strfind(output_file_locations.Ports, 'Port=');
-% Dealing with change of output in the log file.
-nme_end1 = strfind(output_file_locations.Ports, '_amp_of_mode=');
-nme_end2 = strfind(output_file_locations.Ports, '_amp_of_Mode=');
-% Now the port modes.
-mode_end = strfind(output_file_locations.Ports, '-tim');
-port_names_list = cell(1,1);
-port_modes = NaN;
-for nr = 1:length(output_file_locations.Ports)
-    if isempty(nme_end1{nr})
-        if isempty(nme_end2{nr})
-            port_names_list{nr} = '';
-            port_modes(nr) = NaN;
-            continue
-        else
-            nme_end = nme_end2;
-        end %if
-    else
-        nme_end = nme_end1;
+nme_start = strfind(output_file_locations.Ports.voltage, 'Port=');
+nme_end = strfind(output_file_locations.Ports.voltage, '-e_amp_of_mode=');
+port_names_list_voltage = cell(1,1);
+ac = 1;
+for nr = 1:length(output_file_locations.Ports.voltage)
+    if ~isempty(nme_end{nr})       
+    port_names_list_voltage{ac} = output_file_locations.Ports.voltage{nr}(nme_start{nr}+5:nme_end{nr}-1);
+    ac = ac + 1;
     end %if
-    port_names_list{nr} = output_file_locations.Ports{nr}(nme_start{nr}+5:nme_end{nr}-1);
-    port_modes(nr) = str2double(output_file_locations.Ports{nr}(nme_end{nr}+13:mode_end{nr}-1));
 end %for
+% nme_end = strfind(output_file_locations.Ports.power, '-h_amp_of_mode=');
+% port_names_list_power = cell(1,1);
+% ac = 1;
+% for nr = 1:length(output_file_locations.Ports.power)
+%     if ~isempty(nme_end{nr})       
+%     port_names_list_power{ac} = output_file_locations.Ports.power{nr}(nme_start{nr}+5:nme_end{nr}-1);
+%     ac = ac + 1;
+%     end %if
+% end %for
 % find the unique port names
-port_names_temp = unique(port_names_list);
+port_names_temp = unique(port_names_list_voltage);
 empty_names_ind = cellfun(@isempty, (port_names_temp));
 output_file_locations.port_names = port_names_temp(~empty_names_ind);
-if isempty(output_file_locations.port_names)
-    disp('No Port data - This is a problem')
-    output_file_locations.Port_mat = NaN;
-    output_file_locations.port_names = NaN;
-else
-    % put them in a matrix
-    output_file_locations.Port_mat = cell(1,1);
-    for hs = 1:length(output_file_locations.port_names)
-        p_ind = contains(port_names_list, output_file_locations.port_names{hs});
-%         if ~isnan(port_modes(hs))
-            selected_port_modes = port_modes(p_ind);
-            selected_ports = output_file_locations.Ports(p_ind);
-            for hfe = 1:length(selected_ports)
-                output_file_locations.Port_mat{hs, selected_port_modes(hfe)} = selected_ports{hfe};
-            end %for
-%         end %if
+% if isempty(output_file_locations.port_names)
+%     disp('No Port data - This is a problem')
+%     output_file_locations.Port_mat = NaN;
+%     output_file_locations.port_names = NaN;
+% else
+%     port_modes = NaN;
+%     % Now the port modes.
+%     nme_end = strfind(output_file_locations.Ports.voltage, '-e_amp_of_mode=');
+%     mode_end = strfind(output_file_locations.Ports.voltage, '-time.mtv');
+%     for nr = 1:length(output_file_locations.Ports.voltage)
+%         port_modes(nr) = str2double(output_file_locations.Ports.voltage{nr}(nme_end{nr}+15:mode_end{nr}-1));
+%     end %for
+%     % put them in a matrix
+%     output_file_locations.Port_mat.voltage = cell(1,1);
+%     for hs = 1:length(output_file_locations.port_names)
+%         p_ind = contains(port_names_list_voltage, output_file_locations.port_names{hs});
+%         selected_port_modes = port_modes(p_ind);
+%         selected_ports = output_file_locations.Ports.voltage(p_ind);
+%         for hfe = 1:length(selected_ports)
+%             output_file_locations.Port_mat.voltage{hs, selected_port_modes(hfe)} = selected_ports{hfe};
+%         end %for
+%     end %for
+%     output_file_locations.Port_mat.power = cell(1,1);
+%     for hs = 1:length(output_file_locations.port_names)
+%         p_ind = contains(port_names_list_power, output_file_locations.port_names{hs});
+%         selected_port_modes = port_modes(p_ind);
+%         selected_ports = output_file_locations.Ports.power(p_ind);
+%         for hfe = 1:length(selected_ports)
+%             output_file_locations.Port_mat.power{hs, selected_port_modes(hfe)} = selected_ports{hfe};
+%         end %for
+%     end %for
+% end %if
+
+inds = find_position_in_cell_lst(strfind(run_list, 'Port='));
+input_list = run_list(inds);
+inds = find_position_in_cell_lst(strfind(input_list, '-e_amp_of_mode='));
+input_list = input_list(inds);
+nme_start = 'Port=';
+nme_end = '-e_amp_of_mode=';
+mode_end = '-time.mtv';
+port_names = output_file_locations.port_names;
+output_file_locations.Port_mat.time.voltage_port_mode = arrange_outputs_into_grids(nme_start, nme_end, mode_end, port_names, input_list);
+
+inds = find_position_in_cell_lst(strfind(run_list, 'Port='));
+input_list = run_list(inds);
+inds = find_position_in_cell_lst(strfind(input_list, '-h_amp_of_mode='));
+input_list = input_list(inds);
+nme_start = 'Port=';
+nme_end = '-h_amp_of_mode=';
+mode_end = '-time.mtv';
+port_names = output_file_locations.port_names;
+output_file_locations.Port_mat.time.power_port_mode = arrange_outputs_into_grids(nme_start, nme_end, mode_end, port_names, input_list);
+
+inds = find_position_in_cell_lst(strfind(run_list, '-integral-sum-power-df'));
+input_list = run_list(inds);
+nme_start = '/';
+nme_end = '-integral-sum-power-df';
+mode_end = '';
+port_names = output_file_locations.port_names;
+output_file_locations.Port_mat.frequency.power_cumulative_port = arrange_outputs_into_grids(nme_start, nme_end, mode_end, port_names, input_list);
+
+inds = find_position_in_cell_lst(strfind(run_list, '-integral-sum-power-dt'));
+input_list = run_list(inds);
+nme_start = '/';
+nme_end = '-integral-sum-power-dt';
+mode_end = '';
+port_names = output_file_locations.port_names;
+output_file_locations.Port_mat.time.power_cumulative_port = arrange_outputs_into_grids(nme_start, nme_end, mode_end, port_names, input_list);
+
+inds = find_position_in_cell_lst(strfind(run_list, '-sum-power-freq'));
+input_list = run_list(inds);
+nme_start = '/';
+nme_end = '-sum-power-freq';
+mode_end = '';
+port_names = output_file_locations.port_names;
+output_file_locations.Port_mat.frequency.power_port = arrange_outputs_into_grids(nme_start, nme_end, mode_end, port_names, input_list);
+
+inds = find_position_in_cell_lst(strfind(run_list, '-sum-power-time'));
+input_list = run_list(inds);
+nme_start = '/';
+nme_end = '-sum-power-time';
+mode_end = '';
+port_names = output_file_locations.port_names;
+output_file_locations.Port_mat.time.power_port = arrange_outputs_into_grids(nme_start, nme_end, mode_end, port_names, input_list);
+
+end %function
+
+function output_matrix = arrange_outputs_into_grids(nme_start, nme_end, mode_end, port_names, input_list)
+nme_start_ind = strfind(input_list, nme_start);
+nme_end_ind = strfind(input_list, nme_end);
+mode_end_ind = strfind(input_list, mode_end);
+port_names_list = cell(1,1);
+for nr = 1:length(input_list)
+    if ~isempty(nme_end_ind{nr})       
+    port_names_list{nr} = input_list{nr}(nme_start_ind{nr}+length(nme_start):nme_end_ind{nr}-1);
+    end %if
+end %for
+if~strcmp(mode_end, '')
+    port_modes = NaN;
+    % Now the port modes.
+    for nr = 1:length(input_list)
+        port_modes(nr) = str2double(input_list{nr}(nme_end_ind{nr}+length(nme_end):mode_end_ind{nr}-1));
     end %for
+else
+    port_modes = ones(1, length(input_list));
 end %if
+% put them in a matrix
+output_matrix = cell(1,1);
+for hs = 1:length(port_names)
+    p_ind = contains(port_names_list, port_names{hs});
+    selected_port_modes = port_modes(p_ind);
+    selected_ports = input_list(p_ind);
+    for hfe = 1:length(selected_ports)
+        output_matrix{hs, selected_port_modes(hfe)} = selected_ports{hfe};
+    end %for
+end %for
+
+end %function

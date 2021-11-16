@@ -16,15 +16,17 @@ if iscell(output_file_locations.Energy_in_ceramics)
     loss_in_ceramics = cumsum(energy_ceramics_data.data(:,2)) .* ...
         (energy_ceramics_data.data(2,1)-energy_ceramics_data.data(1,1));
     if sum(loss_in_ceramics) == 0
-         loss_in_ceramics = 0;
-         if ~isfield(log.mat_losses, 'loss_time')
-             log.mat_losses.loss_time = 0;
-         end %if
+        loss_in_ceramics = 0;
+        if ~isfield(log.mat_losses, 'loss_time')
+            log.mat_losses.loss_time = 0;
+        end %if
     else
-    % In order to combine with the other material losses I can interpolate (as
-    % I have already done the scaling with timestep.)
-    loss_in_ceramics = interp1(energy_ceramics_data.data(:,1), ...
-        loss_in_ceramics, log.mat_losses.loss_time);
+        % In order to combine with the other material losses I can interpolate (as
+        % I have already done the scaling with timestep.)
+        if isfield(log.mat_losses, 'loss_time')
+            loss_in_ceramics = interp1(energy_ceramics_data.data(:,1), ...
+                loss_in_ceramics, log.mat_losses.loss_time);
+        end %if
     end %if
 end %if
 
@@ -61,7 +63,7 @@ if isfield(log, 'mat_losses')
 end %if
 
 %% Ports
-if ~iscell(output_file_locations.Port_mat)
+if ~isfield(output_file_locations, 'Port_mat')
     disp('postprocess_wakes:No ports to analyse')
     port_data = NaN;
 else
@@ -177,6 +179,18 @@ raw_data.port.data = port_data;
 raw_data.port.labels = modelling_inputs.port_names;
 raw_data.port.t_start = tstart;
 raw_data.wake_setup.Wake_length = wpl_data.data(end,1) .* 2.99792458E8;
-raw_data.mat_losses.loss_time = log.mat_losses.loss_time;
-raw_data.mat_losses.total_loss = total_loss;
-raw_data.mat_losses.single_mat_data = log.mat_losses.single_mat_data;
+if isfield(log.mat_losses, 'loss_time')
+    raw_data.mat_losses.loss_time = log.mat_losses.loss_time;
+else
+    raw_data.mat_losses.loss_time = 0;
+end %if
+if exist('total_loss', 'var')
+    raw_data.mat_losses.total_loss = total_loss;
+else
+    raw_data.mat_losses.total_loss = 0;
+end %if
+if isfield(log.mat_losses, 'single_mat_data')
+    raw_data.mat_losses.single_mat_data = log.mat_losses.single_mat_data;
+else
+    raw_data.mat_losses.single_mat_data = 0;
+end %if

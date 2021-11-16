@@ -1,12 +1,9 @@
 function postprocess_core(pp_data_directory, version, sim_type, s_set, excitation)
 
-% disp(['Post processing ', sim_type, ' data.'])
 if strcmpi(sim_type, 'wake') || strcmpi(sim_type, 'eigenmode')|| strcmpi(sim_type, 'lossy_eigenmode')
-    %     pp_data_directory = fullfile('pp_link',sim_type);
     pp_input_file = ['model_', sim_type, '_post_processing'];
     pp_log_file = ['model_', sim_type ,'_post_processing_log'];
 elseif strcmpi(sim_type, 's_parameter')
-    %     pp_data_directory = fullfile('pp_link', 's_parameter',['model_s_param_set_',s_set,'_',excitation,'_post_processing']);
     pp_input_file = ['model_s_param_set_',s_set, '_',excitation,'_post_processing_input_file'];
     pp_log_file = ['model_s_param_set_',s_set, '_',excitation,'_post_processing_log'];
 end %if

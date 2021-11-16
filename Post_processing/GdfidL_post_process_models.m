@@ -67,7 +67,7 @@ for oef = 1:length(sim_types)
                     % Reading logs
                     run_logs = GdfidL_read_logs(sim_types{oef});
                     save(fullfile(pp_directory, 'data_from_run_logs.mat'), 'run_logs')
-                    
+
                     % Load up the original model input parameters.
                     load(fullfile(pp_directory, 'run_inputs.mat'), 'modelling_inputs')
                     
@@ -80,6 +80,8 @@ for oef = 1:length(sim_types)
                         pp_data = postprocess_eigenmode(modelling_inputs, run_logs, 'lossy_eigenmode');
                     end %if
                     save(fullfile('pp_link', sim_types{oef}, 'data_postprocessed.mat'), 'pp_data','-v7.3')
+                    pp_logs = GdfidL_read_pp_logs(sim_types{oef});
+                    save(fullfile(pp_directory, 'data_from_pp_logs.mat'), 'pp_logs')
                 catch W_ERR
                     disp( ['<strong>', sim_types{oef}, ' Error</strong>'])
                     display_error_message(W_ERR)

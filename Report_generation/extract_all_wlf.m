@@ -26,7 +26,7 @@ for sts = 1:length(model_sets)
         end %if
         extracted_data{sts}.model_names{ind} = split_str{ind}{end - 2};
         extracted_data{sts}.wlf(ind) = wake_sweep_data.time_domain_data{end}.wake_loss_factor;
-        extracted_data{sts}.wake_length(ind) = wake_sweep_data.raw{1, 1}.wake_setup.Wake_length;
+        extracted_data{sts}.wake_length(ind) = str2double(modelling_inputs.wakelength);
         extracted_data{sts}.mesh_density(ind) = modelling_inputs.mesh_stepsize;
         extracted_data{sts}.mesh_scaling(ind) = modelling_inputs.mesh_density_scaling;
         extracted_data{sts}.n_cores(ind) = str2double(modelling_inputs.n_cores);
@@ -37,27 +37,24 @@ for sts = 1:length(model_sets)
         extracted_data{sts}.timestep(ind) = run_logs.Timestep;
         extracted_data{sts}.memory_usage(ind) = run_logs.memory;
         extracted_data{sts}.beam_sigma(ind) = run_logs.beam_sigma;
-        extracted_data{sts}.fractional_loss_beam_ports(ind) = wake_sweep_data.frequency_domain_data{end}.fractional_loss_beam_ports;
-        extracted_data{sts}.fractional_loss_signal_ports(ind) = wake_sweep_data.frequency_domain_data{end}.fractional_loss_signal_ports;
-        extracted_data{sts}.fractional_loss_structure(ind) = wake_sweep_data.frequency_domain_data{end}.fractional_loss_structure;
-        try
-            port_energy = wake_sweep_data.time_domain_data{end}.port_data.port_energy;
-        catch
-            port_energy = wake_sweep_data.port_time_data{end}.port_energy;
-        end%try
+        extracted_data{sts}.fractional_loss_beam_ports(ind) = sum(wake_sweep_data.time_domain_data{end}.port_data.power_port_mode.remnant_only.port_energy(1:2))/wake_sweep_data.time_domain_data{end}.loss_from_beam;
+        if length(wake_sweep_data.time_domain_data{end}.port_data.power_port_mode.remnant_only.port_energy) > 2
+            extracted_data{sts}.fractional_loss_signal_ports(ind) = sum(wake_sweep_data.time_domain_data{end}.port_data.power_port_mode.remnant_only.port_energy(3:end))/wake_sweep_data.time_domain_data{end}.loss_from_beam;
+        else
+            extracted_data{sts}.fractional_loss_signal_ports(ind) = 0;
+        end %if
+        extracted_data{sts}.fractional_loss_structure(ind) = 1- extracted_data{sts}.fractional_loss_beam_ports(ind) - extracted_data{sts}.fractional_loss_signal_ports(ind);
+            port_energy = wake_sweep_data.time_domain_data{end}.port_data.power_port_mode.remnant_only.port_energy;
+
         total_energy = wake_sweep_data.time_domain_data{end}.loss_from_beam;
         extracted_data{sts}.beam_port_loss(ind) = (port_energy(1) + port_energy(2)) / total_energy;
         extracted_data{sts}.signal_port_loss(ind) = sum(port_energy(3:end)) / total_energy;
         extracted_data{sts}.structure_loss(ind) = (total_energy - sum(port_energy(1:end))) / total_energy;
-        all_bunch_signals = wake_sweep_data.raw{end}.port.bunch_amplitude;
-        for hwhs = 1:length(all_bunch_signals) %ports
-            for nse = 1:length(all_bunch_signals{hwhs}) %modes
-                [~, extracted_data{sts}.port{ind}.dominant_modes(hwhs)] = max(abs(all_bunch_signals{hwhs}));
-                extracted_data{sts}.port{ind}.dominant_signal_amplitudes(hwhs) = ...
-                    all_bunch_signals{hwhs}(extracted_data{sts}.port{ind}.dominant_modes(hwhs));
-            end %for
+        all_bunch_signals = wake_sweep_data.time_domain_data{1, 1}.port_data.power_port_mode.remnant_only.port_mode_signals;
+        for hwhs = 1:size(all_bunch_signals,1) %ports
+            [extracted_data{sts}.port{ind}.dominant_signal_amplitude(hwhs), extracted_data{sts}.port{ind}.dominant_mode(hwhs)] = max(sum(all_bunch_signals(hwhs,:,:),3),[], 2);
         end %for
-        extracted_data{sts}.port{ind}.labels = wake_sweep_data.raw{end}.port.labels;
+        extracted_data{sts}.port{ind}.labels = wake_sweep_data.time_domain_data{1, 1}.port_lables;
         for jd = 1:size(run_logs.mat_losses.single_mat_data,1)
             extracted_data{sts}.material_loss{ind}.(regexprep(run_logs.mat_losses.single_mat_data{jd,2},' ', '_')) = ...
                 run_logs.mat_losses.single_mat_data{jd,4}(end,2);

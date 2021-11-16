@@ -2,12 +2,16 @@ function output = condition_timeseries(temp_data, sweep_length, start_time, end_
 % move onto common timestep.
 if ~all(isnan(temp_data))
     tmp_timebase = linspace(temp_data(1,1),temp_data(end,1),(temp_data(end,1) - temp_data(1,1))/timestep + 1);
-    % find the data length required.
-    trimmed = find(tmp_timebase <= (sweep_length / 3E8), 1, 'last');
-    if isempty(trimmed)
-        disp(['Sweep length ', num2str(sweep_length) ,' not found.'])
+    
+    if ~isnan(sweep_length)
+        % find the data length required.
+        trimmed = find(tmp_timebase <= (sweep_length / 3E8), 1, 'last');
+        if isempty(trimmed)
+            disp(['Sweep length ', num2str(sweep_length) ,' not found.'])
+        end %if
+        tmp_timebase = tmp_timebase(1:trimmed);
     end %if
-    tmp_timebase = tmp_timebase(1:trimmed);
+    
     data = interp1(temp_data(:,1), temp_data(:,2),tmp_timebase ) ;
     
     full_timebase = linspace(start_time, end_time,(end_time - start_time)/timestep + 1);

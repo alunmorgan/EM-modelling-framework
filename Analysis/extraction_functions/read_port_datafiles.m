@@ -1,19 +1,58 @@
-function [port_timebase, port_data] = read_port_datafiles(Port_mat)
+function [port_timebase, port_data_conditioned] = read_port_datafiles(input)
 % Extracts ports data from the GdfidL output graphs.
 %
 % Example: [port_timebase, port_data] = read_port_datafiles(Port_mat)
 
-temp_data = GdfidL_read_graph_datafile( Port_mat{1,1});
-port_timebase = temp_data.data(:,1);
+% for time domain data
+Port_mat = input.time;
+substructure = fieldnames(Port_mat);
 
-for hes = 1:size(Port_mat,1) % simulated ports
-    for wha = 1:size(Port_mat,2) % modes
-        if ~isempty(Port_mat{hes,wha})
-            temp_data  = GdfidL_read_graph_datafile( Port_mat{hes,wha} );
-            temp_data = temp_data.data(:,2);
-            port_data{hes}(:,wha) = temp_data(:);
-        end %if
-        clear temp_data
+timebase_start = 0;
+timebase_end = 0;
+timebase_step = 1;
+
+for hs = 1:length(substructure)
+    for hes = 1:size(Port_mat.(substructure{hs}),1) % simulated ports
+        for wha = 1:size(Port_mat.(substructure{hs}),2) % modes
+            if ~isempty(Port_mat.(substructure{hs}){hes,wha})
+                temp_data  = GdfidL_read_graph_datafile( Port_mat.(substructure{hs}){hes,wha} );
+                temp_timebase = temp_data.data(:,1);
+                if temp_timebase(1) < timebase_start
+                    timebase_start = temp_timebase(1);
+                end %if
+                if temp_timebase(end) > timebase_end
+                    timebase_end = temp_timebase(end);
+                end %if
+                if temp_timebase(2) - temp_timebase(1) < timebase_step
+                    timebase_step = temp_timebase(2) - temp_timebase(1);
+                end %if
+                port_data{hs}{hes}{wha} = temp_data.data;
+            end %if
+            clear temp_data
+        end %for
     end %for
 end %for
+
+for hs = 1:length(port_data)
+    for hes = 1:length(port_data{hs}) % simulated ports
+        for wha = 1:length(port_data{hs}{hes}) % modes
+            port_data_conditioned.time.(substructure{hs}){hes}(:,wha) =  condition_timeseries(...
+                port_data{hs}{hes}{wha}, NaN, timebase_start, timebase_end, timebase_step);
+        end %for
+    end %for
+end %for
+port_timebase = linspace(timebase_start, timebase_end,(timebase_end - timebase_start)/timebase_step + 1);
+
+% for frequency domain data
+Port_mat = input.frequency;
+substructure = fieldnames(Port_mat);
+for hs = 1:length(substructure)
+    for hes = 1:size(Port_mat.(substructure{hs}),1) % simulated ports
+        for wha = 1:size(Port_mat.(substructure{hs}),2) % modes
+            temp_data  = GdfidL_read_graph_datafile( Port_mat.(substructure{hs}){hes,wha} );
+            port_data_conditioned.frequency.(substructure{hs}){hes,wha} = temp_data.data;
+        end %for
+    end %for
+end %for
+
 
