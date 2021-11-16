@@ -24,14 +24,17 @@ ck = 1;
 for hse = length(good_wake_data):-1 :1
     if good_wake_data(hse) == 1
         load(fullfile(report_input.source_path, report_input.sources{hse}, 'wake', 'data_analysed_wake.mat'), 'wake_sweep_data');
-        for nw = 1:length(wake_sweep_data.raw)
-            wake_sweep_vals(nw) = wake_sweep_data.raw{1, nw}.wake_setup.Wake_length;
-        end %for
-        chosen_wake_ind = find(wake_sweep_vals == chosen_wake_length);
-        if isempty(chosen_wake_ind)
-            chosen_wake_ind = find(wake_sweep_vals == max(wake_sweep_vals));
-            disp('Chosen wake length not found. Setting the wakelength to maximum value.')
-        end %if
+        load(fullfile(report_input.source_path, report_input.sources{hse}, 'wake', 'data_from_run_logs.mat'), 'run_logs');
+        load(fullfile(report_input.source_path, report_input.sources{hse}, 'wake','data_postprocessed.mat'), 'pp_data');
+        %         for nw = 1:length(wake_sweep_data.raw)
+        %             wake_sweep_vals(nw) = wake_sweep_data.raw{1, nw}.wake_setup.Wake_length;
+        %         end %for
+        %         chosen_wake_ind = find(wake_sweep_vals == chosen_wake_length);
+        %         if isempty(chosen_wake_ind)
+        %             chosen_wake_ind = find(wake_sweep_vals == max(wake_sweep_vals));
+        %             disp('Chosen wake length not found. Setting the wakelength to maximum value.')
+        %         end %if
+        chosen_wake_ind = 1; % Wake sweep has been disabled for now.
         
         f_upper_ind = find(wake_sweep_data.frequency_domain_data{chosen_wake_ind}.f_raw > upper_frequency,1 ,'first');
         data_out(ck, 1).ydata = wake_sweep_data.time_domain_data{chosen_wake_ind}.wakepotential * 1E-9;
@@ -55,30 +58,24 @@ for hse = length(good_wake_data):-1 :1
         data_out(ck, 3).out_name = 'longitudinal_wake_impedance_imaginary';
         data_out(ck, 3).linewidth = 2;
         data_out(ck, 3).islog = 0;
-        if isfield(wake_sweep_data.raw{chosen_wake_ind}, 'Energy')
-            data_out(ck, 4).ydata = cumsum(wake_sweep_data.raw{chosen_wake_ind}.Energy(:,2));
-            data_out(ck, 4).xdata = wake_sweep_data.raw{chosen_wake_ind}.Energy(:,1) * 1e9;
-        else
-            data_out(ck, 4).ydata = cumsum(wake_sweep_data.raw{chosen_wake_ind}.time_series_data.Energy);
-            data_out(ck, 4).xdata = wake_sweep_data.raw{chosen_wake_ind}.time_series_data.timescale_common' * 1e9;
+        if isfield(pp_data, 'Energy')
+            data_out(ck, 4).ydata = cumsum(pp_data.Energy(:,2));
+            data_out(ck, 4).xdata = pp_data.Energy(:,1) * 1e9;
+            
+            data_out(ck, 4).Ylab = 'Cumulative energy (J)';
+            data_out(ck, 4).Xlab = 'Time (ns)';
+            data_out(ck, 4).out_name = 'cumulative_total_energy';
+            data_out(ck, 4).linewidth = 2;
+            data_out(ck, 4).islog = 0;
+            data_out(ck, 5).ydata = pp_data.Energy(:,2);
+            data_out(ck, 5).xdata = pp_data.Energy(:,1) * 1e9;
+            
+            data_out(ck, 5).Ylab = 'Energy (J)';
+            data_out(ck, 5).Xlab = 'Time (ns)';
+            data_out(ck, 5).out_name = 'Energy';
+            data_out(ck, 5).linewidth = 2;
+            data_out(ck, 5).islog = 1;
         end %if
-        data_out(ck, 4).Ylab = 'Cumulative energy (J)';
-        data_out(ck, 4).Xlab = 'Time (ns)';
-        data_out(ck, 4).out_name = 'cumulative_total_energy';
-        data_out(ck, 4).linewidth = 2;
-        data_out(ck, 4).islog = 0;
-        if isfield(wake_sweep_data.raw{chosen_wake_ind}, 'Energy')
-            data_out(ck, 5).ydata = wake_sweep_data.raw{chosen_wake_ind}.Energy(:,2);
-            data_out(ck, 5).xdata = wake_sweep_data.raw{chosen_wake_ind}.Energy(:,1) * 1e9;
-        else
-            data_out(ck, 5).ydata = wake_sweep_data.raw{chosen_wake_ind}.time_series_data.Energy;
-            data_out(ck, 5).xdata = wake_sweep_data.raw{chosen_wake_ind}.time_series_data.timescale_common' * 1e9;
-        end %if
-        data_out(ck, 5).Ylab = 'Energy (J)';
-        data_out(ck, 5).Xlab = 'Time (ns)';
-        data_out(ck, 5).out_name = 'Energy';
-        data_out(ck, 5).linewidth = 2;
-        data_out(ck, 5).islog = 1;
         
         graph_metadata.sources(ck) = report_input.sources(hse);
         graph_metadata.swept_vals(ck) = report_input.swept_vals(hse);
@@ -134,7 +131,8 @@ for hse = length(good_s_data):-1 :1
         ck = ck +1;
     end %if
 end %for
-
-for egvn = 1:size(data_out,2)
-    Generate_2D_graph_with_legend(graph_metadata, squeeze(data_out(:,egvn)), cols, l_st)
-end
+if sum(good_s_data) > 0
+    for egvn = 1:size(data_out,2)
+        Generate_2D_graph_with_legend(graph_metadata, squeeze(data_out(:,egvn)), cols, l_st)
+    end %for
+end %if
