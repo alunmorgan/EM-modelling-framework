@@ -18,13 +18,10 @@ function tfirst = GdfidL_write_pp_input_file(log, tqw_offset, ver)
 % port. If you do not leave enough time then there is an enhancement in
 % what is accounted for. And a sharp pling which messes up the FFT later in
 % the processing chain.
-tfirst(1) = 0;
-tfirst(2) = 0;
-for ek = 3:length(log.port_name)
-    % These are now set to 0 as this truncation is done as a postprocessing
+% These are now set to 0 as this truncation is done as a postprocessing
     % step.
-    tfirst(ek) =tfirst(2);
-end
+tfirst = 0;
+
 
 ov{1} = '';
 ov = cat(1,ov,'-general');
@@ -76,21 +73,23 @@ ov = cat(1,ov,'');
 %     end %if
 % end %if
 
-for lae = 1:length(log.port_name)
-    if ver > 170000 % output changed between versions.
-        ov = cat(1,ov,'-sparameter, showeh=no');
-    else
-        ov = cat(1,ov,'-sparameter');
-    end
-    ov = cat(1,ov,strcat('    ports = ', log.port_name{lae}));
-    ov = cat(1,ov,'    modes = all');
-    ov = cat(1,ov,'    timedata = yes');
-    ov = cat(1,ov,'    ignoreexc = yes');
-    ov = cat(1,ov,strcat('    tfirst = ',num2str(tfirst(lae))));
-    ov = cat(1,ov,'    tintpower = yes');
-    ov = cat(1,ov,'    onlyplotfiles = yes');
-    ov = cat(1,ov,'    doit');
-end
+% for lae = 1:length(log.port_name)
+%     if ver > 170000 % output changed between versions.
+%         ov = cat(1,ov,'-sparameter, showeh=no');
+%     else
+ov = cat(1,ov,'-sparameter');
+%     end
+ov = cat(1,ov,strcat('    ports = all'));%, log.port_name{lae}));
+ov = cat(1,ov,'    modes = all');
+ov = cat(1,ov,'    timedata = yes');
+ov = cat(1,ov,'    ignoreexc = yes');
+ov = cat(1,ov,strcat('    tfirst = ',num2str(tfirst)));
+ov = cat(1,ov,'    tintpower = yes');
+ov = cat(1,ov,'    onlyplotfiles = yes');
+ov = cat(1,ov,'    doit');
+ov = cat(1,ov,'-sparameter, showeh=no');
+ov = cat(1,ov,'    doit');
+% end
 
 % find the first stored field after the bunch has passed out of the
 % structure
