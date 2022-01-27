@@ -99,6 +99,10 @@ writetable(T_losses, fullfile(root, model_set,...
 %%%%%%%%%%%%%%%% port signals table %%%%%%%%%%%%%%%%%%%%
 varnames_port_signals = {};
 for wha = 1:length(dataInds) %for each model in sweep
+    
+    if length(extracted_data.port{dataInds(wha)}.dominant_signal_amplitude) < 3
+        continue
+    end%if
     temp_port_data = extracted_data.port{dataInds(wha)};
     ck = 1;
     for hne = 3:length(temp_port_data.dominant_signal_amplitudes) %for each signal port
@@ -116,14 +120,16 @@ for wha = 1:length(dataInds) %for each model in sweep
         ck = ck +2;
     end %for
 end %for
-ports_present = not(cellfun(@isempty,varnames_port_signals));
-if max(diff(sum(ports_present,2))) > 0
-    disp('makeSweepSummaryTables: The number of ports changes. Please check that this is expected (This mainly occurs with geometry fraction changes)')
+if ~isempty(varnames_port_signals)
+    ports_present = not(cellfun(@isempty,varnames_port_signals));
+    if max(diff(sum(ports_present,2))) > 0
+        disp('makeSweepSummaryTables: The number of ports changes. Please check that this is expected (This mainly occurs with geometry fraction changes)')
+    end %if
+    [~, max_num_pots_ind] = max(sum(ports_present,2));
+    T_port_signals = array2table(port_signals_table_data,...
+        'RowNames', row_names', 'VariableNames', varnames_port_signals(max_num_pots_ind,:));
+    writetable(T_port_signals, fullfile(root, model_set,...
+        [model_set, '_', sweep_name, '_port_signals.txt']),...
+        'Delimiter','|',...
+        'WriteVariableNames',true, 'WriteRowNames',true)
 end %if
-[~, max_num_pots_ind] = max(sum(ports_present,2));
-T_port_signals = array2table(port_signals_table_data,...
-    'RowNames', row_names', 'VariableNames', varnames_port_signals(max_num_pots_ind,:));
-writetable(T_port_signals, fullfile(root, model_set,...
-    [model_set, '_', sweep_name, '_port_signals.txt']),...
-    'Delimiter','|',...
-    'WriteVariableNames',true, 'WriteRowNames',true)
