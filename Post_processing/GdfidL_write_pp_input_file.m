@@ -1,16 +1,13 @@
-function tfirst = GdfidL_write_pp_input_file(log, tqw_offset)
+function tfirst = GdfidL_write_pp_input_file(log)
 % Writes the post processing input file.
 %
 % log is a structure containing the information extracted from the log
 % files.
-% pipe_length is the length of the beam pipe extensions used in the model
-%
-% tqw_offset is the offset to look at the transverse quadrupole wake at (in m)
-%
+
 % Assume that the 1st port in the list is the beam input port.
 % the second is the beam output port, and all the others are signal ports.
 %
-% Example: tfirst = GdfidL_write_pp_input_file(log, pipe_length)
+% Example: tfirst = GdfidL_write_pp_input_file(log)
 
 
 %determine the values for tfirst.
@@ -20,12 +17,16 @@ function tfirst = GdfidL_write_pp_input_file(log, tqw_offset)
 % the processing chain.
 
 % However for some models (e.g. BPMs) this quiet period needs to be extended.
-tfirst{1} = '2E-9';%'8 * SIGMA / 3e8'; % input beam port
-tfirst{2} = '2E-9';%'( @zmax - @zmin + 8 * SIGMA ) / 3e8'; % output beam port
-for kd = 3:length(log.port_name)
-    % For the signal ports you WANT to include the effect of the beam signal
-    %     as that is what you are trying to measure
-    tfirst{kd} = '0';
+for jes = 1:length(log.port_name)
+    if strcmp(log.port_name{jes}, 'Beam_in')
+        tfirst{jes} = '8 * SIGMA / 3e8'; % input beam port
+    elseif strcmp(log.port_name{jes}, 'Beam_out')
+        tfirst{jes} = '( @zmax - @zmin + 8 * SIGMA ) / 3e8'; % output beam port
+    else
+        % For the signal ports you WANT to include the effect of the beam signal
+        %     as that is what you are trying to measure
+        tfirst{jes} = '0';
+    end %if
 end %for
 
 ov{1} = '';
@@ -34,19 +35,20 @@ ov = cat(1,ov,strcat('    infile= data_link/wake'));
 ov = cat(1,ov,strcat('    scratchbase = temp_scratch/'));
 ov = cat(1,ov,'    2dplotopts = -geometry 1024x768');
 ov = cat(1,ov,'    plotopts = -geometry 1024x768');
-ov = cat(1,ov,'    nrofthreads = 25');
+ov = cat(1,ov,'    nrofthreads = 42');
 ov = cat(1,ov,'    ');
+ov_setup = ov;
+
 ov = cat(1,ov,'-wakes');
-ov = cat(1,ov,'    watq = no');
+ov = cat(1,ov,'    watq = yes');
 ov = cat(1,ov,'    awtatq = yes');
 ov = cat(1,ov,'    impedances = yes');
-% ov = cat(1,ov,'    peroffset = yes');
 % ov = cat(1,ov,'    window = no');
 ov = cat(1,ov,'    watxy = (0,0)');
 ov = cat(1,ov,'    wxatxy = (0,0)');
 ov = cat(1,ov,'    wyatxy = (0,0)');
-% ov = cat(1,ov,['    wxatxy = (-', tqw_offset,',', tqw_offset,')']);
-% ov = cat(1,ov,['    wyatxy = (-', tqw_offset,',', tqw_offset,')']);
+% ov = cat(1,ov,'    xyref = (0,0)');
+ov = cat(1,ov,'    usexyref = no');
 ov = cat(1,ov,'    showchargemax = yes');
 ov = cat(1,ov,'    onlyplotfiles = yes');
 ov = cat(1,ov,'    watsfiles = no');
@@ -63,65 +65,23 @@ ov = cat(1,ov,'    onlyplotfiles = yes');
 ov = cat(1,ov,'    doit');
 ov = cat(1,ov,'');
 
-% ov = cat(1,ov,'-fexport');
-% if isfield(log, 'field_data')
-%     if isfield(log.field_data, 'EF')
-%         for kew = 1:size(log.field_data.EF,1)
-%             ov = cat(1,ov,['symbol = EF_e_', num2str(kew)]);
-%             ov = cat(1,ov,['outfile= pp_link/wake/EF_e_', num2str(kew)]);
-%             ov = cat(1,ov,'    doit');
-%         end %for
-%     end %if
-%      if isfield(log.field_data, 'ED')
-%         for kew = 1:size(log.field_data.ED, 1)
-%             ov = cat(1,ov,['symbol = EF_e_', num2str(kew)]);
-%             ov = cat(1,ov,['outfile= pp_link/wake/EF_e_', num2str(kew)]);
-%             ov = cat(1,ov,'    doit');
-%         end %for
-%     end %if
-% end %if
-
-% for lae = 1:length(log.port_name)
-%     if ver > 170000 % output changed between versions.
-%         ov = cat(1,ov,'-sparameter, showeh=no');
-%     else
-ov = cat(1,ov,'-sparameter');
-%     end
-ov = cat(1,ov,strcat('    ports = all'));%, log.port_name{lae}));
-ov = cat(1,ov,'    modes = all');
-ov = cat(1,ov,'    timedata = yes');
-ov = cat(1,ov,'    ignoreexc = yes');
-ov = cat(1,ov,strcat('    tfirst = ',num2str(tfirst)));
-ov = cat(1,ov,'    tintpower = yes');
-ov = cat(1,ov,'    onlyplotfiles = yes');
-ov = cat(1,ov,'    doit');
-ov = cat(1,ov,'-sparameter, showeh=no');
-ov = cat(1,ov,'    doit');
-% end
-
-
-% showeh = {'no', 'yes'};
-% % showeh =yes gives good output power graphs, while showeh=no gives output
-% % voltage graphs which can be used to reconstruct the frequency domain after
-% % truncating the wake/ time slicing etc.
-% for ens = 1:2
-%     for lae = 1:length(log.port_name)
-%         ov = cat(1,ov,'-general');
-%         ov = cat(1,ov,strcat('    scratchbase = temp_scratch/',log.port_name{lae}, '-'));
-%         ov = cat(1,ov,'-sparameter');
-%         ov = cat(1,ov,strcat('    ports = ', log.port_name{lae}));
-%         ov = cat(1,ov,'    modes = all');
-%         ov = cat(1,ov,strcat('showeh   = ', showeh{ens}));
-%         ov = cat(1,ov,'    timedata = yes');
-%         ov = cat(1,ov,'    ignoreexc = yes');
-%         ov = cat(1,ov,strcat('    tfirst = ',tfirst{lae}));
-%         ov = cat(1,ov,'    tsumpower = yes');
-%         ov = cat(1,ov,'    tintpower = yes');
-%         ov = cat(1,ov,'    fintpower = yes');
-%         ov = cat(1,ov,'    onlyplotfiles = yes');
-%         ov = cat(1,ov,'    doit');
-%     end   
-% end %for
+if isfield(log, 'field_data')
+    ov = cat(1,ov,'-fexport');
+    if isfield(log.field_data, 'EF')
+        for kew = 1:size(log.field_data.EF,1)
+            ov = cat(1,ov,['symbol = EF_e_', num2str(kew)]);
+            ov = cat(1,ov,['outfile= pp_link/wake/EF_e_', num2str(kew)]);
+            ov = cat(1,ov,'    doit');
+        end %for
+    end %if
+    if isfield(log.field_data, 'ED')
+        for kew = 1:size(log.field_data.ED, 1)
+            ov = cat(1,ov,['symbol = ED_e_', num2str(kew)]);
+            ov = cat(1,ov,['outfile= pp_link/wake/ED_e_', num2str(kew)]);
+            ov = cat(1,ov,'    doit');
+        end %for
+    end %if
+end %if
 
 % find the first stored field after the bunch has passed out of the
 % structure
@@ -132,18 +92,13 @@ if isfield(log, 'field_data')
         %     field_start = find(log.field_data.ALL(:,1) > model_length_time, 1, 'first');
         field_start = 1;
         ov = cat(1,ov,'-3darrowplot');
-        ov = cat(1,ov,'    lenarrows= 1e-7');
+        ov = cat(1,ov,'    lenarrows= 1');
         ov = cat(1,ov,'    scale= 4');
         ov = cat(1,ov,'    fcolour= 7');
         ov = cat(1,ov,'    arrows= 10');
         ov = cat(1,ov,'    fonmat= yes');
         ov = cat(1,ov,'    eyeposition= ( 1.0, -2.3, 0.5 )');
         ov = cat(1,ov,'    bbxlow=0'); % cutting in half
-        ov = cat(1,ov,'    bbxhigh=1E30');
-        ov = cat(1,ov,'    bbylow=-8E-3');
-        ov = cat(1,ov,'    bbyhigh=8E-3');
-        ov = cat(1,ov,'    bbzlow=-10E-3');
-        ov = cat(1,ov,'    bbzhigh=10E-3');
         ov = cat(1,ov,'    rotx=180');
         ov = cat(1,ov,'    roty=90'); % make the beam horizontal
         ov = cat(1,ov,'    rotz=-90');
@@ -158,15 +113,13 @@ if isfield(log, 'field_data')
         ov = cat(1,ov,'    #');
         ov = cat(1,ov,'define( FARROWMAX, 1e-6 )');
         ov = cat(1,ov,'define( FMAXONMAT, 1e-6 )');
-        for ii = field_start:40 %length(log.field_data.ALL)
+        for ii = field_start:length(log.field_data.ALL)
             ov = cat(1,ov,['       solution= ', num2str(ii)]);
             ov = cat(1,ov,['plotopts =  -geometry 1440X900 -colorps -o ./pp_link/wake/All_scaling_',num2str(ii,'%02d'),'.ps']);
             ov = cat(1,ov,'       doit');
             ov = cat(1,ov,'define( FARROWMAX, max( FARROWMAX, @farrowmax ) )');
             ov = cat(1,ov,'define( FMAXONMAT, max( FMAXONMAT, @absfmax ) )');
         end %for
-        %         ov = cat(1,ov,'    end do');
-        %         ov = cat(1,ov,'system(rm -f ./*-3D-Arrowplot.*.gld )');
         ov = cat(1,ov,'    #');
         ov = cat(1,ov,'    # The second pass through the Results.');
         ov = cat(1,ov,'    # We now know the Max Values, and scale every Frame for the same');
@@ -174,7 +127,7 @@ if isfield(log, 'field_data')
         ov = cat(1,ov,'    #');
         ov = cat(1,ov,'    fmaxonmat= FMAXONMAT / 2  # Slightly cheating.');
         ov = cat(1,ov,'    fscale= 1.5 /  FARROWMAX');
-        for ii = field_start:40 %length(log.field_data.ALL)
+        for ii = field_start:length(log.field_data.ALL)
             ov = cat(1,ov,['       solution= ', num2str(ii)]);
             ov = cat(1,ov,['plotopts =  -geometry 1440X900 -colorps -o pp_link/wake/All_scaled_',num2str(ii,'%02d'),'.ps']);
             ov = cat(1,ov,'       doit   # Create the gld-File.');
@@ -184,7 +137,7 @@ if isfield(log, 'field_data')
         ov = cat(1,ov,'    # Now looking at power on the surfaces.');
         ov = cat(1,ov,'    fscale= auto');
         ov = cat(1,ov,'    fmaxonmat= auto');
-        for ii = field_start:40 %length(log.field_data.ALL)
+        for ii = field_start:length(log.field_data.ALL)
             ov = cat(1,ov,['       solution= ', num2str(ii)]);
             ov = cat(1,ov,['plotopts =  -geometry 1440X900 -colorps -o pp_link/wake/All_power_scaling_',num2str(ii,'%02d'),'.ps']);
             ov = cat(1,ov,'       doit');
@@ -198,62 +151,61 @@ if isfield(log, 'field_data')
         ov = cat(1,ov,'    #');
         ov = cat(1,ov,'    fmaxonmat= FMAXONMAT / 2  # Slightly cheating.');
         ov = cat(1,ov,'    fscale= 1.5 /  FARROWMAX');
-        for ii = field_start:40 %length(log.field_data.ALL)
+        for ii = field_start:length(log.field_data.ALL)
             ov = cat(1,ov,['       solution= ', num2str(ii)]);
             ov = cat(1,ov,['plotopts =  -geometry 1440X900 -colorps -o pp_link/wake/All_power_scaled_',num2str(ii,'%02d'),'.ps']);
             ov = cat(1,ov,'       doit   # Create the gld-File.');
         end %for
     end %if
 end %if
-if exist('data_link/wake/honmat-000000001.gz','file') == 2
-    ov = cat(1,ov,' -3dmanygifs');
-    ov = cat(1,ov,'    1stinfile= data_link/wake/honmat-000000001.gz');
-    ov = cat(1,ov,'     outfiles= pp_link/wake/honmat3D');
-    ov = cat(1,ov,'     what= logabs');
-    ov = cat(1,ov,'     show=no');
-    ov = cat(1,ov,'     scale= 4');
-    ov = cat(1,ov,'     mpegfile= ./temp.mpeg');
-    ov = cat(1,ov,'     doit');
-end %if
-if exist('data_link/wake/efields-000000001.gz','file') == 2
-    ov = cat(1,ov,' -2dmanygifs');
-    ov = cat(1,ov,'    1stinfile= data_link/wake/efields-000000001.gz');
-    ov = cat(1,ov,'      outfiles= pp_link/wake/E2DHy');
-    ov = cat(1,ov,'      what= Hy');
-    ov = cat(1,ov,'      log=yes');
-    ov = cat(1,ov,'      show=no');
-    ov = cat(1,ov,'     scale= 4');
-    ov = cat(1,ov,'     mpegfile= ./temp.mpeg');
-    ov = cat(1,ov,'     doit');
-    ov = cat(1,ov,' -2dmanygifs');
-    ov = cat(1,ov,'    1stinfile= data_link/wake/efields-000000001.gz');
-    ov = cat(1,ov,'      outfiles= pp_link/wake/E2DHx');
-    ov = cat(1,ov,'      what= Hx');
-    ov = cat(1,ov,'      log=yes');
-    ov = cat(1,ov,'      show=no');
-    ov = cat(1,ov,'     scale= 4');
-    ov = cat(1,ov,'     mpegfile= ./temp.mpeg');
-    ov = cat(1,ov,'     doit');
-end %if
-if exist('data_link/wake/hfields-000000001.gz','file') == 2
-    ov = cat(1,ov,' -2dmanygifs');
-    ov = cat(1,ov,'    1stinfile= data_link/wake/hfields-000000001.gz');
-    ov = cat(1,ov,'      outfiles= pp_link/wake/H2DHy');
-    ov = cat(1,ov,'      what= Hy');
-    ov = cat(1,ov,'      log=yes');
-    ov = cat(1,ov,'      show=no');
-    ov = cat(1,ov,'     scale= 4');
-    ov = cat(1,ov,'     mpegfile= ./temp.mpeg');
-    ov = cat(1,ov,'     doit');
-    ov = cat(1,ov,' -2dmanygifs');
-    ov = cat(1,ov,'    1stinfile= data_link/wake/hfields-000000001.gz');
-    ov = cat(1,ov,'      outfiles= pp_link/wake/H2DHx');
-    ov = cat(1,ov,'      what= Hx');
-    ov = cat(1,ov,'      log=yes');
-    ov = cat(1,ov,'      show=no');
-    ov = cat(1,ov,'     scale= 4');
-    ov = cat(1,ov,'     mpegfile= ./temp.mpeg');
-    ov = cat(1,ov,'     doit');
-end %if
+
+% if exist('data_link/wake/efieldsx-000000001.gz','file') == 2
+%     ov = cat(1,ov,' -2dmanygifs');
+%     ov = cat(1,ov,'    1stinfile= data_link/wake/efieldsx-000000001.gz');
+%     ov = cat(1,ov,'      outfiles= pp_link/wake/Ezy_log');
+%     ov = cat(1,ov,'      what= Ezy');
+%     ov = cat(1,ov,'      log=yes');
+%     ov = cat(1,ov,'      show=no');
+%     ov = cat(1,ov,'     scale= 4');
+%     ov = cat(1,ov,'     mpegfile= pp_link/wake/Ezy.mpeg');
+%     ov = cat(1,ov,'     doit');
+%     ov = cat(1,ov,'      outfiles= pp_link/wake/Ezy_lin');
+%     ov = cat(1,ov,'      log=no');
+%     ov = cat(1,ov,'     doit');
+% end %if
+% if exist('data_link/wake/efieldsy-000000001.gz','file') == 2
+%     ov = cat(1,ov,' -2dmanygifs');
+%     ov = cat(1,ov,'    1stinfile= data_link/wake/efieldsy-000000001.gz');
+%     ov = cat(1,ov,'      outfiles= pp_link/wake/Ezx_log');
+%     ov = cat(1,ov,'      what= Ezx');
+%     ov = cat(1,ov,'      log=yes');
+%     ov = cat(1,ov,'      show=no');
+%     ov = cat(1,ov,'     scale= 4');
+%     ov = cat(1,ov,'     mpegfile= pp_link/wake/Ezx.mpeg');
+%     ov = cat(1,ov,'     doit');
+%     ov = cat(1,ov,'      outfiles= pp_link/wake/Ezx_lin');
+%     ov = cat(1,ov,'      log=no');
+%     ov = cat(1,ov,'     doit');
+% end %if
 write_out_data( ov, 'pp_link/wake/model_wake_post_processing' )
 
+for lae = 1:length(log.port_name)
+    ov = cat(1,ov_setup,'-sparameter');
+    ov = cat(1,ov,strcat(['    ports = ',log.port_name{lae}]));
+    ov = cat(1,ov,'    modes = all');
+    ov = cat(1,ov,'    timedata = yes');
+    ov = cat(1,ov,'    ignoreexc = yes');
+    ov = cat(1,ov,strcat('    tfirst = ',tfirst{lae}));
+    ov = cat(1,ov,'    tintpower = yes');
+    ov = cat(1,ov,'    tsumpower = yes');
+    ov = cat(1,ov,'    fintpower = yes');
+    ov = cat(1,ov,'    fsumpower = yes');
+    ov = cat(1,ov,'    onlyplotfiles = yes');
+    ov = cat(1,ov,'    doit');
+    ov = cat(1,ov,'-sparameter, showeh=no');
+    ov = cat(1,ov,'    doit');
+    port_folder = ['pp_link/wake/wake_post_processing_ports-', log.port_name{lae}];
+    mkdir(port_folder)
+    write_out_data( ov, [port_folder,'/model_wake_post_processing_ports-', log.port_name{lae}] )
+    
+end
