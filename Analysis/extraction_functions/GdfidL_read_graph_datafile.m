@@ -72,6 +72,37 @@ if isempty(charge_ind) == 0
     plot_data.charge = str2num(plot_data.charge{1}{1});
 end
 
+sigma_ind = find_position_in_cell_lst(strfind(plot_data.header_info,'sigma'));
+if isempty(sigma_ind) == 0
+    plot_data.sigma = regexp(plot_data.header_info{sigma_ind},...
+        '.*sigma=\s*([0-9\.eE-+]+)\s*.*','tokens');
+    plot_data.sigma = str2double(plot_data.sigma{1}{1});
+end
+
+location_ind = find_position_in_cell_lst(strfind(plot_data.header_info,'(x,y)='));
+if isempty(location_ind) == 0
+    location_temp = regexp(plot_data.header_info{location_ind},...
+        '.*\(x,y\)=\s*\(\s*([0-9\.eE-+]+)\s*,\s*([0-9\.eE-+]+)\s*\)\s*\.*','tokens');
+    plot_data.location.x = str2double(location_temp{1}{1});
+    plot_data.location.y = str2double(location_temp{1}{2});
+end
+
+loss_ind = find_position_in_cell_lst(strfind(plot_data.header_info,'loss='));
+if isempty(loss_ind) == 0
+    loss_temp = regexp(plot_data.header_info{loss_ind},...
+        '.*loss=\s*\(\s*([0-9\.eE-+]+),\s*([0-9\.eE-+]+),\s*([0-9\.eE-+]+)\s*\)\s*\[VAs\].*','tokens');
+    plot_data.loss.x = str2double(loss_temp{1}{1});
+    plot_data.loss.y = str2double(loss_temp{1}{2});
+    plot_data.loss.s = str2double(loss_temp{1}{3});
+end
+
+symmetry_ind = find_position_in_cell_lst(strfind(plot_data.header_info,'symmetry='));
+if isempty(symmetry_ind) == 0
+    symmetry_temp = regexp(plot_data.header_info{symmetry_ind},...
+        '.*symmetry=\s*([A-z]+),.*','tokens');
+    plot_data.symmetry = symmetry_temp{1}{1};
+end
+
 if nxt_line == -1
     fclose(fid);
 else
