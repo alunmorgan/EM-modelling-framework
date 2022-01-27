@@ -4,18 +4,18 @@ function [port_timebase, port_data_conditioned] = read_port_datafiles(input)
 % Example: [port_timebase, port_data] = read_port_datafiles(Port_mat)
 
 % for time domain data
-Port_mat = input.time;
-substructure = fieldnames(Port_mat);
+substructure = fieldnames(input.time);
 
 timebase_start = 0;
 timebase_end = 0;
 timebase_step = 1;
 
 for hs = 1:length(substructure)
-    for hes = 1:size(Port_mat.(substructure{hs}),1) % simulated ports
-        for wha = 1:size(Port_mat.(substructure{hs}),2) % modes
-            if ~isempty(Port_mat.(substructure{hs}){hes,wha})
-                temp_data  = GdfidL_read_graph_datafile( Port_mat.(substructure{hs}){hes,wha} );
+    for hes = 1:size(input.time.(substructure{hs}),1) % simulated ports
+        for wha = 1:size(input.time.(substructure{hs}),2) % modes
+            if ~isempty(input.time.(substructure{hs}){hes,wha})
+                temp_data  = GdfidL_read_graph_datafile(...
+                    input.time.(substructure{hs}){hes,wha} );
                 temp_timebase = temp_data.data(:,1);
                 if temp_timebase(1) < timebase_start
                     timebase_start = temp_timebase(1);
@@ -44,13 +44,14 @@ end %for
 port_timebase = linspace(timebase_start, timebase_end,(timebase_end - timebase_start)/timebase_step + 1);
 
 % for frequency domain data
-Port_mat = input.frequency;
-substructure = fieldnames(Port_mat);
+substructure = fieldnames(input.frequency);
 for hs = 1:length(substructure)
-    for hes = 1:size(Port_mat.(substructure{hs}),1) % simulated ports
-        for wha = 1:size(Port_mat.(substructure{hs}),2) % modes
-            temp_data  = GdfidL_read_graph_datafile( Port_mat.(substructure{hs}){hes,wha} );
-            port_data_conditioned.frequency.(substructure{hs}){hes,wha} = temp_data.data;
+    for hes = 1:size(input.frequency.(substructure{hs}),1) % simulated ports
+        for wha = 1:size(input.frequency.(substructure{hs}),2) % modes
+            temp_data  = GdfidL_read_graph_datafile(...
+                input.frequency.(substructure{hs}){hes,wha} );
+            port_data_conditioned.frequency.(substructure{hs}){hes,wha} =...
+                temp_data.data;
         end %for
     end %for
 end %for
