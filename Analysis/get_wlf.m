@@ -23,6 +23,10 @@ for kfn = 1:length(extracted_data)
             temp_base_val = extracted_data{kfn}.version{hen};
         elseif strcmp(sweeps{hen}, 'Geometry_fraction')
             temp_base_val = extracted_data{kfn}.Geometry_fraction(hen);
+        elseif strcmp(sweeps{hen}, 'beam_offset_x')
+            temp_base_val = extracted_data{kfn}.beam_offset_x(hen);
+        elseif strcmp(sweeps{hen}, 'beam_offset_y')
+            temp_base_val = extracted_data{kfn}.beam_offset_y(hen);
         else
             temp_base_val = extracted_data{kfn}.geometry_values.(sweeps{hen});
         end %if

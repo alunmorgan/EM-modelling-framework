@@ -60,6 +60,8 @@ for sts = 1:length(model_sets)
                 run_logs.mat_losses.single_mat_data{jd,4}(end,2);
         end
         extracted_data{sts}.material_loss{ind}.total_loss = run_logs.mat_losses.total_loss(end);
+        extracted_data{sts}.beam_offset_x(ind) = str2double(modelling_inputs.beam_offset_x);
+        extracted_data{sts}.beam_offset_y(ind) = str2double(modelling_inputs.beam_offset_y);
         clear pp_data wake_sweep_data run_logs modelling_inputs all_bunch_signals
     end %for
 end %for

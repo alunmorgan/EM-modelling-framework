@@ -46,21 +46,21 @@ end
     convert_wakepotential_to_wake_impedance(time_domain_data.charge_distribution, ...
     time_domain_data.wakepotential, time_domain_data.timebase);
 
-[~,~, Wake_Impedance_data_quad_X, Wake_Impedance_data_im_quad_X] = ...
+[~,~, Wake_Impedance_data_X, Wake_Impedance_data_im_X] = ...
     convert_wakepotential_to_wake_impedance(time_domain_data.charge_distribution, ...
-    time_domain_data.wakepotential_trans_quad_x, time_domain_data.timebase);
+    time_domain_data.wakepotential_trans_x, time_domain_data.timebase);
 
-[~,~, Wake_Impedance_data_quad_Y, Wake_Impedance_data_im_quad_Y] = ...
+[~,~, Wake_Impedance_data_Y, Wake_Impedance_data_im_Y] = ...
     convert_wakepotential_to_wake_impedance(time_domain_data.charge_distribution, ...
-    time_domain_data.wakepotential_trans_quad_y, time_domain_data.timebase);
-
-[~,~, Wake_Impedance_data_dipole_X, Wake_Impedance_data_im_dipole_X] = ...
-    convert_wakepotential_to_wake_impedance(time_domain_data.charge_distribution, ...
-    time_domain_data.wakepotential_trans_dipole_x, time_domain_data.timebase);
-
-[~,~, Wake_Impedance_data_dipole_Y, Wake_Impedance_data_im_dipole_Y] = ...
-    convert_wakepotential_to_wake_impedance(time_domain_data.charge_distribution, ...
-    time_domain_data.wakepotential_trans_dipole_y, time_domain_data.timebase);
+    time_domain_data.wakepotential_trans_y, time_domain_data.timebase);
+% 
+% [~,~, Wake_Impedance_data_dipole_X, Wake_Impedance_data_im_dipole_X] = ...
+%     convert_wakepotential_to_wake_impedance(time_domain_data.charge_distribution, ...
+%     time_domain_data.wakepotential_trans_dipole_x, time_domain_data.timebase);
+% 
+% [~,~, Wake_Impedance_data_dipole_Y, Wake_Impedance_data_im_dipole_Y] = ...
+%     convert_wakepotential_to_wake_impedance(time_domain_data.charge_distribution, ...
+%     time_domain_data.wakepotential_trans_dipole_y, time_domain_data.timebase);
 
 %% Port analysis
 % hfoi_ind = find(f_raw > hfoi,1,'first');
@@ -96,14 +96,14 @@ bunch_spectra = bunch_spectra .* sqrt(2);
 %% Remove all data above the highest frequency of interest (hfoi).
 Wake_Impedance_data = trim_to_hfoi(Wake_Impedance_data, f_raw,  hfoi);
 Wake_Impedance_data_im = trim_to_hfoi(Wake_Impedance_data_im, f_raw,  hfoi);
-Wake_Impedance_data_quad_X = trim_to_hfoi(Wake_Impedance_data_quad_X, f_raw,  hfoi);
-Wake_Impedance_data_im_quad_X = trim_to_hfoi(Wake_Impedance_data_im_quad_X, f_raw,  hfoi);
-Wake_Impedance_data_quad_Y = trim_to_hfoi(Wake_Impedance_data_quad_Y, f_raw,  hfoi);
-Wake_Impedance_data_im_quad_Y = trim_to_hfoi(Wake_Impedance_data_im_quad_Y, f_raw,  hfoi);
-Wake_Impedance_data_dipole_X = trim_to_hfoi(Wake_Impedance_data_dipole_X, f_raw,  hfoi);
-Wake_Impedance_data_im_dipole_X = trim_to_hfoi(Wake_Impedance_data_im_dipole_X, f_raw,  hfoi);
-Wake_Impedance_data_dipole_Y = trim_to_hfoi(Wake_Impedance_data_dipole_Y, f_raw,  hfoi);
-Wake_Impedance_data_im_dipole_Y = trim_to_hfoi(Wake_Impedance_data_im_dipole_Y, f_raw,  hfoi);
+Wake_Impedance_data_X = trim_to_hfoi(Wake_Impedance_data_X, f_raw,  hfoi);
+Wake_Impedance_data_im_X = trim_to_hfoi(Wake_Impedance_data_im_X, f_raw,  hfoi);
+Wake_Impedance_data_Y = trim_to_hfoi(Wake_Impedance_data_Y, f_raw,  hfoi);
+Wake_Impedance_data_im_Y = trim_to_hfoi(Wake_Impedance_data_im_Y, f_raw,  hfoi);
+% Wake_Impedance_data_dipole_X = trim_to_hfoi(Wake_Impedance_data_dipole_X, f_raw,  hfoi);
+% Wake_Impedance_data_im_dipole_X = trim_to_hfoi(Wake_Impedance_data_im_dipole_X, f_raw,  hfoi);
+% Wake_Impedance_data_dipole_Y = trim_to_hfoi(Wake_Impedance_data_dipole_Y, f_raw,  hfoi);
+% Wake_Impedance_data_im_dipole_Y = trim_to_hfoi(Wake_Impedance_data_im_dipole_Y, f_raw,  hfoi);
 bunch_spectra = trim_to_hfoi(bunch_spectra, f_raw,  hfoi);
 
 % The outputs from this function are for the model charge.
@@ -121,14 +121,14 @@ bunch_spectra = trim_to_hfoi(bunch_spectra, f_raw,  hfoi);
 frequency_domain_data.f_raw = f_raw;
 frequency_domain_data.Wake_Impedance_data = Wake_Impedance_data;
 frequency_domain_data.Wake_Impedance_data_im = Wake_Impedance_data_im;
-frequency_domain_data.Wake_Impedance_trans_quad_X = Wake_Impedance_data_quad_X;
-frequency_domain_data.Wake_Impedance_trans_im_quad_X = Wake_Impedance_data_im_quad_X;
-frequency_domain_data.Wake_Impedance_trans_quad_Y = Wake_Impedance_data_quad_Y;
-frequency_domain_data.Wake_Impedance_trans_im_quad_Y = Wake_Impedance_data_im_quad_Y;
-frequency_domain_data.Wake_Impedance_trans_dipole_X = Wake_Impedance_data_dipole_X;
-frequency_domain_data.Wake_Impedance_trans_im_dipole_X = Wake_Impedance_data_im_dipole_X;
-frequency_domain_data.Wake_Impedance_trans_dipole_Y = Wake_Impedance_data_dipole_Y;
-frequency_domain_data.Wake_Impedance_trans_im_dipole_Y = Wake_Impedance_data_im_dipole_Y;
+frequency_domain_data.Wake_Impedance_trans_X = Wake_Impedance_data_X;
+frequency_domain_data.Wake_Impedance_trans_im_X = Wake_Impedance_data_im_X;
+frequency_domain_data.Wake_Impedance_trans_Y = Wake_Impedance_data_Y;
+frequency_domain_data.Wake_Impedance_trans_im_Y = Wake_Impedance_data_im_Y;
+% frequency_domain_data.Wake_Impedance_trans_dipole_X = Wake_Impedance_data_dipole_X;
+% frequency_domain_data.Wake_Impedance_trans_im_dipole_X = Wake_Impedance_data_im_dipole_X;
+% frequency_domain_data.Wake_Impedance_trans_dipole_Y = Wake_Impedance_data_dipole_Y;
+% frequency_domain_data.Wake_Impedance_trans_im_dipole_Y = Wake_Impedance_data_im_dipole_Y;
 frequency_domain_data.wlf = wlf;
 frequency_domain_data.bunch_spectra = bunch_spectra;
 frequency_domain_data.Bunch_loss_energy_spectrum = Bunch_loss_energy_spectrum;

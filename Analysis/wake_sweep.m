@@ -105,19 +105,15 @@ end %function
 function r_raw = rearrange_input_structure(raw_data)
 % rearranging the raw data structure into a form which is more useful for
 % later analysis and plotting.
-r_raw.time_series_data.Energy = raw_data.Energy;
-r_raw.time_series_data.Charge_distribution = raw_data.Charge_distribution;
-r_raw.time_series_data.Wake_potential = raw_data.Wake_potential;
-r_raw.time_series_data.Wake_potential_trans_quad_X = raw_data.Wake_potential_trans_quad_X;
-r_raw.time_series_data.Wake_potential_trans_quad_Y = raw_data.Wake_potential_trans_quad_Y;
-r_raw.time_series_data.Wake_potential_trans_dipole_X = raw_data.Wake_potential_trans_dipole_X;
-r_raw.time_series_data.Wake_potential_trans_dipole_Y = raw_data.Wake_potential_trans_dipole_Y;
+r_raw.time_series_data.Energy = raw_data.Energy.data;
+r_raw.time_series_data.Charge_distribution = raw_data.Charge_distribution.data;
+r_raw.time_series_data.Wake_potential = raw_data.Wake_potential.s.data;
+r_raw.time_series_data.Wake_potential_trans_X = raw_data.Wake_potential.x.data;
+r_raw.time_series_data.Wake_potential_trans_Y = raw_data.Wake_potential.y.data;
 r_raw.time_series_data.port_data = raw_data.port; %W
-r_raw.frequency_series_data.Wake_impedance = raw_data.Wake_impedance;
-r_raw.frequency_series_data.Wake_impedance_trans_quad_X = raw_data.Wake_impedance_trans_quad_X;
-r_raw.frequency_series_data.Wake_impedance_trans_quad_Y = raw_data.Wake_impedance_trans_quad_Y;
-r_raw.frequency_series_data.Wake_impedance_trans_dipole_X = raw_data.Wake_impedance_trans_dipole_X;
-r_raw.frequency_series_data.Wake_impedance_trans_dipole_Y = raw_data.Wake_impedance_trans_dipole_Y;
+r_raw.frequency_series_data.Wake_impedance = raw_data.Wake_impedance.s.data;
+r_raw.frequency_series_data.Wake_impedance_trans_X = raw_data.Wake_impedance.x.data;
+r_raw.frequency_series_data.Wake_impedance_trans_Y = raw_data.Wake_impedance.y.data;
 r_raw.wake_setup = raw_data.wake_setup;
 if isfield(raw_data, 'mat_losses')
     % if the model is PEC only then this will not exist.

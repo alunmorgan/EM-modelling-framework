@@ -10,50 +10,68 @@ function output_file_locations = GdfidL_find_ouput(data_loc)
 % stored.
 
 % get the full list of files in the scratch directory.
-run_list = dir_list_gen(data_loc, '',1);
+run_list = dir_list_gen_tree(data_loc, '',1);
 
 % % select only the results which contain the run name.
 % inds = find_position_in_cell_lst(strfind(full_list, [run_name,'_scratch']));
 % run_list = full_list(inds);
 % clear full_list
 
-% Find the longditudinal wakepotential file, for at the beam location.
-inds = find_position_in_cell_lst(strfind(run_list, 'Wq_AT'));
+% Find the longditudinal wakepotential file, for at the origin.
+inds = find_position_in_cell_lst(strfind(run_list, 'W_AT_XY'));
+output_file_locations.WP_origin.s = run_list(inds);
+
+% Find the longditudinal wakepotential file, for at the origin.
+inds = find_position_in_cell_lst(strfind(run_list, 'Wq_AT_XY'));
 output_file_locations.WP_beam.s = run_list(inds);
 
-% now find the transverse wakepotential file, for at the beam location.
+% now find the transverse wakepotential file, for at the origin.
 % x
-inds = find_position_in_cell_lst(strfind(run_list, 'WXq_AT'));
+inds = find_position_in_cell_lst(strfind(run_list, 'WX_AT_XY'));
+output_file_locations.WP_origin.x = run_list(inds);
+% y
+inds = find_position_in_cell_lst(strfind(run_list, 'WY_AT_XY'));
+output_file_locations.WP_origin.y = run_list(inds);
+
+% Find the longditudinal wakepotential file, for at the beam location.
+inds = find_position_in_cell_lst(strfind(run_list, 'Wq_AT_XY'));
+output_file_locations.WP_beam.s = run_list(inds);
+% x
+inds = find_position_in_cell_lst(strfind(run_list, 'WXq_AT_XY'));
 output_file_locations.WP_beam.x = run_list(inds);
 % y
-inds = find_position_in_cell_lst(strfind(run_list, 'WYq_AT'));
+inds = find_position_in_cell_lst(strfind(run_list, 'WYq_AT_XY'));
 output_file_locations.WP_beam.y = run_list(inds);
-
-
-% now find the transverse wakepotential file, for at beam offsets.
-% x
-inds = find_position_in_cell_lst(strfind(run_list, 'WX_AT'));
-output_file_locations.WP_offset.x = run_list(inds);
-% y
-inds = find_position_in_cell_lst(strfind(run_list, 'WY_AT'));
-output_file_locations.WP_offset.y = run_list(inds);
 
 %Find the GdfidL calculated impedances
 %s
-inds = find_position_in_cell_lst(strfind(run_list, 'ReZ_AT'));
+inds = find_position_in_cell_lst(strfind(run_list, 'ReZ_AT_XY'));
 output_file_locations.WI_s = run_list(inds);
 %x
-inds = find_position_in_cell_lst(strfind(run_list, 'ReZx_AT'));
+inds = find_position_in_cell_lst(strfind(run_list, 'ReZx_AT_XY'));
 output_file_locations.WI_x = run_list(inds);
 %y
-inds = find_position_in_cell_lst(strfind(run_list, 'ReZy_AT'));
+inds = find_position_in_cell_lst(strfind(run_list, 'ReZy_AT_XY'));
 output_file_locations.WI_y = run_list(inds);
-% now find the Energy files. The order is determined by the order they are
+
+%s
+inds = find_position_in_cell_lst(strfind(run_list, 'ImZ_AT_XY'));
+output_file_locations.WI_Im_s = run_list(inds);
+%x
+inds = find_position_in_cell_lst(strfind(run_list, 'ImZx_AT_XY'));
+output_file_locations.WI_Im_x = run_list(inds);
+%y
+inds = find_position_in_cell_lst(strfind(run_list, 'ImZy_AT_XY'));
+output_file_locations.WI_Im_y = run_list(inds);
+
+% now find the Energy and electric field files files. The order is determined by the order they are
 % called in the post processing file.
 inds = find_position_in_cell_lst(strfind(run_list, 'oneDPlot'));
 if ~isempty(inds)
     output_file_locations.Energy = run_list(inds(1));
     output_file_locations.Energy_in_ceramics = run_list(inds(2));
+%     output_file_locations.EfieldAtZerox = run_list(inds(3));
+%     output_file_locations.EfieldAtZerox_freq = run_list(inds(4));
 else
     disp('No Energy graphs - This is a problem')
     output_file_locations.Energy = NaN;
@@ -74,16 +92,16 @@ nme_end = strfind(output_file_locations.Ports.voltage, '-e_amp_of_mode=');
 port_names_list_voltage = cell(1,1);
 ac = 1;
 for nr = 1:length(output_file_locations.Ports.voltage)
-    if ~isempty(nme_end{nr})       
-    port_names_list_voltage{ac} = output_file_locations.Ports.voltage{nr}(nme_start{nr}+5:nme_end{nr}-1);
-    ac = ac + 1;
+    if ~isempty(nme_end{nr})
+        port_names_list_voltage{ac} = output_file_locations.Ports.voltage{nr}(nme_start{nr}+5:nme_end{nr}-1);
+        ac = ac + 1;
     end %if
 end %for
 % nme_end = strfind(output_file_locations.Ports.power, '-h_amp_of_mode=');
 % port_names_list_power = cell(1,1);
 % ac = 1;
 % for nr = 1:length(output_file_locations.Ports.power)
-%     if ~isempty(nme_end{nr})       
+%     if ~isempty(nme_end{nr})
 %     port_names_list_power{ac} = output_file_locations.Ports.power{nr}(nme_start{nr}+5:nme_end{nr}-1);
 %     ac = ac + 1;
 %     end %if
@@ -126,6 +144,7 @@ output_file_locations.port_names = port_names_temp(~empty_names_ind);
 % end %if
 
 inds = find_position_in_cell_lst(strfind(run_list, 'Port='));
+if ~isempty(inds)
 input_list = run_list(inds);
 inds = find_position_in_cell_lst(strfind(input_list, '-e_amp_of_mode='));
 input_list = input_list(inds);
@@ -133,9 +152,13 @@ nme_start = 'Port=';
 nme_end = '-e_amp_of_mode=';
 mode_end = '-time.mtv';
 port_names = output_file_locations.port_names;
-output_file_locations.Port_mat.time.voltage_port_mode = arrange_outputs_into_grids(nme_start, nme_end, mode_end, port_names, input_list);
+output_file_locations.Port_mat.time.voltage_port_mode = ...
+    arrange_outputs_into_grids(nme_start, nme_end, mode_end, ...
+    port_names, input_list);
+end %if
 
 inds = find_position_in_cell_lst(strfind(run_list, 'Port='));
+if ~isempty(inds)
 input_list = run_list(inds);
 inds = find_position_in_cell_lst(strfind(input_list, '-h_amp_of_mode='));
 input_list = input_list(inds);
@@ -143,50 +166,69 @@ nme_start = 'Port=';
 nme_end = '-h_amp_of_mode=';
 mode_end = '-time.mtv';
 port_names = output_file_locations.port_names;
-output_file_locations.Port_mat.time.power_port_mode = arrange_outputs_into_grids(nme_start, nme_end, mode_end, port_names, input_list);
+output_file_locations.Port_mat.time.power_port_mode = ...
+    arrange_outputs_into_grids(nme_start, nme_end, mode_end, ...
+    port_names, input_list);
+end %if
 
 inds = find_position_in_cell_lst(strfind(run_list, '-integral-sum-power-df'));
-input_list = run_list(inds);
-nme_start = '/';
-nme_end = '-integral-sum-power-df';
-mode_end = '';
-port_names = output_file_locations.port_names;
-output_file_locations.Port_mat.frequency.power_cumulative_port = arrange_outputs_into_grids(nme_start, nme_end, mode_end, port_names, input_list);
+if ~isempty(inds)
+    input_list = run_list(inds);
+    nme_start = '/';
+    nme_end = '-integral-sum-power-df';
+    mode_end = '';
+    port_names = output_file_locations.port_names;
+    output_file_locations.Port_mat.frequency.power_cumulative_port = ...
+        arrange_outputs_into_grids(nme_start, nme_end, mode_end, ...
+        port_names, input_list);
+end %if
 
 inds = find_position_in_cell_lst(strfind(run_list, '-integral-sum-power-dt'));
+if ~isempty(inds)
 input_list = run_list(inds);
 nme_start = '/';
 nme_end = '-integral-sum-power-dt';
 mode_end = '';
 port_names = output_file_locations.port_names;
-output_file_locations.Port_mat.time.power_cumulative_port = arrange_outputs_into_grids(nme_start, nme_end, mode_end, port_names, input_list);
+output_file_locations.Port_mat.time.power_cumulative_port = ...
+    arrange_outputs_into_grids(nme_start, nme_end, mode_end, ...
+    port_names, input_list);
+end %if
 
 inds = find_position_in_cell_lst(strfind(run_list, '-sum-power-freq'));
+if ~isempty(inds)
 input_list = run_list(inds);
 nme_start = '/';
 nme_end = '-sum-power-freq';
 mode_end = '';
 port_names = output_file_locations.port_names;
-output_file_locations.Port_mat.frequency.power_port = arrange_outputs_into_grids(nme_start, nme_end, mode_end, port_names, input_list);
+output_file_locations.Port_mat.frequency.power_port = ...
+    arrange_outputs_into_grids(nme_start, nme_end, mode_end, ...
+    port_names, input_list);
+end %if
 
 inds = find_position_in_cell_lst(strfind(run_list, '-sum-power-time'));
-input_list = run_list(inds);
-nme_start = '/';
-nme_end = '-sum-power-time';
-mode_end = '';
-port_names = output_file_locations.port_names;
-output_file_locations.Port_mat.time.power_port = arrange_outputs_into_grids(nme_start, nme_end, mode_end, port_names, input_list);
-
+if ~isempty(inds)
+    input_list = run_list(inds);
+    nme_start = '/';
+    nme_end = '-sum-power-time';
+    mode_end = '';
+    port_names = output_file_locations.port_names;
+    output_file_locations.Port_mat.time.power_port = ...
+        arrange_outputs_into_grids(nme_start, nme_end, mode_end, ...
+        port_names, input_list);
+end %if
 end %function
 
-function output_matrix = arrange_outputs_into_grids(nme_start, nme_end, mode_end, port_names, input_list)
+function output_matrix = arrange_outputs_into_grids(nme_start, nme_end, mode_end, ...
+    port_names, input_list)
 nme_start_ind = strfind(input_list, nme_start);
 nme_end_ind = strfind(input_list, nme_end);
 mode_end_ind = strfind(input_list, mode_end);
 port_names_list = cell(1,1);
 for nr = 1:length(input_list)
-    if ~isempty(nme_end_ind{nr})       
-    port_names_list{nr} = input_list{nr}(nme_start_ind{nr}+length(nme_start):nme_end_ind{nr}-1);
+    if ~isempty(nme_end_ind{nr})
+        port_names_list{nr} = input_list{nr}(nme_start_ind{nr}+length(nme_start):nme_end_ind{nr}-1);
     end %if
 end %for
 if~strcmp(mode_end, '')
