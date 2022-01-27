@@ -27,11 +27,14 @@ for sts = 1:length(model_sets)
             wakelength = str2double(modelling_inputs.wakelength);
             [pp_data.port.data] = port_data_conditioning(...
                 pp_data.port.data, run_logs, modelling_inputs.port_fill_factor);
-            % Replicate the port signals as required.
+            % Replicate the port signals as required. Dont run if only beam
+            % ports are present.
+            if length(pp_data.port.labels) > 2
             [pp_data.port.labels, ...
                 pp_data.port.data, pp_data.port.t_start] = duplicate_ports(...
                 modelling_inputs.port_multiple, pp_data.port.labels, ...
                 pp_data.port.data,  pp_logs.start_times);
+            end %if
             %             wake_lengths_to_analyse = [];
             %             for ke = 1:6
             %                 wake_lengths_to_analyse = cat(1, wake_lengths_to_analyse, wakelength);
