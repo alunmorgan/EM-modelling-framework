@@ -1,24 +1,46 @@
-function postprocess_core(pp_data_directory, version, sim_type, s_set, excitation)
+function postprocess_core(pp_data_directory, version, sim_type, s_set, excitation, varargin)
 
-if strcmpi(sim_type, 'wake') || strcmpi(sim_type, 'eigenmode')|| strcmpi(sim_type, 'lossy_eigenmode')
-    pp_input_file = ['model_', sim_type, '_post_processing'];
-    pp_log_file = ['model_', sim_type ,'_post_processing_log'];
-elseif strcmpi(sim_type, 's_parameter')
-    pp_input_file = ['model_s_param_set_',s_set, '_',excitation,'_post_processing_input_file'];
-    pp_log_file = ['model_s_param_set_',s_set, '_',excitation,'_post_processing_log'];
-end %if
+p = inputParser;
+p.StructExpand = false;
+p.CaseSensitive = false;
+valid_string = @(x) ischar(x);
+addRequired(p, 'pp_data_directory');
+addRequired(p, 'version');
+addRequired(p, 'sim_type');
+addRequired(p, 's_set');
+addRequired(p, 'excitation');
+addParameter(p, 'pp_input_file', '');
+parse(p, pp_data_directory, version, sim_type, s_set, excitation, varargin{:});
+
+pp_input_file = p.Results.pp_input_file;
+pp_log_file = [pp_input_file, '_log'];
+% if strcmpi(sim_type, 'wake')
+%     pp_input_file = p.Results.pp_input_file;
+%     pp_log_file = fullfile(pp_data_directory, ['model_', sim_type ,'_post_processing_log']);
+% elseif strcmpi(sim_type, 'eigenmode')|| strcmpi(sim_type, 'lossy_eigenmode')
+%     pp_input_file = fullfile(pp_data_directory,['model_', sim_type ,'_post_processing']);
+%     pp_log_file = fullfile(pp_data_directory, ['model_', sim_type ,'_post_processing_log']);
+% elseif strcmpi(sim_type, 's_parameter')
+%     pp_input_file = fullfile(pp_data_directory,['model_s_param_set_',s_set, '_',excitation,'_post_processing_input_file']);
+%     pp_log_file = fullfile(pp_data_directory, ['model_s_param_set_',s_set, '_',excitation,'_post_processing_log']);
+% end %if
+%% creating file structure
 temp_files('make', '.')
+if contains(pp_input_file, '_EfieldHistory')
+    tag = regexp(pp_input_file,'.*_EfieldHistory([0-9]+)', 'tokens');
+    mkdir(['temp_scratch/field_history/',tag{1}{1},'/'])
+end %if
+
+%% Running the postprocessor
 % setting the GdfidL version to test
 orig_ver = getenv('GDFIDL_VERSION');
 setenv('GDFIDL_VERSION',version);
-[~]=system(['gd1.pp < ',...
-    fullfile(pp_data_directory,pp_input_file),...
-    ' > ',...
-    fullfile(pp_data_directory, pp_log_file)]);
+[~]=system(['gd1.pp < ', pp_input_file, ' > ', pp_log_file]);
 % restoring the original version.
 setenv('GDFIDL_VERSION',orig_ver);
-% Check that the post processor has completed
-data = read_file_full_line(fullfile(pp_data_directory , pp_log_file));
+
+%% Check that the post processor has completed
+data = read_file_full_line(pp_log_file);
 for hwa = 1:length(data)
     if ~isempty(strfind(data{hwa},'The End of File is reached')) ||...
             ~isempty(strfind(data{hwa},'The End of the File is reached')) ||...
@@ -51,7 +73,24 @@ end %for
 
 
 %% move any remaining files to the output location.
-movefile('temp_scratch/*', pp_data_directory)
+% having to do it is seperate sections to avoid an 'Unknown error' in movefile.
+directories = dir_list_gen_tree('temp_scratch', 'dirs',1);
+if ~isempty(directories)
+    for seh = 1:length(directories)
+        new_dir = fullfile(pp_data_directory, regexprep(directories{seh}, 'temp_scratch/',''));
+        if ~exist(new_dir,'dir')
+            mkdir(new_dir)
+        end %if
+    end %for
+end %if
+
+files = dir_list_gen_tree('temp_scratch', '',1);
+if ~isempty(files)
+    for sen = 1:length(files)
+        new_location = fullfile(pp_data_directory, regexprep(files{sen}, 'temp_scratch/',''));
+        movefile(files{sen}, new_location )
+    end %for
+end %if
 
 temp_files('remove', '.')
 delete('POSTP-LOGFILE');

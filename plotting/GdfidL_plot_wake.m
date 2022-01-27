@@ -11,6 +11,12 @@ function GdfidL_plot_wake(path_to_data, ppi, range, chosen_wake_length)
 % chosen_wake_length = str2double(chosen_wake_length);
 
 [path_to_data ,~,~] = fileparts(path_to_data);
+
+if exist(fullfile(path_to_data, 'field_data.mat'), 'file') == 2
+    load(fullfile(path_to_data, 'field_data.mat'), 'field_data');
+    plot_fexport_data(field_data, path_to_data)
+end %if
+    
 if exist(fullfile(path_to_data, 'run_inputs.mat'), 'file') == 2
     load(fullfile(path_to_data, 'run_inputs.mat'), 'modelling_inputs');
 else
@@ -52,7 +58,7 @@ wake_data.frequency_domain_data = wake_sweep_data.frequency_domain_data{1};
 %Line width of the graphs
 lw = 2;
 % limit to the horizontal axis.
-graph_freq_lim = ppi.hfoi * 1e-9;
+graph_freq_lim = ppi.hfod * 1e-9;
 % find the coresponding index.
 cut_freq_ind = find(wake_data.frequency_domain_data.f_raw*1E-9 < graph_freq_lim,1,'last');
 % also find the index for 9GHz for zoomed graphs

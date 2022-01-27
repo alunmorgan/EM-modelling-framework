@@ -9,15 +9,23 @@ function data = postprocess_wakes(modelling_inputs, log)
 %Example: wake_data = postprocess_wakes(ppi, modelling_inputs,log)
 
 %% Write the wake post processing input file
-transverse_quadrupole_wake_offset = '1E-3';
-tstart = GdfidL_write_pp_input_file(log, transverse_quadrupole_wake_offset);
-
+tstart = GdfidL_write_pp_input_file(log);
+% for folder_ind = 1:10
+% GdfidL_write_wake_pp_input_file_E_field_history(1 + (folder_ind-1)*3000);
+% end %for
 
 %% run the wake postprocessor
 wake_output_directory = fullfile('pp_link', 'wake');
-postprocess_core(wake_output_directory, modelling_inputs.version, 'wake', 0, 0);
+a=dir_list_gen_tree(wake_output_directory, '',1);
+c = a(contains(a, 'wake_post_processing'));
+for kwe = 1:length(c)
+    postprocess_core(fileparts(c{kwe}), modelling_inputs.version, 'wake', 0, 0, 'pp_input_file', c{kwe});
+end %for
 %% Extract the wake data
+rename_port_files(wake_output_directory);
 output_file_locations = GdfidL_find_ouput(wake_output_directory);
 data = extract_wake_data_from_pp_output_files(output_file_locations, log, modelling_inputs, tstart);
-% raw_data.port.t_start = tstart;
-
+field_data = read_fexport_files(fullfile('data_link', 'wake'));
+if ~isnan(field_data)
+    save(fullfile(wake_output_directory,'field_data'), 'field_data')
+end %if
