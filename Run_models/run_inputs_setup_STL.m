@@ -40,11 +40,12 @@ base_parameter_file_path = fullfile(mi.paths.path_to_models, ...
     mi.base_model_name,[mi.base_model_name, '_Base'],...
     [mi.base_model_name, '_Base_parameters.txt']);
 
+%% Base model
 for fdhs = 1:length(mi.model_names)
     model_num = model_num +1;
     modelling_inputs{model_num} = base_inputs(mi, mi.model_names{fdhs});
     modelling_inputs{model_num}.mov = 0; %Default to no movie
-    if strcmpi(mi.movie_flag, 'All')
+    if contains(mi.movie_flag, 'base')
         modelling_inputs{model_num}.mov = 1;
     end %if
     if fdhs ~= mi.base_model_ind
@@ -72,23 +73,44 @@ for fdhs = 1:length(mi.model_names)
     end %if
 end %for
 
-% Setting up the material variations off the base model.
+%% Setting up the material variations off the base model.
+baseline_def = regexp(defs{1}, 'define\(\s*(\w*)\s*,\s*(\w*)\s*\)','tokens');
+for ks = 1:length(baseline_def)
+    baseline_materials{ks,1} = baseline_def{ks}{1}{1};
+    baseline_materials{ks,2} = baseline_def{ks}{1}{2};
+end %for
+varying_material = '';
+material_value = '';
 for awh = 2:length(defs)
     model_num = model_num +1;
     def = defs{awh};
     def = regexp(def, 'define\(\s*(\w*)\s*,\s*(\w*)\s*\)','tokens');
-    def = def{1}{1};
+    for ks = 1:length(def)
+        model_materials{ks,1} = def{ks}{1}{1};
+        model_materials{ks,2} = def{ks}{1}{2};
+    end %for
+    for her = 1:size(model_materials,1)
+        ind_in_baseline = find(contains(baseline_materials(:,1), model_materials{her,1}),1,'first');
+        is_stable = strcmp(baseline_materials{ind_in_baseline,2}, model_materials{her,2});
+        if is_stable
+            continue
+        else
+            varying_material = model_materials{her,1};
+            material_value = model_materials{her,2};
+            break
+        end %if
+    end %for
     % The inputs of the current geometry before any simulation
     % parameter sweeps.
     modelling_inputs{model_num} = base_inputs(mi, mi.model_names{mi.base_model_ind});
     modelling_inputs{model_num}.mov = 0; %Default to no movie
-    if strcmpi(mi.movie_flag, 'All')
+    if contains(mi.movie_flag, 'material_changes')
         modelling_inputs{model_num}.mov = 1;
     end %if
-    modelling_inputs{model_num}.set_name = def{1};
+    modelling_inputs{model_num}.set_name = varying_material;
     modelling_inputs{model_num}.defs = defs{awh};
     modelling_inputs{model_num}.model_name = [...
-        mi.base_model_name, '_', def{1}, '_sweep_value_', def{2}];
+        mi.base_model_name, '_', varying_material, '_sweep_value_', material_value];
     modelling_inputs{model_num}.stl_location = fullfile(mi.paths.path_to_models, ...
         mi.base_model_name, [mi.base_model_name, '_Base'], 'ascii');
     if exist(base_parameter_file_path, 'file') == 2
@@ -99,6 +121,7 @@ for awh = 2:length(defs)
     end %if
 end %for
 
+%% Setting up simulation parameter sweeps
 % Then set up the simulation parameter scans off the the base model.
 % Generally all the codes starts with the temp_inputs as a starting
 % point and then modifies the specific variable of that sweep.
@@ -110,7 +133,7 @@ for nw = 1:length(sim_param_sweeps)
         model_num = model_num +1;
         modelling_inputs{model_num} = base_inputs(mi, mi.model_names{mi.base_model_ind});
         modelling_inputs{model_num}.mov = 0; %Default to no movie
-        if strcmpi(mi.movie_flag, 'All')
+        if contains(mi.movie_flag, 'simulation_changes')
             modelling_inputs{model_num}.mov = 1;
         end %if
         modelling_inputs{model_num}.(sim_param_sweeps{nw}) = mi.simulation_defs.(sim_param_sweeps{nw}){mss};
@@ -129,12 +152,12 @@ for nw = 1:length(sim_param_sweeps)
     end %for
 end %for
 
-% Now setup which fractional geometries to use
+%% Now setup which fractional geometries to use
 for uned = 2:length(mi.simulation_defs.geometry_fractions)
     model_num = model_num +1;
     modelling_inputs{model_num} = base_inputs(mi, mi.model_names{mi.base_model_ind});
     modelling_inputs{model_num}.mov = 0; %Default to no movie
-    if strcmpi(mi.movie_flag, 'All')
+    if contains(mi.movie_flag, 'geometry_fraction')
         modelling_inputs{model_num}.mov = 1;
     end %if
     tne = find(mi.simulation_defs.volume_fill_factor == mi.simulation_defs.geometry_fractions(uned));
@@ -161,12 +184,12 @@ for uned = 2:length(mi.simulation_defs.geometry_fractions)
     end %if
 end %for
 
-% Now setup different port excitations to use
+%% Now setup different port excitations to use
 for unej = 2:length(mi.simulation_defs.wake.port_excitation)
     model_num = model_num +1;
     modelling_inputs{model_num} = base_inputs(mi, mi.model_names{mi.base_model_ind});
     modelling_inputs{model_num}.mov = 0; %Default to no movie
-    if strcmpi(mi.movie_flag, 'All')
+    if contains(mi.movie_flag, 'port_excitation')
         modelling_inputs{model_num}.mov = 1;
     end %if
     modelling_inputs{model_num}.port_excitation_wake.excitation_name = mi.simulation_defs.wake.port_excitation{unej}.excitation_name;
@@ -193,7 +216,7 @@ for unej = 2:length(mi.simulation_defs.wake.port_excitation)
         modelling_inputs{model_num}.geometry_defs = {};
     end %if
 end %for
-% 
+%
 % % Now setup different S-parameter settings to use
 % for unpj = 2:length(mi.simulation_defs.s_param)
 %     model_num = model_num +1;
@@ -206,7 +229,7 @@ end %for
 %     modelling_inputs{model_num}.s_param_excitation_bw = mi.simulation_defs.s_param{unpj}.excitation_bw;
 %     modelling_inputs{model_num}.s_param_excitation_amp = mi.simulation_defs.s_param{unpj}.excitation_amp;
 %     modelling_inputs{model_num}.s_param_tmax = mi.simulation_defs.s_param{unpj}.tmax;
-%    
+%
 %     temp = [...
 %         mi.base_model_name, '_', 's_param', '_sweep_value_', num2str(unpj)];
 %     temp = regexprep(temp, '\.','p');
