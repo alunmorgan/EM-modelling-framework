@@ -87,7 +87,9 @@ for sts = 1:length(model_sets)
             disp('Saved')
             clear 'pp_data' 'run_logs' 'modelling_inputs' 'wake_sweep_data' 'current_folder'
         else
-            disp(['Analysis for ', current_folder, ' already exists... Skipping'])
+            [a,b,~] = fileparts(current_folder);
+            [~,c,~] = fileparts(a);
+            disp(['Analysis for ', c, ' already exists... Skipping'])
         end %if
     end %for
 end %for
