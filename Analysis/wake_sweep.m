@@ -59,12 +59,18 @@ for se = length(sweep_lengths):-1:1
         m_data{se}.loss_time = r_raw.mat_losses.loss_time(1:mt_ind);
         m_data{se}.total_loss = r_raw.mat_losses.total_loss(1:mt_ind);
         m_data{se}.single_mat_data = r_raw.mat_losses.single_mat_data;
+       if iscell(m_data{se}.single_mat_data)
+        % I think that if the only material is PEC then this returns a 0 rather
+        % than a cell. In which case don't do the interpolation.
+        % TODO find the code which generates the zeros and change so that the
+        % output type is constant.
         for shw = 1:size(m_data{se}.single_mat_data,1)
             m_data{se}.single_mat_data{shw, 4} =  interp1(...
                 m_data{se}.single_mat_data{shw, 4}(:,1),...
                 m_data{se}.single_mat_data{shw, 4}(:,2),...
                 m_data{se}.loss_time);
         end %for
+       end %if
     else
         m_data{se} = NaN;
     end %if
