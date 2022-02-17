@@ -26,6 +26,6 @@ rename_port_files(wake_output_directory);
 output_file_locations = GdfidL_find_ouput(wake_output_directory);
 data = extract_wake_data_from_pp_output_files(output_file_locations, log, modelling_inputs, tstart);
 field_data = read_fexport_files(fullfile('data_link', 'wake'));
-if ~isnan(field_data)
+if ~isfield(field_data, 'nofiles')
     save(fullfile(wake_output_directory,'field_data'), 'field_data')
 end %if
