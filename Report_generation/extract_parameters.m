@@ -6,7 +6,7 @@ function [mb_param_names, mb_param_vals,...
 % mi is the stored original simulation input parameters.
 % run_logs is a structure containing the data extracted from the log files.
 %
-% Example: [param_names, param_vals] = extract_parameters(mi, run_logs)
+% Example: [mb_param_names, mb_param_vals, geom_param_names, geom_param_vals, mat_param_names, mat_param_vals] = extract_parameters(mi, run_logs, modelling_inputs)
 
 mb_param_names(1:2) = {'mesh', 'version'};
 if isfield(run_logs, 'mesh_step_size')
