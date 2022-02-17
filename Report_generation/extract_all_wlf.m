@@ -17,13 +17,17 @@ for sts = 1:length(model_sets)
         load(fullfile(current_folder, 'data_analysed_wake'),'wake_sweep_data');
         load(fullfile(current_folder, 'run_inputs'), 'modelling_inputs');
         load(fullfile(current_folder, 'data_from_run_logs.mat'), 'run_logs');
-        if strcmp(modelling_inputs.model_name(end-4:end), '_Base')
-            extracted_data{sts}.basename = modelling_inputs.base_model_name;
-            for nwd = 1:length(modelling_inputs.geometry_defs)
-                extracted_data{sts}.geometry_values.(modelling_inputs.geometry_defs{nwd}{1}) =...
-                    modelling_inputs.geometry_defs{nwd}{2}{1};
-            end %for
-        end %if
+ [sim_param_names_tmp, sim_param_vals_tmp, ...
+    geom_param_names_tmp, geom_param_vals_tmp,...
+    mat_param_names_tmp, mat_param_vals_tmp] = extract_parameters(run_logs, modelling_inputs);
+        extracted_data{sts}.materials = modelling_inputs.mat_list(:,1);
+        extracted_data{sts}.material_names{ind} = mat_param_names_tmp;
+        extracted_data{sts}.material_values{ind} = mat_param_vals_tmp;
+        extracted_data{sts}.geometry_names{ind} = geom_param_names_tmp;
+        extracted_data{sts}.geometry_values{ind} = geom_param_vals_tmp;
+        extracted_data{sts}.simulation_names{ind} = sim_param_names_tmp;
+        extracted_data{sts}.simulation_values{ind} = sim_param_vals_tmp;
+        extracted_data{sts}.basename{ind} = modelling_inputs.base_model_name;
         extracted_data{sts}.model_names{ind} = split_str{ind}{end - 2};
         extracted_data{sts}.wlf(ind) = wake_sweep_data.time_domain_data{end}.wake_loss_factor;
         extracted_data{sts}.wake_length(ind) = str2double(modelling_inputs.wakelength);
@@ -44,8 +48,8 @@ for sts = 1:length(model_sets)
             extracted_data{sts}.fractional_loss_signal_ports(ind) = 0;
         end %if
         extracted_data{sts}.fractional_loss_structure(ind) = 1- extracted_data{sts}.fractional_loss_beam_ports(ind) - extracted_data{sts}.fractional_loss_signal_ports(ind);
-            port_energy = wake_sweep_data.time_domain_data{end}.port_data.power_port_mode.remnant_only.port_energy;
-
+        port_energy = wake_sweep_data.time_domain_data{end}.port_data.power_port_mode.remnant_only.port_energy;
+        
         total_energy = wake_sweep_data.time_domain_data{end}.loss_from_beam;
         extracted_data{sts}.beam_port_loss(ind) = (port_energy(1) + port_energy(2)) / total_energy;
         extracted_data{sts}.signal_port_loss(ind) = sum(port_energy(3:end)) / total_energy;
@@ -55,11 +59,15 @@ for sts = 1:length(model_sets)
             [extracted_data{sts}.port{ind}.dominant_signal_amplitude(hwhs), extracted_data{sts}.port{ind}.dominant_mode(hwhs)] = max(sum(all_bunch_signals(hwhs,:,:),3),[], 2);
         end %for
         extracted_data{sts}.port{ind}.labels = wake_sweep_data.time_domain_data{1, 1}.port_lables;
-        for jd = 1:size(run_logs.mat_losses.single_mat_data,1)
-            extracted_data{sts}.material_loss{ind}.(regexprep(run_logs.mat_losses.single_mat_data{jd,2},' ', '_')) = ...
-                run_logs.mat_losses.single_mat_data{jd,4}(end,2);
-        end
-        extracted_data{sts}.material_loss{ind}.total_loss = run_logs.mat_losses.total_loss(end);
+        if isfield(run_logs, 'mat_losses')
+            for jd = 1:size(run_logs.mat_losses.single_mat_data,1)
+                extracted_data{sts}.material_loss{ind}.(regexprep(run_logs.mat_losses.single_mat_data{jd,2},' ', '_')) = ...
+                    run_logs.mat_losses.single_mat_data{jd,4}(end,2);
+            end
+            extracted_data{sts}.material_loss{ind}.total_loss = run_logs.mat_losses.total_loss(end);
+        else
+            extracted_data{sts}.material_loss{ind}.total_loss = 0;
+        end %if
         extracted_data{sts}.beam_offset_x(ind) = str2double(modelling_inputs.beam_offset_x);
         extracted_data{sts}.beam_offset_y(ind) = str2double(modelling_inputs.beam_offset_y);
         clear pp_data wake_sweep_data run_logs modelling_inputs all_bunch_signals

@@ -12,12 +12,6 @@ function GdfidL_plot_pp_wake(path_to_data, ppi)
 
 [path_to_data ,~,~] = fileparts(path_to_data);
 
-
-if exist(fullfile(path_to_data, 'field_data.mat'), 'file') == 2
-    load(fullfile(path_to_data, 'field_data.mat'), 'field_data');
-    plot_fexport_data(field_data, path_to_data)
-end %if
-
 if exist(fullfile(path_to_data, 'run_inputs.mat'), 'file') == 2
     load(fullfile(path_to_data, 'run_inputs.mat'), 'modelling_inputs');
 else
@@ -175,8 +169,11 @@ plot_data = [beam_ports * 1E9, signal_ports * 1E9, structure_energy_loss];
 % lables. This just makes any zero values a very small  positive value to avoid
 % this.
 plot_data(plot_data == 0) = 1e-12;
-x = categorical(['Beam ports', 'Signal ports',material_names]);
-
+if isnan(material_names)
+    x = categorical(cellstr(['Beam ports', 'Signal ports']));
+else
+    x = categorical(cellstr(['Beam ports', 'Signal ports',material_names]));
+end %if
 subplot(2,2,1)
 x1 = categorical({'Energy from beam'});
 y1 = abs(pp_data.Wake_potential.s.loss.s) * 1e9;
@@ -460,3 +457,9 @@ close(h_wake)
 [~, prefix, ~] = fileparts(temp);
 add_prefix(path_to_data, 'png', prefix)
 add_prefix(path_to_data, 'fig', prefix)
+
+if exist(fullfile(path_to_data, 'field_data.mat'), 'file') == 2
+    load(fullfile(path_to_data, 'field_data.mat'), 'field_data');
+    plot_fexport_data_peak_field(field_data, path_to_data)
+    plot_fexport_data(field_data, path_to_data)
+end %if

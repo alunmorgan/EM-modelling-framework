@@ -1,4 +1,4 @@
-function plot_model(datasets, ppi, input_settings, override, p_types)
+function plot_model(datasets, ppi, override, p_types)
 
 for ind = 1:length(datasets)
     % location and size of the default figures.
@@ -6,10 +6,10 @@ for ind = 1:length(datasets)
     
     if isfield(datasets{ind}, 'wake')
         if contains(p_types, 'wake') || contains(p_types, 'all')
-            if strcmp(override, 'no_skip') || isempty(dir_list_gen(fullfile(datasets{ind}.path_to_data, 'wake'), 'png',1))
+            if strcmp(override, 'no_skip') || ...
+                    isempty(dir_list_gen(fullfile(datasets{ind}.path_to_data, 'wake'), 'png',1))
                 disp(['Generating wake graphs for ', datasets{ind}.model_name])
                 GdfidL_plot_pp_wake(datasets{ind}.wake, ppi)
-%                 GdfidL_plot_wake(datasets{ind}.wake, ppi, 1E7, input_settings.wake.wakelength)
             else
                 disp(['Wake graphs already exists for ', datasets{ind}.model_name, ' and no override is set. Skipping...'])
             end

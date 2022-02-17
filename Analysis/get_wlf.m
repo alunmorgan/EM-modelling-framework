@@ -1,42 +1,58 @@
-function get_wlf(model_sets)
+function get_wlf(model_sets, skip_analysis)
+
+if nargin == 1 ||strcmp(skip_analysis, 'skip')
+    return
+end %if
 
 load_local_paths
 [extracted_data] = extract_all_wlf(results_loc, model_sets);
 for kfn = 1:length(extracted_data)
-    names = regexprep(extracted_data{kfn}.model_names, [extracted_data{kfn}.basename '_'], '');
+    names = regexprep(extracted_data{kfn}.model_names, [extracted_data{kfn}.basename{1} '_'], '');
     sweeps = unique(regexprep(names, '_sweep_value_.*', ''));
     sweeps(strcmp(sweeps, 'Base')) = [];
     sweeps(strncmp(sweeps, 'old_data', 8)) = [];
     sweep_values = regexprep(names, '.*_sweep_value_', '');
     base_ind = contains(names, 'Base');
-         makeBaseSummaryTable(extracted_data{kfn}, model_sets{kfn}, results_loc, base_ind)
+    makeBaseSummaryTable(extracted_data{kfn}, model_sets{kfn}, results_loc, base_ind)
     for hen = 1:length(sweeps)
         sweep_inds = contains(names, sweeps{hen});
-        vals = sweep_values(sweep_inds);
+        all_inds = or(base_ind, sweep_inds);
+        %         vals = sweep_values(sweep_inds);
+        %find the relevant values across the current sweep
         if strcmp(sweeps{hen}, 'wake_length')
-            temp_base_val = extracted_data{kfn}.wake_length(hen);
+            temp_vals = extracted_data{kfn}.wake_length(all_inds);
         elseif strcmp(sweeps{hen}, 'mesh_density')
-            temp_base_val = extracted_data{kfn}.mesh_density(hen);
+            temp_vals = extracted_data{kfn}.mesh_density(all_inds);
         elseif strcmp(sweeps{hen}, 'mesh_scaling')
-            temp_base_val = extracted_data{kfn}.mesh_scaling(hen);
+            temp_vals = extracted_data{kfn}.mesh_scaling(all_inds);
         elseif strcmp(sweeps{hen}, 'version')
-            temp_base_val = extracted_data{kfn}.version{hen};
+            temp_vals = extracted_data{kfn}.version{all_inds};
         elseif strcmp(sweeps{hen}, 'Geometry_fraction')
-            temp_base_val = extracted_data{kfn}.Geometry_fraction(hen);
+            temp_vals = extracted_data{kfn}.Geometry_fraction(all_inds);
         elseif strcmp(sweeps{hen}, 'beam_offset_x')
-            temp_base_val = extracted_data{kfn}.beam_offset_x(hen);
+            temp_vals = extracted_data{kfn}.beam_offset_x(all_inds);
         elseif strcmp(sweeps{hen}, 'beam_offset_y')
-            temp_base_val = extracted_data{kfn}.beam_offset_y(hen);
+            temp_vals = extracted_data{kfn}.beam_offset_y(all_inds);
+        elseif contains(sweeps{hen}, '_mat')
+            loop_inds = find(all_inds == 1);
+            for hse = 1:length (loop_inds)
+                mat_loc_ind = find(strcmp(extracted_data{kfn}.material_names{loop_inds(hse)}, sweeps{hen}), 1, 'first');
+                temp_vals{hse} = extracted_data{kfn}.material_values{loop_inds(hse)}{mat_loc_ind};
+            end %for
         else
-            temp_base_val = extracted_data{kfn}.geometry_values.(sweeps{hen});
-        end %if
-        [vals_t, base_val, xunit] = recover_numeric_values(vals, temp_base_val);
-        [valsX, Isort] = sort(cat(2, vals_t, base_val));
-        temp_inds = cat(2, find(sweep_inds), find(base_ind));
-        dataInds = temp_inds(Isort);
-        makeSweepSummaryTables(valsX, dataInds, extracted_data{kfn}, model_sets{kfn}, xunit, sweeps{hen}, results_loc)
-        makeSweepSummaryGraphs(valsX, dataInds, base_val, base_ind, extracted_data{kfn}, model_sets{kfn}, xunit, sweeps{hen}, results_loc)
-        clear vals temp_base_val temp_inds dataInds xunit vals_t base_val valsX Isort
+            geom_loop_inds = find(all_inds == 1);
+            for hse = 1:length (geom_loop_inds)
+            geom_loc_ind = find(strcmp(extracted_data{kfn}.geometry_names{geom_loop_inds(hse)}, sweeps{hen}), 1, 'first');
+            temp_vals = extracted_data{kfn}.geometry_values{geom_loop_inds(hse)}{geom_loc_ind};
+            end %for
+            end %if
+        %         [vals_t, base_val, xunit] = recover_numeric_values(vals, temp_vals);
+        %         [valsX, Isort] = sort(cat(2, vals_t, base_val));
+        %         temp_inds = cat(2, find(sweep_inds), find(base_ind));
+        %         dataInds = temp_inds(Isort);
+        makeSweepSummaryTables(temp_vals, all_inds, extracted_data{kfn}, model_sets{kfn}, sweeps{hen}, results_loc)
+        makeSweepSummaryGraphs(temp_vals, all_inds, base_ind, extracted_data{kfn}, model_sets{kfn}, sweeps{hen}, results_loc)
+        clear temp_vals all_inds mat_loc_ind geom_loc_ind
     end %for
     clear names sweeps sweep_values base_ind
 end %for

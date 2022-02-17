@@ -1,4 +1,4 @@
-function makeSweepSummaryTables(valsX, dataInds, extracted_data, model_set, xunit, sweep_name, root)
+function makeSweepSummaryTables(valsX, dataInds, extracted_data, model_set, sweep_name, root)
 
 wlf = round(extracted_data.wlf(dataInds) .* 1E-9);
 sim_time_string = sec_to_time_string(extracted_data.simulation_time(dataInds));
@@ -6,7 +6,11 @@ mesh_stepsize = extracted_data.mesh_density(dataInds) ./ extracted_data.mesh_sca
 timestep = round(extracted_data.timestep(dataInds) .* 1E15);
 number_of_cells = round(extracted_data.number_of_cells(dataInds) ./ 1E6);
 for ks = 1:length(valsX)
-    row_names{ks} = [num2str(valsX(ks)) ,' ', xunit];
+    if ~iscell(valsX)
+        row_names{ks} = num2str(valsX(ks));
+    else
+        row_names{ks} = valsX{ks};
+    end %if
 end %for
 unique_row_names = unique(row_names);
 if length(unique_row_names) ~= length(row_names)
@@ -98,12 +102,13 @@ writetable(T_losses, fullfile(root, model_set,...
 
 %%%%%%%%%%%%%%%% port signals table %%%%%%%%%%%%%%%%%%%%
 varnames_port_signals = {};
-for wha = 1:length(dataInds) %for each model in sweep
+loop_inds = find(dataInds == 1);
+for wha = 1:length(loop_inds) %for each model in sweep
     
-    if length(extracted_data.port{dataInds(wha)}.dominant_signal_amplitude) < 3
+    if length(extracted_data.port{loop_inds(wha)}.dominant_signal_amplitude) < 3
         continue
     end%if
-    temp_port_data = extracted_data.port{dataInds(wha)};
+    temp_port_data = extracted_data.port{loop_inds(wha)};
     ck = 1;
     for hne = 3:length(temp_port_data.dominant_signal_amplitudes) %for each signal port
         label = temp_port_data.labels{hne};

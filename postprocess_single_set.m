@@ -53,7 +53,7 @@ try
     end %if
     if ~any(contains(p.Results.skip_analysis, 'wake'))
         analyse_models_sets(model_set, analysis_override);
-        get_wlf(model_set);
+        get_wlf(model_set, analysis_override);
     end %if
 catch ME1
     display_error_message(ME1)
@@ -84,7 +84,7 @@ catch ME4
 end %try
 try
     datasets = find_datasets(fullfile(results_loc, model_set{1}));
-    plot_model(datasets, ppi, input_settings, plotting_override, {'all'});
+    plot_model(datasets, ppi, plotting_override, {'all'});
 catch ME5
     display_error_message(ME5)
 end %try
