@@ -2,7 +2,8 @@ function data = read_fexport_files(location)
 
 gzFiles = dir_list_gen(location, 'gz',1);
 if isempty(gzFiles)
-    data = NaN;
+    data = struct;
+    data.nofiles = NaN;
     return
 end %if
 set_start_inds = find(contains(gzFiles, '000001.gz'));
