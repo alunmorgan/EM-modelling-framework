@@ -75,9 +75,9 @@ l_st ={'--',':','-.','--',':','-.','--',':','-.'};
 % end %for
 % These are the plots to generate for a single value of sigma.
 % sigma = round(str2num(mi.beam_sigma) ./3E8 *1E12 *10)/10;
-if isfield(pp_data.port, 'timebase')
+% if isfield(pp_data.port, 'timebase')
     port_names = regexprep(pp_data.port.labels,'_',' ');
-end %if
+% end %if
 if length(port_names)== 2
     % assume that only beam ports are involved and set a flag so that the
     % signal port values are not displayed.
@@ -157,22 +157,28 @@ h_wake = figure('Position',fig_pos);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Thermal graphs
 clf(h_wake)
-time_step = pp_data.port.timebase(2) - pp_data.port.timebase(1);
-beam_ports = sum(pp_data.port.data.time.power_port{1}) .* time_step + ...
-    sum(pp_data.port.data.time.power_port{2}) .* time_step;
-signal_ports = 0;
-for jas = 3:length(pp_data.port.data.time.power_port)
-    signal_ports = signal_ports + sum(pp_data.port.data.time.power_port{jas}) .* time_step;
-end %for
+if isfield(pp_data.port, 'timebase')
+    time_step = pp_data.port.timebase(2) - pp_data.port.timebase(1);
+    beam_ports = sum(pp_data.port.data.time.power_port{1}) .* time_step + ...
+        sum(pp_data.port.data.time.power_port{2}) .* time_step;
+    signal_ports = 0;
+    for jas = 3:length(pp_data.port.data.time.power_port)
+        signal_ports = signal_ports + sum(pp_data.port.data.time.power_port{jas}) .* time_step;
+    end %for
+else
+    beam_ports = 0;
+    signal_ports = 0;
+end %if
 plot_data = [beam_ports * 1E9, signal_ports * 1E9, structure_energy_loss];
 % matlab will ignore any values of zero which messes up the maping of the
 % lables. This just makes any zero values a very small  positive value to avoid
 % this.
 plot_data(plot_data == 0) = 1e-12;
-if isnan(material_names)
-    x = categorical(cellstr(['Beam ports', 'Signal ports']));
-else
+
+if iscell(material_names)
     x = categorical(cellstr(['Beam ports', 'Signal ports',material_names]));
+elseif isnan(material_names)
+    x = categorical(cellstr(['Beam ports', 'Signal ports']));
 end %if
 subplot(2,2,1)
 x1 = categorical({'Energy from beam'});
@@ -338,6 +344,7 @@ savemfmt(h_wake, path_to_data, 'Q_from_wake')
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Port signals
 clf(h_wake)
+if isfield(pp_data.port, 'timebase');
 [hwn, ksn] = num_subplots(length(port_names));
 for ens = length(port_names):-1:1 % ports
     ax_sp(ens) = subplot(hwn,ksn,ens);
@@ -353,7 +360,7 @@ for ens = length(port_names):-1:1 % ports
     xlim(ax_sp(ens),[pp_data.port.timebase(1) .* 1E9 4])
 end %for
 savemfmt(h_wake, path_to_data,'port_signals_first4ns')
-
+end %if
 
 % clf(h_wake)
 % ax = axes('Parent', h_wake);

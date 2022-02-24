@@ -12,7 +12,9 @@ for sts = 1:length(model_sets)
     for ind = 1:length(wanted_files)
         current_folder = fileparts(wanted_files{ind});
         if ~isfile(fullfile(current_folder, 'data_analysed_wake.mat')) || analysis_override == 1
-            disp(['Starting analysis ', current_folder])
+            [a1,~,~]= fileparts(current_folder);
+            [~,name_of_model,~] = fileparts(a1);
+            disp(['Starting analysis <strong>', name_of_model, '</strong>'])
             test = regexprep(current_folder, root_path, '');
             test = regexp(test, filesep, 'split')';
             wake_ind = find(cellfun(@isempty,(strfind(test, 'wake')))==0);
@@ -82,9 +84,9 @@ for sts = 1:length(model_sets)
                 end %if
             end %for
             wake_sweep_data = wake_sweep(wake_lengths_to_analyse, pp_data, ppi, run_logs, port_modes_override);
-            disp('Analysed ... Saving...')
+            fprintf('Analysed ... Saving...')
             save(fullfile(current_folder, 'data_analysed_wake.mat'), 'wake_sweep_data','-v7.3')
-            disp('Saved')
+            fprintf('Saved\n')
             clear 'pp_data' 'run_logs' 'modelling_inputs' 'wake_sweep_data' 'current_folder'
         else
             [a,b,~] = fileparts(current_folder);

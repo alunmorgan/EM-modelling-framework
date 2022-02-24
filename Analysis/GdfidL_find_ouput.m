@@ -97,51 +97,15 @@ for nr = 1:length(output_file_locations.Ports.voltage)
         ac = ac + 1;
     end %if
 end %for
-% nme_end = strfind(output_file_locations.Ports.power, '-h_amp_of_mode=');
-% port_names_list_power = cell(1,1);
-% ac = 1;
-% for nr = 1:length(output_file_locations.Ports.power)
-%     if ~isempty(nme_end{nr})
-%     port_names_list_power{ac} = output_file_locations.Ports.power{nr}(nme_start{nr}+5:nme_end{nr}-1);
-%     ac = ac + 1;
-%     end %if
-% end %for
+
 % find the unique port names
+if ~isempty(inds)
 port_names_temp = unique(port_names_list_voltage);
 empty_names_ind = cellfun(@isempty, (port_names_temp));
 output_file_locations.port_names = port_names_temp(~empty_names_ind);
-% if isempty(output_file_locations.port_names)
-%     disp('No Port data - This is a problem')
-%     output_file_locations.Port_mat = NaN;
-%     output_file_locations.port_names = NaN;
-% else
-%     port_modes = NaN;
-%     % Now the port modes.
-%     nme_end = strfind(output_file_locations.Ports.voltage, '-e_amp_of_mode=');
-%     mode_end = strfind(output_file_locations.Ports.voltage, '-time.mtv');
-%     for nr = 1:length(output_file_locations.Ports.voltage)
-%         port_modes(nr) = str2double(output_file_locations.Ports.voltage{nr}(nme_end{nr}+15:mode_end{nr}-1));
-%     end %for
-%     % put them in a matrix
-%     output_file_locations.Port_mat.voltage = cell(1,1);
-%     for hs = 1:length(output_file_locations.port_names)
-%         p_ind = contains(port_names_list_voltage, output_file_locations.port_names{hs});
-%         selected_port_modes = port_modes(p_ind);
-%         selected_ports = output_file_locations.Ports.voltage(p_ind);
-%         for hfe = 1:length(selected_ports)
-%             output_file_locations.Port_mat.voltage{hs, selected_port_modes(hfe)} = selected_ports{hfe};
-%         end %for
-%     end %for
-%     output_file_locations.Port_mat.power = cell(1,1);
-%     for hs = 1:length(output_file_locations.port_names)
-%         p_ind = contains(port_names_list_power, output_file_locations.port_names{hs});
-%         selected_port_modes = port_modes(p_ind);
-%         selected_ports = output_file_locations.Ports.power(p_ind);
-%         for hfe = 1:length(selected_ports)
-%             output_file_locations.Port_mat.power{hs, selected_port_modes(hfe)} = selected_ports{hfe};
-%         end %for
-%     end %for
-% end %if
+else
+    output_file_locations.port_names = {};
+end %if
 
 inds = find_position_in_cell_lst(strfind(run_list, 'Port='));
 if ~isempty(inds)

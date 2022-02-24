@@ -1,9 +1,11 @@
 function get_wlf(model_sets, skip_analysis)
 
-if nargin == 1 ||strcmp(skip_analysis, 'skip')
+if nargin == 1
+    skip_analysis = 'skip';
+end %if
+if strcmp(skip_analysis, 'skip')
     return
 end %if
-
 load_local_paths
 [extracted_data] = extract_all_wlf(results_loc, model_sets);
 for kfn = 1:length(extracted_data)
@@ -33,6 +35,8 @@ for kfn = 1:length(extracted_data)
             temp_vals = extracted_data{kfn}.beam_offset_x(all_inds);
         elseif strcmp(sweeps{hen}, 'beam_offset_y')
             temp_vals = extracted_data{kfn}.beam_offset_y(all_inds);
+        elseif strcmp(sweeps{hen}, 'port_excitation')
+            temp_vals = sweep_values(all_inds);
         elseif contains(sweeps{hen}, '_mat')
             loop_inds = find(all_inds == 1);
             for hse = 1:length (loop_inds)
@@ -42,14 +46,10 @@ for kfn = 1:length(extracted_data)
         else
             geom_loop_inds = find(all_inds == 1);
             for hse = 1:length (geom_loop_inds)
-            geom_loc_ind = find(strcmp(extracted_data{kfn}.geometry_names{geom_loop_inds(hse)}, sweeps{hen}), 1, 'first');
-            temp_vals = extracted_data{kfn}.geometry_values{geom_loop_inds(hse)}{geom_loc_ind};
+                geom_loc_ind = find(strcmp(extracted_data{kfn}.geometry_names{geom_loop_inds(hse)}, sweeps{hen}), 1, 'first');
+                temp_vals = extracted_data{kfn}.geometry_values{geom_loop_inds(hse)}{geom_loc_ind};
             end %for
-            end %if
-        %         [vals_t, base_val, xunit] = recover_numeric_values(vals, temp_vals);
-        %         [valsX, Isort] = sort(cat(2, vals_t, base_val));
-        %         temp_inds = cat(2, find(sweep_inds), find(base_ind));
-        %         dataInds = temp_inds(Isort);
+        end %if
         makeSweepSummaryTables(temp_vals, all_inds, extracted_data{kfn}, model_sets{kfn}, sweeps{hen}, results_loc)
         makeSweepSummaryGraphs(temp_vals, all_inds, base_ind, extracted_data{kfn}, model_sets{kfn}, sweeps{hen}, results_loc)
         clear temp_vals all_inds mat_loc_ind geom_loc_ind

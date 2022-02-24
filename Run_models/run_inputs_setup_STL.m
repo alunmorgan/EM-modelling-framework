@@ -45,7 +45,7 @@ for fdhs = 1:length(mi.model_names)
     model_num = model_num +1;
     modelling_inputs{model_num} = base_inputs(mi, mi.model_names{fdhs});
     modelling_inputs{model_num}.mov = 0; %Default to no movie
-    if contains(mi.movie_flag, 'base')
+    if any(contains(mi.movie_flag, 'base'))
         modelling_inputs{model_num}.mov = 1;
     end %if
     if fdhs ~= mi.base_model_ind
@@ -104,7 +104,7 @@ for awh = 2:length(defs)
     % parameter sweeps.
     modelling_inputs{model_num} = base_inputs(mi, mi.model_names{mi.base_model_ind});
     modelling_inputs{model_num}.mov = 0; %Default to no movie
-    if contains(mi.movie_flag, 'material_changes')
+    if any(contains(mi.movie_flag, 'material_changes'))
         modelling_inputs{model_num}.mov = 1;
     end %if
     modelling_inputs{model_num}.set_name = varying_material;
@@ -133,7 +133,7 @@ for nw = 1:length(sim_param_sweeps)
         model_num = model_num +1;
         modelling_inputs{model_num} = base_inputs(mi, mi.model_names{mi.base_model_ind});
         modelling_inputs{model_num}.mov = 0; %Default to no movie
-        if contains(mi.movie_flag, 'simulation_changes')
+        if any(contains(mi.movie_flag, 'simulation_changes'))
             modelling_inputs{model_num}.mov = 1;
         end %if
         modelling_inputs{model_num}.(sim_param_sweeps{nw}) = mi.simulation_defs.(sim_param_sweeps{nw}){mss};
@@ -157,7 +157,7 @@ for uned = 2:length(mi.simulation_defs.geometry_fractions)
     model_num = model_num +1;
     modelling_inputs{model_num} = base_inputs(mi, mi.model_names{mi.base_model_ind});
     modelling_inputs{model_num}.mov = 0; %Default to no movie
-    if contains(mi.movie_flag, 'geometry_fraction')
+    if any(contains(mi.movie_flag, 'geometry_fraction'))
         modelling_inputs{model_num}.mov = 1;
     end %if
     tne = find(mi.simulation_defs.volume_fill_factor == mi.simulation_defs.geometry_fractions(uned));
@@ -189,7 +189,7 @@ for unej = 2:length(mi.simulation_defs.wake.port_excitation)
     model_num = model_num +1;
     modelling_inputs{model_num} = base_inputs(mi, mi.model_names{mi.base_model_ind});
     modelling_inputs{model_num}.mov = 0; %Default to no movie
-    if contains(mi.movie_flag, 'port_excitation')
+    if any(contains(mi.movie_flag, 'port_excitation'))
         modelling_inputs{model_num}.mov = 1;
     end %if
     modelling_inputs{model_num}.port_excitation_wake.excitation_name = mi.simulation_defs.wake.port_excitation{unej}.excitation_name;
@@ -201,6 +201,7 @@ for unej = 2:length(mi.simulation_defs.wake.port_excitation)
     modelling_inputs{model_num}.port_excitation_wake.risetime = mi.simulation_defs.wake.port_excitation{unej}.risetime;
     modelling_inputs{model_num}.port_excitation_wake.bandwidth = mi.simulation_defs.wake.port_excitation{unej}.bandwidth;
     modelling_inputs{model_num}.port_excitation_wake.beam_offset_z = mi.simulation_defs.wake.port_excitation{unej}.beam_offset_z;
+    modelling_inputs{model_num}.port_excitation_wake.wakelength = mi.simulation_defs.wake.port_excitation{unej}.wakelength;
     temp = [...
         mi.base_model_name, '_', 'port_excitation', '_sweep_value_', ...
         mi.simulation_defs.wake.port_excitation{unej}.excitation_name];

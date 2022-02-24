@@ -11,7 +11,7 @@ validate_is_cell = @(x) iscell(x);
 validate_is_structure = @(x) isstruct(x);
 addRequired(p,'paths', validate_is_structure);
 addRequired(p,'model_name', validate_is_char);
-addParameter(p,'ow_behaviour','skip', validate_is_char);
+addParameter(p,'ow_behaviour','no', validate_is_char);
 addParameter(p,'input_data_location',{''}, validate_is_cell);
 addParameter(p,'type_selection',{'all'}, validate_is_cell);
 parse(p, paths, model_name, varargin{:});
