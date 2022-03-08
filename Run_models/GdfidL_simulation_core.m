@@ -11,13 +11,14 @@ shell_contents = {'#! /bin/bash'};
 % As a result this code now writes and executes a shell script so that the
 % system environment is reliably used.
 if strcmp(precision, 'single')
-    shell_contents = cat(1,shell_contents,['single.gd1 ',restart,'< temp_data/model.gdf > temp_data/model_log']);
+    shell_contents = cat(1,shell_contents,['single.gd1 ',restart,'< model.gdf > model_log']);
 elseif strcmp(precision, 'double')
-    shell_contents = cat(1,shell_contents,['gd1 ',restart,'< temp_data/model.gdf > temp_data/model_log']);
+    shell_contents = cat(1,shell_contents,['gd1 ',restart,'< model.gdf > model_log']);
 end %if
-
-write_out_data( shell_contents, 'temp_data/run_model.sh' )
-[~] = system('chmod +x temp_data/run_model.sh');
-!./temp_data/run_model.sh
+cd temp_data
+write_out_data( shell_contents, 'run_model.sh' )
+[~] = system('chmod +x run_model.sh');
+!./run_model.sh
+cd ..
 % restoring the original version.
 setenv('GDFIDL_VERSION',orig_ver);

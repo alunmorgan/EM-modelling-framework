@@ -46,8 +46,10 @@ fs = cat(1,fs,'define(beam_dir, +z)');
 fs = cat(1,fs,' ');
 fs = cat(1,fs,'###################################################');
 fs = cat(1,fs,'-general');
-fs = cat(1,fs,['    outfile= ',loc, name,'_data/']);
-fs = cat(1,fs,['    scratch= ',loc, name,'_scratch/']);
+% fs = cat(1,fs,['    outfile= ',loc, name,'_data/']);
+% fs = cat(1,fs,['    scratch= ',loc, name,'_scratch/']);
+fs = cat(1,fs,['    outfile= ','.']);
+fs = cat(1,fs,['    scratch= ../',loc, name,'_scratch/']);
 fs = cat(1,fs,['    nrofthreads= ', num_threads]);
 fs = cat(1,fs,['    restartfiles = ',restart_files_loc]);
 fs = cat(1,fs,'    t1restartfiles = 28800'); % odd behaviour or interaction with filesystem - bit number to stop it triggering for usual models
