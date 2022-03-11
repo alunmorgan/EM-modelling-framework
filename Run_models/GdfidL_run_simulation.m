@@ -25,7 +25,7 @@ results_storage_location = fullfile(paths.storage_path, modelling_inputs.model_n
 run_sim = make_data_store(modelling_inputs.model_name, results_storage_location, sim_type, skip);
 
 if run_sim == 1
-    % If the simulation type is S-paramter then you need a simulation for
+    % If the simulation type is S-parameter then you need a simulation for
     % each excited port. For Shunt you need a simulation for each frequency.
     % For the other types you just need a single simulation.
     f_range = 1.3E9:5E7:1.9E9; % FIXME This needs to become a parameter
@@ -43,46 +43,43 @@ if run_sim == 1
         sparameter_set = repmat(1:s_sets, length(active_ports),1);
         sparameter_set = sparameter_set(:);
         active_ports = repmat(active_ports, 1, s_sets);
+        frequency = NaN;
     elseif strcmp(sim_type, 'shunt')
         n_cycles = length(f_range);
         for hew = 1:n_cycles
             active_ports{hew} = 'NULL';
         end %for
         sparameter_set = NaN;
+        frequency = num2str(f_range(nes));
     else
         n_cycles = 1;
         active_ports = {'NULL'};
         sparameter_set = NaN;
+        frequency = NaN;
     end %if
     
     output_data_location = cell(1,n_cycles);
     for nes = 1:n_cycles
         [old_loc, tmp_location] = move_into_tempororary_folder(paths.scratch_path);
-        temp_files('make', paths.restart_files_path)
-        if strcmp(sim_type, 'shunt')
-        frequency = num2str(f_range(nes));
-        else
-            frequency = NaN;
-        end %if
-        arch_out = construct_storage_area_path(results_storage_location, sim_type, active_ports{nes}, sparameter_set(nes), frequency);
-        restart_root = fullfile(paths.restart_files_path, modelling_inputs.base_model_name, modelling_inputs.model_name);
-        restart_out = construct_storage_area_path(restart_root, sim_type, active_ports{nes}, sparameter_set(nes), frequency);
+        temp_files('make', '.')
+        cd temp_data
         construct_gdf_file(paths, sim_type, modelling_inputs, active_ports(nes), sparameter_set(nes), frequency, restart_out)
+        save('run_inputs.mat', 'paths', 'modelling_inputs')
         disp(['Running ', sim_type,' simulation for ', modelling_inputs.model_name, '.'])
         GdfidL_simulation_core(modelling_inputs.version, modelling_inputs.precision, restart)
-        save(fullfile('temp_data', 'run_inputs.mat'), 'paths', 'modelling_inputs')
-        if strcmp(sim_type, 'geometry')
-            % Converting the images from ps to png to reduce the file
-            % size. For larger models keeping the ps files can break the
-            % filesystem.
-            pic_names = dir_list_gen('temp_data','ps',1);
-            for ns = 1:length(pic_names)
-                pic_nme = pic_names{ns}(1:end-3);
-                [~] = system(['convert ',pic_nme,'.ps -rotate -90 ',pic_nme,'.png']);
-                delete([pic_nme,'.ps'])
-            end
-        end %if
-        [status, message] = movefile('temp_data/*', arch_out);
+        
+        % Converting any images from ps to png to reduce the file
+        % size. For larger models keeping the ps files can break the
+        % filesystem.
+        pic_names = dir_list_gen('.','ps',1);
+        for ns = 1:length(pic_names)
+            pic_nme = pic_names{ns}(1:end-3);
+            [~] = system(['convert ',pic_nme,'.ps -rotate -90 ',pic_nme,'.png']);
+            delete([pic_nme,'.ps'])
+        end %for
+        
+        arch_out = construct_storage_area_path(results_storage_location, sim_type, active_ports{nes}, sparameter_set(nes), frequency);
+        [status, message] = movefile('./*', arch_out);
         if status == 1
             temp_files('remove', paths.restart_files_path)
             output_data_location{1, nes} = arch_out;
@@ -90,7 +87,6 @@ if run_sim == 1
             rmdir(tmp_location, 's')
         elseif status == 0
             disp(['<strong>Error in file transfer</strong> - data left in ', tmp_location])
-            disp(['restart files left in ', paths.restart_files_path])
             disp(message)
             output_data_location{1, nes} = tmp_location;
             cd(old_loc)

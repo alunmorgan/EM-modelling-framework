@@ -54,4 +54,4 @@ plots = create_geometry_plots(modelling_inputs);
 % construct the full input file.
 data = cat(1,fs, modelling_inputs.defs', geom, mesh_def, mesh_fixed_planes, ...
     data, plots);
-write_out_data( data, 'temp_data/model.gdf' )
+write_out_data( data, 'model.gdf' )

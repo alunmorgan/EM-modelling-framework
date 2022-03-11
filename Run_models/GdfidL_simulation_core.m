@@ -15,10 +15,8 @@ if strcmp(precision, 'single')
 elseif strcmp(precision, 'double')
     shell_contents = cat(1,shell_contents,['gd1 ',restart,'< model.gdf > model_log']);
 end %if
-cd temp_data
 write_out_data( shell_contents, 'run_model.sh' )
 [~] = system('chmod +x run_model.sh');
 !./run_model.sh
-cd ..
 % restoring the original version.
 setenv('GDFIDL_VERSION',orig_ver);

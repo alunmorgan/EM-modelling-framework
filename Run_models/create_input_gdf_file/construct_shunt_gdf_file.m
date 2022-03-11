@@ -20,4 +20,4 @@ mon = gdf_shunt_monitor_construction;
 % construct the full input file.
 data = cat(1,fs, add_defs', data, port_defs, mon);
 % write the full datafile to base_path.
- write_out_data( data, 'temp_data/model.gdf' )
+ write_out_data( data, 'model.gdf' )
