@@ -55,5 +55,5 @@ else
     fs = cat(1,fs,'# No movie requested... not storing additional files.');
 end %if
 
-fs = cat(1,fs,'-fdtd   ');
-% fs = cat(1,fs,'    doit');
+% fs = cat(1,fs,'-fdtd   ');
+% % fs = cat(1,fs,'    doit');
