@@ -6,7 +6,7 @@ function output_data_location = GdfidL_run_simulation(sim_type, paths, modelling
 %       sim_type (str): geometry, wake or s-parameter
 %       paths (structure): Contains all the paths and file locations.
 %       modelling_inputs (structure): Contains the setting for a specific modelling run.
-%       ow_behaviour (string): optional. If set to 'no_skip' any existant data
+%       ow_behaviour (string): optional. If set to 'yes' any existant data
 %       will be moved to a folder called old data.
 %       The default is for the simulation to be skipped.
 %
@@ -19,7 +19,7 @@ function output_data_location = GdfidL_run_simulation(sim_type, paths, modelling
 
 % 'geometry', 'wake', 's_parameters', 'eigenmode', 'lossy_eigenmode', 'shunt'
 
-skip = strcmp(ow_behaviour, 'skip');
+skip = strcmp(ow_behaviour, 'no');
 % Create the required top level output directories.
 results_storage_location = fullfile(paths.storage_path, modelling_inputs.model_name);
 run_sim = make_data_store(modelling_inputs.model_name, results_storage_location, sim_type, skip);
@@ -86,17 +86,12 @@ if run_sim == 1
         if status == 1
             temp_files('remove', paths.restart_files_path)
             output_data_location{1, nes} = arch_out;
-            fileID = fopen(fullfile(arch_out, 'simulation_complete.txt'),'w');
-            fclose(fileID);
             cd(old_loc)
             rmdir(tmp_location, 's')
         elseif status == 0
             disp(['<strong>Error in file transfer</strong> - data left in ', tmp_location])
             disp(['restart files left in ', paths.restart_files_path])
             disp(message)
-            fileID = fopen(fullfile(arch_out, 'simulation_incomplete.txt'),'w');
-            fprintf(fileID, message);
-            fclose(fileID);
             output_data_location{1, nes} = tmp_location;
             cd(old_loc)
         end %if

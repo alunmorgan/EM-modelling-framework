@@ -5,7 +5,6 @@ base.stl_part_mapping = mi.stl_part_mapping;
 base.mat_list = mi.mat_list;
 base.background = mi.background;
 base.n_cores  = mi.simulation_defs.n_cores{1};
-base.sim_select = mi.simulation_defs.sim_select;
 base.beam = mi.simulation_defs.beam;
 base.extension_names = mi.simulation_defs.extension_names;
 base.base_model_name = mi.base_model_name;

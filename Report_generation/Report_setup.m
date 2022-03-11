@@ -37,11 +37,11 @@ preamble = latex_add_preamble(report_input);
 summary = latex_generate_summary( ppi, modelling_inputs, run_logs);
 
 %% Construct the individual chapters
-if contains(modelling_inputs.sim_select, 's')
+if exist(fullfile(results_path, 's_parameter'), 'dir')
     [s_ltx, s_appnd] = report_chapter_s_parameter(fullfile(results_path, 's_parameter'));
 end %if
 
-if contains(modelling_inputs.sim_select, 'w')
+if exist(fullfile(results_path, 'wake'), 'dir')
     [w_ltx, w_appnd] = report_chapter_wake(fullfile(results_path, 'wake'), ppi, input_settings.wake.portOverrides, input_settings.wake.wakelength);
 end %if
 
