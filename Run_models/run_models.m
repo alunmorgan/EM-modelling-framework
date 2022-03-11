@@ -39,7 +39,6 @@ for awh = 1:length(modelling_inputs)
             end %if
             s_ck = s_ck +1;
         end %if
-        
         if contains(sim_types, 'sparameter')
             sims{s_ck} = 's_parameter';
             restart_loc_tmp =fullfile(restart_root, modelling_inputs{awh}.base_model_name, modelling_inputs{awh}.model_name, 's_parameter', '.iMod-1');
@@ -93,9 +92,6 @@ for awh = 1:length(modelling_inputs)
             if strcmp(sims{ksbi}, 's_parameter')
                 cd ..
             end %if
-            fileID = fopen(fullfile(mi.paths.results_path,modelling_inputs{awh}.model_name, [sims{ksbi},'_simulation_incomplete.txt']),'w');
-            fprintf(fileID, message);
-            fclose(fileID);
             continue
         end %try
     end %for
