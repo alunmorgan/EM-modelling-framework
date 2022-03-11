@@ -27,7 +27,7 @@ fs = cat(1,fs,'');
 
 if mov == 1
     fs = cat(1,fs,'# Store data for the Movie.');
-    fs = cat(1,fs,' define( FIRSTSAV, 1e-3  / @clight )');
+    fs = cat(1,fs,' define( FIRSTSAV, 20e-3  / @clight )');
     fs = cat(1,fs,' define( DISTSAV, 10e-3 / @clight )');
     fs = cat(1,fs,' define( MODELLENTIME, INF)');%50E-3 / @clight )');%( @zmax - @zmin) / @clight )');
     fs = cat(1,fs,'    -fexport');
