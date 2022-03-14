@@ -1,11 +1,11 @@
-function run_models(mi, sim_types, force_sim, restart_root)
+function run_models(mi, sim_types, force_sim, restart_root, versions, n_cores, precision)
 % Runs all the geometric and simulation variations set up.
 
 if ispc ==1
     error('This needs to be run on the linux modelling machine')
 end %if
 
-modelling_inputs = run_inputs_setup_STL(mi);
+modelling_inputs = run_inputs_setup_STL(mi, versions, n_cores, precision);
 
 % Running the different simulators for each model.
 for awh = 1:length(modelling_inputs)

@@ -1,4 +1,4 @@
-function modelling_inputs = run_inputs_setup_STL(mi)
+function modelling_inputs = run_inputs_setup_STL(mi, versions, n_cores, precision)
 % Runs the model with the requested variations in parameters and stores them in a user specified
 % location.
 %
@@ -43,7 +43,7 @@ base_parameter_file_path = fullfile(mi.paths.path_to_models, ...
 %% Base model
 for fdhs = 1:length(mi.model_names)
     model_num = model_num +1;
-    modelling_inputs{model_num} = base_inputs(mi, mi.model_names{fdhs});
+    modelling_inputs{model_num} = base_inputs(mi, mi.model_names{fdhs}, versions, n_cores, precision);
     modelling_inputs{model_num}.mov = 0; %Default to no movie
     if any(contains(mi.movie_flag, 'base'))
         modelling_inputs{model_num}.mov = 1;
@@ -102,7 +102,7 @@ for awh = 2:length(defs)
     end %for
     % The inputs of the current geometry before any simulation
     % parameter sweeps.
-    modelling_inputs{model_num} = base_inputs(mi, mi.model_names{mi.base_model_ind});
+    modelling_inputs{model_num} = base_inputs(mi, mi.model_names{mi.base_model_ind}, versions, n_cores, precision);
     modelling_inputs{model_num}.mov = 0; %Default to no movie
     if any(contains(mi.movie_flag, 'material_changes'))
         modelling_inputs{model_num}.mov = 1;
@@ -127,11 +127,11 @@ end %for
 % point and then modifies the specific variable of that sweep.
 sim_param_sweeps = {'beam_sigma', 'beam_offset_x', 'beam_offset_y',...
     'mesh_stepsize', 'mesh_density_scaling', 'wakelength', ...
-    'NPMLs', 'precision', 'version', 'n_cores'};
+    'NPMLs'};
 for nw = 1:length(sim_param_sweeps)
     for mss = 2:length(mi.simulation_defs.(sim_param_sweeps{nw}))
         model_num = model_num +1;
-        modelling_inputs{model_num} = base_inputs(mi, mi.model_names{mi.base_model_ind});
+        modelling_inputs{model_num} = base_inputs(mi, mi.model_names{mi.base_model_ind}, versions, n_cores, precision);
         modelling_inputs{model_num}.mov = 0; %Default to no movie
         if any(contains(mi.movie_flag, 'simulation_changes'))
             modelling_inputs{model_num}.mov = 1;
@@ -152,10 +152,45 @@ for nw = 1:length(sim_param_sweeps)
     end %for
 end %for
 
+%% Setting up simulator parameter sweeps
+% Then set up the simulation parameter scans off the the base model.
+% Generally all the codes starts with the temp_inputs as a starting
+% point and then modifies the specific variable of that sweep.
+sim_param_sweeps = {'version','precision', 'n_cores'};
+for nw = 1:length(sim_param_sweeps)
+    for mss = 2:length(mi.simulation_defs.(sim_param_sweeps{nw}))
+        model_num = model_num +1;
+        modelling_inputs{model_num} = base_inputs(mi, mi.model_names{mi.base_model_ind}, versions, n_cores, precision);
+        modelling_inputs{model_num}.mov = 0; %Default to no movie
+        if any(contains(mi.movie_flag, 'simulation_changes'))
+            modelling_inputs{model_num}.mov = 1;
+        end %if
+        if strcmp(sim_param_sweeps{nw}, 'version')
+            modelling_inputs{model_num}.(sim_param_sweeps{nw}) = versions{mss};
+        elseif strcmp(sim_param_sweeps{nw}, 'precision')
+            modelling_inputs{model_num}.(sim_param_sweeps{nw}) = precision{mss};
+        elseif strcmp(sim_param_sweeps{nw}, 'n_cores')
+            modelling_inputs{model_num}.(sim_param_sweeps{nw}) = n_cores{mss};
+        end %if
+        modelling_inputs{model_num}.model_name = [...
+            mi.base_model_name, '_', sim_param_sweeps{nw}, '_sweep_value_', ...
+            regexprep(num2str(modelling_inputs{model_num}.(sim_param_sweeps{nw})), '\.','p')];
+        modelling_inputs{model_num}.defs = defs{1};
+        modelling_inputs{model_num}.stl_location = fullfile(mi.paths.path_to_models, ...
+            mi.base_model_name, [mi.base_model_name, '_Base'], 'ascii');
+        if exist(base_parameter_file_path, 'file') == 2
+            modelling_inputs{model_num}.geometry_defs = ...
+                get_parameters_from_sidecar_file(base_parameter_file_path);
+        else
+            modelling_inputs{model_num}.geometry_defs = {};
+        end %if
+    end %for
+end %for
+
 %% Now setup which fractional geometries to use
 for uned = 2:length(mi.simulation_defs.geometry_fractions)
     model_num = model_num +1;
-    modelling_inputs{model_num} = base_inputs(mi, mi.model_names{mi.base_model_ind});
+    modelling_inputs{model_num} = base_inputs(mi, mi.model_names{mi.base_model_ind}, versions, n_cores, precision);
     modelling_inputs{model_num}.mov = 0; %Default to no movie
     if any(contains(mi.movie_flag, 'geometry_fraction'))
         modelling_inputs{model_num}.mov = 1;
@@ -187,7 +222,7 @@ end %for
 %% Now setup different port excitations to use
 for unej = 2:length(mi.simulation_defs.wake.port_excitation)
     model_num = model_num +1;
-    modelling_inputs{model_num} = base_inputs(mi, mi.model_names{mi.base_model_ind});
+    modelling_inputs{model_num} = base_inputs(mi, mi.model_names{mi.base_model_ind}, versions, n_cores, precision);
     modelling_inputs{model_num}.mov = 0; %Default to no movie
     if any(contains(mi.movie_flag, 'port_excitation'))
         modelling_inputs{model_num}.mov = 1;

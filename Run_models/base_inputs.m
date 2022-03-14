@@ -1,10 +1,10 @@
-function base = base_inputs(mi, base_name)
+function base = base_inputs(mi, base_name, versions, n_cores, precision)
 % get the setting for the original base model.
 base.author = mi.author;
 base.stl_part_mapping = mi.stl_part_mapping;
 base.mat_list = mi.mat_list;
 base.background = mi.background;
-base.n_cores  = mi.simulation_defs.n_cores{1};
+base.n_cores  = n_cores{1};
 base.beam = mi.simulation_defs.beam;
 base.extension_names = mi.simulation_defs.extension_names;
 base.base_model_name = mi.base_model_name;
@@ -24,7 +24,7 @@ base.port_fill_factor = mi.simulation_defs.port_fill_factor{selected_geometry_fr
 base.volume_fill_factor = mi.simulation_defs.volume_fill_factor(selected_geometry_frac_loc);
 
 base.extension_names = mi.simulation_defs.extension_names;
-base.version = mi.simulation_defs.version{1};
+base.version = versions{1};
 % base.defs = defs{1};
 base.beam_sigma = mi.simulation_defs.beam_sigma{1};
 base.beam_offset_x = mi.simulation_defs.beam_offset_x{1};
@@ -32,7 +32,7 @@ base.beam_offset_y = mi.simulation_defs.beam_offset_y{1};
 base.mesh_stepsize = mi.simulation_defs.mesh_stepsize{1};
 base.wakelength = mi.simulation_defs.wakelength{1};
 base.NPMLs = mi.simulation_defs.NPMLs{1};
-base.precision = mi.simulation_defs.precision{1};
+base.precision = precision{1};
 base.ports = mi.simulation_defs.ports;
 base.port_names = mi.simulation_defs.ports; %<-- NEEDED?
 base.port_location = mi.simulation_defs.port_location;

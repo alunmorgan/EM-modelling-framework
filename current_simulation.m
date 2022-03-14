@@ -9,6 +9,9 @@ sim_types = {'wake', 'sparameter', 'eigenmode', 'lossy_eigenmode', 'shunt'};
 default_sim_types = {'wake', 'sparameter', 'eigenmode', 'lossy_eigenmode'};
 default_override = {'no', 'no', 'no', 'no'};
 default_stages = {'simulate', 'postprocess', 'analyse', 'plot'};
+default_version = {'220303'};
+default_number_of_cores = {'48'};
+default_precision = {'double'};
 
 p = inputParser;
 p.StructExpand = false;
@@ -19,11 +22,16 @@ addParameter(p, 'inputfile_location', default_inputfile_location);
 addParameter(p, 'sim_types', default_sim_types, @(x) any(contains(x,sim_types)))
 addParameter(p, 'override', default_override, @(x) any(contains(x,binary_string)))
 addParameter(p, 'stages', default_stages)
+addParameter(p, 'versions', default_version)
+addParameter(p, 'n_cores', default_number_of_cores)
+addParameter(p, 'precision', default_precision)
+
 parse(p, sets, varargin{:});
 
 try
     if any(contains(p.Results.stages, 'simulate'))
-        run_model_sets(p.Results.sets, p.Results.sim_types, p.Results.override);
+        run_model_sets(p.Results.sets, p.Results.sim_types, p.Results.override,...
+                       p.Results.versions, p.Results.n_cores, p.Results.precision);
     end %if
     for set_id = 1:length(p.Results.sets)
         stamp = regexprep(datestr(now),':', '-');
