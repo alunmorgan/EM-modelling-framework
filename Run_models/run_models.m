@@ -4,7 +4,7 @@ function run_models(mi, sim_types, force_sim, restart_root, versions, n_cores, p
 if ispc ==1
     error('This needs to be run on the linux modelling machine')
 end %if
-
+default_location = pwd;
 modelling_inputs = run_inputs_setup_STL(mi, versions, n_cores, precision);
 
 % Running the different simulators for each model.
@@ -30,7 +30,7 @@ for awh = 1:length(modelling_inputs)
     if str2double(modelling_inputs{awh}.beam_offset_x) == 0 ...
             && str2double(modelling_inputs{awh}.beam_offset_y) == 0
         % FIXME add filter for user signals
-        if contains(sim_types, 'geometry') ...
+        if contains(sim_types, 'geometry'), ...
                 sims{s_ck} = 'geometry';
             restart_loc_tmp =fullfile(restart_loc_base, 'geometry', '.iMod-1');
             if exist(restart_loc_tmp)
@@ -89,10 +89,10 @@ for awh = 1:length(modelling_inputs)
                 override, restart{ksbi});
         catch ERR
             display_modelling_error(ERR, sims{ksbi})
-            cd(simulation_result_locations{1, 1})
-            if strcmp(sims{ksbi}, 's_parameter')
-                cd ..
-            end %if
+            cd(default_location)
+%             if strcmp(sims{ksbi}, 's_parameter')
+%                 cd ..
+%             end %if
             continue
         end %try
     end %for
