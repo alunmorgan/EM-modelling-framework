@@ -358,11 +358,11 @@ wall_time_ind = find_position_in_cell_lst(strfind(data,'Wall Clock Time:'));
 %wall_time = 0;
 wall_rate = 0;
 if ~isempty(wall_time_ind)
-    wall_time = regexp(data{wall_time_ind(end)},'.*Wall Clock Time\s*:\s*(\d+)\s*Seconds\s*,\s+diff:\s+[0-9]+\s*,\s*[A-Z]Flop/s\s*:\s+\d+.*\d+', 'tokens');
+    wall_time = regexp(data{wall_time_ind(end)},'.*Wall Clock Time\s*:\s*(\d+)\s*Seconds\s*,\s+diff:\s+[0-9]+\s*,\s*[A-Za-z]Flop/s\s*:\s+\d+.*\d+', 'tokens');
     wall_time = find_val_in_cell_nest(wall_time);
     lg.wall_time = str2double(wall_time);
     for hse = 1:length(wall_time_ind)
-        wall_rate = regexp(data{wall_time_ind(hse)},'.*Wall Clock Time\s*:\s*\d+\s*Seconds\s*,\s+diff:\s+[0-9]+\s*,\s*([A-Z])Flop/s\s*:\s+(\d+.*\d+)', 'tokens');
+        wall_rate = regexp(data{wall_time_ind(hse)},'.*Wall Clock Time\s*:\s*\d+\s*Seconds\s*,\s+diff:\s+[0-9]+\s*,\s*([A-Za-z])Flop/s\s*:\s+(\d+.*\d+)', 'tokens');
         wall_rate = wall_rate{1};
         wall_multiplier = wall_rate{1};
         wall_rate = str2double(wall_rate{2});
