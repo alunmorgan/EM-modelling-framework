@@ -60,7 +60,7 @@ elseif strcmp(length_type,'time')
     time_stepsize = abs(timescale(2) - timescale(1));
     % Create a new timescale using the original stepsize but with the length specified.
     timescale_out = linspace(data_start, data_end, (data_end - data_start)/time_stepsize + 1)';
-    offset = find(timescale_out < timescale(1),1, 'last')
+    offset = find(timescale_out < timescale(1),1, 'last');
     % Calculate how much the original datasets need to be extended
     %     ext_needed = length(timescale_out) - t_length_orig;
     % padding the time domain data

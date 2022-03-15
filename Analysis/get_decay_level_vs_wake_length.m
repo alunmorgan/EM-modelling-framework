@@ -26,7 +26,6 @@ for ind = 1:length(wanted_files)
     simulation_time(sts, ind) = run_logs.wall_time;
     clear pp_data wake_data
 end %for
-end %for
 wlf = wlf .* 1e-9;
 myfittype = fittype('a - b .* exp(-c *x)', 'dependent', {'y'},...
     'independent', {'x'},...

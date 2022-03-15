@@ -13,7 +13,7 @@ clear locs_all
 locs = cat(1,locs_mat, locs_gdf, locs_pp, locs_log);
 locs_out = regexprep(locs, root, dest);
 for ics = 1:length(locs_out)
-    [tmp_path,name,ext] = fileparts(locs_out{ics});
+    [tmp_path,~,~] = fileparts(locs_out{ics});
     if ~exist(tmp_path, 'dir')
         mkdir(tmp_path);
     end %if

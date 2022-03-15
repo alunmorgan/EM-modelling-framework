@@ -16,7 +16,7 @@ arc_chop = strfind(arcs, '/');
 arc_mark = cellfun(@max,arc_chop);
 % create lists of names and dates for the found files.
 clk = 1;
-for wn = 1:size(arcs,1);
+for wn = 1:size(arcs,1)
     temp_arc = arcs{wn}(arc_mark(wn)+1:end);
     if regexp(temp_arc, '\d{8}T\d{6}') == 1
         arc_names{clk} = temp_arc;
