@@ -63,7 +63,7 @@ if run_sim == 1
         [old_loc, tmp_location] = move_into_tempororary_folder(paths.scratch_path);
         temp_files('make', '.')
         cd temp_data
-        construct_gdf_file(paths, sim_type, modelling_inputs, active_ports(nes), sparameter_set(nes), frequency, restart_out)
+        construct_gdf_file(paths, sim_type, modelling_inputs, active_ports(nes), sparameter_set(nes), frequency)
         save('run_inputs.mat', 'paths', 'modelling_inputs')
         disp(['Running ', sim_type,' simulation for ', modelling_inputs.model_name, '.'])
         GdfidL_simulation_core(modelling_inputs.version, modelling_inputs.precision, restart)
@@ -81,7 +81,8 @@ if run_sim == 1
         arch_out = construct_storage_area_path(results_storage_location, sim_type, active_ports{nes}, sparameter_set(nes), frequency);
         [status, message] = movefile('./*', arch_out);
         if status == 1
-            temp_files('remove', paths.restart_files_path)
+            cd ..
+            temp_files('remove', '.')
             output_data_location{1, nes} = arch_out;
             cd(old_loc)
             rmdir(tmp_location, 's')
