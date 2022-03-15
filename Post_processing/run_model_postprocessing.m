@@ -1,11 +1,12 @@
-function run_model_postprocessing(mi, simulation_result_locations, force_pp, pp_type)
+function run_model_postprocessing(mi, simulation_result_locations, force_pp,...
+                                  pp_type, versions, n_cores, precision)
 
 
 if ispc ==1
     error('This needs to be run on the linux modelling machine')
 end %if
 
-modelling_inputs = run_inputs_setup_STL(mi);
+modelling_inputs = run_inputs_setup_STL(mi, versions, n_cores, precision);
 
 for awh = 1:length(modelling_inputs)
     disp(['<strong>', datestr(now), '</strong>'])

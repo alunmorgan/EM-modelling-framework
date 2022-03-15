@@ -42,7 +42,8 @@ try
         diary(fullfile(p.Results.logfile_location, p.Results.sets{set_id}, stamp));
         if any(contains(p.Results.stages, 'postprocess'))
             postprocess_single_set(p.Results.sets{set_id}, p.Results.inputfile_location, ...
-                p.Results.sim_types, p.Results.override);
+                p.Results.sim_types, p.Results.override,...
+                       p.Results.versions, p.Results.n_cores, p.Results.precision);
         end %if
         if any(contains(p.Results.stages, 'analyse'))
             analyse_single_set(sets{set_id}, p.Results.sim_types, p.Results.override);

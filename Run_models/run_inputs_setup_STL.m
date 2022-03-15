@@ -158,7 +158,14 @@ end %for
 % point and then modifies the specific variable of that sweep.
 sim_param_sweeps = {'version','precision', 'n_cores'};
 for nw = 1:length(sim_param_sweeps)
-    for mss = 2:length(mi.simulation_defs.(sim_param_sweeps{nw}))
+    if strcmp(sim_param_sweeps{nw}, 'version')
+        sweep_length = length(versions);
+    elseif strcmp(sim_param_sweeps{nw}, 'precision')
+        sweep_length = length(precision);
+    elseif strcmp(sim_param_sweeps{nw}, 'n_cores')
+        sweep_length = length(n_cores);
+    end %if
+    for mss = 2:sweep_length
         model_num = model_num +1;
         modelling_inputs{model_num} = base_inputs(mi, mi.model_names{mi.base_model_ind}, versions, n_cores, precision);
         modelling_inputs{model_num}.mov = 0; %Default to no movie

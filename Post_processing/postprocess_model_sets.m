@@ -1,4 +1,5 @@
-function postprocess_model_sets(input_file_loc, model_names, force_pp, pp_type)
+function postprocess_model_sets(input_file_loc, model_names, force_pp, pp_type,...
+                                versions, n_cores, precision)
 % model_names: the name of the model set you wish to simulate.
 % force_pp: sets whether the GdfidL postprocessing is rerun for existing
 % simulations. values are 'skip' and 'no_skip'.
@@ -10,7 +11,8 @@ for hew = 1:length(model_names)
         disp(['<strong>Post processing model set ', model_names{hew}, '</strong>'])
         cd(fullfile(input_file_loc, model_names{hew}))
         run_inputs = feval(model_names{hew});
-        run_model_postprocessing(run_inputs, NaN, force_pp, pp_type)
+        run_model_postprocessing(run_inputs, NaN, force_pp, pp_type,...
+                                 versions, n_cores, precision)
         cd(orig_loc)
     catch ME
         cd(orig_loc)

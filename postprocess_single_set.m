@@ -1,4 +1,5 @@
-function postprocess_single_set(model_set, input_file_loc, types, override)
+function postprocess_single_set(model_set, input_file_loc, types, override,...
+                                versions, n_cores, precision)
 % Runs the postprocessing for a single model set.
 %   Args:
 %       model_set(str): Name of model set to run.
@@ -14,7 +15,8 @@ diary on
 for herf = 1:length(types)
     try
         if any(contains(types, types{herf}))
-            postprocess_model_sets(input_file_loc, {model_set}, override{herf}, {types{herf}})
+            postprocess_model_sets(input_file_loc, {model_set}, ...
+                override{herf}, {types{herf}}, versions, n_cores, precision)
         end %if
     catch ME1
         display_error_message(ME1)
