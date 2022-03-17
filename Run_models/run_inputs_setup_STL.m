@@ -234,24 +234,7 @@ for unej = 2:length(mi.simulation_defs.wake.port_excitation)
     if any(contains(mi.movie_flag, 'port_excitation'))
         modelling_inputs{model_num}.mov = 1;
     end %if
-    modelling_inputs{model_num}.port_excitation_wake.excitation_name = mi.simulation_defs.wake.port_excitation{unej}.excitation_name;
-    modelling_inputs{model_num}.port_excitation_wake.port_names = mi.simulation_defs.wake.port_excitation{unej}.port_names;
-    modelling_inputs{model_num}.port_excitation_wake.frequency = mi.simulation_defs.wake.port_excitation{unej}.frequency;
-    modelling_inputs{model_num}.port_excitation_wake.risetime = mi.simulation_defs.wake.port_excitation{unej}.risetime;
-    modelling_inputs{model_num}.port_excitation_wake.bandwidth = mi.simulation_defs.wake.port_excitation{unej}.bandwidth;
-    modelling_inputs{model_num}.port_excitation_wake.beam_offset_z = mi.simulation_defs.wake.port_excitation{unej}.beam_offset_z;
-    modelling_inputs{model_num}.port_excitation_wake.wakelength = mi.simulation_defs.wake.port_excitation{unej}.wakelength;
-    if isfield(mi.simulation_defs.wake.port_excitation{unej}, 'user_signal_file_names')
-        modelling_inputs{model_num}.port_excitation_wake.user_signal_file_names = mi.simulation_defs.wake.port_excitation{unej}.user_signal_file_names;
-        modelling_inputs{model_num}.port_excitation_wake.user_signal_risetime = mi.simulation_defs.wake.port_excitation{unej}.user_signal_risetime;
-        modelling_inputs{model_num}.port_excitation_wake.user_signal_decaytime = mi.simulation_defs.wake.port_excitation{unej}.user_signal_decaytime;
-        modelling_inputs{model_num}.port_excitation_wake.user_signal_holdtime = mi.simulation_defs.wake.port_excitation{unej}.user_signal_holdtime;
-        modelling_inputs{model_num}.port_excitation_wake.user_signal_amplitude = mi.simulation_defs.wake.port_excitation{unej}.user_signal_amplitude;
-    else
-        modelling_inputs{model_num}.port_excitation_wake.amplitude = mi.simulation_defs.wake.port_excitation{unej}.amplitude;
-        modelling_inputs{model_num}.port_excitation_wake.phase = mi.simulation_defs.wake.port_excitation{unej}.phase;
-        modelling_inputs{model_num}.port_excitation_wake.mode = mi.simulation_defs.wake.port_excitation{unej}.mode;
-    end %if
+    modelling_inputs{model_num}.port_excitation_wake = mi.simulation_defs.wake.port_excitation{unej};
     temp = [...
         mi.base_model_name, '_', 'port_excitation', '_sweep_value_', ...
         mi.simulation_defs.wake.port_excitation{unej}.excitation_name];
