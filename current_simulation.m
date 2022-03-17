@@ -9,7 +9,7 @@ sim_types = {'wake', 'sparameter', 'eigenmode', 'lossy_eigenmode', 'shunt'};
 default_sim_types = {'wake', 'sparameter', 'eigenmode', 'lossy_eigenmode'};
 default_override = {'no', 'no', 'no', 'no'};
 default_stages = {'simulate', 'postprocess', 'analyse', 'plot'};
-default_version = {'220303'};
+default_version = {'220315'};
 default_number_of_cores = {'48'};
 default_precision = {'double'};
 
