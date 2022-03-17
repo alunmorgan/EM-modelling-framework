@@ -158,6 +158,15 @@ if isfield(log, 'field_data')
         end %for
     end %if
 end %if
+ov = cat(1,ov,[' -voltages']);
+ov = cat(1,ov,['    timedata= yes']);
+ov = cat(1,ov,['    freq= no']);
+ov = cat(1,ov,['asymbol= VSignal3_1_um    # The measured Voltage at the Voltage named VSignal3_1.']);
+ov = cat(1,ov,['  doit']);
+ov = cat(1,ov,['asymbol= VSignal3_2_um    # The measured Voltage at the Voltage named VSignal3_2.']);
+ov = cat(1,ov,['  doit']);
+ov = cat(1,ov,['asymbol= VSignal3_05_um    # The measured Voltage at the Voltage named VSignal3_05.']);
+ov = cat(1,ov,['  doit']);
 
 % if exist('data_link/wake/efieldsx-000000001.gz','file') == 2
 %     ov = cat(1,ov,' -2dmanygifs');

@@ -14,7 +14,7 @@ if iscell(output_file_locations.Energy_in_ceramics)
         (energy_ceramics_data.data(2,1)-energy_ceramics_data.data(1,1));
     if sum(loss_in_ceramics) == 0
         loss_in_ceramics = 0;
-        if ~isfield(log, 'mat_losses') || ~isfield(log.mat_losses, 'loss_time') 
+        if ~isfield(log, 'mat_losses') || ~isfield(log.mat_losses, 'loss_time')
             log.mat_losses.loss_time = 0;
         end %if
     else
@@ -71,6 +71,12 @@ end
 % raw_data.EfieldAtZerox = GdfidL_read_graph_datafile(output_file_locations.EfieldAtZerox{1} );
 % raw_data.EfieldAtZerox_freq = GdfidL_read_graph_datafile(output_file_locations.EfieldAtZerox_freq{1} );
 
+%% Voltage signals
+if isfield(output_file_locations, 'Voltage_Signals')
+    for wic = 1:length(output_file_locations.Voltage_Signals)
+        raw_data.voltages{wic} = GdfidL_read_graph_datafile(output_file_locations.Voltage_Signals{wic});
+    end %for
+end %if
 
 %% Wake potentials
 %     The charge distribution with the integral scaled to 1C

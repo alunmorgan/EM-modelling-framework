@@ -64,14 +64,29 @@ output_file_locations.WI_Im_x = run_list(inds);
 inds = find_position_in_cell_lst(strfind(run_list, 'ImZy_AT_XY'));
 output_file_locations.WI_Im_y = run_list(inds);
 
-% now find the Energy and electric field files files. The order is determined by the order they are
+% now find the Energy and voltage files. The order is determined by the order they are
 % called in the post processing file.
 inds = find_position_in_cell_lst(strfind(run_list, 'oneDPlot'));
+
 if ~isempty(inds)
-    output_file_locations.Energy = run_list(inds(1));
-    output_file_locations.Energy_in_ceramics = run_list(inds(2));
-%     output_file_locations.EfieldAtZerox = run_list(inds(3));
-%     output_file_locations.EfieldAtZerox_freq = run_list(inds(4));
+    vs = 1;
+    eo = 1;
+    for shd = 1:length(inds)
+        temp = GdfidL_read_graph_datafile(run_list{inds(shd)});
+        if contains(temp.header_info{3}, 'TEIS')
+        output_file_locations.Energy = run_list(inds(shd));
+        elseif contains(temp.header_info{3}, 'TEC')
+            output_file_locations.Energy_in_ceramics = run_list(inds(shd));
+        elseif contains(temp.header_info{3}, 'VSignal')
+            output_file_locations.Voltage_Signals{vs} = run_list{inds(shd)};
+            vs = vs +1;
+        else
+            output_file_locations.extra_output{eo} = run_list{inds(shd)};
+            eo = eo +1;
+        end %if 
+        %     output_file_locations.EfieldAtZerox = run_list(inds(3));
+        %     output_file_locations.EfieldAtZerox_freq = run_list(inds(4));
+    end %for
 else
     disp('No Energy graphs - This is a problem')
     output_file_locations.Energy = NaN;
