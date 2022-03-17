@@ -23,6 +23,8 @@ for kwe = 1:length(c)
 end %for
 %% Extract the wake data
 rename_port_files(wake_output_directory);
+% FIXME move the following two line into analysis so that separation between the
+% data folder and the analysis folder is clear.
 output_file_locations = GdfidL_find_ouput(wake_output_directory);
 data = extract_wake_data_from_pp_output_files(output_file_locations, log, modelling_inputs, tstart);
 disp('Extracting field data')
