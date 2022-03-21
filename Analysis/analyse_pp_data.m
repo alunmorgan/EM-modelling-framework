@@ -32,10 +32,16 @@ for sts = 1:length(model_sets)
             % Replicate the port signals as required. Dont run if only beam
             % ports are present.
             if length(pp_data.port.labels) > 2
-            [pp_data.port.labels, ...
-                pp_data.port.data, pp_data.port.t_start] = duplicate_ports(...
-                modelling_inputs.port_multiple, pp_data.port.labels, ...
-                pp_data.port.data,  pp_logs.start_times);
+                if isfield(pp_logs, 'start_times')
+                    % if they are not in the log then they have not been used.
+                    start_times = pp_logs.start_times;
+                else
+                    start_times = num2cell(zeros(length(pp_data.port.t_start),2));
+                end %if
+                [pp_data.port.labels, ...
+                    pp_data.port.data, pp_data.port.t_start] = duplicate_ports(...
+                    modelling_inputs.port_multiple, pp_data.port.labels, ...
+                    pp_data.port.data,  start_times);
             end %if
             %             wake_lengths_to_analyse = [];
             %             for ke = 1:6
@@ -55,7 +61,7 @@ for sts = 1:length(model_sets)
                     pp_data.port.data.time.power_port_mode.bunch_signal{dlw}(1:size_data(1), 1:size_data(2)) = 0; %W
                     pp_data.port.data.time.power_port_mode.remnant_signal{dlw} = pp_data.port.data.time.power_port_mode.data{dlw}; %W
                 else
-                    for shf = 1:size(pp_data.port.data.time.voltage_port_mode.data{dlw}, 2)      
+                    for shf = 1:size(pp_data.port.data.time.voltage_port_mode.data{dlw}, 2)
                         [cut_inds(shf), first_peak_amplitude(shf)]= separate_bunch_from_remenent_field(...
                             pp_data.port.timebase, pp_data.port.data.time.voltage_port_mode.data{dlw}(:,shf),...
                             modelling_inputs.beam_sigma , 4);
