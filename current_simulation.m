@@ -3,11 +3,9 @@ function current_simulation(sets, varargin)
 default_logfile_location = '/scratch/afdm76/logs';
 default_inputfile_location = '/scratch/afdm76/em_simulation_design_input_files';
 
-binary_string = {'yes', 'no'};
 sim_types = {'wake', 'sparameter', 'eigenmode', 'lossy_eigenmode', 'shunt'};
 
 default_sim_types = {'wake', 'sparameter', 'eigenmode', 'lossy_eigenmode'};
-default_override = {'no', 'no', 'no', 'no'};
 default_stages = {'simulate', 'postprocess', 'analyse', 'plot'};
 default_version = {'220315'};
 default_number_of_cores = {'48'};
@@ -20,7 +18,6 @@ addRequired(p, 'sets');
 addParameter(p, 'logfile_location', default_logfile_location);
 addParameter(p, 'inputfile_location', default_inputfile_location);
 addParameter(p, 'sim_types', default_sim_types, @(x) any(contains(x,sim_types)))
-addParameter(p, 'override', default_override, @(x) any(contains(x,binary_string)))
 addParameter(p, 'stages', default_stages)
 addParameter(p, 'versions', default_version)
 addParameter(p, 'n_cores', default_number_of_cores)
@@ -30,7 +27,7 @@ parse(p, sets, varargin{:});
 
 try
     if any(contains(p.Results.stages, 'simulate'))
-        run_model_sets(p.Results.sets, p.Results.sim_types, p.Results.override,...
+        run_model_sets(p.Results.sets, p.Results.sim_types,...
                        p.Results.versions, p.Results.n_cores, p.Results.precision);
     end %if
     for set_id = 1:length(p.Results.sets)
@@ -42,14 +39,14 @@ try
         diary(fullfile(p.Results.logfile_location, p.Results.sets{set_id}, stamp));
         if any(contains(p.Results.stages, 'postprocess'))
             postprocess_single_set(p.Results.sets{set_id}, p.Results.inputfile_location, ...
-                p.Results.sim_types, p.Results.override,...
+                p.Results.sim_types, ...
                        p.Results.versions, p.Results.n_cores, p.Results.precision);
         end %if
         if any(contains(p.Results.stages, 'analyse'))
-            analyse_single_set(sets{set_id}, p.Results.sim_types, p.Results.override);
+            analyse_single_set(sets{set_id}, p.Results.sim_types);
         end %if
         if any(contains(p.Results.stages, 'plot'))
-            plot_single_set(sets{set_id}, p.Results.sim_types, p.Results.override);
+            plot_single_set(sets{set_id}, p.Results.sim_types);
         end %if
         %         generate_report_single_set(sets{set_id});
     end %for

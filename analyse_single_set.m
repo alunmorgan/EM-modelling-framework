@@ -1,4 +1,4 @@
-function analyse_single_set(model_set, types, override)
+function analyse_single_set(model_set, types)
 % Runs the analysis for a single model set.
 %   Args:
 %       model_set(str): Name of model set to run.
@@ -11,13 +11,8 @@ diary on
 
 try
     if any(contains(types, 'wake'))
-        if strcmp(override{contains(types, 'wake')}, 'yes')
-            wake_override = 'no_skip';
-        else
-            wake_override = 'skip';
-        end %if
-        analyse_models_sets({model_set}, wake_override);
-        get_wlf({model_set}, override{contains(types, 'wake')});
+        analyse_models_sets({model_set});
+        get_wlf({model_set});
     end %if
 catch ME1
     display_error_message(ME1)

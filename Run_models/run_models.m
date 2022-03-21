@@ -1,4 +1,4 @@
-function run_models(mi, sim_types, force_sim, restart_root, versions, n_cores, precision)
+function run_models(mi, sim_types, restart_root, versions, n_cores, precision)
 % Runs all the geometric and simulation variations set up.
 
 if ispc ==1
@@ -84,9 +84,8 @@ for awh = 1:length(modelling_inputs)
     for ksbi = 1:length(sims)
         try
             sim_loc = find_position_in_cell_lst(strfind(sim_types, 'wake'));
-            override = force_sim{sim_loc};
             simulation_result_locations =  GdfidL_run_simulation(sims{ksbi}, mi.paths, modelling_inputs{awh}, ...
-                override, restart{ksbi});
+                restart{ksbi});
         catch ERR
             display_modelling_error(ERR, sims{ksbi})
             cd(default_location)

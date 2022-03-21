@@ -1,11 +1,5 @@
-function get_wlf(model_sets, skip_analysis)
+function get_wlf(model_sets)
 
-if nargin == 1
-    skip_analysis = 'skip';
-end %if
-if strcmp(skip_analysis, 'skip')
-    return
-end %if
 load_local_paths
 [extracted_data] = extract_all_wlf(results_loc, model_sets);
 for kfn = 1:length(extracted_data)

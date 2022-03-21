@@ -1,9 +1,4 @@
-function analyse_pp_data(root_path, model_sets, ppi, port_modes_override, ...
-    analysis_override)
-
-if nargin <5
-    analysis_override = 0;
-end %if
+function analyse_pp_data(root_path, model_sets, ppi, port_modes_override)
 
 for sts = 1:length(model_sets)
     files = dir_list_gen_tree(fullfile(root_path, model_sets{sts}), 'mat', 1);
@@ -11,7 +6,7 @@ for sts = 1:length(model_sets)
     
     for ind = 1:length(wanted_files)
         current_folder = fileparts(wanted_files{ind});
-        if ~isfile(fullfile(current_folder, 'data_analysed_wake.mat')) || analysis_override == 1
+        if ~isfile(fullfile(current_folder, 'data_analysed_wake.mat'))
             [a1,~,~]= fileparts(current_folder);
             [~,name_of_model,~] = fileparts(a1);
             disp(['Starting analysis <strong>', name_of_model, '</strong>'])

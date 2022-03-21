@@ -11,7 +11,6 @@ validate_is_cell = @(x) iscell(x);
 validate_is_structure = @(x) isstruct(x);
 addRequired(p,'paths', validate_is_structure);
 addRequired(p,'model_name', validate_is_char);
-addParameter(p,'ow_behaviour','no', validate_is_char);
 addParameter(p,'input_data_location',{''}, validate_is_cell);
 addParameter(p,'type_selection',{'all'}, validate_is_cell);
 parse(p, paths, model_name, varargin{:});
@@ -49,7 +48,7 @@ sim_types = {'wake', 'eigenmode', 'lossy_eigenmode'};
 for oef = 1:length(sim_types)
     if any(contains(p.Results.type_selection, sim_types{oef})) || any(contains(p.Results.type_selection, 'all'))
         if exist(fullfile('data_link', [sim_types{oef},'/']), 'dir')
-            run_pp = will_pp_run(sim_types{oef}, p.Results.ow_behaviour);
+            run_pp = will_pp_run(sim_types{oef});
             if run_pp == 1
                 try
                     disp(['Post processing ', sim_types{oef}, ' data.'])
@@ -99,7 +98,7 @@ sim_types = {'s_parameter', 'shunt'};
 for heb = 1:length(sim_types)
     if any(contains(p.Results.type_selection, sim_types{heb})) || any(contains(p.Results.type_selection, 'all'))
         if exist(fullfile('data_link', sim_types{heb}), 'dir')
-            run_pp = will_pp_run(sim_types{heb}, p.Results.ow_behaviour);
+            run_pp = will_pp_run(sim_types{heb});
             if run_pp == 1
                 %             try                
                 disp(['Post processing ', sim_types{heb}, ' data.'])
