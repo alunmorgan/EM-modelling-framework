@@ -27,7 +27,7 @@ parse(p, sets, varargin{:});
 
 load_local_paths
 ppi = analysis_settings;
-
+number_of_wake_lengths_to_analyse = 1;
 try
     if any(contains(p.Results.stages, 'simulate'))
         run_model_sets(p.Results.sets, p.Results.sim_types,...
@@ -70,7 +70,7 @@ for set_id = 1:length(p.Results.sets)
         if any(contains(p.Results.sim_types, 'wake'))
             try
                 analyse_pp_data(results_loc,...
-                    p.Results.sets{set_id}, ppi);
+                    p.Results.sets{set_id}, ppi, number_of_wake_lengths_to_analyse);
             catch ME
                 warning([sets{set_id}, '<strong>Problem with wake analysis</strong>'])
                 display_error_message(ME)

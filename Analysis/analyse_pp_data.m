@@ -1,4 +1,4 @@
-function analyse_pp_data(root_path, model_sets, ppi)
+function analyse_pp_data(root_path, model_sets, ppi, number_of_wake_lengths_to_analyse)
 
 for sts = 1:length(model_sets)
     files = dir_list_gen_tree(fullfile(root_path, model_sets{sts}), 'mat', 1);
@@ -44,13 +44,11 @@ for sts = 1:length(model_sets)
                     modelling_inputs.port_multiple, pp_data.port.labels, ...
                     pp_data.port.data,  start_times);
             end %if
-            %             wake_lengths_to_analyse = [];
-            %             for ke = 1:6
-            %                 wake_lengths_to_analyse = cat(1, wake_lengths_to_analyse, wakelength);
-            %                 wakelength = wakelength ./2;
-            %             end %for
             wakelength = str2double(modelling_inputs.wakelength);
             wake_lengths_to_analyse = wakelength;
+            for ke = 2:number_of_wake_lengths_to_analyse
+                wake_lengths_to_analyse = cat(1, wake_lengths_to_analyse, ke * wakelength/number_of_wake_lengths_to_analyse);
+            end %for
            
             wake_sweep_data = wake_sweep(wake_lengths_to_analyse, pp_data, ppi, run_logs);
             fprintf('Analysed ... Saving...')
