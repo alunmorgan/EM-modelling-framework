@@ -1,4 +1,4 @@
-function [time_domain_analysed_data] = time_domain_analysis(raw_data, log, mode_overrides)
+function [time_domain_analysed_data] = time_domain_analysis(raw_data, log)
 % Takes the raw time domain data and calculates the wake loss factor
 % and port losses from it.
 %
@@ -43,45 +43,25 @@ else
         if strcmp(substructure{ha}, 'voltage_port_mode') || strcmp(substructure{ha}, 'power_port_mode')
             if strcmp(substructure{ha}, 'voltage_port_mode')
                 time_domain_analysed_data.port_data.(substructure{ha}).full_signal = port_analysis(raw_data.time_series_data.timescale_common, ...
-                    raw_data.time_series_data.port_data.data.time.(substructure{ha}).data, mode_overrides, 'voltage');
+                    raw_data.time_series_data.port_data.data.time.(substructure{ha}).data, 'voltage');
                 time_domain_analysed_data.port_data.(substructure{ha}).bunch_only = port_analysis(raw_data.time_series_data.timescale_common, ...
-                    raw_data.time_series_data.port_data.data.time.(substructure{ha}).bunch_signal, mode_overrides, 'voltage');
+                    raw_data.time_series_data.port_data.data.time.(substructure{ha}).bunch_signal, 'voltage');
                 time_domain_analysed_data.port_data.(substructure{ha}).remnant_only = port_analysis(raw_data.time_series_data.timescale_common, ...
-                    raw_data.time_series_data.port_data.data.time.(substructure{ha}).remnant_signal, mode_overrides, 'voltage');
+                    raw_data.time_series_data.port_data.data.time.(substructure{ha}).remnant_signal, 'voltage');
             elseif strcmp(substructure{ha}, 'power_port_mode')
                 time_domain_analysed_data.port_data.(substructure{ha}).full_signal = port_analysis(raw_data.time_series_data.timescale_common, ...
-                    raw_data.time_series_data.port_data.data.time.(substructure{ha}).data, mode_overrides, 'power');
+                    raw_data.time_series_data.port_data.data.time.(substructure{ha}).data, 'power');
                 time_domain_analysed_data.port_data.(substructure{ha}).bunch_only = port_analysis(raw_data.time_series_data.timescale_common, ...
-                    raw_data.time_series_data.port_data.data.time.(substructure{ha}).bunch_signal, mode_overrides, 'power');
+                    raw_data.time_series_data.port_data.data.time.(substructure{ha}).bunch_signal, 'power');
                 time_domain_analysed_data.port_data.(substructure{ha}).remnant_only = port_analysis(raw_data.time_series_data.timescale_common, ...
-                    raw_data.time_series_data.port_data.data.time.(substructure{ha}).remnant_signal, mode_overrides, 'power');
+                    raw_data.time_series_data.port_data.data.time.(substructure{ha}).remnant_signal, 'power');
             end %if
-            time_domain_analysed_data.port_data.(substructure{ha}).alpha = cell(1,1);
-            time_domain_analysed_data.port_data.(substructure{ha}).beta = cell(1,1);
-            time_domain_analysed_data.port_data.(substructure{ha}).frequency_cutoffs = cell(1,1);
-            for lse = 1:length(mode_overrides)
-                if length(raw_data.time_series_data.port_data.data.time.(substructure{ha}).alpha{lse}) < mode_overrides(lse)
-                    time_domain_analysed_data.port_data.(substructure{ha}).alpha{lse} =...
-                        raw_data.time_series_data.port_data.data.time.(substructure{ha}).alpha{lse};
-                else
-                    time_domain_analysed_data.port_data.(substructure{ha}).alpha{lse} =...
-                        raw_data.time_series_data.port_data.data.time.(substructure{ha}).alpha{lse}(1:mode_overrides(lse));
-                end %if
-                if length(raw_data.time_series_data.port_data.data.time.(substructure{ha}).beta{lse}) < mode_overrides(lse)
-                    time_domain_analysed_data.port_data.(substructure{ha}).beta{lse} = ...
-                        raw_data.time_series_data.port_data.data.time.(substructure{ha}).beta{lse};
-                else
-                    time_domain_analysed_data.port_data.(substructure{ha}).beta{lse} = ...
-                        raw_data.time_series_data.port_data.data.time.(substructure{ha}).beta{lse}(1:mode_overrides(lse));
-                end %if
-                if length(raw_data.time_series_data.port_data.data.time.(substructure{ha}).cutoff{lse}) < mode_overrides(lse)
-                    time_domain_analysed_data.port_data.(substructure{ha}).frequency_cutoffs{lse} =...
-                        raw_data.time_series_data.port_data.data.time.(substructure{ha}).cutoff{lse};
-                else
-                    time_domain_analysed_data.port_data.(substructure{ha}).frequency_cutoffs{lse} =...
-                        raw_data.time_series_data.port_data.data.time.(substructure{ha}).cutoff{lse}(1:mode_overrides(lse));
-                end %if
-            end %for
+            time_domain_analysed_data.port_data.(substructure{ha}).alpha =...
+                raw_data.time_series_data.port_data.data.time.(substructure{ha}).alpha;
+            time_domain_analysed_data.port_data.(substructure{ha}).beta = ...
+                raw_data.time_series_data.port_data.data.time.(substructure{ha}).beta;
+            time_domain_analysed_data.port_data.(substructure{ha}).frequency_cutoffs =...
+                raw_data.time_series_data.port_data.data.time.(substructure{ha}).cutoff;
         end %if
     end %for
 end %if

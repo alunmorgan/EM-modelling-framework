@@ -1,4 +1,4 @@
-function wake_sweep_data = wake_sweep(sweep_lengths, raw_data, ppi, log, port_modes_override)
+function wake_sweep_data = wake_sweep(sweep_lengths, raw_data, ppi, log)
 % Run the frequency domain analysis over data which is increasingly reduced
 % in length (i.e. having different wake lengths).
 %
@@ -50,7 +50,7 @@ for se = length(sweep_lengths):-1:1
     r_data{se}.wake_setup.Wake_length = sweep_lengths(se);
     
     %% Time domain analysis
-    t_data{se} = time_domain_analysis(r_data{se}, log, port_modes_override);
+    t_data{se} = time_domain_analysis(r_data{se}, log);
     %% Frequency domain analysis
         f_data{se} = frequency_domain_analysis(t_data{se},r_data{se}.time_series_data.port_data.data.frequency.power_port.data, log, ppi.hfoi);
     %% Material loss

@@ -1,4 +1,4 @@
-function analyse_pp_data(root_path, model_sets, ppi, port_modes_override)
+function analyse_pp_data(root_path, model_sets, ppi)
 
 for sts = 1:length(model_sets)
     files = dir_list_gen_tree(fullfile(root_path, model_sets{sts}), 'mat', 1);
@@ -90,7 +90,7 @@ for sts = 1:length(model_sets)
                     end %if
                 end %if
             end %for
-            wake_sweep_data = wake_sweep(wake_lengths_to_analyse, pp_data, ppi, run_logs, port_modes_override);
+            wake_sweep_data = wake_sweep(wake_lengths_to_analyse, pp_data, ppi, run_logs);
             fprintf('Analysed ... Saving...')
             save(fullfile(current_folder, 'data_analysed_wake.mat'), 'wake_sweep_data','-v7.3')
             fprintf('Saved\n')

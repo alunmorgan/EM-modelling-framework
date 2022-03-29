@@ -1,4 +1,4 @@
-function [port_analysed_data] = port_analysis(timebase, port_data, overrides, input_type)
+function [port_analysed_data] = port_analysis(timebase, port_data, input_type)
 % In order to get the total power we need to sum the modes together for
 % each port to give the measured signal. Square this to get the power out
 % of each port. Add up the powers.
@@ -9,13 +9,6 @@ function [port_analysed_data] = port_analysis(timebase, port_data, overrides, in
 %
 % Example: [port_data] = port_analysis(port_data)
 
-if nargin >2 % There are overrides to the number of port modes to be used.
-    for dl = 1:length(port_data)
-        if size(port_data{dl},2) > overrides(dl)
-            port_data{dl} = port_data{dl}(:,1:overrides(dl));
-        end %if
-    end %for
-end %if
 t_step = abs(timebase(2) - timebase(1)); % time step in s
 % Port signals are in units of power.
 % The t_step scaling is to deal with the fact that the data
@@ -23,8 +16,8 @@ t_step = abs(timebase(2) - timebase(1)); % time step in s
 % points with a certain separation. In order to get a truthful
 % value of the integral one needs to multiply each point by the
 % separation (effectively turning the point into areas).
-port_mode_energy_time = zeros(length(port_data), max(overrides), length(timebase));
-port_mode_signals = zeros(length(port_data), max(overrides), length(timebase));
+port_mode_energy_time = zeros(length(port_data), size(port_data{1},2), length(timebase));
+port_mode_signals = zeros(length(port_data), size(port_data{1},2), length(timebase));
 for es =length(port_data):-1:1
     %     convert port signal to port energy. (port, modes, time)
     if strcmp(input_type, 'voltage')

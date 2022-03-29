@@ -68,11 +68,9 @@ for set_id = 1:length(p.Results.sets)
     end %if
     if any(contains(p.Results.stages, 'analyse'))
         if any(contains(p.Results.sim_types, 'wake'))
-            input_settings = analysis_model_settings_library(p.Results.sets{set_id});
             try
                 analyse_pp_data(results_loc,...
-                    p.Results.sets{set_id}, ppi,...
-                    input_settings.wake.portOverrides);
+                    p.Results.sets{set_id}, ppi);
             catch ME
                 warning([sets{set_id}, '<strong>Problem with wake analysis</strong>'])
                 display_error_message(ME)
