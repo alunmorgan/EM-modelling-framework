@@ -31,68 +31,74 @@ ppi = analysis_settings;
 try
     if any(contains(p.Results.stages, 'simulate'))
         run_model_sets(p.Results.sets, p.Results.sim_types,...
-                       p.Results.versions, p.Results.n_cores, p.Results.precision);
+            p.Results.versions, p.Results.n_cores, p.Results.precision);
     end %if
-    for set_id = 1:length(p.Results.sets)
-        stamp = regexprep(datestr(now),':', '-');
-        if ~exist(fullfile(p.Results.logfile_location, p.Results.sets{set_id}), 'dir')
-            mkdir(fullfile(p.Results.logfile_location, p.Results.sets{set_id}))
-        end %if
-        % Setting up log file
-        diary(fullfile(p.Results.logfile_location, p.Results.sets{set_id}, stamp));
-        if any(contains(p.Results.stages, 'postprocess'))
-            % postprocess the current set for all simulation types
-            for herf = 1:length(p.Results.sim_types)
-                orig_loc = pwd; 
-                try
-                    disp(['<strong>Post processing model set ', p.Results.sets{set_id}, '</strong>'])
-                    cd(fullfile(p.Results.inputfile_location, p.Results.sets{set_id}))
-                    run_inputs = feval(p.Results.sets{set_id});
-                    run_model_postprocessing(run_inputs, NaN, p.Results.sim_types{herf},...
-                        p.Results.versions, p.Results.n_cores, p.Results.precision)
-                    cd(orig_loc)
-                catch ME
-                    cd(orig_loc)
-                    disp('<strong>Problem with postprocessing models.</strong>')
-                    display_error_message(ME)
-                end %try
-            end %for
-        end %if
-        if any(contains(p.Results.stages, 'analyse'))
-            if any(contains(p.Results.sim_types, 'wake'))
-                input_settings = analysis_model_settings_library(p.Results.sets{set_id});
-                try
-                    analyse_pp_data(results_loc,...
-                        p.Results.sets{set_id}, ppi,...
-                        input_settings.wake.portOverrides);
-                catch ME
-                    warning([sets{set_id}, '<strong>Problem with wake analysis</strong>'])
-                    display_error_message(ME)
-                end %try
-            end %if
-            if any(contains(p.Results.sim_types, 'lossy_eigenmode'))
-                try
-                    makeLossyEigenmodeSummaryTable(p.Results.sets{set_id}, results_loc)
-                catch ME3
-                    warning([sets{set_id}, '<strong>Problem with losy eigenmode analysis</strong>'])
-                    display_error_message(ME3)
-                end %try
-            end %if
-        end %if
-        if any(contains(p.Results.stages, 'plot'))
-            try
-                datasets = find_datasets(fullfile(results_loc, p.Results.sets{set_id}));
-                plot_model(datasets, ppi, p.Results.sim_types);
-            catch ME5
-                warning([sets{set_id}, '<strong>Problem with plotting</strong>'])
-                display_error_message(ME5)
-            end %try
-        end %if
-        %         generate_report_single_set(sets{set_id});
-    end %for
 catch ME1
+    disp('<strong>Problem with simulating models.</strong>')
     display_error_message(ME1)
 end %try
+
+for set_id = 1:length(p.Results.sets)
+    stamp = regexprep(datestr(now),':', '-');
+    if ~exist(fullfile(p.Results.logfile_location, p.Results.sets{set_id}), 'dir')
+        mkdir(fullfile(p.Results.logfile_location, p.Results.sets{set_id}))
+    end %if
+    % Setting up log file
+    diary(fullfile(p.Results.logfile_location, p.Results.sets{set_id}, stamp));
+    if any(contains(p.Results.stages, 'postprocess'))
+        % postprocess the current set for all simulation types
+        for herf = 1:length(p.Results.sim_types)
+            orig_loc = pwd;
+            try
+                disp(['<strong>Post processing model set ', p.Results.sets{set_id}, '</strong>'])
+                cd(fullfile(p.Results.inputfile_location, p.Results.sets{set_id}))
+                run_inputs = feval(p.Results.sets{set_id});
+                modelling_inputs = run_inputs_setup_STL(run_inputs, p.Results.versions, p.Results.n_cores, p.Results.precision);
+                for awh = 1:length(modelling_inputs)
+                    GdfidL_post_process_models(mi.paths, modelling_inputs{awh}.model_name,...
+                        'type_selection', p.Results.sim_types{herf});
+                end %for
+                cd(orig_loc)
+            catch ME
+                cd(orig_loc)
+                disp('<strong>Problem with postprocessing models.</strong>')
+                display_error_message(ME)
+            end %try
+        end %for
+    end %if
+    if any(contains(p.Results.stages, 'analyse'))
+        if any(contains(p.Results.sim_types, 'wake'))
+            input_settings = analysis_model_settings_library(p.Results.sets{set_id});
+            try
+                analyse_pp_data(results_loc,...
+                    p.Results.sets{set_id}, ppi,...
+                    input_settings.wake.portOverrides);
+            catch ME
+                warning([sets{set_id}, '<strong>Problem with wake analysis</strong>'])
+                display_error_message(ME)
+            end %try
+        end %if
+        if any(contains(p.Results.sim_types, 'lossy_eigenmode'))
+            try
+                makeLossyEigenmodeSummaryTable(p.Results.sets{set_id}, results_loc)
+            catch ME3
+                warning([sets{set_id}, '<strong>Problem with losy eigenmode analysis</strong>'])
+                display_error_message(ME3)
+            end %try
+        end %if
+    end %if
+    if any(contains(p.Results.stages, 'plot'))
+        try
+            datasets = find_datasets(fullfile(results_loc, p.Results.sets{set_id}));
+            plot_model(datasets, ppi, p.Results.sim_types);
+        catch ME5
+            warning([sets{set_id}, '<strong>Problem with plotting</strong>'])
+            display_error_message(ME5)
+        end %try
+    end %if
+    %         generate_report_single_set(sets{set_id});
+end %for
+
 
 
 % upper_frequency = 25E9;
