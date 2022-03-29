@@ -25,6 +25,9 @@ addParameter(p, 'precision', default_precision)
 
 parse(p, sets, varargin{:});
 
+load_local_paths
+ppi = analysis_settings;
+
 try
     if any(contains(p.Results.stages, 'simulate'))
         run_model_sets(p.Results.sets, p.Results.sim_types,...
@@ -38,15 +41,52 @@ try
         % Setting up log file
         diary(fullfile(p.Results.logfile_location, p.Results.sets{set_id}, stamp));
         if any(contains(p.Results.stages, 'postprocess'))
-            postprocess_single_set(p.Results.sets{set_id}, p.Results.inputfile_location, ...
-                p.Results.sim_types, ...
-                       p.Results.versions, p.Results.n_cores, p.Results.precision);
+            % postprocess the current set for all simulation types
+            for herf = 1:length(p.Results.sim_types)
+                orig_loc = pwd; 
+                try
+                    disp(['<strong>Post processing model set ', p.Results.sets{set_id}, '</strong>'])
+                    cd(fullfile(p.Results.inputfile_location, p.Results.sets{set_id}))
+                    run_inputs = feval(p.Results.sets{set_id});
+                    run_model_postprocessing(run_inputs, NaN, p.Results.sim_types{herf},...
+                        p.Results.versions, p.Results.n_cores, p.Results.precision)
+                    cd(orig_loc)
+                catch ME
+                    cd(orig_loc)
+                    disp('<strong>Problem with postprocessing models.</strong>')
+                    display_error_message(ME)
+                end %try
+            end %for
         end %if
         if any(contains(p.Results.stages, 'analyse'))
-            analyse_single_set(sets{set_id}, p.Results.sim_types);
+            if any(contains(p.Results.sim_types, 'wake'))
+                input_settings = analysis_model_settings_library(p.Results.sets{set_id});
+                try
+                    analyse_pp_data(results_loc,...
+                        p.Results.sets{set_id}, ppi,...
+                        input_settings.wake.portOverrides);
+                catch ME
+                    warning([sets{set_id}, '<strong>Problem with wake analysis</strong>'])
+                    display_error_message(ME)
+                end %try
+            end %if
+            if any(contains(p.Results.sim_types, 'lossy_eigenmode'))
+                try
+                    makeLossyEigenmodeSummaryTable(p.Results.sets{set_id}, results_loc)
+                catch ME3
+                    warning([sets{set_id}, '<strong>Problem with losy eigenmode analysis</strong>'])
+                    display_error_message(ME3)
+                end %try
+            end %if
         end %if
         if any(contains(p.Results.stages, 'plot'))
-            plot_single_set(sets{set_id}, p.Results.sim_types);
+            try
+                datasets = find_datasets(fullfile(results_loc, p.Results.sets{set_id}));
+                plot_model(datasets, ppi, p.Results.sim_types);
+            catch ME5
+                warning([sets{set_id}, '<strong>Problem with plotting</strong>'])
+                display_error_message(ME5)
+            end %try
         end %if
         %         generate_report_single_set(sets{set_id});
     end %for
