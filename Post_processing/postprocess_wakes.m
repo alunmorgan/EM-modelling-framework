@@ -1,4 +1,4 @@
-function data = postprocess_wakes(modelling_inputs, log)
+function postprocess_wakes(modelling_inputs, log)
 % Runs the GdfidL postprocessor on the selected data.
 % The model data has already been selected using soft links.
 %
@@ -9,7 +9,7 @@ function data = postprocess_wakes(modelling_inputs, log)
 %Example: wake_data = postprocess_wakes(ppi, modelling_inputs,log)
 
 %% Write the wake post processing input file
-tstart = GdfidL_write_pp_input_file(log);
+GdfidL_write_pp_input_file(log);
 % for folder_ind = 1:10
 % GdfidL_write_wake_pp_input_file_E_field_history(1 + (folder_ind-1)*3000);
 % end %for
@@ -23,10 +23,10 @@ for kwe = 1:length(c)
 end %for
 %% Extract the wake data
 rename_port_files(wake_output_directory);
-% FIXME move the following two line into analysis so that separation between the
-% data folder and the analysis folder is clear.
-output_file_locations = GdfidL_find_ouput(wake_output_directory);
-data = extract_wake_data_from_pp_output_files(output_file_locations, log, modelling_inputs, tstart);
+% % FIXME move the following two line into analysis so that separation between the
+% % data folder and the analysis folder is clear.
+% output_file_locations = GdfidL_find_ouput(wake_output_directory);
+% data = extract_wake_data_from_pp_output_files(output_file_locations, log, modelling_inputs, tstart);
 disp('Extracting field data')
 field_data = read_fexport_files(fullfile('data_link', 'wake'));
 if ~isfield(field_data, 'nofiles')

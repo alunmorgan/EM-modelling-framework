@@ -13,14 +13,20 @@ for sts = 1:length(model_sets)
             test = regexprep(current_folder, root_path, '');
             test = regexp(test, filesep, 'split')';
             wake_ind = find(cellfun(@isempty,(strfind(test, 'wake')))==0);
-            pp_data = load(fullfile(current_folder, 'data_postprocessed'), 'pp_data');
-            pp_data = pp_data.pp_data;
+%             pp_data = load(fullfile(current_folder, 'data_postprocessed'), 'pp_data');
+%             pp_data = pp_data.pp_data;
             run_logs = load(fullfile(current_folder, 'data_from_run_logs.mat'), 'run_logs');
             run_logs = run_logs.run_logs;
             pp_logs = load(fullfile(current_folder, 'data_from_pp_logs.mat'), 'pp_logs');
             pp_logs = pp_logs.pp_logs;
             modelling_inputs = load(fullfile(current_folder, 'run_inputs.mat'), 'modelling_inputs');
             modelling_inputs = modelling_inputs.modelling_inputs;
+            
+            % FIXME move the following two line into analysis so that separation between the
+            % data folder and the analysis folder is clear.
+            output_file_locations = GdfidL_find_ouput(current_folder);
+            pp_data = extract_wake_data_from_pp_output_files(output_file_locations, run_logs, modelling_inputs);
+            
             wakelength = str2double(modelling_inputs.wakelength);
             [pp_data.port.data] = port_data_conditioning(...
                 pp_data.port.data, run_logs, modelling_inputs.port_fill_factor);

@@ -72,13 +72,13 @@ for oef = 1:length(sim_types)
                     
                     % Running postprocessor
                     if strcmp(sim_types{oef}, 'wake')
-                        pp_data = postprocess_wakes(modelling_inputs, run_logs);
+                        postprocess_wakes(modelling_inputs, run_logs);
                     elseif strcmp(sim_types{oef}, 'eigenmode')
                         pp_data = postprocess_eigenmode(modelling_inputs, run_logs, 'eigenmode');
                     elseif strcmp(sim_types{oef}, 'lossy_eigenmode')
                         pp_data = postprocess_eigenmode(modelling_inputs, run_logs, 'lossy_eigenmode');
                     end %if
-                    save(fullfile('pp_link', sim_types{oef}, 'data_postprocessed.mat'), 'pp_data','-v7.3')
+%                     save(fullfile('pp_link', sim_types{oef}, 'data_postprocessed.mat'), 'pp_data','-v7.3')
                     pp_logs = GdfidL_read_pp_logs(sim_types{oef});
                     save(fullfile(pp_directory, 'data_from_pp_logs.mat'), 'pp_logs')
                 catch W_ERR

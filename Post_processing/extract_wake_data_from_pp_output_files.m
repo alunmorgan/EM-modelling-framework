@@ -1,4 +1,4 @@
-function raw_data = extract_wake_data_from_pp_output_files(output_file_locations, log, modelling_inputs, tstart)
+function raw_data = extract_wake_data_from_pp_output_files(output_file_locations, log, modelling_inputs)
 
 % get the Total energy in the structure
 raw_data.Energy = GdfidL_read_graph_datafile(output_file_locations.Energy{1});
@@ -133,7 +133,7 @@ raw_data.wake_loss_factor = raw_data.Wake_impedance.s.loss.s ./ raw_data.Wake_im
 %% Generate the data file which the analysis code is expecting.
 
 raw_data.port.labels = modelling_inputs.port_names;
-raw_data.port.t_start = tstart;
+% raw_data.port.t_start = tstart;
 raw_data.wake_setup.Wake_length = raw_data.Wake_potential.s.data(end,1) .* 2.99792458E8;
 if isfield(log.mat_losses, 'loss_time')
     raw_data.mat_losses.loss_time = log.mat_losses.loss_time;
