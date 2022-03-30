@@ -1,22 +1,19 @@
 function current_simulation(sets, varargin)
 %sets(cell of strings/char): Names of the model sets to run.
-default_logfile_location = '/scratch/afdm76/logs';
-default_inputfile_location = '/scratch/afdm76/em_simulation_design_input_files';
+
 
 sim_types = {'wake', 'sparameter', 'eigenmode', 'lossy_eigenmode', 'shunt'};
 
-default_sim_types = {'wake', 'sparameter', 'eigenmode', 'lossy_eigenmode'};
+default_sim_types = {'wake', 'sparameter', 'lossy_eigenmode'};
 default_stages = {'simulate', 'postprocess', 'analyse', 'plot'};
 default_version = {'220315'};
-default_number_of_cores = {'48'};
+default_number_of_cores = {'40'};
 default_precision = {'double'};
 
 p = inputParser;
 p.StructExpand = false;
 p.CaseSensitive = false;
 addRequired(p, 'sets');
-addParameter(p, 'logfile_location', default_logfile_location);
-addParameter(p, 'inputfile_location', default_inputfile_location);
 addParameter(p, 'sim_types', default_sim_types, @(x) any(contains(x,sim_types)))
 addParameter(p, 'stages', default_stages)
 addParameter(p, 'versions', default_version)
@@ -40,18 +37,18 @@ end %try
 
 for set_id = 1:length(p.Results.sets)
     stamp = regexprep(datestr(now),':', '-');
-    if ~exist(fullfile(p.Results.logfile_location, p.Results.sets{set_id}), 'dir')
-        mkdir(fullfile(p.Results.logfile_location, p.Results.sets{set_id}))
+    if ~exist(fullfile(logfile_location, p.Results.sets{set_id}), 'dir')
+        mkdir(fullfile(logfile_location, p.Results.sets{set_id}))
     end %if
     % Setting up log file
-    diary(fullfile(p.Results.logfile_location, p.Results.sets{set_id}, stamp));
+    diary(fullfile(logfile_location, p.Results.sets{set_id}, stamp));
     if any(contains(p.Results.stages, 'postprocess'))
         % postprocess the current set for all simulation types
         for herf = 1:length(p.Results.sim_types)
             orig_loc = pwd;
             try
                 disp(['<strong>Post processing model set ', p.Results.sets{set_id}, '</strong>'])
-                cd(fullfile(p.Results.inputfile_location, p.Results.sets{set_id}))
+                cd(fullfile(inputfile_location, p.Results.sets{set_id}))
                 run_inputs = feval(p.Results.sets{set_id});
                 modelling_inputs = run_inputs_setup_STL(run_inputs, p.Results.versions, p.Results.n_cores, p.Results.precision);
                 for awh = 1:length(modelling_inputs)
