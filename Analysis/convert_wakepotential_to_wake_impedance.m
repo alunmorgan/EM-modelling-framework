@@ -19,7 +19,9 @@ function [f_raw,bunch_spectra,...
 % Example: [f_raw,bunch_spectra, wakeimpedance, wakeimpedance_IM] = 
 %    convert_wakepotential_to_wake_impedance(Charge_distribution, 
 %    wakepotential, timescale)
-
+% Replacing the NaNs with zeros so as not to upset the FFT
+Charge_distribution(isnan(Charge_distribution) == 1) =0;
+wakepotential(isnan(wakepotential) == 1) =0;
 % Find the step size (this should not change).
 time_stepsize = abs(timescale(2) - timescale(1));
 %% Regenerate the frequency domain data
@@ -27,6 +29,7 @@ time_stepsize = abs(timescale(2) - timescale(1));
 n_freq_points = length(timescale);
 f_raw = (linspace(0,1,n_freq_points) / time_stepsize)';
 % Calculating the bunch spectra for a 1C charge.
+
 bunch_spectra = (fft(Charge_distribution))/n_freq_points;
 fft_wp = fft(wakepotential)/n_freq_points; 
 % In order to get the proper impedence you need divide the fft of
