@@ -5,7 +5,7 @@ function current_simulation(sets, varargin)
 sim_types = {'wake', 'sparameter', 'eigenmode', 'lossy_eigenmode', 'shunt'};
 
 default_sim_types = {'wake', 'sparameter', 'lossy_eigenmode'};
-default_stages = {'simulate', 'postprocess', 'analyse', 'plot'};
+default_stages = {'simulate', 'postprocess', 'analyse', 'reconstruct'  'plot'};
 default_version = {'220315'};
 default_number_of_cores = {'40'};
 default_precision = {'double'};
@@ -65,8 +65,7 @@ for set_id = 1:length(p.Results.sets)
     if any(contains(p.Results.stages, 'analyse'))
         if any(contains(p.Results.sim_types, 'wake'))
             try
-                analyse_pp_data(results_loc,...
-                    p.Results.sets{set_id}, ppi, number_of_wake_lengths_to_analyse);
+                analyse_pp_data(results_loc, p.Results.sets{set_id});
             catch ME
                 warning([sets{set_id}, ' <strong>Problem with wake analysis</strong>'])
                 display_error_message(ME)
@@ -78,6 +77,17 @@ for set_id = 1:length(p.Results.sets)
             catch ME3
                 warning([sets{set_id}, ' <strong>Problem with losy eigenmode analysis</strong>'])
                 display_error_message(ME3)
+            end %try
+        end %if
+    end %if
+    if any(contains(p.Results.stages, 'reconstruct'))
+        if any(contains(p.Results.sim_types, 'wake'))
+            try
+                reconstruct_pp_data(results_loc,...
+                    p.Results.sets{set_id}, ppi, number_of_wake_lengths_to_analyse);
+            catch ME
+                warning([sets{set_id}, ' <strong>Problem with wake analysis</strong>'])
+                display_error_message(ME)
             end %try
         end %if
     end %if
