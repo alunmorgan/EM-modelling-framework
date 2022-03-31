@@ -31,7 +31,7 @@ try
             p.Results.versions, p.Results.n_cores, p.Results.precision);
     end %if
 catch ME1
-    disp('<strong>Problem with simulating models.</strong>')
+    disp([sets{set_id},' <strong>Problem with simulating models.</strong>'])
     display_error_message(ME1)
 end %try
 
@@ -47,7 +47,6 @@ for set_id = 1:length(p.Results.sets)
         for herf = 1:length(p.Results.sim_types)
             orig_loc = pwd;
             try
-                disp(['<strong>Post processing model set ', p.Results.sets{set_id}, '</strong>'])
                 cd(fullfile(inputfile_location, p.Results.sets{set_id}))
                 run_inputs = feval(p.Results.sets{set_id});
                 modelling_inputs = run_inputs_setup_STL(run_inputs, p.Results.versions, p.Results.n_cores, p.Results.precision);
@@ -58,7 +57,7 @@ for set_id = 1:length(p.Results.sets)
                 cd(orig_loc)
             catch ME
                 cd(orig_loc)
-                disp('<strong>Problem with postprocessing models.</strong>')
+                disp([sets{set_id},' <strong>Problem with postprocessing models.</strong>'])
                 display_error_message(ME)
             end %try
         end %for
@@ -69,7 +68,7 @@ for set_id = 1:length(p.Results.sets)
                 analyse_pp_data(results_loc,...
                     p.Results.sets{set_id}, ppi, number_of_wake_lengths_to_analyse);
             catch ME
-                warning([sets{set_id}, '<strong>Problem with wake analysis</strong>'])
+                warning([sets{set_id}, ' <strong>Problem with wake analysis</strong>'])
                 display_error_message(ME)
             end %try
         end %if
@@ -77,7 +76,7 @@ for set_id = 1:length(p.Results.sets)
             try
                 makeLossyEigenmodeSummaryTable(p.Results.sets{set_id}, results_loc)
             catch ME3
-                warning([sets{set_id}, '<strong>Problem with losy eigenmode analysis</strong>'])
+                warning([sets{set_id}, ' <strong>Problem with losy eigenmode analysis</strong>'])
                 display_error_message(ME3)
             end %try
         end %if
@@ -87,7 +86,7 @@ for set_id = 1:length(p.Results.sets)
             datasets = find_datasets(fullfile(results_loc, p.Results.sets{set_id}));
             plot_model(datasets, ppi, p.Results.sim_types);
         catch ME5
-            warning([sets{set_id}, '<strong>Problem with plotting</strong>'])
+            warning([sets{set_id}, ' <strong>Problem with plotting</strong>'])
             display_error_message(ME5)
         end %try
     end %if
