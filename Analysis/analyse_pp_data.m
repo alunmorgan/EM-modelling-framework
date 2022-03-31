@@ -1,7 +1,7 @@
 function analyse_pp_data(root_path, model_set, ppi, number_of_wake_lengths_to_analyse)
 
 files = dir_list_gen_tree(fullfile(root_path, model_set), 'mat', 1);
-wanted_files = files(contains(files, ['wake', filesep, 'data_postprocessed.mat']));
+wanted_files = files(contains(files, ['wake', filesep, 'data_from_pp_logs.mat']));
 
 for ind = 1:length(wanted_files)
     current_folder = fileparts(wanted_files{ind});
@@ -23,9 +23,9 @@ for ind = 1:length(wanted_files)
         pp_data = extract_wake_data_from_pp_output_files(output_file_locations, run_logs, modelling_inputs);   
         pp_data.port.data = port_data_fill_factor_scaling(pp_data.port.data, modelling_inputs.port_fill_factor);
         %separating time domain, frequency domain and material losses.
-        pp_data = rearrange_pp_data_structure(pp_data);
         save(fullfile(current_folder, 'data_postprocessed.mat'), 'pp_data','-v7.3')
         % Prepare for reconstruction
+        pp_data = rearrange_pp_data_structure(pp_data);
         % extracting the time domain info
         pp_reconstruction_data = pp_data.time_series_data;
         pp_reconstruction_data.port_data = port_data_remove_non_transmitting(pp_reconstruction_data.port_data, run_logs);

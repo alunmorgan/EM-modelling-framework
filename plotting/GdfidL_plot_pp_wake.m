@@ -11,35 +11,22 @@ function GdfidL_plot_pp_wake(path_to_data, ppi)
 % chosen_wake_length = str2double(chosen_wake_length);
 
 [path_to_data ,~,~] = fileparts(path_to_data);
+files_to_load = {'run_inputs.mat', 'modelling_inputs';...
+    'data_postprocessed.mat', 'pp_data';...
+    'data_from_run_logs.mat', 'run_logs'};
 
-if exist(fullfile(path_to_data, 'run_inputs.mat'), 'file') == 2
-    load(fullfile(path_to_data, 'run_inputs.mat'), 'modelling_inputs');
-else
-    disp(['Unable to load ', fullfile(path_to_data, 'run_inputs.mat')])
-    return
-end %if
-if exist(fullfile(path_to_data,'data_postprocessed.mat'), 'file') == 2
-    load(fullfile(path_to_data,'data_postprocessed.mat'), 'pp_data');
-else
-    disp(['Unable to load ', fullfile(path_to_data,'data_postprocessed.mat')])
-    return
-end %if
-
-if exist(fullfile(path_to_data, 'data_from_run_logs.mat'), 'file') == 2
-    load(fullfile(path_to_data, 'data_from_run_logs.mat'), 'run_logs')
-else
-    disp(['Unable to load ', fullfile(path_to_data, 'data_from_run_logs.mat')])
-    return
-end %if
-
+for rnf = 1:size(files_to_load,1)
+    if exist(fullfile(path_to_data, files_to_load{rnf,1}), 'file') == 2
+        load(fullfile(path_to_data, files_to_load{rnf,1}), files_to_load{rnf,2});
+    else
+        disp(['Unable to load ', files_to_load{rnf,1}])
+        return
+    end %if
+end %for
 %Line width of the graphs
 lw = 2;
 % limit to the horizontal axis.
 graph_freq_lim = ppi.hfod * 1e-9;
-% find the coresponding index.
-cut_freq_ind = find(pp_data.Wake_impedance.s.data(:,1)*1E-9 < graph_freq_lim,1,'last');
-% also find the index for 9GHz for zoomed graphs
-% power_dist_ind = find(wake_data.frequency_domain_data.f_raw > 9E9, 1,'First');
 % location and size of the default figures.
 fig_width = 800;
 fig_height = 600;
@@ -60,13 +47,6 @@ fig_pos = [fig_left fig_bottom fig_width fig_height];
 % cols = {'b','k','m','c','g',[1, 0.5, 0],[0.5, 1, 0],[1, 0, 0.5],[0.5, 0, 1],[0.5, 1, 0] };
 l_st ={'--',':','-.','--',':','-.','--',':','-.'};
 
-% Identifying the non replica ports.
-% for sjew = length(pp_data.port.labels_table):-1:1
-%     lab_ind(sjew) = find(strcmp(pp_data.port.labels,...
-%         pp_data.port.labels_table{sjew}));
-% end %for
-% can I just do a search using the original names in raw data?
-
 % Some pre processing to pull out trends.
 % [wl, freqs, Qs, mags, bws] = find_Q_trends(wake_sweep_data.frequency_domain_data, range, run_logs.wake_length);
 % Show the Q values of the resonances shows if the simulation has stablised.
@@ -76,15 +56,7 @@ l_st ={'--',':','-.','--',':','-.','--',':','-.'};
 % These are the plots to generate for a single value of sigma.
 % sigma = round(str2num(mi.beam_sigma) ./3E8 *1E12 *10)/10;
 % if isfield(pp_data.port, 'timebase')
-    port_names = regexprep(pp_data.port.labels,'_',' ');
 % end %if
-if length(port_names)== 2
-    % assume that only beam ports are involved and set a flag so that the
-    % signal port values are not displayed.
-    bp_only_flag = 1;
-else
-    bp_only_flag = 0;
-end %if
 
 % Extracting  losses
 [model_mat_data, mat_loss, m_time, m_data] = ...
@@ -100,6 +72,7 @@ end %if
 % pme = extract_port_energy_from_wake_data(wake_data);
 
 % Extracting wake impedances
+cut_freq_ind = find(pp_data.Wake_impedance.s.data(:,1)*1E-9 < graph_freq_lim,1,'last');
 wi_re = pp_data.Wake_impedance.s.data(1:cut_freq_ind,:);
 wi_re(:,1) = wi_re(:,1) .* 1E-9; % frequency in GHz
 wi_dipole_x = pp_data.Wake_impedance.x.data(1:cut_freq_ind,:);
@@ -107,8 +80,8 @@ wi_dipole_x(:,1) = wi_dipole_x(:,1) .* 1E-9; % frequency in GHz
 wi_dipole_y = pp_data.Wake_impedance.y.data(1:cut_freq_ind,:);
 wi_dipole_y(:,1) = wi_dipole_y(:,1) .* 1E-9; % frequency in GHz
 
-wi_im = pp_data.Wake_impedance_Im.s.data(1:cut_freq_ind,:);
-wi_im(:,1) = wi_im(:,1) .* 1E-9; % frequency in GHz
+% wi_im = pp_data.Wake_impedance_Im.s.data(1:cut_freq_ind,:);
+% wi_im(:,1) = wi_im(:,1) .* 1E-9; % frequency in GHz
 
 % Extracting time series
 wp = pp_data.Wake_potential.s.data; % V/pC
@@ -159,11 +132,11 @@ h_wake = figure('Position',fig_pos);
 clf(h_wake)
 if isfield(pp_data.port, 'timebase')
     time_step = pp_data.port.timebase(2) - pp_data.port.timebase(1);
-    beam_ports = sum(pp_data.port.data.time.power_port{1}) .* time_step + ...
-        sum(pp_data.port.data.time.power_port{2}) .* time_step;
+    beam_ports = sum(pp_data.port.data.time.power_port.data{1}) .* time_step + ...
+        sum(pp_data.port.data.time.power_port.data{2}) .* time_step;
     signal_ports = 0;
-    for jas = 3:length(pp_data.port.data.time.power_port)
-        signal_ports = signal_ports + sum(pp_data.port.data.time.power_port{jas}) .* time_step;
+    for jas = 3:length(pp_data.port.data.time.power_port.data)
+        signal_ports = signal_ports + sum(pp_data.port.data.time.power_port.data{jas}) .* time_step;
     end %for
 else
     beam_ports = 0;
@@ -343,23 +316,24 @@ savemfmt(h_wake, path_to_data, 'Q_from_wake')
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Port signals
+port_names = regexprep(pp_data.port.labels,'_',' ');
 clf(h_wake)
-if isfield(pp_data.port, 'timebase');
-[hwn, ksn] = num_subplots(length(port_names));
-for ens = length(port_names):-1:1 % ports
-    ax_sp(ens) = subplot(hwn,ksn,ens);
-    plot(pp_data.port.timebase .* 1E9, pp_data.port.data.time.power_port{ens}, 'b', 'Parent', ax_sp(ens))
-    title(port_names{ens}, 'Parent', ax_sp(ens))
-    xlim([pp_data.port.timebase(1) .* 1E9 pp_data.port.timebase(end) .* 1E9])
-    xlabel('Time (ns)', 'Parent', ax_sp(ens))
-    ylabel('Power (W)', 'Parent', ax_sp(ens))
-    grid on
-end %for
-savemfmt(h_wake, path_to_data,'port_signals')
-for ens = length(port_names):-1:1 % ports
-    xlim(ax_sp(ens),[pp_data.port.timebase(1) .* 1E9 4])
-end %for
-savemfmt(h_wake, path_to_data,'port_signals_first4ns')
+if isfield(pp_data.port, 'timebase')
+    [hwn, ksn] = num_subplots(length(port_names));
+    for ens = length(port_names):-1:1 % ports
+        ax_sp(ens) = subplot(hwn,ksn,ens);
+        plot(pp_data.port.timebase .* 1E9, pp_data.port.data.time.power_port.data{ens}, 'b', 'Parent', ax_sp(ens))
+        title(port_names{ens}, 'Parent', ax_sp(ens))
+        xlim([pp_data.port.timebase(1) .* 1E9 pp_data.port.timebase(end) .* 1E9])
+        xlabel('Time (ns)', 'Parent', ax_sp(ens))
+        ylabel('Power (W)', 'Parent', ax_sp(ens))
+        grid on
+    end %for
+    savemfmt(h_wake, path_to_data,'port_signals')
+    for ens = length(port_names):-1:1 % ports
+        xlim(ax_sp(ens),[pp_data.port.timebase(1) .* 1E9 4])
+    end %for
+    savemfmt(h_wake, path_to_data,'port_signals_first4ns')
 end %if
 
 % clf(h_wake)
