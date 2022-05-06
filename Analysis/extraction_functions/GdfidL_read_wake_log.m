@@ -439,3 +439,11 @@ lg.port_name = port_name;
 wake_length_ind = find_position_in_cell_lst(regexp(data,'lcharges>\s*shigh\s*=\s*\d+'));
 wake_length = regexp(data(wake_length_ind),'lcharges>\s*shigh\s*=\s*(\d+)','tokens');
 lg.wake_length = str2double(wake_length{1}{1}{1});
+
+%find the voltage monitors
+voltage_monitors_ind = find_position_in_cell_lst(regexp(data,'-voltages>\s*name=\s*.*'));
+if ~isempty(voltage_monitors_ind)
+    voltage_monitors = regexp(data(voltage_monitors_ind), '-voltages>\s*name=\s*(.*)', 'tokens');
+    lg.voltage_monitors = flatten_nest(voltage_monitors);
+end %if
+
