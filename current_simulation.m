@@ -2,12 +2,12 @@ function current_simulation(sets, varargin)
 %sets(cell of strings/char): Names of the model sets to run.
 
 
-sim_types = {'wake', 'sparameter', 'eigenmode', 'lossy_eigenmode', 'shunt'};
+sim_types = {'geometry','wake', 'sparameter', 'eigenmode', 'lossy_eigenmode', 'shunt'};
 
-default_sim_types = {'wake', 'sparameter', 'lossy_eigenmode'};
+default_sim_types = {'geometry', 'wake', 'sparameter', 'lossy_eigenmode'};
 default_stages = {'simulate', 'postprocess', 'analyse', 'reconstruct'  'plot'};
-default_version = {'220315'};
-default_number_of_cores = {'40'};
+default_version = {'220421'};
+default_number_of_cores = {'64'};
 default_precision = {'double'};
 
 p = inputParser;
@@ -22,7 +22,7 @@ addParameter(p, 'precision', default_precision)
 
 parse(p, sets, varargin{:});
 
-load_local_paths
+paths = load_local_paths;
 ppi = analysis_settings;
 number_of_wake_lengths_to_analyse = 1;
 try
@@ -37,22 +37,25 @@ end %try
 
 for set_id = 1:length(p.Results.sets)
     stamp = regexprep(datestr(now),':', '-');
-    if ~exist(fullfile(logfile_location, p.Results.sets{set_id}), 'dir')
-        mkdir(fullfile(logfile_location, p.Results.sets{set_id}))
+    if ~exist(fullfile(paths.logfile_location, p.Results.sets{set_id}), 'dir')
+        mkdir(fullfile(paths.logfile_location, p.Results.sets{set_id}))
     end %if
     % Setting up log file
-    diary(fullfile(logfile_location, p.Results.sets{set_id}, stamp));
+    diary(fullfile(paths.logfile_location, p.Results.sets{set_id}, stamp));
     if any(contains(p.Results.stages, 'postprocess'))
         % postprocess the current set for all simulation types
         for herf = 1:length(p.Results.sim_types)
             orig_loc = pwd;
             try
-                cd(fullfile(inputfile_location, p.Results.sets{set_id}))
+                cd(fullfile(paths.inputfile_location, p.Results.sets{set_id}))
                 run_inputs = feval(p.Results.sets{set_id});
                 modelling_inputs = run_inputs_setup_STL(run_inputs, p.Results.versions, p.Results.n_cores, p.Results.precision);
                 for awh = 1:length(modelling_inputs)
-                    GdfidL_post_process_models(mi.paths, modelling_inputs{awh}.model_name,...
+                    [old_loc, tmp_name] = prepare_for_pp(modelling_inputs{awh}.base_model_name,...
+                        modelling_inputs{awh}.model_name, paths);
+                    GdfidL_post_process_models(paths, modelling_inputs{awh}.model_name,...
                         'type_selection', p.Results.sim_types{herf});
+                cleanup_after_pp(old_loc, tmp_name)
                 end %for
                 cd(orig_loc)
             catch ME
@@ -65,7 +68,7 @@ for set_id = 1:length(p.Results.sets)
     if any(contains(p.Results.stages, 'analyse'))
         if any(contains(p.Results.sim_types, 'wake'))
             try
-                analyse_pp_data(results_loc, p.Results.sets{set_id});
+                analyse_pp_data(paths.results_loc, p.Results.sets{set_id});
             catch ME
                 warning([sets{set_id}, ' <strong>Problem with wake analysis</strong>'])
                 display_error_message(ME)
@@ -83,7 +86,7 @@ for set_id = 1:length(p.Results.sets)
     if any(contains(p.Results.stages, 'reconstruct'))
         if any(contains(p.Results.sim_types, 'wake'))
             try
-                reconstruct_pp_data(results_loc,...
+                reconstruct_pp_data(paths.results_loc,...
                     p.Results.sets{set_id}, ppi, number_of_wake_lengths_to_analyse);
             catch ME
                 warning([sets{set_id}, ' <strong>Problem with wake analysis</strong>'])
@@ -93,7 +96,7 @@ for set_id = 1:length(p.Results.sets)
     end %if
     if any(contains(p.Results.stages, 'plot'))
         try
-            datasets = find_datasets(fullfile(results_loc, p.Results.sets{set_id}));
+            datasets = find_datasets(fullfile(paths.results_loc, p.Results.sets{set_id}));
             plot_model(datasets, ppi, p.Results.sim_types);
         catch ME5
             warning([sets{set_id}, ' <strong>Problem with plotting</strong>'])

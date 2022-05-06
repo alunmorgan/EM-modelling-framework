@@ -3,14 +3,14 @@ function run_model_sets(model_names, sim_types, versions, n_cores, precision)
 % force_pp: sets whether the GdfidL postprocessing is rerun for existing
 % simulations. values are 'skip' and 'no_skip'.
 
-load_local_paths
+paths = load_local_paths;
 orig_loc = pwd;
 
 for hew = 1:length(model_names)
     try
-        cd(fullfile(orig_loc, model_names{hew}))
+        cd(fullfile(paths.orig_loc, model_names{hew}))
         run_inputs = feval(model_names{hew});
-        run_models(run_inputs, sim_types, restart_files_path, ...
+        run_models(run_inputs, sim_types, paths.restart_files_path, ...
                    versions, n_cores, precision)
         cd(orig_loc)
     catch ME

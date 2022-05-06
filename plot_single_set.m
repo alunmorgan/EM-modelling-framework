@@ -6,13 +6,13 @@ function plot_single_set(model_set, types)
 %       override(cell of strings/char): Override status of each entry in types.
 
 diary off
-load_local_paths
+paths = load_local_paths;
 
 diary on
 ppi = analysis_settings;
 
 try
-    datasets = find_datasets(fullfile(results_loc, model_set));
+    datasets = find_datasets(fullfile(paths.results_loc, model_set));
     plot_model(datasets, ppi, types);
 catch ME5
     display_error_message(ME5)

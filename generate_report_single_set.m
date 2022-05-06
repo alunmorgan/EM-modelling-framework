@@ -4,7 +4,7 @@ function generate_report_single_set(model_set)
 %       model_set(str): Name of model set to run.
 
 diary off
-load_local_paths
+paths = load_local_paths;
 diary on
 
 try

@@ -7,14 +7,14 @@ function postprocess_single_set(model_set, input_file_loc, types, ...
 %       types(cell of strings/char): Types of postprocessing to run.
 
 diary off
-load_local_paths
+paths = load_local_paths;
 
 diary on
 
 for herf = 1:length(types)
     try
         if any(contains(types, types{herf}))
-            postprocess_model_sets(input_file_loc, {model_set}, ...
+            postprocess_model_sets(paths.input_file_loc, {model_set}, ...
                 {types{herf}}, versions, n_cores, precision)
         end %if
     catch ME1

@@ -11,10 +11,12 @@ path_to_code = which(model_name);
 
 % Load the paths associated with the input file set. This is placed one
 % level above the py and m files for each model.
-run(fullfile(fileparts(path_to_input_files), 'load_local_paths'));
+addpath(fileparts(path_to_input_files))
+paths = load_local_paths;
+rmpath(fileparts(path_to_input_files))
 
-store = fullfile(data_loc, model_name);
-results_path = fullfile(results_loc, model_name);
+store = fullfile(paths.data_loc, model_name);
+results_path = fullfile(paths.results_loc, model_name);
 
 %% Creating folders
 if exist(results_path, 'dir') ~= 7
@@ -32,19 +34,19 @@ end %if
 
 %% Adding locations to the data structure.
 % Location of the temporary file space. Nothing is kept here.
-run_inputs.paths.scratch_path = scratch_loc;
+run_inputs.paths.scratch_path = paths.scratch_loc;
 % Location of the framework input files.
-run_inputs.paths.input_file_path = path_to_input_files;
+run_inputs.paths.input_file_path = paths.inputfile_location;
 % Location of the models.
-run_inputs.paths.path_to_models = path_to_models;
+run_inputs.paths.path_to_models = paths.path_to_models;
 % Location to store the data generated from the modelling run.
 run_inputs.paths.storage_path = store;
 % Location to put the post processed output and reports.
 run_inputs.paths.results_path = results_path;
 % Location of static graphics used in the reports.
-run_inputs.paths.graphics_path = graphic_loc;
+run_inputs.paths.graphics_path = paths.graphic_loc;
 % Location of restart files. Useful safety next for long running simulations.
-run_inputs.paths.restart_files_path = restart_files_path;
+run_inputs.paths.restart_files_path = paths.restart_files_path;
 
 %% Adding list of model names to run.
 [run_inputs.model_names, ~] = dir_list_gen(fullfile(run_inputs.paths.path_to_models, model_name), 'dirs',1);
