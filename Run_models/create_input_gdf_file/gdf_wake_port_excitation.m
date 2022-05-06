@@ -32,24 +32,4 @@ else
         end %if
         fs = cat(1,fs,'    nextport');
     end %for
-    fs = cat(1,fs,['    define(XMAX, 17e-3)']);
-    fs = cat(1,fs,[' define(ZZ, 70e-3)']);
-    fs = cat(1,fs,['     -voltages']);
-    fs = cat(1,fs,['         name= VSignal3_2']);
-    fs = cat(1,fs,['            startpoint= ( 0, 0.2, ZZ )']);
-    fs = cat(1,fs,['            endpoint= ( XMAX, 0.2, ZZ )']);
-    fs = cat(1,fs,['            logcurrent= yes']);
-    fs = cat(1,fs,['            resistance= 1e10, ']);
-    fs = cat(1,fs,['            amplitude= 1e-10,']);
-    fs = cat(1,fs,['            risetime= 1e-10,']);
-    fs = cat(1,fs,['            frequency= 0']);
-    fs = cat(1,fs,['         doit']);
-    fs = cat(1,fs,['         name= VSignal3_1']);
-    fs = cat(1,fs,['            startpoint= ( 0, 0.1, ZZ )']);
-    fs = cat(1,fs,['            endpoint= ( XMAX, 0.1, ZZ )']);
-    fs = cat(1,fs,['         doit']);
-    fs = cat(1,fs,['         name= VSignal3_05']);
-    fs = cat(1,fs,['            startpoint= ( 0, 0.05, ZZ )']);
-    fs = cat(1,fs,['            endpoint= ( XMAX, 0.05, ZZ )']);
-    fs = cat(1,fs,['         doit']);
 end %if
