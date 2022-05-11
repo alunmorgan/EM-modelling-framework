@@ -1,11 +1,11 @@
 function reconstruct_pp_data(root_path, model_set, ppi, number_of_wake_lengths_to_analyse)
 
-files = dir_list_gen_tree(fullfile(root_path, model_set), 'mat', 1);
-wanted_files = files(contains(files, ['wake', filesep, 'data_from_pp_logs.mat']));
+files = dir_list_gen_tree(fullfile(root_path, model_set), '', 1);
+wanted_files = files(contains(files, ['wake', filesep, 'model_wake_post_processing_log']));
 
 for ind = 1:length(wanted_files)
     current_folder = fileparts(wanted_files{ind});
-    if ~isfile(fullfile(current_folder, 'data_analysed_wake.mat'))
+    if ~isfile(fullfile(current_folder, 'data_reconstructed_wake.mat'))
         [a1,~,~]= fileparts(current_folder);
         [~,name_of_model,~] = fileparts(a1);
         disp(['Starting reconstruction <strong>', name_of_model, '</strong>'])
@@ -14,17 +14,22 @@ for ind = 1:length(wanted_files)
         wake_ind = find(cellfun(@isempty,(strfind(test, 'wake')))==0);
         run_logs = load(fullfile(current_folder, 'data_from_run_logs.mat'), 'run_logs');
         run_logs = run_logs.run_logs;
-        pp_logs = load(fullfile(current_folder, 'data_from_pp_logs.mat'), 'pp_logs');
-        pp_logs = pp_logs.pp_logs;
+        pp_logs = GdfidL_read_pp_wake_log(current_folder);
+%         pp_logs = load(fullfile(current_folder, 'data_from_pp_logs.mat'), 'pp_logs');
+%         pp_logs = pp_logs.pp_logs;
         modelling_inputs = load(fullfile(current_folder, 'run_inputs.mat'), 'modelling_inputs');
         modelling_inputs = modelling_inputs.modelling_inputs;
-        pp_data = load(fullfile(current_folder, 'data_postprocessed.mat'), 'pp_data');
-        pp_data = pp_data.pp_data;
+        
+        output_file_locations = GdfidL_find_ouput(current_folder);
+        pp_data = extract_wake_data_from_pp_output_files(output_file_locations, run_logs, modelling_inputs);
+        
+%         pp_data = load(fullfile(current_folder, 'data_postprocessed.mat'), 'pp_data');
+%         pp_data = pp_data.pp_data;
         
         % Prepare for reconstruction
-        pp_data = rearrange_pp_data_structure(pp_data);
+        pp_data_rearranged = rearrange_pp_data_structure(pp_data);
         % extracting the time domain info
-        pp_reconstruction_data = pp_data.time_series_data;
+        pp_reconstruction_data = pp_data_rearranged.time_series_data;
         pp_reconstruction_data.port_data = port_data_remove_non_transmitting(pp_reconstruction_data.port_data, run_logs);
         pp_reconstruction_data.port_data = port_data_separate_remnant(pp_reconstruction_data.port_data,...
             pp_reconstruction_data.port_timebase,modelling_inputs.beam_sigma);
@@ -35,7 +40,7 @@ for ind = 1:length(wanted_files)
                 % if they are not in the log then they have not been used.
                 start_times = pp_logs.start_times;
             else
-                start_times = num2cell(zeros(length(pp_data.port.t_start),2));
+                start_times = num2cell(zeros(length(pp_reconstruction_data.port_labels),2));
             end %if
             [pp_reconstruction_data.port_labels, ...
                 pp_reconstruction_data.port_data, pp_reconstruction_data.port_t_start] = duplicate_ports(...
@@ -52,7 +57,7 @@ for ind = 1:length(wanted_files)
         pp_reconstruction_data = pp_apply_common_timebase(pp_reconstruction_data, timescale_common);
         wake_sweep_data = wake_sweep(wake_lengths_to_analyse, pp_reconstruction_data, ppi, run_logs);
         fprintf('Reconstructed ... Saving...')
-        save(fullfile(current_folder, 'data_analysed_wake.mat'), 'wake_sweep_data','-v7.3')
+        save(fullfile(current_folder, 'data_reconstructed_wake.mat'), 'wake_sweep_data','-v7.3')
         fprintf('Saved\n')
         clear 'pp_data' 'run_logs' 'modelling_inputs' 'wake_sweep_data' 'current_folder'
     else

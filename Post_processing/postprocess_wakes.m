@@ -15,20 +15,16 @@ GdfidL_write_pp_input_file(log);
 % end %for
 
 %% run the wake postprocessor
-wake_output_directory = fullfile('pp_link', 'wake');
-a=dir_list_gen_tree(wake_output_directory, '',1);
+a=dir_list_gen_tree(fullfile('pp_link', 'wake'), '',1);
 c = a(contains(a, 'wake_post_processing'));
 for kwe = 1:length(c)
     postprocess_core(fileparts(c{kwe}), modelling_inputs.version, 'wake', 0, 0, 'pp_input_file', c{kwe});
 end %for
 %% Extract the wake data
-rename_port_files(wake_output_directory);
+rename_port_files(fullfile('pp_link', 'wake'));
 % % FIXME move the following two line into analysis so that separation between the
 % % data folder and the analysis folder is clear.
 % output_file_locations = GdfidL_find_ouput(wake_output_directory);
 % data = extract_wake_data_from_pp_output_files(output_file_locations, log, modelling_inputs, tstart);
-disp('Extracting field data')
-field_data = read_fexport_files(fullfile('data_link', 'wake'));
-if ~isfield(field_data, 'nofiles')
-    save(fullfile(wake_output_directory,'field_data'), 'field_data')
-end %if
+
+

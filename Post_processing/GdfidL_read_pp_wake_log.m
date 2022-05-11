@@ -31,7 +31,7 @@ for lse = 1:length(logs)
     %% Analyse the data
     if strcmp(f, 'wake')
         % Find the variable values.
-        variable_regexp = '.*\s+defining:\s*"(.*)",\s+Value:\s+"(.*)"';
+        variable_regexp = '.*\s+defining:\s*"(.*)"\s*[,to]+\s+Value:\s+"(.*)"';
         test= regexp(data, variable_regexp, 'tokens');
         test_ind = cellfun(@isempty,test);
         test2=test(~test_ind);

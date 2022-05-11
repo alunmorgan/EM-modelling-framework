@@ -6,6 +6,7 @@ if isempty(gzFiles)
     data.nofiles = NaN;
     return
 end %if
+disp('Extracting field data')
 set_start_inds = find(contains(gzFiles, '000001.gz'));
 set_start_inds = [set_start_inds; length(gzFiles)+1];
 for twm = 1:length(set_start_inds) -1
@@ -68,7 +69,7 @@ for twm = 1:length(set_start_inds) -1
     end %for
 
     % populates data grid
-    parfor ydf = 1:length(fileset)
+    for ydf = 1:length(fileset) %par
         fprintf('.')
         temp_name = fullfile(data_path, ['temp_data_file_', num2str(ydf)]);
         [~] = system(['gunzip -c "', fileset{ydf}, '" > "', temp_name,'"']);

@@ -2,7 +2,7 @@ function GdfidL_post_process_models(paths, model_name, varargin)
 % Takes the output of the GdfidL run and postprocesses it to generate
 % reports.
 %
-% Example: pp_log = GdfidL_post_process_models(paths, model_name, 'ow_behaviour','skip', 'input_data_location', '/home');
+% Example: GdfidL_post_process_models(paths, model_name, 'input_data_location', '/home');
 
 p = inputParser;
 p.StructExpand = false;
@@ -49,8 +49,8 @@ if run_pp == 1
                 pp_data = postprocess_eigenmode(modelling_inputs, run_logs, 'lossy_eigenmode');
             end %if
             %                     save(fullfile('pp_link', sim_types{oef}, 'data_postprocessed.mat'), 'pp_data','-v7.3')
-            pp_logs = GdfidL_read_pp_logs(p.Results.type_selection);
-            save(fullfile(pp_directory, 'data_from_pp_logs.mat'), 'pp_logs')
+%             pp_logs = GdfidL_read_pp_logs(p.Results.type_selection);
+%             save(fullfile(pp_directory, 'data_from_pp_logs.mat'), 'pp_logs')
         catch W_ERR
             disp( ['<strong>', p.Results.type_selection, ' Error</strong>'])
             display_error_message(W_ERR)
@@ -68,8 +68,8 @@ if run_pp == 1
                 pp_data = postprocess_shunt;
                 
             end %if
-            save(fullfile(pp_directory, 'data_from_run_logs.mat'), 'run_logs')
-            save(fullfile(pp_directory, 'data_postprocessed.mat'), 'pp_data','-v7.3')
+%             save(fullfile(pp_directory, 'data_from_run_logs.mat'), 'run_logs')
+%             save(fullfile(pp_directory, 'data_postprocessed.mat'), 'pp_data','-v7.3')
         catch W_ERR
             disp( ['<strong>', p.Results.type_selection, ' Error</strong>'])
             display_error_message(W_ERR)

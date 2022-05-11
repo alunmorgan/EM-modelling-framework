@@ -12,7 +12,8 @@ function GdfidL_plot_pp_wake(path_to_data, ppi)
 
 [path_to_data ,~,~] = fileparts(path_to_data);
 files_to_load = {'run_inputs.mat', 'modelling_inputs';...
-    'data_postprocessed.mat', 'pp_data';...
+    'data_analysed_wake.mat', 'pp_data';...
+    'data_reconstructed_wake.mat', 'wake_sweep_data';...
     'data_from_run_logs.mat', 'run_logs'};
 
 for rnf = 1:size(files_to_load,1)
@@ -322,7 +323,10 @@ if isfield(pp_data.port, 'timebase')
     [hwn, ksn] = num_subplots(length(port_names));
     for ens = length(port_names):-1:1 % ports
         ax_sp(ens) = subplot(hwn,ksn,ens);
+        try
+            % This is to cope with the case of missing data files.
         plot(pp_data.port.timebase .* 1E9, pp_data.port.data.time.power_port.data{ens}, 'b', 'Parent', ax_sp(ens))
+        end
         title(port_names{ens}, 'Parent', ax_sp(ens))
         xlim([pp_data.port.timebase(1) .* 1E9 pp_data.port.timebase(end) .* 1E9])
         xlabel('Time (ns)', 'Parent', ax_sp(ens))

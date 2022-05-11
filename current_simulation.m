@@ -56,6 +56,7 @@ for set_id = 1:length(p.Results.sets)
                     GdfidL_post_process_models(paths, modelling_inputs{awh}.model_name,...
                         'type_selection', p.Results.sim_types{herf});
                 cleanup_after_pp(old_loc, tmp_name)
+                extract_field_data
                 end %for
                 cd(orig_loc)
             catch ME
@@ -89,7 +90,7 @@ for set_id = 1:length(p.Results.sets)
                 reconstruct_pp_data(paths.results_loc,...
                     p.Results.sets{set_id}, ppi, number_of_wake_lengths_to_analyse);
             catch ME
-                warning([sets{set_id}, ' <strong>Problem with wake analysis</strong>'])
+                warning([sets{set_id}, ' <strong>Problem with wake reconstruction</strong>'])
                 display_error_message(ME)
             end %try
         end %if
