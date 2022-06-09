@@ -6,15 +6,15 @@ for ofw = 1:length(substructure)
             strcmp(substructure{ofw}, 'power_port_mode')
         for dlw = 1:length(data.(substructure{ofw}).data)
             if ~isempty(data.(substructure{ofw}).data{dlw}) % Skip empty cells
+                size_data = size(data.(substructure{ofw}).data{dlw});
                 if dlw <3
                     % Beam ports. These should have t_start set to
                     % ignore the passing beam pulse. so everything is
                     % remnant.
-                    size_data = size(data.(substructure{ofw}).data{dlw});
                     data.(substructure{ofw}).bunch_signal{dlw}(1:size_data(1), 1:size_data(2)) = 0; %W
                     data.(substructure{ofw}).remnant_signal{dlw} = data.(substructure{ofw}).data{dlw}; %W
                 else
-                    for shf = 1:size(data.voltage_port_mode.data{dlw}, 2)
+                    for shf = 1:size_data(2)
                         [cut_inds(shf), first_peak_amplitude(shf)]= separate_bunch_from_remenent_field(...
                             timebase, data.(substructure{ofw}).data{dlw}(:,shf), beam_sigma , 4);
                     end %for
