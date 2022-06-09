@@ -3,7 +3,7 @@ function construct_gdf_file(paths, sim_name, modelling_inputs, port_name, sparam
 restart_root = fullfile(paths.restart_files_path, modelling_inputs.base_model_name, modelling_inputs.model_name);
 restart_out = construct_storage_area_path(restart_root, sim_name, port_name, sparameter_set, frequency);
 
-if strcmp(sim_name, 's_parameter')
+if strcmp(sim_name, 'sparameter')
     construct_s_param_gdf_file(modelling_inputs, port_name, sparameter_set, restart_out)
 elseif strcmp(sim_name, 'geometry')
     construct_geometry_gdf_file(modelling_inputs, restart_out)
