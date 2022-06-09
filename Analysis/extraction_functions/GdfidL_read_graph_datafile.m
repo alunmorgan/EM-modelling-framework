@@ -109,7 +109,7 @@ else
     plot_data.ylabel = '';
     plot_data.xlabel = '';
     plot_data.data = [NaN, NaN];
-        fclose(fid);
+    fclose(fid);
     return
 end %if
 
@@ -147,6 +147,8 @@ if nxt_line ~= -1
         fclose(fid);
     end %if
     varargout{1} = plot_data2;
+else
+    fclose(fid);
 end %if
 
 
