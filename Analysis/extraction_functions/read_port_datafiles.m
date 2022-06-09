@@ -14,19 +14,23 @@ for hs = 1:length(substructure)
     for hes = 1:size(input.time.(substructure{hs}),1) % simulated ports
         for wha = 1:size(input.time.(substructure{hs}),2) % modes
             if ~isempty(input.time.(substructure{hs}){hes,wha})
-                temp_data  = GdfidL_read_graph_datafile(...
-                    input.time.(substructure{hs}){hes,wha} );
-                temp_timebase = temp_data.data(:,1);
-                if temp_timebase(1) < timebase_start
-                    timebase_start = temp_timebase(1);
+                if isempty(input.time.(substructure{hs}){hes,wha})
+                    port_data{hs}{hes}{wha} = 0;
+                else
+                    temp_data  = GdfidL_read_graph_datafile(...
+                        input.time.(substructure{hs}){hes,wha} );
+                    temp_timebase = temp_data.data(:,1);
+                    if temp_timebase(1) < timebase_start
+                        timebase_start = temp_timebase(1);
+                    end %if
+                    if temp_timebase(end) > timebase_end
+                        timebase_end = temp_timebase(end);
+                    end %if
+                    if temp_timebase(2) - temp_timebase(1) < timebase_step
+                        timebase_step = temp_timebase(2) - temp_timebase(1);
+                    end %if
+                    port_data{hs}{hes}{wha} = temp_data.data;
                 end %if
-                if temp_timebase(end) > timebase_end
-                    timebase_end = temp_timebase(end);
-                end %if
-                if temp_timebase(2) - temp_timebase(1) < timebase_step
-                    timebase_step = temp_timebase(2) - temp_timebase(1);
-                end %if
-                port_data{hs}{hes}{wha} = temp_data.data;
             end %if
             clear temp_data
         end %for
@@ -48,10 +52,14 @@ substructure = fieldnames(input.frequency);
 for hs = 1:length(substructure)
     for hes = 1:size(input.frequency.(substructure{hs}),1) % simulated ports
         for wha = 1:size(input.frequency.(substructure{hs}),2) % modes
-            temp_data  = GdfidL_read_graph_datafile(...
-                input.frequency.(substructure{hs}){hes,wha} );
-            port_data_conditioned.frequency.(substructure{hs}){hes,wha} =...
-                temp_data.data;
+            if isempty(input.frequency.(substructure{hs}){hes,wha})
+                port_data_conditioned.frequency.(substructure{hs}){hes,wha} = 0;
+            else
+                temp_data  = GdfidL_read_graph_datafile(...
+                    input.frequency.(substructure{hs}){hes,wha} );
+                port_data_conditioned.frequency.(substructure{hs}){hes,wha} =...
+                    temp_data.data;
+            end %if
         end %for
     end %for
 end %for
