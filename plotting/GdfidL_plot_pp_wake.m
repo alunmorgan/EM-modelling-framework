@@ -131,7 +131,7 @@ h_wake = figure('Position',fig_pos);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Thermal graphs
 clf(h_wake)
-if isfield(pp_data.port, 'timebase')
+if isfield(pp_data.port, 'timebase') && isfield(pp_data.port.data, 'time') && isfield(pp_data.port.data.time, 'power_port')
     time_step = pp_data.port.timebase(2) - pp_data.port.timebase(1);
     beam_ports = sum(pp_data.port.data.time.power_port.data{1}) .* time_step + ...
         sum(pp_data.port.data.time.power_port.data{2}) .* time_step;
@@ -338,6 +338,29 @@ if isfield(pp_data.port, 'timebase')
         xlim(ax_sp(ens),[pp_data.port.timebase(1) .* 1E9 4])
     end %for
     savemfmt(h_wake, path_to_data,'port_signals_first4ns')
+end %if
+
+%% Voltage monitors
+clf(h_wake)
+if isfield(pp_data, 'voltages')
+    [hwn, ksn] = num_subplots(length(pp_data.voltages));
+    for ens = length(pp_data.voltages):-1:1 
+        ax_sp(ens) = subplot(hwn,ksn,ens);
+        try
+            % This is to cope with the case of missing data files.
+        plot(pp_data.voltages{ens}.data(:,1) .* 1E9, pp_data.voltages{ens}.data(:,2), 'b', 'Parent', ax_sp(ens))
+        end
+        title(regexprep(pp_data.voltages{ens}.title, 'voltage ',''), 'Parent', ax_sp(ens))
+        xlim([pp_data.voltages{ens}.data(1,1) .* 1E9 pp_data.voltages{ens}.data(end, 1) .* 1E9])
+        xlabel('Time (ns)', 'Parent', ax_sp(ens))
+        ylabel('Voltage (V)', 'Parent', ax_sp(ens))
+        grid on
+    end %for
+    savemfmt(h_wake, path_to_data,'voltage_monitors')
+    for ens = length(pp_data.voltages):-1:1 
+        xlim(ax_sp(ens),[pp_data.voltages{ens}.data(1,1) .* 1E9 4])
+    end %for
+    savemfmt(h_wake, path_to_data,'voltage_monitors_first4ns')
 end %if
 
 % clf(h_wake)
