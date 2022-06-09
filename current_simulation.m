@@ -25,16 +25,26 @@ parse(p, sets, varargin{:});
 paths = load_local_paths;
 ppi = analysis_settings;
 number_of_wake_lengths_to_analyse = 1;
-try
-    if any(contains(p.Results.stages, 'simulate'))
-        run_model_sets(p.Results.sets, p.Results.sim_types,...
-            p.Results.versions, p.Results.n_cores, p.Results.precision);
-    end %if
-catch ME1
-    disp([sets{set_id},' <strong>Problem with simulating models.</strong>'])
-    display_error_message(ME1)
-end %try
 
+%% Simulation
+if any(contains(p.Results.stages, 'simulate'))
+    orig_loc = pwd;
+    for set_id = 1:length(p.Results.sets)
+        try
+            cd(fullfile(orig_loc, p.Results.sets{set_id}))
+            run_inputs = feval(p.Results.sets{set_id});
+            run_models(run_inputs, p.Results.sim_types, paths.restart_files_path, ...
+                p.Results.versions, p.Results.n_cores, p.Results.precision)
+            cd(orig_loc)
+        catch ME
+            cd(orig_loc)
+            disp(['Problem simulating model ', p.Results.sets{set_id}])
+            display_error_message(ME)
+        end %try
+    end %for
+end %if
+
+%% Post simulation
 for set_id = 1:length(p.Results.sets)
     stamp = regexprep(datestr(now),':', '-');
     if ~exist(fullfile(paths.logfile_location, p.Results.sets{set_id}), 'dir')
@@ -55,8 +65,8 @@ for set_id = 1:length(p.Results.sets)
                         modelling_inputs{awh}.model_name, paths);
                     GdfidL_post_process_models(paths, modelling_inputs{awh}.model_name,...
                         'type_selection', p.Results.sim_types{herf});
-                cleanup_after_pp(old_loc, tmp_name)
-                extract_field_data
+                    extract_field_data(paths.scratch_loc)
+                    cleanup_after_pp(old_loc, tmp_name)
                 end %for
                 cd(orig_loc)
             catch ME

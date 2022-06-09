@@ -1,4 +1,4 @@
-function output_data_location = GdfidL_run_simulation(sim_type, paths, modelling_inputs, restart)
+function GdfidL_run_simulation(sim_type, paths, modelling_inputs, restart)
 % Takes the geometry specification, adds the setup for a  simulation and
 % runs the simulation with the desired calculational precision.
 %
@@ -27,7 +27,7 @@ if run_sim == 1
     % each excited port. For Shunt you need a simulation for each frequency.
     % For the other types you just need a single simulation.
     f_range = 1.3E9:5E7:1.9E9; % FIXME This needs to become a parameter
-    if strcmp(sim_type, 's_parameter')
+    if strcmp(sim_type, 'sparameter')
         active_port_inds = find(modelling_inputs.port_multiple ~= 0);
         if strcmp(modelling_inputs.beam, 'yes')
             active_port_inds = active_port_inds(3:end); % removing the beam ports from the list.
@@ -56,7 +56,7 @@ if run_sim == 1
         frequency = NaN;
     end %if
     
-    output_data_location = cell(1,n_cycles);
+    %     output_data_location = cell(1,n_cycles);
     for nes = 1:n_cycles
         [old_loc, tmp_location] = move_into_tempororary_folder(paths.scratch_path);
         temp_files('make', '.')
@@ -70,27 +70,29 @@ if run_sim == 1
         % size. For larger models keeping the ps files can break the
         % filesystem.
         pic_names = dir_list_gen('.','ps',1);
-        for ns = 1:length(pic_names)
-            pic_nme = pic_names{ns}(1:end-3);
-            [~] = system(['convert ',pic_nme,'.ps -rotate -90 ',pic_nme,'.png']);
-            delete([pic_nme,'.ps'])
-        end %for
+        if ~isempty(pic_names)
+            for ns = 1:length(pic_names)
+                pic_nme = pic_names{ns}(1:end-3);
+                [~] = system(['convert ',pic_nme,'.ps -rotate -90 ',pic_nme,'.png']);
+                delete([pic_nme,'.ps'])
+            end %for
+        end %if
         
         arch_out = construct_storage_area_path(results_storage_location, sim_type, active_ports{nes}, sparameter_set(nes), frequency);
         [status, message] = movefile('./*', arch_out);
         if status == 1
             cd ..
             temp_files('remove', '.')
-            output_data_location{1, nes} = arch_out;
+            %             output_data_location{1, nes} = arch_out;
             cd(old_loc)
             rmdir(tmp_location, 's')
         elseif status == 0
             disp(['<strong>Error in file transfer</strong> - data left in ', tmp_location])
             disp(message)
-            output_data_location{1, nes} = tmp_location;
+            %             output_data_location{1, nes} = tmp_location;
             cd(old_loc)
         end %if
     end %for
 else
-    output_data_location = {results_storage_location};
+    %     output_data_location = {results_storage_location};
 end %if
