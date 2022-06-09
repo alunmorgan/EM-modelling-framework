@@ -77,7 +77,7 @@ if ~isempty(inds)
         output_file_locations.Energy = run_list(inds(shd));
         elseif contains(temp.header_info{3}, 'TEC')
             output_file_locations.Energy_in_ceramics = run_list(inds(shd));
-        elseif contains(temp.header_info{3}, 'VSignal')
+        elseif contains(temp.ylabel, '[V]')
             output_file_locations.Voltage_Signals{vs} = run_list{inds(shd)};
             vs = vs +1;
         else
