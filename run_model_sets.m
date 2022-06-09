@@ -8,7 +8,7 @@ orig_loc = pwd;
 
 for hew = 1:length(model_names)
     try
-        cd(fullfile(paths.orig_loc, model_names{hew}))
+        cd(fullfile(orig_loc, model_names{hew}))
         run_inputs = feval(model_names{hew});
         run_models(run_inputs, sim_types, paths.restart_files_path, ...
                    versions, n_cores, precision)

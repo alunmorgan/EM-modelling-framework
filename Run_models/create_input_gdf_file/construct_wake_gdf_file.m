@@ -54,7 +54,7 @@ port_selection = modelling_inputs.port_multiple ~=0;
 port_defs = gdf_write_port_definitions( modelling_inputs.ports,...
     modelling_inputs.port_location, modelling_inputs.port_modes, port_selection);
 excitation = gdf_wake_port_excitation(modelling_inputs.port_excitation_wake);
-mon = gdf_wake_monitor_construction(modelling_inputs.dtsafety, modelling_inputs.mov, modelling_inputs.wake.voltage_monitoring);
+mon = gdf_wake_monitor_construction(modelling_inputs.dtsafety, modelling_inputs.mov, modelling_inputs.voltage_monitoring);
 % construct the full input file.
 data = cat(1,fs, modelling_inputs.defs', geom, mesh_def, mesh_fixed_planes, ...
     data, port_defs, excitation, mon, '-fdtd   ','    doit');
