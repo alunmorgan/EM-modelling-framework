@@ -1,6 +1,6 @@
-function data = read_fexport_files(location)
+function data = read_fexport_files(data_location, scratch_path)
 
-gzFiles = dir_list_gen(location, 'gz',1);
+gzFiles = dir_list_gen(data_location, 'gz',1);
 if isempty(gzFiles)
     data = struct;
     data.nofiles = NaN;
@@ -12,28 +12,55 @@ set_start_inds = [set_start_inds; length(gzFiles)+1];
 for twm = 1:length(set_start_inds) -1
     fprintf('\n')
     fileset = gzFiles(set_start_inds(twm):set_start_inds(twm+1)-1);
-    [data_path, fileset_name, ~] = fileparts(gzFiles{set_start_inds(twm)});
+    [~, fileset_name, ~] = fileparts(gzFiles{set_start_inds(twm)});
     fileset_name = regexprep(fileset_name, '[0-9-]', '');
+    fprintf('*')
     
-    [~] = system(['gunzip -c "', fileset{1}, '" > "', fullfile(data_path, 'temp_data_file"')]);
-    test_input = read_in_text_file(fullfile(data_path, 'temp_data_file'));
+    % Load in inital data file in order to o some setup.
+    temp_unzip = fullfile(scratch_path, 'temp_unzip');
+    temp_name_limits = gunzip(fileset{1}, temp_unzip);
+    %     [~] = system(['gunzip -c "', fileset{1}, '" > "', temp_name_limits, '"']);
     
-%     Find boundary limits
-    boundary_limit_names = {'ix1', 'ix2', 'iy1', 'iy2', 'iz1', 'iz2'};
-    for eens = 1:length(boundary_limit_names)
-        temp_boundary = test_input(find(contains(test_input, [': ',boundary_limit_names{eens}]),1, 'first'));
-        tok = regexp(temp_boundary, '\s*([0-9]+)\s*:.*', 'tokens');
-        boundary_limits.(boundary_limit_names{eens}) = str2double(tok{1}{1});
+    for als = 1:10
+        try
+            test_input_limits = read_in_text_file(temp_name_limits{1});
+            break
+        catch
+            % If the filesystem is slow then the new file will not appear by the
+            % time you want to read it in. Wait for a bit and then try again.
+             disp(['file ', temp_name{1}, ' unavailable... retrying'])
+            pause(5)
+        end %try
     end %for
+    if exist('test_input_limits', 'var')
+    delete(temp_name_limits{1})
+    else
+    disp(['Could not extract data from initial datafile', temp_name{1},'... skipping this fileset.', ])
+    continue
+end %if
+    % Find boundary limits using the fisrts data file of the set.
+    temp_boundary1 = test_input_limits(find(contains(test_input_limits, [': ','ix1']),1, 'first'));
+    temp_boundary2 = test_input_limits(find(contains(test_input_limits, [': ','ix2']),1, 'first'));
+    tokr1 = regexp(temp_boundary1, '\s*([0-9]+)\s*:.*', 'tokens');
+    tokr2 = regexp(temp_boundary2, '\s*([0-9]+)\s*:.*', 'tokens');
+    n_cords_x = str2double(tokr2{1}{1}) - str2double(tokr1{1}{1}) + 1;
     
-    n_cords_x = boundary_limits.ix2 - boundary_limits.ix1 +1;
-    n_cords_y = boundary_limits.iy2 - boundary_limits.iy1 +1;
-    n_cords_z = boundary_limits.iz2 - boundary_limits.iz1 +1;
+    temp_boundary3 = test_input_limits(find(contains(test_input_limits, [': ','iy1']),1, 'first'));
+    temp_boundary4 = test_input_limits(find(contains(test_input_limits, [': ','iy2']),1, 'first'));
+    tokr3 = regexp(temp_boundary3, '\s*([0-9]+)\s*:.*', 'tokens');
+    tokr4 = regexp(temp_boundary4, '\s*([0-9]+)\s*:.*', 'tokens');
+    n_cords_y = str2double(tokr4{1}{1}) - str2double(tokr3{1}{1}) + 1;
     
-     % find the spacial coordinates of the indicies.
-    Xcoord_start_ind = find(contains(test_input, 'X-Coordinates(ix1:ix2):'),1, 'first');
-    Ycoord_start_ind = find(contains(test_input, 'Y-Coordinates(iy1:iy2):'),1, 'first');
-    Zcoord_start_ind = find(contains(test_input, 'Z-Coordinates(iz1:iz2):'),1, 'first');
+    temp_boundary5 = test_input_limits(find(contains(test_input_limits, [': ','iz1']),1, 'first'));
+    temp_boundary6 = test_input_limits(find(contains(test_input_limits, [': ','iz2']),1, 'first'));
+    tokr5 = regexp(temp_boundary5, '\s*([0-9]+)\s*:.*', 'tokens');
+    tokr6 = regexp(temp_boundary6, '\s*([0-9]+)\s*:.*', 'tokens');
+    n_cords_z = str2double(tokr6{1}{1}) - str2double(tokr5{1}{1}) + 1;
+    
+    % find the spacial coordinates of the indicies.
+    Xcoord_start_ind = find(contains(test_input_limits, 'X-Coordinates(ix1:ix2):'),1, 'first');
+    Ycoord_start_ind = find(contains(test_input_limits, 'Y-Coordinates(iy1:iy2):'),1, 'first');
+    Zcoord_start_ind = find(contains(test_input_limits, 'Z-Coordinates(iz1:iz2):'),1, 'first');
     
     if n_cords_x ==1
         n_cords_1 = n_cords_y;
@@ -52,53 +79,71 @@ for twm = 1:length(set_start_inds) -1
         coord_2_start_ind = Ycoord_start_ind;
     end %if
     
-    % Initialise data grid
-    Fx = NaN(n_cords_1, n_cords_2, length(fileset));
-    Fy = NaN(n_cords_1, n_cords_2, length(fileset));
-    Fz = NaN(n_cords_1, n_cords_2, length(fileset));
-   
     for hes = 1:n_cords_1
-        data_temp = test_input{coord_1_start_ind + hes};
+        data_temp = test_input_limits{coord_1_start_ind + hes};
         reg_temp = regexp(data_temp, '\s*([0-9-+eE.]+)\s+.*', 'tokens');
         data.(fileset_name).coord_1(hes) = str2double(reg_temp{1}{1});
     end %for
     for hes = 1:n_cords_2
-        data_temp = test_input{coord_2_start_ind + hes};
+        data_temp = test_input_limits{coord_2_start_ind + hes};
         reg_temp = regexp(data_temp, '\s*([0-9-+eE.]+)\s+.*', 'tokens');
         data.(fileset_name).coord_2(hes) = str2double(reg_temp{1}{1});
     end %for
-
-    % populates data grid
-    for ydf = 1:length(fileset) %par
+    
+    % Initialise data grid
+    Fx = NaN(n_cords_1, n_cords_2, length(fileset));
+    Fy = NaN(n_cords_1, n_cords_2, length(fileset));
+    Fz = NaN(n_cords_1, n_cords_2, length(fileset));
+    
+    % Run through all datafiles in the fileset in order to populate the data grid.
+    parfor wns = 1:length(fileset)
+        % Extract data into a variable.
         fprintf('.')
-        temp_name = fullfile(data_path, ['temp_data_file_', num2str(ydf)]);
-        [~] = system(['gunzip -c "', fileset{ydf}, '" > "', temp_name,'"']);
-        test_input = read_in_text_file(temp_name);
-        delete(temp_name)
-        timestamp_temp = test_input(find(contains(test_input, 'subtitle: "t='),1, 'first'));
-        time_temp = regexp(timestamp_temp, 'subtitle: "t=\s*([0-9\.eE-+]+)".*', 'tokens');
-        timestamp(ydf) = str2double(time_temp{1}{1});
-        
-        data_start_ind = find(contains(test_input, 'ENDDO'),1, 'last')+2;
-        
-        ck = 0;
-        
-        for hfgs = 1:n_cords_2
-            for hsk = 1:n_cords_1
-                temp_data = test_input{data_start_ind + ck};
-                temp_data_reg = regexp(temp_data, '\s*([0-9-+eE.]+)\s+([0-9-+eE.]+)\s+([0-9-+eE.]+)\s+.*', 'tokens');
-                Fx(hsk, hfgs, ydf) = str2double(temp_data_reg{1}{1});
-                Fy(hsk, hfgs, ydf) = str2double(temp_data_reg{1}{2});
-                Fz(hsk, hfgs, ydf) = str2double(temp_data_reg{1}{3});
-                ck = ck +1;
-            end %for
+        temp_name = gunzip(fileset{wns}, temp_unzip)
+        %         [~] = system(['gunzip -c "', fileset{wns}, '" > "', temp_name, '"']);
+        test_input = {};
+        for hsk = 1:10
+            try
+                test_input = read_in_text_file(temp_name{1});
+                break
+            catch
+                % If the filesystem is slow then the new file will not appear by the
+                % time you want to read it in. Wait for a bit and then try again.
+                disp(['file ', temp_name{1}, ' unavailable... retrying'])
+                pause(5)
+            end %try
         end %for
+        if ~isempty('test_input')
+            delete(temp_name{1})
+            
+            % populates data grid
+            timestamp_temp = test_input(find(contains(test_input, 'subtitle: "t='),1, 'first'));
+            time_temp = regexp(timestamp_temp, 'subtitle: "t=\s*([0-9\.eE-+]+)".*', 'tokens');
+            timestamp(wns) = str2double(time_temp{1}{1});
+            
+            data_start_ind = find(contains(test_input, 'ENDDO'),1, 'last')+2;
+            
+            ck = 0;
+            for hfgs = 1:n_cords_2
+                for hsk = 1:n_cords_1
+                    temp_data = test_input{data_start_ind + ck};
+                    temp_data_reg = regexp(temp_data, '\s*([0-9-+eE.]+)\s+([0-9-+eE.]+)\s+([0-9-+eE.]+)\s+.*', 'tokens');
+                    Fx(hsk, hfgs, wns) = str2double(temp_data_reg{1}{1});
+                    Fy(hsk, hfgs, wns) = str2double(temp_data_reg{1}{2});
+                    Fz(hsk, hfgs, wns) = str2double(temp_data_reg{1}{3});
+                    ck = ck +1;
+                end %for
+            end %for
+        else
+            disp(['Could not extract data from ', temp_name{1}])
+        end %if
     end %parfor
+    
+    % Combine data for all filesets
     data.(fileset_name).Fx = Fx;
     data.(fileset_name).Fy = Fy;
     data.(fileset_name).Fz = Fz;
     data.(fileset_name).timestamp = timestamp;
 end %for
-
 
 

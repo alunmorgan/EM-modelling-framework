@@ -24,8 +24,8 @@ end %for
 level_list = linspace(-graph_lim, graph_lim, 51);
 n_times = length(data.(sets{1}).timestamp);
 parfor oird = 1:n_times
-    f1(oird) = figure('Position',[30,30, 1500, 600]);
-    plot_field_slices(f1(oird), sets, field_dirs, data, oird, level_list)
+    f1 = figure('Position',[30,30, 1500, 600]);
+    plot_field_slices(f1, sets, field_dirs, data, oird, level_list)
    
 %     figure(f3)
 %     clf(f3)
@@ -77,8 +77,8 @@ parfor oird = 1:n_times
 %             Fmx(oird) = getframe(f2);
 %         end %if
 %     end %for
-    F_fixed(oird) = getframe(f1(oird));
-    close(f1(oird))
+    F_fixed(oird) = getframe(f1);
+    close(f1)
 %     F(oird) = getframe(f3);
 end %for
 
