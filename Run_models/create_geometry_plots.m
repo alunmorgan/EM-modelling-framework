@@ -35,10 +35,10 @@ function model_file = create_volume_plots(modelling_inputs, eyepos)
 model_file = {'-volumeplot'};
 model_file = cat(1, model_file, eyepos.threedxeyepos);
 model_file = cat(1, model_file, '   scale=3.5');
-model_file = cat(1, model_file,'    plotopts = -o temp_data/3Dmodel.ps -colorps');
+model_file = cat(1, model_file,'    plotopts = -o ./3Dmodel.ps -colorps');
 model_file = cat(1, model_file, 'doit');
 model_file = cat(1, model_file, 'showlines=yes');
-model_file = cat(1, model_file,'    plotopts = -o temp_data/3Dmodel_w_lines.ps -colorps');
+model_file = cat(1, model_file,'    plotopts = -o ./3Dmodel_w_lines.ps -colorps');
 model_file = cat(1, model_file, 'doit');
 x_count = 0;
 y_count = 0;
@@ -52,7 +52,7 @@ for ndw = 1:size(modelling_inputs.cuts,1)
         model_file = cat(1, model_file, ['   bbxhigh=', modelling_inputs.cuts{ndw, 2}]);
         model_file = cat(1, model_file, eyepos.twodxeyepos);
         x_count = x_count +1;
-        model_file = cat(1, model_file, ['   plotopts = -o temp_data/2Dmodel_cut_', modelling_inputs.cuts{ndw, 1},'_user',num2str(x_count),'.ps -colorps']);
+        model_file = cat(1, model_file, ['   plotopts = -o ./2Dmodel_cut_', modelling_inputs.cuts{ndw, 1},'_user',num2str(x_count),'.ps -colorps']);
         model_file = cat(1, model_file, 'doit');
     elseif strcmp(modelling_inputs.cuts{ndw, 1},'y')
         model_file = reset_bounding_box(model_file);
@@ -60,7 +60,7 @@ for ndw = 1:size(modelling_inputs.cuts,1)
         model_file = cat(1, model_file, ['   bbyhigh=', modelling_inputs.cuts{ndw, 2}]);
         model_file = cat(1, model_file, eyepos.twodyeyepos);
         y_count = y_count +1;
-        model_file = cat(1, model_file, ['   plotopts = -o temp_data/2Dmodel_cut_', modelling_inputs.cuts{ndw, 1},'_user', num2str(y_count),'.ps -colorps']);
+        model_file = cat(1, model_file, ['   plotopts = -o ./2Dmodel_cut_', modelling_inputs.cuts{ndw, 1},'_user', num2str(y_count),'.ps -colorps']);
         model_file = cat(1, model_file, 'doit');
     elseif strcmp(modelling_inputs.cuts{ndw, 1},'z')
         model_file = reset_bounding_box(model_file);
@@ -68,7 +68,7 @@ for ndw = 1:size(modelling_inputs.cuts,1)
         model_file = cat(1, model_file, ['   bbzhigh=',modelling_inputs.cuts{ndw, 2}]);
         model_file = cat(1, model_file, eyepos.twodzeyepos);
         z_count = z_count +1;
-        model_file = cat(1, model_file, ['   plotopts = -o temp_data/2Dmodel_cut_',modelling_inputs.cuts{ndw, 1},'_user',num2str(z_count),'.ps -colorps']);
+        model_file = cat(1, model_file, ['   plotopts = -o ./2Dmodel_cut_',modelling_inputs.cuts{ndw, 1},'_user',num2str(z_count),'.ps -colorps']);
         model_file = cat(1, model_file, 'doit');
     end %if
 end %for
@@ -97,7 +97,7 @@ for ndw = 1:size(modelling_inputs.cuts,1)
         z3d_count = z3d_count +1;
         count3d = y3d_count;
     end %if
-    model_file = cat(1, model_file, ['   plotopts = -o temp_data/3Dmodel_cut_',modelling_inputs.cuts{ndw, 1},'_user',num2str(count3d),'.ps -colorps']);
+    model_file = cat(1, model_file, ['   plotopts = -o ./3Dmodel_cut_',modelling_inputs.cuts{ndw, 1},'_user',num2str(count3d),'.ps -colorps']);
     model_file = cat(1, model_file, 'doit');
 end %for
 for ndfd = 1:length(modelling_inputs.subsections)
@@ -115,26 +115,26 @@ for ndfd = 1:length(modelling_inputs.subsections)
     model_file = cat(1, model_file, ['   bbxhigh=', x_centre]);
     model_file = cat(1, model_file, ['   bbxlow=', x_centre]);
     model_file = cat(1, model_file, eyepos.twodxeyepos);
-    model_file = cat(1, model_file, ['   plotopts = -o temp_data/2Dsub',num2str(ndfd),'_cut_x_.ps -colorps']);
+    model_file = cat(1, model_file, ['   plotopts = -o ./2Dsub',num2str(ndfd),'_cut_x_.ps -colorps']);
     model_file = cat(1, model_file, 'doit');
     model_file = cat(1, model_file, ['   bbxhigh=', modelling_inputs.subsections{ndfd}.xmax]);
     model_file = cat(1, model_file, ['   bbxlow=', modelling_inputs.subsections{ndfd}.xmin]);
     model_file = cat(1, model_file, ['   bbyhigh=', y_centre]);
     model_file = cat(1, model_file, ['   bbylow=', y_centre]);
     model_file = cat(1, model_file, eyepos.twodyeyepos);
-    model_file = cat(1, model_file, ['   plotopts = -o temp_data/2Dsub',num2str(ndfd),'_cut_y_.ps -colorps']);
+    model_file = cat(1, model_file, ['   plotopts = -o ./2Dsub',num2str(ndfd),'_cut_y_.ps -colorps']);
     model_file = cat(1, model_file, 'doit');
     model_file = cat(1, model_file, ['   bbyhigh=', modelling_inputs.subsections{ndfd}.ymax]);
     model_file = cat(1, model_file, ['   bbylow=', modelling_inputs.subsections{ndfd}.ymin]);
     model_file = cat(1, model_file, ['   bbzhigh=', z_centre]);
     model_file = cat(1, model_file, ['   bbzlow=', z_centre]);
     model_file = cat(1, model_file, eyepos.twodzeyepos);
-    model_file = cat(1, model_file, ['   plotopts = -o temp_data/2Dsub',num2str(ndfd),'_cut_z_.ps -colorps']);
+    model_file = cat(1, model_file, ['   plotopts = -o ./2Dsub',num2str(ndfd),'_cut_z_.ps -colorps']);
     model_file = cat(1, model_file, 'doit');
     model_file = cat(1, model_file, ['   bbzhigh=', modelling_inputs.subsections{ndfd}.zmax]);
     model_file = cat(1, model_file, ['   bbzlow=', modelling_inputs.subsections{ndfd}.zmin]);
     model_file = cat(1, model_file, eyepos.threedxeyepos);
-    model_file = cat(1, model_file, ['   plotopts = -o temp_data/3Dsub',num2str(ndfd),'.ps -colorps']);
+    model_file = cat(1, model_file, ['   plotopts = -o ./3Dsub',num2str(ndfd),'.ps -colorps']);
     model_file = cat(1, model_file, 'doit');
 end %for
 model_file = reset_bounding_box(model_file);
@@ -166,7 +166,7 @@ for ndw = 1:size(modelling_inputs.cuts,1)
         z_count = z_count +1;
         count = z_count;
     end %if
-    model_file = cat(1, model_file, ['   plotopts = -o temp_data/2Dmodel_cutplot_',modelling_inputs.cuts{ndw, 1},'_user',num2str(count),'.ps -colorps']);
+    model_file = cat(1, model_file, ['   plotopts = -o ./2Dmodel_cutplot_',modelling_inputs.cuts{ndw, 1},'_user',num2str(count),'.ps -colorps']);
     model_file = cat(1, model_file, 'doit');
 end %for
 for ndfd = 1:length(modelling_inputs.subsections)
@@ -184,17 +184,17 @@ for ndfd = 1:length(modelling_inputs.subsections)
     model_file = cat(1, model_file, '    normal=x');
     model_file = cat(1, model_file, ['   cutat= (',modelling_inputs.subsections{ndfd}.xmax, ') - (', modelling_inputs.subsections{ndfd}.xmin, ')']);
     model_file = cat(1, model_file, eyepos.twodxeyepos);
-    model_file = cat(1, model_file, ['   plotopts = -o temp_data/2Dsub',num2str(ndfd),'_cutplot_x.ps -colorps']);
+    model_file = cat(1, model_file, ['   plotopts = -o ./2Dsub',num2str(ndfd),'_cutplot_x.ps -colorps']);
     model_file = cat(1, model_file, 'doit');
     model_file = cat(1, model_file, '    normal=y');
     model_file = cat(1, model_file, ['   cutat= (',modelling_inputs.subsections{ndfd}.ymax, ') - (', modelling_inputs.subsections{ndfd}.ymin, ')']);
     model_file = cat(1, model_file, eyepos.twodyeyepos);
-    model_file = cat(1, model_file, ['   plotopts = -o temp_data/2Dsub',num2str(ndfd),'_cutplot_y.ps -colorps']);
+    model_file = cat(1, model_file, ['   plotopts = -o ./2Dsub',num2str(ndfd),'_cutplot_y.ps -colorps']);
     model_file = cat(1, model_file, 'doit');
     model_file = cat(1, model_file, '    normal=z');
     model_file = cat(1, model_file, ['   cutat= (',modelling_inputs.subsections{ndfd}.zmax, ') - (', modelling_inputs.subsections{ndfd}.zmin, ')']);
     model_file = cat(1, model_file, eyepos.twodzeyepos);
-    model_file = cat(1, model_file, ['   plotopts = -o temp_data/2Dsub',num2str(ndfd),'_cutplot_z.ps -colorps']);
+    model_file = cat(1, model_file, ['   plotopts = -o ./2Dsub',num2str(ndfd),'_cutplot_z.ps -colorps']);
     model_file = cat(1, model_file, 'doit');
 end %for
 end %function
