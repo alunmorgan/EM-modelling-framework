@@ -65,7 +65,9 @@ for set_id = 1:length(p.Results.sets)
                         modelling_inputs{awh}.model_name, paths);
                     GdfidL_post_process_models(paths, modelling_inputs{awh}.model_name,...
                         'type_selection', p.Results.sim_types{herf});
-                    extract_field_data(paths.scratch_loc)
+                    if strcmp(p.Results.sim_types{herf}, 'wake')
+                        extract_field_data(paths.scratch_loc)
+                    end %if
                     cleanup_after_pp(old_loc, tmp_name)
                 end %for
                 cd(orig_loc)
@@ -82,6 +84,14 @@ for set_id = 1:length(p.Results.sets)
                 analyse_pp_data(paths.results_loc, p.Results.sets{set_id});
             catch ME
                 warning([sets{set_id}, ' <strong>Problem with wake analysis</strong>'])
+                display_error_message(ME)
+            end %try
+        end %if
+        if any(contains(p.Results.sim_types, 'sparameter'))
+            try
+                analyse_sparameter_data(paths.results_loc, p.Results.sets{set_id})
+            catch ME
+                warning([sets{set_id}, ' <strong>Problem with S parameter analysis</strong>'])
                 display_error_message(ME)
             end %try
         end %if
