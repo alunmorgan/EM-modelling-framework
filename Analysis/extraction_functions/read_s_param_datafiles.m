@@ -18,9 +18,15 @@ for hes = 1:size(s_mat,1) % ports
             temp_data  = GdfidL_read_graph_datafile( s_mat{hes,wha} );
             temp_vals = temp_data.data(:,2);
             temp_scale = temp_data.data(:,1);
-            s_data{hes}(wha,:) = temp_vals(:);
-            s_scale{hes}(wha,:) = temp_scale(:);
-            clear temp_data temp_vals temp_scale
-        end
-    end
-end
+%             Sometimes there are additional datapoints after the main data
+%           This can be identified by the scale no longer being increasing.
+            data_end = find(diff(temp_scale)<0, 1, 'first');
+            if isempty(data_end)
+                data_end = length(temp_scale);
+            end %if
+            s_data{hes}(wha,1:data_end) = temp_vals(1:data_end);
+            s_scale{hes}(wha,1:data_end) = temp_scale(1:data_end);
+            clear temp_data temp_vals temp_scale data_end
+        end %if
+    end %for
+end %for

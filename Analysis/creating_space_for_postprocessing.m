@@ -11,5 +11,5 @@ if exist(pp_directory, 'dir') == 7
     movefile(pp_directory, fullfile('pp_link', old_store))
 end %if
 disp(['Creating ', sim_type, ' postprocessing folder for ',model_name])
-[~] = system(['mkdir ', pp_directory]);
+mkdir(pp_directory);
 

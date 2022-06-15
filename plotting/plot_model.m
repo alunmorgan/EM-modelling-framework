@@ -33,10 +33,10 @@ for ind = 1:length(datasets)
     end %if
     
     
-    if isfield(datasets{ind}, 's_parameter') && any(contains(p_types, 's_parameter'))
-        if isempty(dir_list_gen(fullfile(datasets{ind}.path_to_data, 's_parameter'), 'png',1)) 
+    if isfield(datasets{ind}, 'sparameter') && any(contains(p_types, 'sparameter'))
+        if isempty(dir_list_gen(fullfile(datasets{ind}.path_to_data, 'sparameter'), 'png',1)) 
             disp(['Generating s_parameter graphs for ', datasets{ind}.model_name])
-            GdfidL_plot_s_parameters(datasets{ind}.s_parameter, fig_pos);
+            GdfidL_plot_s_parameters(datasets{ind}.sparameter, fig_pos);
         else
             disp(['s_parameter graphs already exists for ', datasets{ind}.model_name, '. Skipping...'])
         end

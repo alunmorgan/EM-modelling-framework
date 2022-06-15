@@ -56,13 +56,13 @@ if run_pp == 1
             display_error_message(W_ERR)
         end %try
         %% Post processing S-parameters and shunt
-    elseif any(contains({'s_parameter', 'shunt'}, p.Results.type_selection))
+    elseif any(contains({'sparameter', 'shunt'}, p.Results.type_selection))
         try
             % Reading logs and Running postprocessor
                             [freq_folders] = dir_list_gen(data_directory, 'dirs', 1);
-            if strcmp(p.Results.type_selection, 's_parameter')
+            if strcmp(p.Results.type_selection, 'sparameter')
                 run_logs= GdfidL_read_s_parameter_log(freq_folders);
-                pp_data = postprocess_s_parameters(model_name);
+                postprocess_s_parameters(model_name);
             elseif strcmp(p.Results.type_selection, 'shunt')
                 run_logs.(['f_', f_name]) = GdfidL_read_rshunt_log(freq_folders);
                 pp_data = postprocess_shunt;

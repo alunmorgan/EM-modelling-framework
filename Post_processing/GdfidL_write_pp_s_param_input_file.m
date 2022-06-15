@@ -7,7 +7,7 @@ function ov = GdfidL_write_pp_s_param_input_file(s_set, excite)
 % example: GdfidL_write_pp_s_param_input_file(excite)
 ov{1} = '';
 ov = cat(1,ov,'-general');
-ov = cat(1,ov,strcat('    infile= data_link/s_parameter/set_', s_set,'_port_',excite,'_excitation'));
+ov = cat(1,ov,strcat('    infile= data_link/sparameter/set_', s_set,'_port_',excite,'_excitation'));
 ov = cat(1,ov,strcat('    scratchbase = temp_scratch/'));
 ov = cat(1,ov,'    2dplotopts = -geometry 1024x768');
 ov = cat(1,ov,'    plotopts = -geometry 1024x768');
