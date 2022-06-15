@@ -8,7 +8,7 @@ for ind = 1:length(wanted_files)
     if ~isfile(fullfile(current_folder, 'data_analysed_wake.mat'))
         [a1,~,~]= fileparts(current_folder);
         [~,name_of_model,~] = fileparts(a1);
-        disp(['Starting analysis <strong>', name_of_model, '</strong>'])
+        disp(['Starting wake analysis <strong>', name_of_model, '</strong>'])
 
         run_logs = load(fullfile(current_folder, 'data_from_run_logs.mat'), 'run_logs');
         run_logs = run_logs.run_logs;
