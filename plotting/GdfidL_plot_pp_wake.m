@@ -10,11 +10,14 @@ function GdfidL_plot_pp_wake(path_to_data, ppi)
 
 % chosen_wake_length = str2double(chosen_wake_length);
 
-[path_to_data ,~,~] = fileparts(path_to_data);
+[path_to_data ,~,~] = fileparts(path_to_data{1});
 files_to_load = {'run_inputs.mat', 'modelling_inputs';...
     'data_analysed_wake.mat', 'pp_data';...
     'data_reconstructed_wake.mat', 'wake_sweep_data';...
     'data_from_run_logs.mat', 'run_logs'};
+
+[temp, ~, ~] = fileparts(path_to_data);
+[~, prefix, ~] = fileparts(temp);
 
 for rnf = 1:size(files_to_load,1)
     if exist(fullfile(path_to_data, files_to_load{rnf,1}), 'file') == 2
@@ -171,7 +174,7 @@ text(xtips1,ytips1,labels1,'HorizontalAlignment','center',...
     'VerticalAlignment','bottom')
 title('Thermal Losses into materials')
 ylabel('Energy (nJ)')
-savemfmt(h_wake, path_to_data,'Thermal_Losses_into_materials')
+savemfmt(h_wake, path_to_data,[prefix, 'Thermal_Losses_into_materials'])
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Electric field at the origin over time.
@@ -185,7 +188,7 @@ if isfield(pp_data, 'EfieldAtZerox')
     xlim([pp_data.EfieldAtZerox.data(1,1) * 1E9 pp_data.EfieldAtZerox.data(end,1) * 1e9])
     ylabel('Electric field (V/m)', 'Parent', ax)
     grid on
-    savemfmt(h_wake, path_to_data,'EfieldAtZerox')
+    savemfmt(h_wake, path_to_data, [prefix, 'EfieldAtZerox'])
     
     clf(h_wake)
     ax = axes('Parent', h_wake);
@@ -201,7 +204,7 @@ if isfield(pp_data, 'EfieldAtZerox')
     xlim([0 graph_freq_lim])
     ylabel('Electric field (V/m/Hz)', 'Parent', ax)
     grid on
-    savemfmt(h_wake, path_to_data,'EfieldAtZerox_freq')
+    savemfmt(h_wake, path_to_data, [prefix, 'EfieldAtZerox_freq'])
 end %if
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -215,7 +218,7 @@ xlabel('Time (ns)', 'Parent', ax)
 xlim([wp(1,1) wp(end,1)])
 ylabel('Wake potential (V/pC)', 'Parent', ax)
 grid on
-savemfmt(h_wake, path_to_data,'wake_potential')
+savemfmt(h_wake, path_to_data, [prefix, 'wake_potential'])
 
 clf(h_wake)
 ax = axes('Parent', h_wake);
@@ -226,7 +229,7 @@ xlabel('Time (ns)', 'Parent', ax)
 xlim([wpdx(1,1) wpdx(end,1)])
 ylabel('Wake potential (V/pC)', 'Parent', ax)
 grid on
-savemfmt(h_wake, path_to_data,'transverse_dipole_x_wake_potential')
+savemfmt(h_wake, path_to_data, [prefix, 'transverse_dipole_x_wake_potential'])
 
 clf(h_wake)
 ax = axes('Parent', h_wake);
@@ -237,7 +240,7 @@ xlabel('Time (ns)', 'Parent', ax)
 xlim([wpdy(1,1) wpdy(end,1)])
 ylabel('Wake potential (V/pC)', 'Parent', ax)
 grid on
-savemfmt(h_wake, path_to_data,'transverse_dipole_y_wake_potential')
+savemfmt(h_wake, path_to_data, [prefix, 'transverse_dipole_y_wake_potential'])
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Wake impedance.
@@ -251,7 +254,7 @@ xlim([0 graph_freq_lim])
 ylim([0 inf])
 legend(['Wake loss factor = ',num2str(pp_data.Wake_impedance.s.loss.s .* 1E9),'mV/pC'])
 grid on
-savemfmt(h_wake, path_to_data,'longditudinal_real_wake_impedance')
+savemfmt(h_wake, path_to_data, [prefix, 'longditudinal_real_wake_impedance'])
 
 clf(h_wake)
 ax = axes('Parent', h_wake);
@@ -263,7 +266,7 @@ xlim([0 graph_freq_lim])
 ylim([0 inf])
 legend(['Wake loss factor = ',num2str(pp_data.Wake_impedance.x.loss.x .* 1E9),'mV/pC'])
 grid on
-savemfmt(h_wake, path_to_data,'transverse_x_real_wake_impedance')
+savemfmt(h_wake, path_to_data, [prefix, 'transverse_x_real_wake_impedance'])
 
 clf(h_wake)
 ax = axes('Parent', h_wake);
@@ -275,7 +278,7 @@ xlim([0 graph_freq_lim])
 ylim([0 inf])
 legend(['Wake loss factor = ',num2str(pp_data.Wake_impedance.y.loss.y .* 1E9),'mV/pC'])
 grid on
-savemfmt(h_wake, path_to_data,'transverse_y_real_wake_impedance')
+savemfmt(h_wake, path_to_data, [prefix, 'transverse_y_real_wake_impedance'])
 
 
 clf(h_wake)
@@ -295,7 +298,7 @@ end %for
 xlabel('Frequency (GHz)')
 ylabel('R/Q')
 hold off
-savemfmt(h_wake, path_to_data, 'R_over_Q_from_wake')
+savemfmt(h_wake, path_to_data, [prefix, 'R_over_Q_from_wake'])
 
 clf(h_wake)
 ax = axes('Parent', h_wake);
@@ -313,7 +316,7 @@ end %for
 xlabel('Frequency (GHz)')
 ylabel('Q')
 hold off
-savemfmt(h_wake, path_to_data, 'Q_from_wake')
+savemfmt(h_wake, path_to_data, [prefix, 'Q_from_wake'])
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Port signals
@@ -333,11 +336,11 @@ if isfield(pp_data.port, 'timebase')
         ylabel('Power (W)', 'Parent', ax_sp(ens))
         grid on
     end %for
-    savemfmt(h_wake, path_to_data,'port_signals')
+    savemfmt(h_wake, path_to_data, [prefix, 'port_signals'])
     for ens = length(port_names):-1:1 % ports
         xlim(ax_sp(ens),[pp_data.port.timebase(1) .* 1E9 4])
     end %for
-    savemfmt(h_wake, path_to_data,'port_signals_first4ns')
+    savemfmt(h_wake, path_to_data, [prefix, 'port_signals_first4ns'])
 end %if
 
 %% Voltage monitors
@@ -356,11 +359,11 @@ if isfield(pp_data, 'voltages')
         ylabel('Voltage (V)', 'Parent', ax_sp(ens))
         grid on
     end %for
-    savemfmt(h_wake, path_to_data,'voltage_monitors')
+    savemfmt(h_wake, path_to_data, [prefix, 'voltage_monitors'])
     for ens = length(pp_data.voltages):-1:1 
         xlim(ax_sp(ens),[pp_data.voltages{ens}.data(1,1) .* 1E9 4])
     end %for
-    savemfmt(h_wake, path_to_data,'voltage_monitors_first4ns')
+    savemfmt(h_wake, path_to_data, [prefix, 'voltage_monitors_first4ns'])
 end %if
 
 % clf(h_wake)
@@ -410,7 +413,7 @@ if ~isnan(energy)
     xlabel('Time (ns)')
     grid on
 end %if
-savemfmt(h_wake, path_to_data,'Energy')
+savemfmt(h_wake, path_to_data, [prefix, 'Energy'])
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Checking alignment of the input signals
@@ -428,7 +431,7 @@ ylabel('a.u.')
 grid on
 legend('Wake potential', 'Charge distribution','Location','SouthEast')
 title('Alignment check')
-savemfmt(h_wake, path_to_data,'input_signal_alignment_check')
+savemfmt(h_wake, path_to_data, [prefix, 'input_signal_alignment_check'])
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 clf(h_wake)
@@ -458,16 +461,12 @@ xlabel('time (ns)')
 ylabel('a.u.')
 title('Lossy and reactive signal')
 legend('Real','Imaginary','Charge','Location','SouthEast')
-savemfmt(h_wake, path_to_data,'input_signal_lossy_reactive_check')
+savemfmt(h_wake, path_to_data, [prefix, 'input_signal_lossy_reactive_check'])
 clf(h_wake)
 close(h_wake)
-[temp, ~, ~] = fileparts(path_to_data);
-[~, prefix, ~] = fileparts(temp);
-add_prefix(path_to_data, 'png', prefix)
-add_prefix(path_to_data, 'fig', prefix)
 
 if exist(fullfile(path_to_data, 'field_data.mat'), 'file') == 2
     load(fullfile(path_to_data, 'field_data.mat'), 'field_data');
-    plot_fexport_data_peak_field(field_data, path_to_data)
-    plot_fexport_data(field_data, path_to_data)
+    plot_fexport_data_peak_field(field_data, path_to_data, prefix)
+    plot_fexport_data(field_data, path_to_data, prefix)
 end %if
