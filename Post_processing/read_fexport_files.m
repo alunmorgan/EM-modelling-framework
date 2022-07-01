@@ -14,9 +14,10 @@ for twm = 1:length(set_start_inds) -1
     fileset = gzFiles(set_start_inds(twm):set_start_inds(twm+1)-1);
     [~, fileset_name, ~] = fileparts(gzFiles{set_start_inds(twm)});
     fileset_name = regexprep(fileset_name, '[0-9-]', '');
+    fprintf(['\n', fileset_name, '\n'])
     fprintf('*')
     
-    % Load in inital data file in order to o some setup.
+    % Load in inital data file in order to do some setup.
     temp_unzip = fullfile(scratch_path, 'temp_unzip');
     temp_name_limits = gunzip(fileset{1}, temp_unzip);
     %     [~] = system(['gunzip -c "', fileset{1}, '" > "', temp_name_limits, '"']);
@@ -28,16 +29,16 @@ for twm = 1:length(set_start_inds) -1
         catch
             % If the filesystem is slow then the new file will not appear by the
             % time you want to read it in. Wait for a bit and then try again.
-             disp(['file ', temp_name{1}, ' unavailable... retrying'])
+            disp(['file ', temp_name_limits{1}, ' unavailable... retrying'])
             pause(5)
         end %try
     end %for
     if exist('test_input_limits', 'var')
-    delete(temp_name_limits{1})
+        delete(temp_name_limits{1})
     else
-    disp(['Could not extract data from initial datafile', temp_name{1},'... skipping this fileset.', ])
-    continue
-end %if
+        disp(['Could not extract data from initial datafile', temp_name_limits{1},'... skipping this fileset.', ])
+        continue
+    end %if
     % Find boundary limits using the fisrts data file of the set.
     temp_boundary1 = test_input_limits(find(contains(test_input_limits, [': ','ix1']),1, 'first'));
     temp_boundary2 = test_input_limits(find(contains(test_input_limits, [': ','ix2']),1, 'first'));
@@ -100,7 +101,6 @@ end %if
         % Extract data into a variable.
         fprintf('.')
         temp_name = gunzip(fileset{wns}, temp_unzip)
-        %         [~] = system(['gunzip -c "', fileset{wns}, '" > "', temp_name, '"']);
         test_input = {};
         for hsk = 1:10
             try
@@ -138,12 +138,17 @@ end %if
             disp(['Could not extract data from ', temp_name{1}])
         end %if
     end %parfor
-    
+    fprintf('\n')
+    fprintf('Combining data')
     % Combine data for all filesets
     data.(fileset_name).Fx = Fx;
+    fprintf('.')
     data.(fileset_name).Fy = Fy;
+    fprintf('.')
     data.(fileset_name).Fz = Fz;
+    fprintf('.')
     data.(fileset_name).timestamp = timestamp;
+    fprintf('Done\n')
 end %for
 
 

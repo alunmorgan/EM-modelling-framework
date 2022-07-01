@@ -1,4 +1,4 @@
-function plot_fexport_data(data, output_location)
+function plot_fexport_data(data, output_location, prefix)
 % f2 = figure('Position',[30,30, 1500, 600]);
 % f3 = figure('Position',[30,30, 1500, 600]);
 sets = fields(data);
@@ -26,66 +26,66 @@ n_times = length(data.(sets{1}).timestamp);
 parfor oird = 1:n_times
     f1 = figure('Position',[30,30, 1500, 600]);
     plot_field_slices(f1, sets, field_dirs, data, oird, level_list)
-   
-%     figure(f3)
-%     clf(f3)
-%     for whs = 1:length(sets)
-%         subplot(length(sets), length(field_dirs) +1, igr + 1 + (whs-1) * (length(field_dirs) +1))
-%         if strcmp(sets{whs}, 'efieldsz')
-%             contourf(xaxis.*1e3, yaxis.*1e3, temp_accum',  'LineStyle', 'none')
-%             xlabel('Horizontal (mm)')
-%             ylabel('Vertical (mm)')
-%         else
-%             contourf(xaxis.*1e3, yaxis.*1e3, temp_accum, 'LineStyle', 'none')
-%             xlabel('Beam direction (mm)')
-%             if strcmp(sets{whs}, 'efieldsx')
-%                 ylabel('Horizontal (mm)')
-%             elseif strcmp(sets{whs}, 'efieldsy')
-%                 ylabel('Vertical (mm)')
-%             end %if
-%         end %if
-%         title('Field magnitude')
-%         axis equal
-%         colorbar
-%     end %for
-%     
-%     figure(f2)
-%     clf(f2)
-%     for whs = 1:length(sets)
-%         clf(f2)
-%         if strcmp(sets{whs}, 'efieldsz')
-%             contourf(xaxis.*1e3, yaxis.*1e3, temp_accum', mag_level_list, 'LineStyle', 'none')
-%             xlabel('Horizontal (mm)')
-%             ylabel('Vertical (mm)')
-%         else
-%             contourf(xaxis.*1e3, yaxis.*1e3, temp_accum, mag_level_list, 'LineStyle', 'none')
-%             xlabel('Beam direction (mm)')
-%             if strcmp(sets{whs}, 'efieldsx')
-%                 ylabel('Horizontal (mm)')
-%             elseif strcmp(sets{whs}, 'efieldsy')
-%                 ylabel('Vertical (mm)')
-%             end %if
-%         end %if
-%         title('Field magnitude')
-%         axis equal
-%         colorbar
-%         if strcmp(sets{whs}, 'efieldsz')
-%             Fmz(oird) = getframe(f2);
-%         elseif strcmp(sets{whs}, 'efieldsy')
-%             Fmy(oird) = getframe(f2);
-%         elseif strcmp(sets{whs}, 'efieldsx')
-%             Fmx(oird) = getframe(f2);
-%         end %if
-%     end %for
+    
+    %     figure(f3)
+    %     clf(f3)
+    %     for whs = 1:length(sets)
+    %         subplot(length(sets), length(field_dirs) +1, igr + 1 + (whs-1) * (length(field_dirs) +1))
+    %         if strcmp(sets{whs}, 'efieldsz')
+    %             contourf(xaxis.*1e3, yaxis.*1e3, temp_accum',  'LineStyle', 'none')
+    %             xlabel('Horizontal (mm)')
+    %             ylabel('Vertical (mm)')
+    %         else
+    %             contourf(xaxis.*1e3, yaxis.*1e3, temp_accum, 'LineStyle', 'none')
+    %             xlabel('Beam direction (mm)')
+    %             if strcmp(sets{whs}, 'efieldsx')
+    %                 ylabel('Horizontal (mm)')
+    %             elseif strcmp(sets{whs}, 'efieldsy')
+    %                 ylabel('Vertical (mm)')
+    %             end %if
+    %         end %if
+    %         title('Field magnitude')
+    %         axis equal
+    %         colorbar
+    %     end %for
+    %
+    %     figure(f2)
+    %     clf(f2)
+    %     for whs = 1:length(sets)
+    %         clf(f2)
+    %         if strcmp(sets{whs}, 'efieldsz')
+    %             contourf(xaxis.*1e3, yaxis.*1e3, temp_accum', mag_level_list, 'LineStyle', 'none')
+    %             xlabel('Horizontal (mm)')
+    %             ylabel('Vertical (mm)')
+    %         else
+    %             contourf(xaxis.*1e3, yaxis.*1e3, temp_accum, mag_level_list, 'LineStyle', 'none')
+    %             xlabel('Beam direction (mm)')
+    %             if strcmp(sets{whs}, 'efieldsx')
+    %                 ylabel('Horizontal (mm)')
+    %             elseif strcmp(sets{whs}, 'efieldsy')
+    %                 ylabel('Vertical (mm)')
+    %             end %if
+    %         end %if
+    %         title('Field magnitude')
+    %         axis equal
+    %         colorbar
+    %         if strcmp(sets{whs}, 'efieldsz')
+    %             Fmz(oird) = getframe(f2);
+    %         elseif strcmp(sets{whs}, 'efieldsy')
+    %             Fmy(oird) = getframe(f2);
+    %         elseif strcmp(sets{whs}, 'efieldsx')
+    %             Fmx(oird) = getframe(f2);
+    %         end %if
+    %     end %for
     F_fixed(oird) = getframe(f1);
     close(f1)
-%     F(oird) = getframe(f3);
+    %     F(oird) = getframe(f3);
 end %for
 
 % close(f2)
 % close(f3)
 % write_vid(F, fullfile(output_location,'fields.avi'))
-write_vid(F_fixed, fullfile(output_location,'fields_fixed.avi'))
+write_vid(F_fixed, fullfile(output_location,[prefix, 'fields_fixed.avi']))
 % write_vid(Fmz, fullfile(output_location,'fieldsmz.avi'))
 % write_vid(Fmy, fullfile(output_location,'fieldsmy.avi'))
 % write_vid(Fmx, fullfile(output_location,'fieldsmx.avi'))
