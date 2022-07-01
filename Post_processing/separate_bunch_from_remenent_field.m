@@ -26,4 +26,8 @@ first_peak_amplitude = data(first_peak_ind);
 time_of_first_peak = timescale(first_peak_ind);
 cut_time = time_of_first_peak + n_sigmas * str2double(bunch_sigma) / 3E8;
 cut_ind = find(timescale > cut_time, 1, 'first');
+if isempty(cut_ind)
+    % there is no remnent data
+    cut_ind = length(timescale);
+end %if
 

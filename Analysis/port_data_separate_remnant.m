@@ -14,6 +14,8 @@ for ofw = 1:length(substructure)
                     data.(substructure{ofw}).bunch_signal{dlw}(1:size_data(1), 1:size_data(2)) = 0; %W
                     data.(substructure{ofw}).remnant_signal{dlw} = data.(substructure{ofw}).data{dlw}; %W
                 else
+                    first_peak_amplitude = zeros(size_data(2),1);
+                    cut_inds = ones(size_data(2),1);
                     for shf = 1:size_data(2)
                         [cut_inds(shf), first_peak_amplitude(shf)]= separate_bunch_from_remenent_field(...
                             timebase, data.(substructure{ofw}).data{dlw}(:,shf), beam_sigma , 4);
