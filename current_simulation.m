@@ -5,7 +5,7 @@ function current_simulation(sets, varargin)
 sim_types = {'geometry','wake', 'sparameter', 'eigenmode', 'lossy_eigenmode', 'shunt'};
 
 default_sim_types = {'geometry', 'wake', 'sparameter', 'lossy_eigenmode'};
-default_stages = {'simulate', 'postprocess', 'analyse', 'reconstruct'  'plot'};
+default_stages = {'simulate', 'postprocess', 'field_extraction', 'analyse', 'reconstruct'  'plot'};
 default_version = {'220421'};
 default_number_of_cores = {'64'};
 default_precision = {'double'};
@@ -65,9 +65,6 @@ for set_id = 1:length(p.Results.sets)
                         modelling_inputs{awh}.model_name, paths);
                     GdfidL_post_process_models(paths, modelling_inputs{awh}.model_name,...
                         'type_selection', p.Results.sim_types{herf});
-                    if strcmp(p.Results.sim_types{herf}, 'wake')
-                        extract_field_data(paths.scratch_loc)
-                    end %if
                     cleanup_after_pp(old_loc, tmp_name)
                 end %for
                 cd(orig_loc)
@@ -78,6 +75,31 @@ for set_id = 1:length(p.Results.sets)
             end %try
         end %for
     end %if
+    if any(contains(p.Results.stages, 'field_extraction'))
+        for herf = 1:length(p.Results.sim_types)
+            if strcmp(p.Results.sim_types{herf}, 'wake')
+                orig_loc = pwd;
+                cd(fullfile(paths.inputfile_location, p.Results.sets{set_id}))
+                run_inputs = feval(p.Results.sets{set_id});
+                modelling_inputs = run_inputs_setup_STL(run_inputs, p.Results.versions, p.Results.n_cores, p.Results.precision);
+                cd(orig_loc)
+                for awh = 1:length(modelling_inputs) 
+                    try
+                        extract_field_data(...
+                            fullfile(paths.data_loc, modelling_inputs{awh}.base_model_name, modelling_inputs{awh}.model_name, 'wake'),...
+                            fullfile(paths.results_loc, modelling_inputs{awh}.base_model_name, modelling_inputs{awh}.model_name, 'wake'),...
+                            paths.scratch_loc...
+                            )
+                    catch ME
+                        warning([sets{set_id}, ' <strong>Problem with field extraction</strong>'])
+                        display_error_message(ME)
+                    end %try
+                end %for
+            end %if
+        end %for
+    end %it
+    
+    
     if any(contains(p.Results.stages, 'analyse'))
         if any(contains(p.Results.sim_types, 'wake'))
             try
