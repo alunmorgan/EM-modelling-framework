@@ -13,14 +13,19 @@ for awh = 1:length(modelling_inputs)
     disp(['Running ',num2str(awh), ' of ',...
         num2str(length(modelling_inputs)), ' simulations'])
     restart_loc_base =fullfile(restart_root, modelling_inputs{awh}.base_model_name, modelling_inputs{awh}.model_name);
-    % only want to run the geometry model for the central beam location.
+    % only want to run the geometry simulations for the geometry sweeps.
     % remove it from the list otherwise.
-    if str2double(modelling_inputs{awh}.beam_offset_x) ~= 0 ...
-            || str2double(modelling_inputs{awh}.beam_offset_y) ~= 0
+    if ~strcmp(modelling_inputs{awh}.sweep_type, 'Geometry')
         g_ind = find_position_in_cell_lst(strfind(sim_types, 'geometry'));
         sim_types(g_ind) = [];
     end %if
-
+    % only want to run the S parameter simulations for the geometry sweeps.
+    % remove it from the list otherwise.
+    if ~strcmp(modelling_inputs{awh}.sweep_type, 'Geometry')
+        s_ind = find_position_in_cell_lst(strfind(sim_types, 'sparameter'));
+        sim_types(s_ind) = [];
+    end %if
+    
     for ksbi = 1:length(sim_types)
         try
             %             sim_loc = find_position_in_cell_lst(strfind(sim_types, 'wake'));

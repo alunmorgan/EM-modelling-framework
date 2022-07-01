@@ -32,15 +32,7 @@ model_num = 0;
 [defs, ~] = construct_defs(mi.material_defs);
 % The geometry variations are already defined,
 
-% This is the locaton of the parameter file for the base model. The code
-% will default to using this if there is no model specific parameter file
-% present. (i.e. if meshing parameters are being changed rather
-% than geometric parameters)
-base_parameter_file_path = fullfile(mi.paths.path_to_models, ...
-    mi.base_model_name,[mi.base_model_name, '_Base'],...
-    [mi.base_model_name, '_Base_parameters.txt']);
-
-%% Base model
+%% Base model and geometry sweeps
 for fdhs = 1:length(mi.model_names)
     model_num = model_num +1;
     modelling_inputs{model_num} = base_inputs(mi, mi.model_names{fdhs}, versions, n_cores, precision);
@@ -48,6 +40,7 @@ for fdhs = 1:length(mi.model_names)
     if any(contains(mi.movie_flag, 'base'))
         modelling_inputs{model_num}.mov = 1;
     end %if
+    modelling_inputs{model_num}.sweep_type = 'Geometry';
     if fdhs ~= mi.base_model_ind
         modelling_inputs{model_num}.set_name = regexprep(mi.model_names{fdhs}, ...
             [mi.base_model_name, '_(.*)?_value_.*'], '$1' );
@@ -61,18 +54,18 @@ for fdhs = 1:length(mi.model_names)
     modelling_inputs{model_num}.defs = defs{1};
     modelling_inputs{model_num}.stl_location = fullfile(mi.paths.path_to_models, ...
         mi.base_model_name,mi.model_names{fdhs}, 'ascii');
-    parameter_file_path = fullfile(mi.paths.path_to_models, ...
+    modelling_inputs{model_num}.parameter_file_path = fullfile(mi.paths.path_to_models, ...
         mi.base_model_name,mi.model_names{fdhs},...
         [mi.model_names{fdhs}, '_parameters.txt']);
     
-    if exist(parameter_file_path, 'file') == 2
+    if exist(modelling_inputs{model_num}.parameter_file_path, 'file') == 2
         modelling_inputs{model_num}.geometry_defs = ...
-            get_parameters_from_sidecar_file(parameter_file_path);
+            get_parameters_from_sidecar_file(modelling_inputs{model_num}.parameter_file_path);
     else
         modelling_inputs{model_num}.geometry_defs = {};
     end %if
 end %for
-
+geometry_models_last_ind = model_num;
 %% Setting up the material variations off the base model.
 baseline_def = regexp(defs{1}, 'define\(\s*(\w*)\s*,\s*(\w*)\s*\)','tokens');
 for ks = 1:length(baseline_def)
@@ -107,15 +100,16 @@ for awh = 2:length(defs)
     if any(contains(mi.movie_flag, 'material_changes'))
         modelling_inputs{model_num}.mov = 1;
     end %if
+    modelling_inputs{model_num}.sweep_type = 'Material';
     modelling_inputs{model_num}.set_name = varying_material;
     modelling_inputs{model_num}.defs = defs{awh};
     modelling_inputs{model_num}.model_name = [...
-        mi.base_model_name, '_', varying_material, '_sweep_value_', material_value];
+        mi.base_model_name, '_Base_', varying_material, '_sweep_value_', material_value];
     modelling_inputs{model_num}.stl_location = fullfile(mi.paths.path_to_models, ...
         mi.base_model_name, [mi.base_model_name, '_Base'], 'ascii');
-    if exist(base_parameter_file_path, 'file') == 2
+    if exist(modelling_inputs{model_num}.parameter_file_path, 'file') == 2
         modelling_inputs{model_num}.geometry_defs = ...
-            get_parameters_from_sidecar_file(base_parameter_file_path);
+            get_parameters_from_sidecar_file(modelling_inputs{model_num}.parameter_file_path);
     else
         modelling_inputs{model_num}.geometry_defs = {};
     end %if
@@ -125,30 +119,63 @@ end %for
 % Then set up the simulation parameter scans off the the base model.
 % Generally all the codes starts with the temp_inputs as a starting
 % point and then modifies the specific variable of that sweep.
-sim_param_sweeps = {'beam_sigma', 'beam_offset_x', 'beam_offset_y',...
+sim_param_sweeps = {'beam_sigma', ...
     'mesh_stepsize', 'mesh_density_scaling', 'wakelength', ...
     'NPMLs'};
 for nw = 1:length(sim_param_sweeps)
     for mss = 2:length(mi.simulation_defs.(sim_param_sweeps{nw}))
         model_num = model_num +1;
-        modelling_inputs{model_num} = base_inputs(mi, mi.model_names{mi.base_model_ind}, versions, n_cores, precision);
+        modelling_inputs{model_num} = modelling_inputs{1}; % copy geometry model
         modelling_inputs{model_num}.mov = 0; %Default to no movie
         if any(contains(mi.movie_flag, 'simulation_changes'))
             modelling_inputs{model_num}.mov = 1;
         end %if
+        modelling_inputs{model_num}.sweep_type = 'Simulation';
         modelling_inputs{model_num}.(sim_param_sweeps{nw}) = mi.simulation_defs.(sim_param_sweeps{nw}){mss};
+        modelling_inputs{model_num}.stl_location = fullfile(mi.paths.path_to_models, ...
+            mi.base_model_name, modelling_inputs{model_num}.model_name, 'ascii');
         modelling_inputs{model_num}.model_name = [...
-            mi.base_model_name, '_', sim_param_sweeps{nw}, '_sweep_value_', ...
+            modelling_inputs{model_num}.model_name, '_', sim_param_sweeps{nw}, '_sweep_value_', ...
             regexprep(num2str(modelling_inputs{model_num}.(sim_param_sweeps{nw})), '\.','p')];
         modelling_inputs{model_num}.defs = defs{1};
-        modelling_inputs{model_num}.stl_location = fullfile(mi.paths.path_to_models, ...
-            mi.base_model_name, [mi.base_model_name, '_Base'], 'ascii');
-        if exist(base_parameter_file_path, 'file') == 2
+        if exist(modelling_inputs{model_num}.parameter_file_path, 'file') == 2
             modelling_inputs{model_num}.geometry_defs = ...
-                get_parameters_from_sidecar_file(base_parameter_file_path);
+                get_parameters_from_sidecar_file(modelling_inputs{model_num}.parameter_file_path);
         else
             modelling_inputs{model_num}.geometry_defs = {};
         end %if
+    end %for
+end %for
+
+%% Setting up beam offset sweeps
+% Then set up the simulation parameter scans off the the base model.
+% Generally all the codes starts with the temp_inputs as a starting
+% point and then modifies the specific variable of that sweep.
+beam_offset_sweeps = {'beam_offset_x', 'beam_offset_y'};
+for awh = 1:geometry_models_last_ind
+    for nw = 1:length(beam_offset_sweeps)
+        for mss = 2:length(mi.simulation_defs.(beam_offset_sweeps{nw}))
+            model_num = model_num +1;
+            modelling_inputs{model_num} = modelling_inputs{awh}; % copy geometry model
+            modelling_inputs{model_num}.mov = 0; %Default to no movie
+            if any(contains(mi.movie_flag, 'simulation_changes'))
+                modelling_inputs{model_num}.mov = 1;
+            end %if
+            modelling_inputs{model_num}.sweep_type = 'BeamOffset';
+            modelling_inputs{model_num}.(beam_offset_sweeps{nw}) = mi.simulation_defs.(beam_offset_sweeps{nw}){mss};
+            modelling_inputs{model_num}.stl_location = fullfile(mi.paths.path_to_models, ...
+                mi.base_model_name, modelling_inputs{model_num}.model_name, 'ascii');
+            modelling_inputs{model_num}.model_name = [...
+                modelling_inputs{model_num}.model_name, '_', beam_offset_sweeps{nw}, '_sweep_value_', ...
+                regexprep(num2str(modelling_inputs{model_num}.(beam_offset_sweeps{nw})), '\.','p')];
+            modelling_inputs{model_num}.defs = defs{1};
+            if exist(modelling_inputs{model_num}.parameter_file_path, 'file') == 2
+                modelling_inputs{model_num}.geometry_defs = ...
+                    get_parameters_from_sidecar_file(modelling_inputs{model_num}.parameter_file_path);
+            else
+                modelling_inputs{model_num}.geometry_defs = {};
+            end %if
+        end %for
     end %for
 end %for
 
@@ -172,6 +199,7 @@ for nw = 1:length(sim_param_sweeps)
         if any(contains(mi.movie_flag, 'simulation_changes'))
             modelling_inputs{model_num}.mov = 1;
         end %if
+        modelling_inputs{model_num}.sweep_type = 'Simulator';
         if strcmp(sim_param_sweeps{nw}, 'version')
             modelling_inputs{model_num}.(sim_param_sweeps{nw}) = versions{mss};
         elseif strcmp(sim_param_sweeps{nw}, 'precision')
@@ -180,14 +208,14 @@ for nw = 1:length(sim_param_sweeps)
             modelling_inputs{model_num}.(sim_param_sweeps{nw}) = n_cores{mss};
         end %if
         modelling_inputs{model_num}.model_name = [...
-            mi.base_model_name, '_', sim_param_sweeps{nw}, '_sweep_value_', ...
+            mi.base_model_name, '_Base_', sim_param_sweeps{nw}, '_sweep_value_', ...
             regexprep(num2str(modelling_inputs{model_num}.(sim_param_sweeps{nw})), '\.','p')];
         modelling_inputs{model_num}.defs = defs{1};
         modelling_inputs{model_num}.stl_location = fullfile(mi.paths.path_to_models, ...
             mi.base_model_name, [mi.base_model_name, '_Base'], 'ascii');
-        if exist(base_parameter_file_path, 'file') == 2
+        if exist(modelling_inputs{model_num}.parameter_file_path, 'file') == 2
             modelling_inputs{model_num}.geometry_defs = ...
-                get_parameters_from_sidecar_file(base_parameter_file_path);
+                get_parameters_from_sidecar_file(modelling_inputs{model_num}.parameter_file_path);
         else
             modelling_inputs{model_num}.geometry_defs = {};
         end %if
@@ -202,6 +230,7 @@ for uned = 2:length(mi.simulation_defs.geometry_fractions)
     if any(contains(mi.movie_flag, 'geometry_fraction'))
         modelling_inputs{model_num}.mov = 1;
     end %if
+    modelling_inputs{model_num}.sweep_type = 'GeometryFraction';
     tne = find(mi.simulation_defs.volume_fill_factor == mi.simulation_defs.geometry_fractions(uned));
     modelling_inputs{model_num}.geometry_fraction = mi.simulation_defs.geometry_fractions(uned);
     modelling_inputs{model_num}.port_fill_factor = mi.simulation_defs.port_fill_factor{tne};
@@ -211,44 +240,47 @@ for uned = 2:length(mi.simulation_defs.geometry_fractions)
     modelling_inputs{model_num}.port_location = mi.simulation_defs.port_location(1:end-tne +1);
     modelling_inputs{model_num}.port_modes = mi.simulation_defs.port_modes(1:end-tne +1);
     temp = [...
-        mi.base_model_name, '_', 'Geometry_fraction', '_sweep_value_', ...
+        mi.base_model_name, '_Base_', 'Geometry_fraction', '_sweep_value_', ...
         num2str(mi.simulation_defs.geometry_fractions(uned))];
     temp = regexprep(temp, '\.','p');
     modelling_inputs{model_num}.model_name = temp;
     modelling_inputs{model_num}.defs = defs{1};
     modelling_inputs{model_num}.stl_location = fullfile(mi.paths.path_to_models, ...
         mi.base_model_name, [mi.base_model_name, '_Base'], 'ascii');
-    if exist(base_parameter_file_path, 'file') == 2
+    if exist(modelling_inputs{model_num}.parameter_file_path, 'file') == 2
         modelling_inputs{model_num}.geometry_defs = ...
-            get_parameters_from_sidecar_file(base_parameter_file_path);
+            get_parameters_from_sidecar_file(modelling_inputs{model_num}.parameter_file_path);
     else
         modelling_inputs{model_num}.geometry_defs = {};
     end %if
 end %for
 
 %% Now setup different port excitations to use
-for unej = 2:length(mi.simulation_defs.wake.port_excitation)
-    model_num = model_num +1;
-    modelling_inputs{model_num} = base_inputs(mi, mi.model_names{mi.base_model_ind}, versions, n_cores, precision);
-    modelling_inputs{model_num}.mov = 0; %Default to no movie
-    if any(contains(mi.movie_flag, 'port_excitation'))
-        modelling_inputs{model_num}.mov = 1;
-    end %if
-    modelling_inputs{model_num}.port_excitation_wake = mi.simulation_defs.wake.port_excitation{unej};
-    temp = [...
-        mi.base_model_name, '_', 'port_excitation', '_sweep_value_', ...
-        mi.simulation_defs.wake.port_excitation{unej}.excitation_name];
-    temp = regexprep(temp, '\.','p');
-    modelling_inputs{model_num}.model_name = temp;
-    modelling_inputs{model_num}.defs = defs{1};
-    modelling_inputs{model_num}.stl_location = fullfile(mi.paths.path_to_models, ...
-        mi.base_model_name, [mi.base_model_name, '_Base'], 'ascii');
-    if exist(base_parameter_file_path, 'file') == 2
-        modelling_inputs{model_num}.geometry_defs = ...
-            get_parameters_from_sidecar_file(base_parameter_file_path);
-    else
-        modelling_inputs{model_num}.geometry_defs = {};
-    end %if
+for awh = 1:geometry_models_last_ind
+    for unej = 2:length(mi.simulation_defs.wake.port_excitation)
+        model_num = model_num +1;
+        modelling_inputs{model_num} = modelling_inputs{awh}; % Copy geometry model
+        modelling_inputs{model_num}.mov = 0; %Default to no movie
+        if any(contains(mi.movie_flag, 'port_excitation'))
+            modelling_inputs{model_num}.mov = 1;
+        end %if
+        modelling_inputs{model_num}.sweep_type = 'PortExcitation';
+        modelling_inputs{model_num}.port_excitation_wake = mi.simulation_defs.wake.port_excitation{unej};
+        modelling_inputs{model_num}.stl_location = fullfile(mi.paths.path_to_models, ...
+            mi.base_model_name, modelling_inputs{model_num}.model_name, 'ascii');
+        temp = [...
+            modelling_inputs{model_num}.model_name, '_', 'port_excitation', '_sweep_value_', ...
+            mi.simulation_defs.wake.port_excitation{unej}.excitation_name];
+        temp = regexprep(temp, '\.','p');
+        modelling_inputs{model_num}.model_name = temp;
+        modelling_inputs{model_num}.defs = defs{1};
+        if exist(modelling_inputs{model_num}.parameter_file_path, 'file') == 2
+            modelling_inputs{model_num}.geometry_defs = ...
+                get_parameters_from_sidecar_file(modelling_inputs{model_num}.parameter_file_path);
+        else
+            modelling_inputs{model_num}.geometry_defs = {};
+        end %if
+    end %for
 end %for
 %
 % % Now setup different S-parameter settings to use
