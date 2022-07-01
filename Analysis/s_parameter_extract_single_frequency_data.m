@@ -41,7 +41,7 @@ h(1, 1) = figure('Position', [0, 0, 800, 800]);
 h(1, 2) = figure('Position', [0, 0, 800, 800]);
 for jef = 1:length(good_data)
     if good_data(jef) == 1
-        load(fullfile(report_input.source_path, report_input.sources{jef}, 's_parameter', 'data_postprocessed.mat'), 'pp_data')
+        load(fullfile(report_input.source_path, report_input.sources{jef}, 'sparameter', 'data_analysed_sparameter.mat'), 'pp_data')
         trace_name = trace_names{jef};
         sets = unique(pp_data.set);
             n_ports = length(pp_data.all_ports);
