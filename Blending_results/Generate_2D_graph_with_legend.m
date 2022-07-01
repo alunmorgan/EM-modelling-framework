@@ -62,6 +62,6 @@ setup_graph_for_display(ax1, xlims,...
     regexprep([graph_metadata.swept_name{1}, ' - sweep'], '_', ' '));
 legend(ax1, 'Location', 'EastOutside', 'Box', 'off')
 % save 2D graph
-% [~, model_name] = fileparts(graph_metadata.output_loc);
-savemfmt(h1, graph_metadata.output_loc, data(1).out_name)
+[~, model_name] = fileparts(graph_metadata.output_loc);
+savemfmt(h1, graph_metadata.output_loc, [model_name, '-', data(1).out_name])
 close(h1)

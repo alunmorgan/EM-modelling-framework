@@ -6,10 +6,10 @@ function Blend_reports(sets, chosen_wake_length, upper_frequency, use_names)
 %       sets (cell array of strings): If there is a single entry then generate blended results for all parameter sweeps in the set.
 %                                     If there are more than one entries then blend the base models
 % Example: Blend_reports(results_loc, chosen_wake_length, frequency_display_limit)
-load_local_paths
+paths = load_local_paths;
 if length(sets) == 1
     single_set = sets{1};
-    set_results_loc = fullfile(results_loc, single_set);
+    set_results_loc = fullfile(paths.results_loc, single_set);
     [names,~] = dir_list_gen(set_results_loc, 'dirs', 1);
     if isempty(names)
         disp(['No data available for ', single_set])
@@ -96,14 +96,14 @@ if length(sets) == 1
             mkdir(report_input.output_loc)
         end %if
         s_parameter_extract_single_frequency_data(report_input);
-        Blend_figs(report_input, chosen_wake_length, upper_frequency);
+        Blend_figs(report_input);
         Blend_single_report(report_input, chosen_wake_length)
         clear varying_pars_ind param_names param_vals good_data names_in_sweep report_input
     end %for
 else
     ck = 1;
     for jse = 1:length(sets)
-        set_results_loc = fullfile(results_loc, sets{jse});
+        set_results_loc = fullfile(paths.results_loc, sets{jse});
         names_temp = dir_list_gen(set_results_loc, 'dirs', 1);
         if isempty(names_temp)
             disp(['No data available for ', sets{jse}])
