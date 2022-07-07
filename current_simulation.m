@@ -5,7 +5,7 @@ function current_simulation(sets, varargin)
 sim_types = {'geometry','wake', 'sparameter', 'eigenmode', 'lossy_eigenmode', 'shunt'};
 
 default_sim_types = {'geometry', 'wake', 'sparameter', 'lossy_eigenmode'};
-default_stages = {'simulate', 'postprocess', 'field_extraction', 'analyse', 'reconstruct'  'plot'};
+default_stages = {'simulate', 'postprocess', 'field_extraction', 'analyse', 'reconstruct'  'plot_data', 'plot_fields'};
 default_version = {'220421'};
 default_number_of_cores = {'64'};
 default_precision = {'double'};
@@ -83,7 +83,7 @@ for set_id = 1:length(p.Results.sets)
                 run_inputs = feval(p.Results.sets{set_id});
                 modelling_inputs = run_inputs_setup_STL(run_inputs, p.Results.versions, p.Results.n_cores, p.Results.precision);
                 cd(orig_loc)
-                for awh = 1:length(modelling_inputs) 
+                for awh = 1:length(modelling_inputs)
                     try
                         extract_field_data(...
                             fullfile(paths.data_loc, modelling_inputs{awh}.base_model_name, modelling_inputs{awh}.model_name, 'wake'),...
@@ -137,7 +137,7 @@ for set_id = 1:length(p.Results.sets)
             end %try
         end %if
     end %if
-    if any(contains(p.Results.stages, 'plot'))
+    if any(contains(p.Results.stages, 'plot_data'))
         try
             datasets = find_datasets(fullfile(paths.results_loc, p.Results.sets{set_id}));
             plot_model(datasets, ppi, p.Results.sim_types);
@@ -146,17 +146,39 @@ for set_id = 1:length(p.Results.sets)
             display_error_message(ME5)
         end %try
     end %if
+    if any(contains(p.Results.stages, 'plot_fields'))
+        try
+            datasets = find_datasets(fullfile(paths.results_loc, p.Results.sets{set_id}));
+            for ind = 1:length(datasets)
+                if isempty(dir_list_gen(datasets{ind}.path_to_data, 'avi',1))
+                    if exist(fullfile(datasets{ind}.path_to_data, 'wake', 'field_data.mat'), 'file') == 2
+                        load(fullfile(datasets{ind}.path_to_data, 'wake', 'field_data.mat'), 'field_data');
+                        disp(['Data loaded ', datasets{ind}.path_to_data])
+                        [~, prefix, ~] = fileparts(datasets{ind}.path_to_data);
+                        output_location = fullfile(datasets{ind}.path_to_data, 'wake');
+%                         fprintf('Plotting peak fields...')
+%                         plot_fexport_data_peak_field(field_data, output_location, prefix);
+%                         fprintf('Done\n')
+%                         fprintf('Plotting slices...')
+%                         plot_fexport_data(field_data, output_location, prefix)
+%                         fprintf('Done\n')
+                        fprintf('Making field images...')
+                        make_field_images(field_data, output_location);
+                        fprintf('Done\n')
+                        fprintf('Plotting single time slice...')
+                        slice_index = 70; % NEED TO FIX 
+                        plot_fexport_data_single_slice(slice_index, output_location, prefix)
+                        fprintf('Done\n')
+                        fprintf('Making field videos...')
+                        make_field_videos(output_location, prefix)
+                        fprintf('Done\n')
+                    end %if
+                end %if
+            end %for
+        catch ME6
+            warning([sets{set_id}, ' <strong>Problem with plotting fields</strong>'])
+            display_error_message(ME6)
+        end %try
+    end %if
     %         generate_report_single_set(sets{set_id});
 end %for
-
-
-
-% upper_frequency = 25E9;
-
-% try
-% for set_id = 1:length(sets)
-%     Blend_reports(sets(set_id), {'20'}, upper_frequency)
-% end %for
-% catch
-%     disp(['Error in simulation. See ', logfile_location, ' for details'])
-% end %try

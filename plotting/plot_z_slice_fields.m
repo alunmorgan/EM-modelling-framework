@@ -1,4 +1,4 @@
-function plot_z_slice_fields(f_handle, xaxis, yaxis, slice, slice_dir, field_dir)
+function plot_z_slice_fields(f_handle, xaxis, yaxis, slice, slice_dir, field_dir, field_limits)
 figure(f_handle)
 subplot(2,2,1)
 contourf(xaxis.*1e3, yaxis.*1e3, slice', 'LineStyle', 'none')
@@ -24,7 +24,7 @@ colorbar
 subplot(2,2,3)
 
 
-plot(squeeze(xaxis(1,:)).*1E3,slice(:, x_cut_ind))
+plot(squeeze(xaxis(1,:)).*1E3, slice(:, x_cut_ind))
 if strcmp(slice_dir, 'efieldsz')
     xlabel('Horizontal (mm)')
 elseif strcmp(slice_dir, 'efieldsy')
@@ -34,6 +34,11 @@ elseif strcmp(slice_dir, 'efieldsx')
 end %if
 ylabel('Field (Vm^{-1})')
 axis tight
+if nargin > 6
+    ylim(field_limits)
+end %if
+
+
 subplot(2,2,2)
 plot(slice(y_cut_ind,:),squeeze(yaxis(:,1)).*1E3)
 xlabel('Field (Vm^{-1})')
@@ -45,6 +50,9 @@ elseif strcmp(slice_dir, 'efieldsx')
     ylabel('Longitudinal (mm)')
 end %if
 axis tight
+if nargin > 6
+    xlim(field_limits)
+end %if
 
 end %function
 

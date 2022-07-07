@@ -464,9 +464,3 @@ legend('Real','Imaginary','Charge','Location','SouthEast')
 savemfmt(h_wake, path_to_data, [prefix, 'input_signal_lossy_reactive_check'])
 clf(h_wake)
 close(h_wake)
-
-if exist(fullfile(path_to_data, 'field_data.mat'), 'file') == 2
-    load(fullfile(path_to_data, 'field_data.mat'), 'field_data');
-    plot_fexport_data_peak_field(field_data, path_to_data, prefix)
-    plot_fexport_data(field_data, path_to_data, prefix)
-end %if

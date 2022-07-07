@@ -1,6 +1,4 @@
 function plot_fexport_data(data, output_location, prefix)
-% f2 = figure('Position',[30,30, 1500, 600]);
-% f3 = figure('Position',[30,30, 1500, 600]);
 sets = fields(data);
 field_dirs = {'Fx','Fy','Fz'};
 
@@ -23,87 +21,40 @@ end %for
 
 level_list = linspace(-graph_lim, graph_lim, 51);
 n_times = length(data.(sets{1}).timestamp);
-parfor oird = 1:n_times
-    f1 = figure('Position',[30,30, 1500, 600]);
-    plot_field_slices(f1, sets, field_dirs, data, oird, level_list)
-    
-    %     figure(f3)
-    %     clf(f3)
-    %     for whs = 1:length(sets)
-    %         subplot(length(sets), length(field_dirs) +1, igr + 1 + (whs-1) * (length(field_dirs) +1))
-    %         if strcmp(sets{whs}, 'efieldsz')
-    %             contourf(xaxis.*1e3, yaxis.*1e3, temp_accum',  'LineStyle', 'none')
-    %             xlabel('Horizontal (mm)')
-    %             ylabel('Vertical (mm)')
-    %         else
-    %             contourf(xaxis.*1e3, yaxis.*1e3, temp_accum, 'LineStyle', 'none')
-    %             xlabel('Beam direction (mm)')
-    %             if strcmp(sets{whs}, 'efieldsx')
-    %                 ylabel('Horizontal (mm)')
-    %             elseif strcmp(sets{whs}, 'efieldsy')
-    %                 ylabel('Vertical (mm)')
-    %             end %if
-    %         end %if
-    %         title('Field magnitude')
-    %         axis equal
-    %         colorbar
-    %     end %for
-    %
-    %     figure(f2)
-    %     clf(f2)
-    %     for whs = 1:length(sets)
-    %         clf(f2)
-    %         if strcmp(sets{whs}, 'efieldsz')
-    %             contourf(xaxis.*1e3, yaxis.*1e3, temp_accum', mag_level_list, 'LineStyle', 'none')
-    %             xlabel('Horizontal (mm)')
-    %             ylabel('Vertical (mm)')
-    %         else
-    %             contourf(xaxis.*1e3, yaxis.*1e3, temp_accum, mag_level_list, 'LineStyle', 'none')
-    %             xlabel('Beam direction (mm)')
-    %             if strcmp(sets{whs}, 'efieldsx')
-    %                 ylabel('Horizontal (mm)')
-    %             elseif strcmp(sets{whs}, 'efieldsy')
-    %                 ylabel('Vertical (mm)')
-    %             end %if
-    %         end %if
-    %         title('Field magnitude')
-    %         axis equal
-    %         colorbar
-    %         if strcmp(sets{whs}, 'efieldsz')
-    %             Fmz(oird) = getframe(f2);
-    %         elseif strcmp(sets{whs}, 'efieldsy')
-    %             Fmy(oird) = getframe(f2);
-    %         elseif strcmp(sets{whs}, 'efieldsx')
-    %             Fmx(oird) = getframe(f2);
-    %         end %if
-    %     end %for
-    F_fixed(oird) = getframe(f1);
-    close(f1)
-    %     F(oird) = getframe(f3);
-end %for
-
-% close(f2)
-% close(f3)
-% write_vid(F, fullfile(output_location,'fields.avi'))
-write_vid(F_fixed, fullfile(output_location,[prefix, 'fields_fixed.avi']))
-% write_vid(Fmz, fullfile(output_location,'fieldsmz.avi'))
-% write_vid(Fmy, fullfile(output_location,'fieldsmy.avi'))
-% write_vid(Fmx, fullfile(output_location,'fieldsmx.avi'))
-end %function
-
-
-function write_vid(data, output_loc)
-try
-    v = VideoWriter(output_loc);
-    v.FrameRate = 5;
-    open(v);
-    for kwh = 1:length(data)
-        writeVideo(v, data(kwh));
+max_length = 560; % Due to memory limits
+if n_times > max_length
+    n_chunks = floor(n_times / max_length) +1;
+    section_lengths = [ones(1,n_chunks -1) * max_length, n_times - max_length * (n_chunks - 1)];
+else
+    n_chunks = 1;
+    section_lengths = n_times;
+end %if
+for ams = 1:n_chunks
+    data_temp = data;
+    if ams < n_chunks
+        for lsd = 1:length(sets)
+            data_temp.(sets{lsd}).timestamp = data_temp.(sets{lsd}).timestamp(:,(ams-1)*max_length+1:(ams)*max_length);
+            data_temp.(sets{lsd}).Fx = data_temp.(sets{lsd}).Fx(:,:,(ams-1)*max_length+1:(ams)*max_length);
+            data_temp.(sets{lsd}).Fy = data_temp.(sets{lsd}).Fy(:,:,(ams-1)*max_length+1:(ams)*max_length);
+            data_temp.(sets{lsd}).Fz = data_temp.(sets{lsd}).Fz(:,:,(ams-1)*max_length+1:(ams)*max_length);
+        end %for
+    else
+        for lsd = 1:length(sets)
+            data_temp.(sets{lsd}).timestamp = data_temp.(sets{lsd}).timestamp(:,(ams-1)*max_length+1:end);
+            data_temp.(sets{lsd}).Fx = data_temp.(sets{lsd}).Fx(:,:,(ams-1)*max_length+1:end);
+            data_temp.(sets{lsd}).Fy = data_temp.(sets{lsd}).Fy(:,:,(ams-1)*max_length+1:end);
+            data_temp.(sets{lsd}).Fz = data_temp.(sets{lsd}).Fz(:,:,(ams-1)*max_length+1:end);
+        end %for
+    end %if
+    parfor oird = 1:section_lengths(ams)
+        f1 = figure('Position',[30,30, 1500, 600]);
+        plot_field_slices(f1, sets, field_dirs, data_temp, oird, level_list)
+        F_fixed(oird) = getframe(f1);
+        close(f1)
+        fprintf('*')
+        %         disp(oird)
     end %for
-    close(v)
-catch
-    save(output_loc, 'data')
-end %try
-
-end %function
-
+    fprintf('\n')
+    write_vid(F_fixed, fullfile(output_location,[prefix, 'fields_fixed',num2str(ams), '.avi']))
+    clear F_fixed
+end %for
