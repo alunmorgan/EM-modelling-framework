@@ -1,4 +1,4 @@
-function summary = Blend_summaries(doc_root, names, chosen_wake_length)
+function summary = Blend_summaries(doc_root, names)
 % Extacts data from the summary graph fig files.
 %
 % Example: summary = Blend_summaries(doc_root, names)

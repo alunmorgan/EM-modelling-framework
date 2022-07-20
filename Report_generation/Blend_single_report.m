@@ -1,4 +1,4 @@
-function Blend_single_report(report_input, chosen_wake_length)
+function Blend_single_report(report_input)
 
 [~, base_name, ~] = fileparts(report_input.source_path);
     % replace all spaces with _ as latex has problems with spaces.
@@ -28,7 +28,7 @@ ov = cat(1,ov,['To start with, here are the modelling setups and run times ',...
 
 %%%%%%%%%%%%%%%%%%%% Material Losses section %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % if exist(fullfile(report_input.source_path, report_input.sources{1}, 'wake'), 'dir') == 7
-summary = Blend_summaries(report_input.source_path, report_input.sources, chosen_wake_length);
+summary = Blend_summaries(report_input.source_path, report_input.sources);
 out_T = add_blend_table(regexprep(base_name, '_', ' '),...
     ['sweep of ',regexprep(report_input.swept_name{1}, '_', ' ')] , report_input.swept_vals, summary);
 ov = cat(1,ov,out_T);
