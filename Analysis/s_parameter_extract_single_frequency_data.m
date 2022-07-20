@@ -2,21 +2,17 @@ function s_parameter_extract_single_frequency_data(report_input)
 
 cols_sep = {'y','k','r','b','g','c','m'};
 linewidth = 2;
-% top_of_range = [750E6, 5e9];
-% for kds = 1:length(top_of_range) % different frequency extents
 good_data = zeros(length(report_input.sources),1);
 for jef = 1:length(report_input.sources) % different models in sweep
-    if exist(fullfile(report_input.source_path, report_input.sources{jef}, 's_parameter'), 'dir') == 7
+    if exist(fullfile(report_input.source_path, report_input.sources{jef}, 'sparameter'), 'dir') == 7
         good_data(jef) = 1;
-        %     else
-        %         good_data(jef) = 0;
     end %if
 end %for
 
 [~,sim_name,~] = fileparts(report_input.source_path);
 sim_name = regexprep(sim_name, '_', ' ');
 A = strfind(report_input.sources, '_sweep_');
-B = find(cellfun(@isempty, A)==0,1,'first');
+B = find(cellfun(@isempty, A)==0,1,'first'); % first entry with the sweep name
 if isempty(B)
     sweep_title = '';
 else
@@ -26,25 +22,30 @@ else
 end %if
 trace_names = regexprep(report_input.sources, '_', ' ');
 trace_names = regexprep(trace_names, sim_name ,'');
-trace_names = regexprep(trace_names, [sweep_title, ' sweep value '] ,'');
+sweep_type = regexprep(report_input.sweep_type, '_', ' ');
+trace_names = regexprep(trace_names, [sweep_type, ' sweep value .*'] ,'');
 C = strfind(trace_names, ' Base');
-D = find(cellfun(@isempty, C)==0,1,'first');
+D = find(cellfun(@isempty, C)==0,1,'first'); % base loc
 E = strfind(trace_names, 'mm');
 F = find(cellfun(@isempty, E)==0,1,'first');
 if isempty(F)
-trace_names{D} = num2str(report_input.swept_vals{D});
+    E = strfind(trace_names, 'deg');
+    F = find(cellfun(@isempty, E)==0,1,'first');
+    if isempty(F)
+        trace_names{D} = num2str(report_input.swept_vals{D});
+    else
+        trace_names{D} = [num2str(round(report_input.swept_vals{D}./pi*180)), 'degrees'];
+    end %if
 else
     trace_names{D} = [num2str(str2double(report_input.swept_vals{D})*1000), 'mm'];
 end %if
 ck = 1;
-h(1, 1) = figure('Position', [0, 0, 800, 800]);
-h(1, 2) = figure('Position', [0, 0, 800, 800]);
 for jef = 1:length(good_data)
     if good_data(jef) == 1
-        load(fullfile(report_input.source_path, report_input.sources{jef}, 'sparameter', 'data_analysed_sparameter.mat'), 'pp_data')
+        load(fullfile(report_input.source_path, report_input.sources{jef}, 'sparameter', 'data_analysed_sparameter.mat'), 'sparameter_data')
         trace_name = trace_names{jef};
-        sets = unique(pp_data.set);
-            n_ports = length(pp_data.all_ports);
+        sets = unique(sparameter_data.set);
+            n_ports = length(sparameter_data.all_ports);
             old_size_h = size(h);
             for kse = 1:n_ports
                 for hsw = 1:n_ports
@@ -54,25 +55,20 @@ for jef = 1:length(good_data)
                 end %for
             end %for
         
-        %             range_ind = find(pp_data.scale{1}(1,:) > (top_of_range(kds) - 1e6), 1, 'first');
         for law = 1:length(sets)
-            set_filter = strcmp(pp_data.set,sets{law});
-            temp_data = pp_data.data(set_filter,:);
-            temp_scale = pp_data.scale(set_filter,:);
-            temp_excitation_port_list = pp_data.port_list(set_filter);
+            set_filter = strcmp(sparameter_data.set,sets{law});
+            temp_data = sparameter_data.data(set_filter,:);
+            temp_scale = sparameter_data.scale(set_filter,:);
+            temp_excitation_port_list = sparameter_data.port_list(set_filter);
             for nre = 1:size(temp_data,1) % excitation ports
-                s_in  = find_position_in_cell_lst(strfind(pp_data.all_ports, temp_excitation_port_list{nre}));
+                s_in  = find_position_in_cell_lst(strfind(sparameter_dataa.all_ports, temp_excitation_port_list{nre}));
                 for es = 1:size(temp_data,2) % receiving ports
                     tmp_data = temp_data{nre,es};
                     for m=1:1%size(tmp_data,1) % Iterate over modes
                         x_data = temp_scale{nre, es}(m,1:end-2) * 1e-9;
                         y_data = 20* log10(tmp_data(m, 1:end-2));
-%                         % Trimming off the end 10% as this often contains artifacts.
-%                         start_ind = ceil(length(x_data)/10);
-%                         final_ind = floor(length(x_data) - length(x_data) /10);
                         figure(h(s_in,es))
                         hold on
-%                         hl = plot(x_data(start_ind:final_ind), y_data(start_ind:final_ind), '-',...
                         hl = plot(x_data, y_data, '-',...
                             'Color', cols_sep{rem(ck,length(cols_sep))+1}, ...
                             'Linewidth', linewidth,...
@@ -81,9 +77,6 @@ for jef = 1:length(good_data)
                         if law > 1
                             set(get(get(hl,'Annotation'),'LegendInformation'),'IconDisplayStyle','off');
                         end %if
-                        %                             data_out2(1:length(pp_data.port_list),1:length(pp_data.all_ports),ck) = ...
-                        %                                 cellfun(@(x)x(1,1:range_ind),pp_data.data, 'UniformOutput',false);
-                        %                             scale_out(1:range_ind,ck) = pp_data.scale{1, 1}(1, 1:range_ind);
                     end %for
                     t_string1 = ['S(',num2str(s_in),',',num2str(es),')'];
                     legend('Location', 'EastOutside')

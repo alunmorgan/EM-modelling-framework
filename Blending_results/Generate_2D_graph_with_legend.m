@@ -19,7 +19,7 @@ end %if
 ls_tk = 1;
 for en = 1:length(variation_data)
     if isfield(variation_data(en), 'xdata') && ~isempty(variation_data(en).xdata)
-        plot(variation_data(en).xdata, variation_data(en).ydata, 'linestyle',l_st{ls_tk},...
+        plot(squeeze(variation_data(en).xdata), squeeze(variation_data(en).ydata), 'linestyle',l_st{ls_tk},...
             'Color',cols{rem(en,length(cols))+1}, 'linewidth',data(en).linewidth, 'Parent', ax1,...
             'DisplayName', regexprep(swept_vals{en},'_', ' '));
         if rem(en,length(cols))+1 == 1
@@ -32,7 +32,7 @@ for en = 1:length(variation_data)
 end %for
 
 if isfield(base_data, 'xdata') && ~isempty(base_data.xdata)
-    plot(base_data.xdata, base_data.ydata,...%'linestyle',l_st{1},...
+    plot(squeeze(base_data.xdata), squeeze(base_data.ydata),...%'linestyle',l_st{1},...
         'Color',cols{1}, 'linewidth',data(en).linewidth, 'Parent', ax1, 'DisplayName', regexprep(base_vals{1},'_', ' '));
 else
     plot(NaN, NaN,...%'linestyle',l_st{1},...
@@ -63,5 +63,5 @@ setup_graph_for_display(ax1, xlims,...
 legend(ax1, 'Location', 'EastOutside', 'Box', 'off')
 % save 2D graph
 [~, model_name] = fileparts(graph_metadata.output_loc);
-savemfmt(h1, graph_metadata.output_loc, [model_name, '-', data(1).out_name])
+savemfmt(h1, graph_metadata.output_loc, [model_name, '-',graph_metadata.sweep_type,'-', data(1).out_name])
 close(h1)
