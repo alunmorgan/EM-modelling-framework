@@ -156,19 +156,24 @@ for set_id = 1:length(p.Results.sets)
                         disp(['Data loaded ', datasets{ind}.path_to_data])
                         [~, prefix, ~] = fileparts(datasets{ind}.path_to_data);
                         output_location = fullfile(datasets{ind}.path_to_data, 'wake');
-%                         fprintf('Plotting peak fields...')
-%                         plot_fexport_data_peak_field(field_data, output_location, prefix);
-%                         fprintf('Done\n')
-%                         fprintf('Plotting slices...')
-%                         plot_fexport_data(field_data, output_location, prefix)
-%                         fprintf('Done\n')
+                        fprintf('Plotting peak fields...')
+                        plot_fexport_data_peak_field(field_data, output_location, prefix);
+                        fprintf('Done\n')
+                        fprintf('Plotting selected fields...')
+                        selected_timeslice = 70;
+                        plot_fexport_data_selected_timeslice(field_data, output_location, prefix, selected_timeslice)
+                        plot_field_views_selected_timeslice(field_data, output_location, prefix, selected_timeslice)
+                        fprintf('Done\n')
+                        fprintf('Plotting slices...')
+                        plot_fexport_data(field_data, output_location, prefix)
+                        fprintf('Done\n')
                         fprintf('Making field images...')
                         make_field_images(field_data, output_location);
                         fprintf('Done\n')
-                        fprintf('Plotting single time slice...')
-                        slice_index = 70; % NEED TO FIX 
-                        plot_fexport_data_single_slice(slice_index, output_location, prefix)
-                        fprintf('Done\n')
+%                         fprintf('Plotting single time slice...')
+%                         slice_index = 70; % NEED TO FIX 
+%                         plot_fexport_data_single_slice(slice_index, output_location, prefix)
+%                         fprintf('Done\n')
                         fprintf('Making field videos...')
                         make_field_videos(output_location, prefix)
                         fprintf('Done\n')

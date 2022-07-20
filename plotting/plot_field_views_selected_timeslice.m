@@ -1,10 +1,9 @@
-function varargout = make_field_images(data, output_location)
+function plot_field_views_selected_timeslice(data, output_location, prefix, selected_timeslice)
 
 field_dirs = {'Fx','Fy','Fz'};
 slice_dirs = {'efieldsx', 'efieldsy', 'efieldsz'};
 ROI = 8E-3;
 
-field_images = cell(length(slice_dirs), length(field_dirs));
 for aks = 1:length(slice_dirs)
     geometry_slice = geometry_from_slice_data(data.(slice_dirs{aks}));
     [xaxis, yaxis] = meshgrid(data.(slice_dirs{aks}).coord_1, ...
@@ -35,30 +34,17 @@ for aks = 1:length(slice_dirs)
         dirfields_trim = dirfields(x_ind1:x_ind2, y_ind1:y_ind2, :);
         geometry_slice_trim = geometry_slice(x_ind1:x_ind2, y_ind1:y_ind2);
         field_name = field_dirs{oas};
-        graph_lims(1) = min(min(min(dirfields_trim)));
-        graph_lims(2) = max(max(max(dirfields_trim)));
-        parfor ifen = 1:size(dirfields_trim,3)
-            f2 = figure('Position',[30,30, 1500, 600]);
-            slice = squeeze(dirfields_trim(:,:,ifen));
-            slice(geometry_slice_trim==0) = NaN;
-            plot_z_slice_fields(f2, ...
-                xaxis_trim, ...
-                yaxis_trim, ...
-                slice, ...
-                dir_name, field_name, graph_lims)
-            Frames(ifen) = getframe(f2);
-            close(f2)
-            fprintf('.')
-        end %parfor
-        fprintf('\n')
-        field_images{aks,oas}.frames = Frames;
-        field_images{aks,oas}.field_dirs = field_dirs;
-        field_images{aks,oas}.slice_dirs = slice_dirs;
-        clear Frames
+        f2 = figure('Position',[30,30, 1500, 600]);
+        slice = squeeze(dirfields_trim(:,:,selected_timeslice));
+        slice(geometry_slice_trim==0) = NaN;
+        plot_z_slice_fields(f2, ...
+            xaxis_trim, ...
+            yaxis_trim, ...
+            slice, ...
+            dir_name, field_name)
+        output_name = [prefix, '_field_through_centre_',slice_dirs{aks},'_', field_dirs{oas}, '_at_slice_', num2str(selected_timeslice), '(',num2str(round(data.efieldsx.timestamp(selected_timeslice)*1e9)),'ns)' ];
+        savemfmt(f2, output_location, output_name);
+        close(f2)
+        fprintf('.')  
     end %for
 end %for
-save(fullfile(output_location, 'EfieldFrames.mat'), 'field_images')
-
-if nargout > 0
-    varargout{1} = field_images;
-end %if
