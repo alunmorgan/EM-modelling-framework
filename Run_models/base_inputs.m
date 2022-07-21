@@ -53,6 +53,9 @@ end %if
 if isfield(mi.simulation_defs.wake, 'voltage_monitoring')
     base.voltage_monitoring = mi.simulation_defs.wake.voltage_monitoring;
 end %if
+if isfield(mi.simulation_defs.wake, 'field_capture')
+    base.field_capture = mi.simulation_defs.wake.field_capture;
+end %if
 base.port_excitation_wake.port_names = mi.simulation_defs.wake.port_excitation{1}.port_names;
 base.port_excitation_wake.frequency = mi.simulation_defs.wake.port_excitation{1}.frequency;
 if ~isempty(mi.simulation_defs.wake.port_excitation{1}.port_names{1})

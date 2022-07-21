@@ -1,4 +1,4 @@
-function data = blend_field_data(field_data, snapshot_time)
+function data = blend_field_data(field_data, sweep_val, snapshot_time)
 % Extracts the field data from multiple analysis files and combines them.
 %
 % Example: data = blend_field_data(pp_data)
@@ -42,6 +42,7 @@ for nre = 1:length(slices)
         data(1, ck).out_name = strcat('field_', field_dirs{es}, direction1, '_time_', time_string_for_name, tag);
         data(1, ck).linewidth = 2;
         data(1, ck).islog = 0;
+        data(1, ck).sweep_val = sweep_val;
         ck = ck +1;
         data(1, ck).xdata = field_data.(slices{nre}).coord_2 .* 1000;
         ind = find(abs(field_data.(slices{nre}).coord_1) < 2E-4, 1, 'first');
@@ -53,8 +54,10 @@ for nre = 1:length(slices)
         data(1, ck).out_name = strcat('field_', field_dirs{es}, direction2, '_time_', time_string_for_name, tag);
         data(1, ck).linewidth = 2;
         data(1, ck).islog = 0;
+        data(1, ck).sweep_val = sweep_val;
         ck = ck +1;
         if strcmp(slices{nre}, 'efieldsx') || strcmp(slices{nre}, 'efieldsy')
+            % FIXME only FX horizontal is being generated
             data(1, ck).xdata = field_data.(slices{nre}).coord_1 .* 1000;
             data(1, ck).ydata = squeeze(sum(field_data.(slices{nre}).(field_dirs{es})(:, :, time_slice),2));
             data(1, ck).Xlab = 'Position (mm)';
@@ -64,6 +67,7 @@ for nre = 1:length(slices)
             data(1, ck).out_name = strcat('field_intergrated_longitudinally_', field_dirs{es}, direction1, '_time_', time_string_for_name, tag);
             data(1, ck).linewidth = 2;
             data(1, ck).islog = 0;
+            data(1, ck).sweep_val = sweep_val;
             ck = ck +1;
         end %if
     end %for

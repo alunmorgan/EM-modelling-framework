@@ -263,6 +263,7 @@ for awh = 1:geometry_models_last_ind
         modelling_inputs{model_num}.mov = 0; %Default to no movie
         if any(contains(mi.movie_flag, 'port_excitation'))
             modelling_inputs{model_num}.mov = 1;
+            modelling_inputs{model_num}.field_capture.stop_time = mi.simulation_defs.wake.port_excitation{unej}.field_capture.stop_time;
         end %if
         modelling_inputs{model_num}.sweep_type = 'PortExcitation';
         modelling_inputs{model_num}.port_excitation_wake = mi.simulation_defs.wake.port_excitation{unej};

@@ -1,4 +1,4 @@
-function data = blend_s_param_data(pp_data)
+function data = blend_s_param_data(pp_data, sweep_val)
 % Extracts the S-parameter data from a single analysis file.
 %
 % Example: data = blend_s_param_data(pp_data)
@@ -22,6 +22,7 @@ for nre = 1:length(excitations)
         data(1, ck).out_name = strcat('S',num2str(nre), num2str(es), '(',num2str(m), ')');
         data(1, ck).linewidth = 2;
         data(1, ck).islog = 0;
+        data(1, ck).sweep_val = sweep_val;
         ck = ck +1;
     end %for
 end %for

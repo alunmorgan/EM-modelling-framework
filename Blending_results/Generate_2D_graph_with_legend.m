@@ -1,44 +1,20 @@
-function Generate_2D_graph_with_legend(graph_metadata, data, cols, l_st)
+function Generate_2D_graph_with_legend(graph_metadata, data)
+
+cols = {[0.5, 1, 0], 'b','k','m','c','g',[1, 0.5, 0],[0.5, 1, 0],[0.5, 0, 1],[1, 0, 0.5]};
+l_st ={'-.', '-', '--', ':'};
+
 h1 = figure('Position', [ 0 0 1000 400]);
 ax1 = axes('Parent', h1);
 hold(ax1, 'on')
 
-base_data = data(contains(graph_metadata.sources, '_Base'));
-base_vals = graph_metadata.swept_vals(contains(graph_metadata.sources, '_Base'));
-variation_data = data(~contains(graph_metadata.sources, '_Base'));
-swept_vals = graph_metadata.swept_vals(~contains(graph_metadata.sources, '_Base'));
-
-% adjusting for the multiple set bases scenario.
-if length(base_data) > 1 && isempty(variation_data)
-    variation_data = base_data(2:end);
-swept_vals = base_vals(2:end);
-base_data = base_data(1);
-base_vals = base_vals(1);
-end %if
-
-ls_tk = 1;
-for en = 1:length(variation_data)
-    if isfield(variation_data(en), 'xdata') && ~isempty(variation_data(en).xdata)
-        plot(squeeze(variation_data(en).xdata), squeeze(variation_data(en).ydata), 'linestyle',l_st{ls_tk},...
-            'Color',cols{rem(en,length(cols))+1}, 'linewidth',data(en).linewidth, 'Parent', ax1,...
-            'DisplayName', regexprep(swept_vals{en},'_', ' '));
-        if rem(en,length(cols))+1 == 1
-            ls_tk = ls_tk +1;
-        end %if
-    else
-        plot(NaN, NaN, 'linestyle',l_st{1},...
-            'Color',cols{rem(en,length(cols))+1}, 'linewidth',data(en).linewidth, 'Parent', ax1);
-    end %if
+for en = 1:length(data)
+        plot(squeeze(data(en).xdata), squeeze(data(en).ydata),...
+            'linestyle',l_st{rem(en,length(l_st))+1},...
+            'Color',cols{rem(en,length(cols))+1},...
+            'linewidth',data(en).linewidth,...
+            'Parent', ax1,...
+            'DisplayName', data(en).sweep_val);
 end %for
-
-if isfield(base_data, 'xdata') && ~isempty(base_data.xdata)
-    plot(squeeze(base_data.xdata), squeeze(base_data.ydata),...%'linestyle',l_st{1},...
-        'Color',cols{1}, 'linewidth',data(en).linewidth, 'Parent', ax1, 'DisplayName', regexprep(base_vals{1},'_', ' '));
-else
-    plot(NaN, NaN,...%'linestyle',l_st{1},...
-        'Color',cols{1}, 'linewidth',data(en).linewidth, 'Parent', ax1);
-end %if
-% leg{end+1} = base_vals{1};
 
 hold(ax1, 'off')
 
