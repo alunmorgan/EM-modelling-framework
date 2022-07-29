@@ -9,6 +9,18 @@ function Blend_figs(report_input)
 graph_metadata.swept_name = report_input.swept_name;
 graph_metadata.output_loc = report_input.output_loc;
 graph_metadata.sweep_type = report_input.sweep_type;
+swept_vals = report_input.swept_vals;
+if strcmp(report_input.swept_name{1}, 'stripline_taper_end_width')
+    %             convert radians to degrees
+    for ks = 1:length(swept_vals)
+        swept_vals{ks} = [num2str(round(str2double(swept_vals{ks})  ./ pi .* 180)), ' degrees'];
+    end %for
+else
+    %             convert to mm
+    for ks = 1:length(swept_vals)
+        swept_vals{ks} = [num2str(str2double(swept_vals{ks})  .* 1000), ' mm'];
+    end %for
+end
 
 %% wake graphs
 good_wake_data = zeros(length(report_input.sources),1);
@@ -17,17 +29,16 @@ for hse = 1:length(report_input.sources)
         good_wake_data(hse) = 1;
     end %if
 end %for
+if sum(good_wake_data) > 0
 ck = 1;
 for hse = length(good_wake_data):-1 :1
     if good_wake_data(hse) == 1
         load(fullfile(report_input.source_path, report_input.sources{hse}, 'wake', 'data_analysed_wake.mat'), 'pp_data');
-        %         load(fullfile(report_input.source_path, report_input.sources{hse}, 'wake', 'data_from_run_logs.mat'), 'run_logs');
-        data_out(ck, :) = blend_wake_data(pp_data, report_input.swept_vals{hse});
+        data_out(ck, :) = blend_wake_data(pp_data, swept_vals{hse});
         ck = ck +1;
     end %if
 end %for
-if sum(good_wake_data) > 0
-    for egvn = 1:size(data_out,2)
+    parfor egvn = 1:size(data_out,2)
         Generate_2D_graph_with_legend(graph_metadata, squeeze(data_out(:,egvn)))
     end
 end %if
@@ -40,42 +51,49 @@ for hse = 1:length(report_input.sources)
         good_s_data(hse) = 1;
     end %if
 end %for
+if sum(good_s_data) > 0
 ck = 1;
 for hse = length(good_s_data):-1 :1
     if good_s_data(hse) == 1
         load(fullfile(report_input.source_path, report_input.sources{hse}, 'sparameter', 'data_analysed_sparameter.mat'), 'sparameter_data');
-        data_out(ck, :) = blend_s_param_data(sparameter_data, report_input.swept_vals{hse});
+        
+        data_out(ck, :) = blend_s_param_data(sparameter_data, swept_vals{hse});
         ck = ck +1;
     end %if
 end %for
-if sum(good_s_data) > 0
-    for egvn = 1:size(data_out,2)
+    parfor egvn = 1:size(data_out,2)
         Generate_2D_graph_with_legend(graph_metadata, squeeze(data_out(:,egvn)))
     end %for
 end %if
 clear data_out
 
 %% Field graphs
-good_field_data = zeros(length(report_input.sources),1);
-for hse = 1:length(report_input.sources)
-    if exist(fullfile(report_input.source_path, report_input.sources{hse}, 'wake', 'field_data.mat'), 'file') == 2
+source_path = report_input.source_path;
+sources = report_input.sources;
+field_snapshot_times = report_input.field_snapshot_times;
+
+good_field_data = zeros(length(sources),1);
+for hse = 1:length(sources)
+    if exist(fullfile(source_path, sources{hse}, 'wake', 'field_data.mat'), 'file') == 2
         good_field_data(hse) = 1;
     end %if
 end %for
-ck = 1;
-for hse = length(good_field_data):-1 :1
-    if good_field_data(hse) == 1
-        load(fullfile(report_input.source_path, report_input.sources{hse}, 'wake', 'field_data.mat'), 'field_data');
-        for ens = 1:length(report_input.field_snapshot_times)
-            data_out(ck, ens, :) = blend_field_data(field_data, report_input.swept_vals{hse}, report_input.field_snapshot_times(ens));
-        end %for
-        data_out(ck, ens +1, :) = blend_field_data(field_data, report_input.swept_vals{hse}, 'max');
-        ck = ck +1;
-    end %if
-end %for
 if sum(good_field_data) > 0
+    parfor hse = 1:length(good_field_data)
+        if good_field_data(hse) == 1
+            T = load(fullfile(source_path, sources{hse}, 'wake', 'field_data.mat'), 'field_data');
+            data_out_temp{hse}(1, :) = blend_field_data(T.field_data, swept_vals{hse}, 'max');
+            for ens = 2:length(field_snapshot_times) +1
+                data_out_temp{hse}(ens, :) = blend_field_data(T.field_data, swept_vals{hse}, field_snapshot_times(ens -1));
+            end %for
+        end %if
+    end %parfor
+    data_out_temp(good_field_data == 0) = [];
+    for nes = 1:length(data_out_temp)
+        data_out(nes, :, :) = data_out_temp{nes}(:,:);
+    end %for
     for fns = 1:length(report_input.field_snapshot_times) + 1
-        for egvn = 1:size(data_out,2)
+        parfor egvn = 1:size(data_out,2)
             Generate_2D_graph_with_legend(graph_metadata, squeeze(data_out(:,fns, egvn)))
         end %for
     end %for
