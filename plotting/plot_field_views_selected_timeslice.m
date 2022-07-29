@@ -1,8 +1,13 @@
-function plot_field_views_selected_timeslice(data, output_location, prefix, selected_timeslice)
+function plot_field_views_selected_timeslice(data, output_location, prefix, selected_time)
 
 field_dirs = {'Fx','Fy','Fz'};
-slice_dirs = {'efieldsx', 'efieldsy', 'efieldsz'};
+slice_dirs = fields(data);
 ROI = 8E-3;
+xslice_ind = contains(slice_dirs, 'fieldsx');
+xslice = slice_dirs(xslice_ind);
+xslice = xslice{1};
+selected_timeslice = find(data.(xslice).timestamp > selected_time * 1E-9, 1, 'first');
+actual_time = num2str(round(data.(xslice).timestamp(selected_timeslice)*1E9*100)/100);
 
 for aks = 1:length(slice_dirs)
     geometry_slice = geometry_from_slice_data(data.(slice_dirs{aks}));
@@ -11,17 +16,17 @@ for aks = 1:length(slice_dirs)
     dir_name = slice_dirs{aks};
     xax = xaxis(1,:);
     yax = yaxis(:,1);
-    if strcmp(dir_name, 'efieldsz')
+    if contains(dir_name, 'fieldsz')
         x_ind1 = find(abs(xax) < ROI ,1, 'first');
         x_ind2 = find(abs(xax) < ROI ,1, 'last');
         y_ind1 = find(abs(yax) < ROI ,1, 'first');
         y_ind2 = find(abs(yax) < ROI ,1, 'last');
-    elseif strcmp(dir_name, 'efieldsy')
+    elseif contains(dir_name, 'fieldsy')
         x_ind1 = find(abs(xax) < ROI ,1, 'first');
         x_ind2 = find(abs(xax) < ROI ,1, 'last');
         y_ind1 = 1;
         y_ind2 = length(yax);
-    elseif strcmp(dir_name, 'efieldsx')
+    elseif contains(dir_name, 'fieldsx')
         x_ind1 = find(abs(xax) < ROI ,1, 'first');
         x_ind2 = find(abs(xax) < ROI ,1, 'last');
         y_ind1 = 1;
@@ -41,8 +46,8 @@ for aks = 1:length(slice_dirs)
             xaxis_trim, ...
             yaxis_trim, ...
             slice, ...
-            dir_name, field_name)
-        output_name = [prefix, '_field_through_centre_',slice_dirs{aks},'_', field_dirs{oas}, '_at_slice_', num2str(selected_timeslice), '(',num2str(round(data.efieldsx.timestamp(selected_timeslice)*1e9)),'ns)' ];
+            dir_name, field_name, actual_time)
+        output_name = [prefix, '_field_through_centre_',slice_dirs{aks},'_', field_dirs{oas}, '_at_slice_', num2str(selected_timeslice), '(',num2str(round(data.(xslice).timestamp(selected_timeslice)*1e9)),'ns)' ];
         savemfmt(f2, output_location, output_name);
         close(f2)
         fprintf('.')  

@@ -1,4 +1,5 @@
 function plot_field_slices(fig_handle, sets, field_dirs, data, selected_timeslice, field_levels)
+time_val = num2str(round(data.(sets{1}).timestamp(selected_timeslice)*1E9*100)/100);
 
 figure(fig_handle)
 clf(fig_handle)
@@ -80,7 +81,7 @@ for whs = 1:length(sets)
             ylabel('Vertical (mm)')
         end %if
     end %if
-    title('Field magnitude')
+    title(['Field magnitude at ', time_val, 'ns'])
     axis equal
     colorbar
 end %for

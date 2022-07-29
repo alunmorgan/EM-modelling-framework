@@ -2,8 +2,10 @@ function plot_fexport_data_peak_field(data, output_location, prefix)
 
 sets = fields(data);
 field_dirs = {'Fx','Fy','Fz'};
-
-test2 = squeeze(data.efieldsx.Fx);
+xslice_ind = contains(sets, 'fieldsx');
+xslice = sets(xslice_ind);
+xslice = xslice{1};
+test2 = squeeze(data.(xslice).Fx);
 test = squeeze(sum(sum(abs(test2))));
 [~,selected_timeslice] = max(test);
 

@@ -16,6 +16,7 @@ for twm = 1:length(set_start_inds) -1
     fileset_name = regexprep(fileset_name, '[0-9-]', '');
     fprintf(['\n', fileset_name, '\n'])
     fprintf('*')
+    field_type  = fileset_name(1);
     
     % Load in inital data file in order to do some setup.
     temp_unzip = fullfile(scratch_path, 'temp_unzip');
@@ -83,12 +84,12 @@ for twm = 1:length(set_start_inds) -1
     for hes = 1:n_cords_1
         data_temp = test_input_limits{coord_1_start_ind + hes};
         reg_temp = regexp(data_temp, '\s*([0-9-+eE.]+)\s+.*', 'tokens');
-        data.(fileset_name).coord_1(hes) = str2double(reg_temp{1}{1});
+        data.(field_type).(fileset_name).coord_1(hes) = str2double(reg_temp{1}{1});
     end %for
     for hes = 1:n_cords_2
         data_temp = test_input_limits{coord_2_start_ind + hes};
         reg_temp = regexp(data_temp, '\s*([0-9-+eE.]+)\s+.*', 'tokens');
-        data.(fileset_name).coord_2(hes) = str2double(reg_temp{1}{1});
+        data.(field_type).(fileset_name).coord_2(hes) = str2double(reg_temp{1}{1});
     end %for
     
     % Initialise data grid
@@ -141,13 +142,13 @@ for twm = 1:length(set_start_inds) -1
     fprintf('\n')
     fprintf('Combining data')
     % Combine data for all filesets
-    data.(fileset_name).Fx = Fx;
+    data.(field_type).(fileset_name).Fx = Fx;
     fprintf('.')
-    data.(fileset_name).Fy = Fy;
+    data.(field_type).(fileset_name).Fy = Fy;
     fprintf('.')
-    data.(fileset_name).Fz = Fz;
+    data.(field_type).(fileset_name).Fz = Fz;
     fprintf('.')
-    data.(fileset_name).timestamp = timestamp;
+    data.(field_type).(fileset_name).timestamp = timestamp;
     fprintf('Done\n')
 end %for
 

@@ -1,10 +1,11 @@
 function make_field_videos(output_location, prefix)
 
-load(fullfile(output_location, 'EfieldFrames.mat'), 'field_images')
-
-for aks = 1:length(field_images{1,1}.slice_dirs)
-    for oas = 1:length(field_images{1,1}.field_dirs)
-        write_vid(field_images{aks,oas}.frames, fullfile(output_location,...
-            [prefix, 'fields_', field_images{aks,oas}.slice_dirs{aks}, '_', field_images{aks,oas}.field_dirs{oas}]))
+load(fullfile(output_location, 'fieldFrames.mat'), 'field_images')
+for hsw = 1:size(field_images,1)
+    for aks = 1:size(field_images,2)
+        for oas = 1:size(field_images,3)
+            write_vid(field_images{hsw, aks, oas}.frames, fullfile(output_location,...
+                [prefix, field_images{hsw, aks, oas}.field_type, 'fields_', field_images{hsw, aks, oas}.slice_dir, '_', field_images{hsw, aks, oas}.field_dir]))
+        end %for
     end %for
 end %for
