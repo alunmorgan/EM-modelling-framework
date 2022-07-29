@@ -152,28 +152,29 @@ for set_id = 1:length(p.Results.sets)
             for ind = 1:length(datasets)
                 if isempty(dir_list_gen(datasets{ind}.path_to_data, 'avi',1))
                     if exist(fullfile(datasets{ind}.path_to_data, 'wake', 'field_data.mat'), 'file') == 2
-                        load(fullfile(datasets{ind}.path_to_data, 'wake', 'field_data.mat'), 'field_data');
+                        T = load(fullfile(datasets{ind}.path_to_data, 'wake', 'field_data.mat'), 'field_data');
                         disp(['Data loaded ', datasets{ind}.path_to_data])
                         [~, prefix, ~] = fileparts(datasets{ind}.path_to_data);
                         output_location = fullfile(datasets{ind}.path_to_data, 'wake');
+                        
                         fprintf('Plotting peak fields...')
-                        plot_fexport_data_peak_field(field_data, output_location, prefix);
+                        plot_fexport_data_peak_field(T.field_data.e, output_location, [prefix, 'e']);
+                        plot_fexport_data_peak_field(T.field_data.h, output_location, [prefix, 'h']);
                         fprintf('Done\n')
                         fprintf('Plotting selected fields...')
-                        selected_timeslice = 70;
-                        plot_fexport_data_selected_timeslice(field_data, output_location, prefix, selected_timeslice)
-                        plot_field_views_selected_timeslice(field_data, output_location, prefix, selected_timeslice)
+                        selected_time = 2; %ns
+                        plot_fexport_data_selected_timeslice(T.field_data.e, output_location, [prefix, 'e'], selected_time)
+                        plot_fexport_data_selected_timeslice(T.field_data.h, output_location, [prefix, 'h'], selected_time)
+                        plot_field_views_selected_timeslice(T.field_data.e, output_location, [prefix, 'e'], selected_time)
+                        plot_field_views_selected_timeslice(T.field_data.h, output_location, [prefix, 'h'], selected_time)
                         fprintf('Done\n')
                         fprintf('Plotting slices...')
-                        plot_fexport_data(field_data, output_location, prefix)
+                        plot_fexport_data(T.field_data.e, output_location, [prefix, 'e'])
+                        plot_fexport_data(T.field_data.h, output_location, [prefix, 'h'])
                         fprintf('Done\n')
                         fprintf('Making field images...')
-                        make_field_images(field_data, output_location);
+                        make_field_images(T.field_data, output_location);
                         fprintf('Done\n')
-%                         fprintf('Plotting single time slice...')
-%                         slice_index = 70; % NEED TO FIX 
-%                         plot_fexport_data_single_slice(slice_index, output_location, prefix)
-%                         fprintf('Done\n')
                         fprintf('Making field videos...')
                         make_field_videos(output_location, prefix)
                         fprintf('Done\n')
