@@ -13,7 +13,13 @@ for hse = 1:length(names)
         % FIXME check scaling on these loss values.
         summary.wlfx{hse} = [num2str(pp_data.Wake_impedance.s.loss.x * 1e-12), '~V/pC' ];
         summary.wlfy{hse} = [num2str(pp_data.Wake_impedance.s.loss.y * 1e-12), '~V/pC' ];
-        summary.wlfy{hse} = [num2str(pp_data.Wake_impedance.s.loss.s * 1e-12), '~V/pC' ];
+        summary.wlfs{hse} = [num2str(pp_data.Wake_impedance.s.loss.s * 1e-12), '~V/pC' ];
+        summary.wlfdx{hse} = [num2str(pp_data.Wake_impedance.dx.loss.x * 1e-12), '~V/pC' ];
+        summary.wlfdx{hse} = [num2str(pp_data.Wake_impedance.dx.loss.y * 1e-12), '~V/pC' ];
+        summary.wlfdx{hse} = [num2str(pp_data.Wake_impedance.dx.loss.s * 1e-12), '~V/pC' ];
+        summary.wlfdy{hse} = [num2str(pp_data.Wake_impedance.dy.loss.x * 1e-12), '~V/pC' ];
+        summary.wlfdy{hse} = [num2str(pp_data.Wake_impedance.dy.loss.y * 1e-12), '~V/pC' ];
+        summary.wlfdy{hse} = [num2str(pp_data.Wake_impedance.dy.loss.s * 1e-12), '~V/pC' ];
         summary.date{hse} = [run_logs.dte, '  ', run_logs.tme];
         summary.soft_ver{hse} = num2str(run_logs.ver);
         summary.soft_type{hse} = 'GdfidL';

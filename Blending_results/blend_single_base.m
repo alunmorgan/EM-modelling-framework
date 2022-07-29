@@ -95,8 +95,9 @@ for jse = 1:length(names_group)
             mkdir(report_input.output_loc)
         end %if
 %         s_parameter_extract_single_frequency_data(report_input); %FIXME
-%         Blend_figs(report_input);
+        Blend_figs(report_input);
         summary = Blend_summaries(report_input.source_path, report_input.sources);
+        save(fullfile(report_input.output_loc, [report_input.swept_name{1}, '_summary.mat']), 'summary')
         Blend_single_report(report_input)
         clear varying_pars_ind param_names param_vals good_data names_in_sweep report_input
     end %for
