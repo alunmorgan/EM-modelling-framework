@@ -66,6 +66,14 @@ materials.molybdenum.conductivity = 1.82E7; % (S/m)
 materials.molybdenum.epsilon_r = 1;% Relative permativity
 materials.molybdenum.mu_r = 1;% Relative permiability
 
+materials.glidcopper.conductivity = 4.5E7; % (S/m)
+materials.glidcopper.epsilon_r = 1;% Relative permativity
+materials.glidcopper.mu_r = 1;% Relative permiability
+
+materials.hastelloyC22.conductivity = 0.877E6; % (S/m)
+materials.hastelloyC22.epsilon_r = 1;% Relative permativity
+materials.hastelloyC22.mu_r = 1;% Relative permiability
+
 materials.nickel.conductivity = 1.5625E7; % (S/m)
 materials.nickel.epsilon_r = 1;% Relative permativity
 materials.nickel.mu_r = 1240;% Relative permiability
