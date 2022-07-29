@@ -94,7 +94,7 @@ if mov == 1
             fs = cat(1,fs,'    -fexport');
             fs = cat(1,fs,'       what= e-fields');
             fs = cat(1,fs,['       firstsaved=', field_setup.full_field_snapshot_times{wld}]);
-            fs = cat(1,fs,['       lastsaved=', field_setup.full_field_snapshot_times{wld}]);
+            fs = cat(1,fs,['       lastsaved=', field_setup.full_field_snapshot_times{wld}, ' + DISTSAV']);
             fs = cat(1,fs,['       outfile= ./efields_full_snapshot_', field_setup.full_field_snapshot_times{wld}]);
             fs = cat(1,fs,'       doit');
             fs = cat(1,fs,'       what= h-fields');
@@ -104,7 +104,7 @@ if mov == 1
             fs = cat(1,fs,'       whattosave=both');
             fs = cat(1,fs,'       name=field_snapshots');
             fs = cat(1,fs,['       firstsaved=', field_setup.full_field_snapshot_times{wld}]);
-            fs = cat(1,fs,['       lastsaved=', field_setup.full_field_snapshot_times{wld}]);
+            fs = cat(1,fs,['       lastsaved=', field_setup.full_field_snapshot_times{wld}, ' + DISTSAV']);
             fs = cat(1,fs,'       distancesaved= DISTSAV');
             fs = cat(1,fs,'       doit');  
         end %for
