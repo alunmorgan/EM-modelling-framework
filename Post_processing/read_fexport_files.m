@@ -81,75 +81,157 @@ for twm = 1:length(set_start_inds) -1
         coord_2_start_ind = Ycoord_start_ind;
     end %if
     
-    for hes = 1:n_cords_1
-        data_temp = test_input_limits{coord_1_start_ind + hes};
-        reg_temp = regexp(data_temp, '\s*([0-9-+eE.]+)\s+.*', 'tokens');
-        data.(field_type).(fileset_name).coord_1(hes) = str2double(reg_temp{1}{1});
-    end %for
-    for hes = 1:n_cords_2
-        data_temp = test_input_limits{coord_2_start_ind + hes};
-        reg_temp = regexp(data_temp, '\s*([0-9-+eE.]+)\s+.*', 'tokens');
-        data.(field_type).(fileset_name).coord_2(hes) = str2double(reg_temp{1}{1});
-    end %for
-    
-    % Initialise data grid
-    Fx = NaN(n_cords_1, n_cords_2, length(fileset));
-    Fy = NaN(n_cords_1, n_cords_2, length(fileset));
-    Fz = NaN(n_cords_1, n_cords_2, length(fileset));
-    
-    % Run through all datafiles in the fileset in order to populate the data grid.
-    parfor wns = 1:length(fileset)
-        % Extract data into a variable.
-        fprintf('.')
-        temp_name = gunzip(fileset{wns}, temp_unzip)
-        test_input = {};
-        for hsk = 1:10
-            try
-                test_input = read_in_text_file(temp_name{1});
-                break
-            catch
-                % If the filesystem is slow then the new file will not appear by the
-                % time you want to read it in. Wait for a bit and then try again.
-                disp(['file ', temp_name{1}, ' unavailable... retrying'])
-                pause(5)
-            end %try
+    if exist('n_cords_1', 'var')
+        % dealing with a single slice
+        % Initialise data grid
+        Fx = NaN(n_cords_1, n_cords_2, length(fileset));
+        Fy = NaN(n_cords_1, n_cords_2, length(fileset));
+        Fz = NaN(n_cords_1, n_cords_2, length(fileset));
+        
+        for hes = 1:n_cords_1
+            data_temp = test_input_limits{coord_1_start_ind + hes};
+            reg_temp = regexp(data_temp, '\s*([0-9-+eE.]+)\s+.*', 'tokens');
+            data.(field_type).slices.(fileset_name).coord_1(hes) = str2double(reg_temp{1}{1});
         end %for
-        if ~isempty('test_input')
-            delete(temp_name{1})
-            
-            % populates data grid
-            timestamp_temp = test_input(find(contains(test_input, 'subtitle: "t='),1, 'first'));
-            time_temp = regexp(timestamp_temp, 'subtitle: "t=\s*([0-9\.eE-+]+)".*', 'tokens');
-            timestamp(wns) = str2double(time_temp{1}{1});
-            
-            data_start_ind = find(contains(test_input, 'ENDDO'),1, 'last')+2;
-            
-            ck = 0;
-            for hfgs = 1:n_cords_2
-                for hsk = 1:n_cords_1
-                    temp_data = test_input{data_start_ind + ck};
-                    temp_data_reg = regexp(temp_data, '\s*([0-9-+eE.]+)\s+([0-9-+eE.]+)\s+([0-9-+eE.]+)\s+.*', 'tokens');
-                    Fx(hsk, hfgs, wns) = str2double(temp_data_reg{1}{1});
-                    Fy(hsk, hfgs, wns) = str2double(temp_data_reg{1}{2});
-                    Fz(hsk, hfgs, wns) = str2double(temp_data_reg{1}{3});
-                    ck = ck +1;
-                end %for
+        for hes = 1:n_cords_2
+            data_temp = test_input_limits{coord_2_start_ind + hes};
+            reg_temp = regexp(data_temp, '\s*([0-9-+eE.]+)\s+.*', 'tokens');
+            data.(field_type).slices.(fileset_name).coord_2(hes) = str2double(reg_temp{1}{1});
+        end %for
+        
+        % Run through all datafiles in the fileset in order to populate the data grid.
+        parfor wns = 1:length(fileset)
+            % Extract data into a variable.
+            fprintf('.')
+            temp_name = gunzip(fileset{wns}, temp_unzip)
+            test_input = {};
+            for hsk = 1:10
+                try
+                    test_input = read_in_text_file(temp_name{1});
+                    break
+                catch
+                    % If the filesystem is slow then the new file will not appear by the
+                    % time you want to read it in. Wait for a bit and then try again.
+                    disp(['file ', temp_name{1}, ' unavailable... retrying'])
+                    pause(5)
+                end %try
             end %for
-        else
-            disp(['Could not extract data from ', temp_name{1}])
-        end %if
-    end %parfor
-    fprintf('\n')
-    fprintf('Combining data')
-    % Combine data for all filesets
-    data.(field_type).(fileset_name).Fx = Fx;
-    fprintf('.')
-    data.(field_type).(fileset_name).Fy = Fy;
-    fprintf('.')
-    data.(field_type).(fileset_name).Fz = Fz;
-    fprintf('.')
-    data.(field_type).(fileset_name).timestamp = timestamp;
-    fprintf('Done\n')
+            if ~isempty('test_input')
+                delete(temp_name{1})
+                
+                % populates data grid
+                timestamp_temp = test_input(find(contains(test_input, 'subtitle: "t='),1, 'first'));
+                time_temp = regexp(timestamp_temp, 'subtitle: "t=\s*([0-9\.eE-+]+)".*', 'tokens');
+                timestamp(wns) = str2double(time_temp{1}{1});
+                
+                data_start_ind = find(contains(test_input, 'ENDDO'),1, 'last')+2;
+                
+                ck = 0;
+                for hfgs = 1:n_cords_2
+                    for hsk = 1:n_cords_1
+                        temp_data = test_input{data_start_ind + ck};
+                        temp_data_reg = regexp(temp_data, '\s*([0-9-+eE.]+)\s+([0-9-+eE.]+)\s+([0-9-+eE.]+)\s+.*', 'tokens');
+                        Fx(hsk, hfgs, wns) = str2double(temp_data_reg{1}{1});
+                        Fy(hsk, hfgs, wns) = str2double(temp_data_reg{1}{2});
+                        Fz(hsk, hfgs, wns) = str2double(temp_data_reg{1}{3});
+                        ck = ck +1;
+                    end %for
+                end %for
+            else
+                disp(['Could not extract data from ', temp_name{1}])
+            end %if
+        end %parfor
+        fprintf('\n')
+        fprintf('Combining data')
+        % Combine data for all filesets
+        data.(field_type).slices.(fileset_name).Fx = Fx;
+        fprintf('.')
+        data.(field_type).slices.(fileset_name).Fy = Fy;
+        fprintf('.')
+        data.(field_type).slices.(fileset_name).Fz = Fz;
+        fprintf('.')
+        data.(field_type).slices.(fileset_name).timestamp = timestamp;
+        fprintf('Done\n')
+    else
+        % dealing with a full field
+        % Initialise data grid
+        Fx = NaN(n_cords_x, n_cords_y, n_cords_z, length(fileset));
+        Fy = NaN(n_cords_x, n_cords_y, n_cords_z, length(fileset));
+        Fz = NaN(n_cords_x, n_cords_y, n_cords_z, length(fileset));
+        
+        for hes = 1:n_cords_x
+            data_temp = test_input_limits{Xcoord_start_ind + hes};
+            reg_temp = regexp(data_temp, '\s*([0-9-+eE.]+)\s+.*', 'tokens');
+            data.(field_type).snapshots.(fileset_name).coord_x(hes) = str2double(reg_temp{1}{1});
+        end %for
+        for hes = 1:n_cords_y
+            data_temp = test_input_limits{Ycoord_start_ind + hes};
+            reg_temp = regexp(data_temp, '\s*([0-9-+eE.]+)\s+.*', 'tokens');
+            data.(field_type).snapshots.(fileset_name).coord_y(hes) = str2double(reg_temp{1}{1});
+        end %for
+        for hes = 1:n_cords_z
+            data_temp = test_input_limits{Zcoord_start_ind + hes};
+            reg_temp = regexp(data_temp, '\s*([0-9-+eE.]+)\s+.*', 'tokens');
+            data.(field_type).snapshots.(fileset_name).coord_z(hes) = str2double(reg_temp{1}{1});
+        end %for
+        
+        % Run through all datafiles in the fileset in order to populate the data grid.
+        parfor wns = 1:length(fileset)
+            % Extract data into a variable.
+            fprintf('.')
+            temp_name = gunzip(fileset{wns}, temp_unzip)
+            test_input = {};
+            for hsk = 1:10
+                try
+                    test_input = read_in_text_file(temp_name{1});
+                    break
+                catch
+                    % If the filesystem is slow then the new file will not appear by the
+                    % time you want to read it in. Wait for a bit and then try again.
+                    disp(['file ', temp_name{1}, ' unavailable... retrying'])
+                    pause(5)
+                end %try
+            end %for
+            if ~isempty('test_input')
+                delete(temp_name{1})
+                
+                % populates data grid
+                timestamp_temp = test_input(find(contains(test_input, 'subtitle: "t='),1, 'first'));
+                time_temp = regexp(timestamp_temp, 'subtitle: "t=\s*([0-9\.eE-+]+)".*', 'tokens');
+                timestamp(wns) = str2double(time_temp{1}{1});
+                
+                data_start_ind = find(contains(test_input, 'ENDDO'),1, 'last')+2;
+                
+                ck = 0;
+                for jwad = 1:n_cords_z
+                    for hfgs = 1:n_cords_y
+                        for hsk = 1:n_cords_x
+                            temp_data = test_input{data_start_ind + ck};
+                            temp_data_reg = regexp(temp_data, '\s*([0-9-+eE.]+)\s+([0-9-+eE.]+)\s+([0-9-+eE.]+)\s+.*', 'tokens');
+                            Fx(hsk, hfgs, jwad, wns) = str2double(temp_data_reg{1}{1});
+                            Fy(hsk, hfgs, jwad, wns) = str2double(temp_data_reg{1}{2});
+                            Fz(hsk, hfgs, jwad, wns) = str2double(temp_data_reg{1}{3});
+                            ck = ck +1;
+                        end %for
+                    end %for
+                end %for
+            else
+                disp(['Could not extract data from ', temp_name{1}])
+            end %if
+        end %parfor
+        fprintf('\n')
+        fprintf('Combining data')
+        % Combine data for all filesets
+        data.(field_type).snapshots.(fileset_name).Fx = Fx;
+        fprintf('.')
+        data.(field_type).snapshots.(fileset_name).Fy = Fy;
+        fprintf('.')
+        data.(field_type).snapshots.(fileset_name).Fz = Fz;
+        fprintf('.')
+        data.(field_type).snapshots.(fileset_name).timestamp = timestamp;
+        fprintf('Done\n')
+    end %if
+    clear n_cords_1
 end %for
 
 

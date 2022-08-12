@@ -11,9 +11,9 @@ for nrd = 1:length(field_types)
     ROI = 8E-3;
     
     for aks = 1:length(slice_dirs)
-        geometry_slice = geometry_from_slice_data(data.(field_types{nrd}).(slice_dirs{aks}));
-        [xaxis, yaxis] = meshgrid(data.(field_types{nrd}).(slice_dirs{aks}).coord_1, ...
-            data.(field_types{nrd}).(slice_dirs{aks}).coord_2);
+        geometry_slice = geometry_from_slice_data(data.(field_types{nrd}).slices.(slice_dirs{aks}));
+        [xaxis, yaxis] = meshgrid(data.(field_types{nrd}).slices.(slice_dirs{aks}).coord_1, ...
+            data.(field_types{nrd}).slices.(slice_dirs{aks}).coord_2);
         dir_name = slice_dirs{aks};
         xax = xaxis(1,:);
         yax = yaxis(:,1);
@@ -36,13 +36,13 @@ for nrd = 1:length(field_types)
         xaxis_trim = xaxis(y_ind1:y_ind2, x_ind1:x_ind2);
         yaxis_trim = yaxis(y_ind1:y_ind2, x_ind1:x_ind2);
         for oas = 1:length(field_dirs)
-            dirfields = data.(field_types{nrd}).(dir_name).(field_dirs{oas});
+            dirfields = data.(field_types{nrd}).slices.(dir_name).(field_dirs{oas});
             dirfields_trim = dirfields(x_ind1:x_ind2, y_ind1:y_ind2, :);
             geometry_slice_trim = geometry_slice(x_ind1:x_ind2, y_ind1:y_ind2);
             field_name = field_dirs{oas};
             graph_lims(1) = min(min(min(dirfields_trim)));
             graph_lims(2) = max(max(max(dirfields_trim)));
-            timescale = data.(field_types{nrd}).(slice_dirs{aks}).timestamp;
+            timescale = data.(field_types{nrd}).slices.(slice_dirs{aks}).timestamp;
             parfor ifen = 1:size(dirfields_trim,3)
                 f2 = figure('Position',[30,30, 1500, 600]);
                 slice = squeeze(dirfields_trim(:,:,ifen));

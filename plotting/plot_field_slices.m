@@ -19,7 +19,7 @@ for whs = 1:length(sets)
         temp_accum(:,:,igr) = slice;
         
         subplot(length(sets), length(field_dirs) +1, igr + (whs-1) * (length(field_dirs) +1))
-        if strcmp(sets{whs}, 'efieldsz')
+        if strcmp(sets{whs}, 'efieldsz') || strcmp(sets{whs}, 'hfieldsz')
             [xaxis, yaxis] = meshgrid(data.(sets{whs}).coord_1, data.(sets{whs}).coord_2);
             xaxis = xaxis(valid_c, valid_r);
             yaxis = yaxis(valid_c, valid_r);
@@ -44,13 +44,13 @@ for whs = 1:length(sets)
                 contourf(xaxis.*1e3, yaxis.*1e3, slice, field_levels, 'LineStyle', 'none')
             end %if
             xlabel('Beam direction (mm)')
-            if strcmp(sets{whs}, 'efieldsx')
+            if strcmp(sets{whs}, 'efieldsx') || strcmp(sets{whs}, 'hfieldsx')
                 ylabel('Horizontal (mm)')
-            elseif strcmp(sets{whs}, 'efieldsy')
+            elseif strcmp(sets{whs}, 'efieldsy') || strcmp(sets{whs}, 'hfieldsy')
                 ylabel('Vertical (mm)')
             end %if
         end %if
-        title(field_dirs{igr})
+        title([field_dirs{igr}, ' (', sets{whs}(1), ' field)'])
         axis equal
         colorbar
     end%for
@@ -58,7 +58,7 @@ for whs = 1:length(sets)
     temp_accum = (sum(temp_accum .^2, 3)).^0.5;
     
     subplot(length(sets), length(field_dirs) +1, igr + 1 + (whs-1) * (length(field_dirs) +1))
-    if strcmp(sets{whs}, 'efieldsz')
+    if strcmp(sets{whs}, 'efieldsz') || strcmp(sets{whs}, 'hfieldsz')
         if isnan(field_levels)
             contourf(xaxis.*1e3, yaxis.*1e3, temp_accum',  'LineStyle', 'none')
         else
@@ -75,9 +75,9 @@ for whs = 1:length(sets)
             contourf(xaxis.*1e3, yaxis.*1e3, temp_accum, field_levels, 'LineStyle', 'none') 
         end %if
         xlabel('Beam direction (mm)')
-        if strcmp(sets{whs}, 'efieldsx')
+        if strcmp(sets{whs}, 'efieldsx') || strcmp(sets{whs}, 'hfieldsx')
             ylabel('Horizontal (mm)')
-        elseif strcmp(sets{whs}, 'efieldsy')
+        elseif strcmp(sets{whs}, 'efieldsy') || strcmp(sets{whs}, 'hfieldsy')
             ylabel('Vertical (mm)')
         end %if
     end %if

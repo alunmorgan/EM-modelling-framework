@@ -156,21 +156,25 @@ for set_id = 1:length(p.Results.sets)
                         disp(['Data loaded ', datasets{ind}.path_to_data])
                         [~, prefix, ~] = fileparts(datasets{ind}.path_to_data);
                         output_location = fullfile(datasets{ind}.path_to_data, 'wake');
-                        
+                        fprintf('Plotting field snapshots...')
+                        graph_limits{1} = [-20,20; -14, 14];
+                        graph_limits{2} = [-6,6; -6, 6];
+                        plot_fexport_snapshots(T.field_data.e.snapshots, graph_limits, output_location, [prefix, 'e']);
+                        fprintf('Plotting field slices...')
                         fprintf('Plotting peak fields...')
-                        plot_fexport_data_peak_field(T.field_data.e, output_location, [prefix, 'e']);
-                        plot_fexport_data_peak_field(T.field_data.h, output_location, [prefix, 'h']);
+                        plot_fexport_data_peak_field(T.field_data.e.slices, output_location, [prefix, 'e']);
+                        plot_fexport_data_peak_field(T.field_data.h.slices, output_location, [prefix, 'h']);
                         fprintf('Done\n')
                         fprintf('Plotting selected fields...')
                         selected_time = 2; %ns
-                        plot_fexport_data_selected_timeslice(T.field_data.e, output_location, [prefix, 'e'], selected_time)
-                        plot_fexport_data_selected_timeslice(T.field_data.h, output_location, [prefix, 'h'], selected_time)
-                        plot_field_views_selected_timeslice(T.field_data.e, output_location, [prefix, 'e'], selected_time)
-                        plot_field_views_selected_timeslice(T.field_data.h, output_location, [prefix, 'h'], selected_time)
+                        plot_fexport_data_selected_timeslice(T.field_data.e.slices, output_location, [prefix, 'e'], selected_time)
+                        plot_fexport_data_selected_timeslice(T.field_data.h.slices, output_location, [prefix, 'h'], selected_time)
+                        plot_field_views_selected_timeslice(T.field_data.e.slices, output_location, [prefix, 'e'], selected_time)
+                        plot_field_views_selected_timeslice(T.field_data.h.slices, output_location, [prefix, 'h'], selected_time)
                         fprintf('Done\n')
                         fprintf('Plotting slices...')
-                        plot_fexport_data(T.field_data.e, output_location, [prefix, 'e'])
-                        plot_fexport_data(T.field_data.h, output_location, [prefix, 'h'])
+                        plot_fexport_data(T.field_data.e.slices, output_location, [prefix, 'e'])
+                        plot_fexport_data(T.field_data.h.slices, output_location, [prefix, 'h'])
                         fprintf('Done\n')
                         fprintf('Making field images...')
                         make_field_images(T.field_data, output_location);
