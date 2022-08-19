@@ -8,26 +8,34 @@ ax1 = axes('Parent', h1);
 hold(ax1, 'on')
 
 for en = 1:length(data)
+    if ~isempty(data(en).ydata)
         plot(squeeze(data(en).xdata), squeeze(data(en).ydata),...
             'linestyle',l_st{rem(en,length(l_st))+1},...
             'Color',cols{rem(en,length(cols))+1},...
             'linewidth',data(en).linewidth,...
             'Parent', ax1,...
             'DisplayName', data(en).sweep_val);
+        if ~exist('xlim_min', 'var')
+            xlim_min = min(data(1).xdata);
+            xlim_max = max(data(1).xdata);
+            ylim_min = min(data(1).ydata);
+            ylim_max = max(data(1).ydata);
+        else
+            xlim_min = min(xlim_min, min(data(en).xdata));
+            xlim_max = max(xlim_max, max(data(en).xdata));
+            ylim_min = min(ylim_min, min(data(en).ydata));
+            ylim_max = max(ylim_max, max(data(en).ydata));
+        end %if
+    end %if
 end %for
 
 hold(ax1, 'off')
-
-xlim_min = min(data(1).xdata);
-xlim_max = max(data(1).xdata);
-ylim_min = min(data(1).ydata);
-ylim_max = max(data(1).ydata);
-for ew = 2:length(data)
-    xlim_min = min(xlim_min, min(data(ew).xdata));
-    xlim_max = max(xlim_max, max(data(ew).xdata));
-    ylim_min = min(ylim_min, min(data(ew).ydata));
-    ylim_max = max(ylim_max, max(data(ew).ydata));
-end %for
+ if ~exist('xlim_min', 'var')
+     % there was no valid data to plot.
+     close(h1)
+     return
+ end %if
+ 
 xlims = [xlim_min xlim_max];
 ylims = [ylim_min ylim_max];
 setup_graph_for_display(ax1, xlims,...
