@@ -153,13 +153,15 @@ for set_id = 1:length(p.Results.sets)
                 if isempty(dir_list_gen(datasets{ind}.path_to_data, 'avi',1))
                     if exist(fullfile(datasets{ind}.path_to_data, 'wake', 'field_data.mat'), 'file') == 2
                         T = load(fullfile(datasets{ind}.path_to_data, 'wake', 'field_data.mat'), 'field_data');
+                        RL = load(fullfile(datasets{ind}.path_to_data, 'wake', 'data_from_run_logs.mat'), 'run_logs');
                         disp(['Data loaded ', datasets{ind}.path_to_data])
                         [~, prefix, ~] = fileparts(datasets{ind}.path_to_data);
                         output_location = fullfile(datasets{ind}.path_to_data, 'wake');
                         fprintf('Plotting field snapshots...')
                         graph_limits{1} = [-20,20; -14, 14];
                         graph_limits{2} = [-6,6; -6, 6];
-                        plot_fexport_snapshots(T.field_data.e.snapshots, graph_limits, output_location, [prefix, 'e']);
+                        plot_fexport_snapshots(T.field_data.e.snapshots, RL.run_logs.mesh_step_size, graph_limits, output_location, [prefix, 'e']);
+                        plot_fexport_snapshots(T.field_data.h.snapshots, RL.run_logs.mesh_step_size, graph_limits, output_location, [prefix, 'h']);
                         fprintf('Plotting field slices...')
                         fprintf('Plotting peak fields...')
                         plot_fexport_data_peak_field(T.field_data.e.slices, output_location, [prefix, 'e']);
