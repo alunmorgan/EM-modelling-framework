@@ -1,4 +1,4 @@
-function plot_fexport_snapshots(data, limits, output_location, prefix)
+function plot_fexport_snapshots(data, mesh_step, limits, output_location, prefix)
 
 sets = fields(data);
 field_dirs = {'Fx','Fy','Fz'};
@@ -8,13 +8,21 @@ for osd = 1:length (sets)
     for ahd = 1:length(data.(sets{osd}).timestamp)
         graph_timestamp = [num2str(round(data.(sets{osd}).timestamp(ahd) * 1E9*10000)/10000), 'ns'];
         save_timestamp = regexprep(graph_timestamp, '\.', 'p');
+        if contains(sets{osd}, 'efields_')
+            field_units = '(V/m)';
+        elseif contains(sets{osd}, 'hfields_')
+                        field_units = '(A/m)';
+        else
+            field_units = '';
+        end %if
         for wnd = 1:length(field_dirs)
             graph_data_temp = squeeze(data.(sets{osd}).(field_dirs{wnd})(:,:,:,ahd));
-            graph_data = squeeze(sum(graph_data_temp, 3))';
+            graph_data = squeeze(sum(graph_data_temp, 3))' * mesh_step;
             out_file_name = [prefix, '_snapshot_', sets{osd}, save_timestamp, '_', field_dirs{wnd}];
             writematrix(graph_data, fullfile(output_location, [out_file_name, '.csv']));
             imagesc(data.(sets{osd}).coord_x*1E3, data.(sets{osd}).coord_y * 1E3, graph_data)
-            title_text = ['snapshot ', sets{osd}, ' ', graph_timestamp, ' ', field_dirs{wnd}];
+            title_text = {['snapshot ', sets{osd}, ' ', graph_timestamp, ' ', field_dirs{wnd}]; 
+                           ['Integrated along beam direction ', field_units]};
             title_text = regexprep(title_text, '_', ' ');
             title(title_text)
             colorbar
