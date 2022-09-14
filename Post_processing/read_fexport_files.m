@@ -17,6 +17,9 @@ for twm = 1:length(set_start_inds) -1
     fprintf(['\n', fileset_name, '\n'])
     fprintf('*')
     field_type  = fileset_name(1);
+%     if strcmp(field_type, 'e')
+%         continue
+%     end %IF %TEMP FOR TESTING
     
     % Load in inital data file in order to do some setup.
     temp_unzip = fullfile(scratch_path, 'temp_unzip');
@@ -126,15 +129,14 @@ for twm = 1:length(set_start_inds) -1
                 
                 data_start_ind = find(contains(test_input, 'ENDDO'),1, 'last')+2;
                 
-                ck = 0;
                 for hfgs = 1:n_cords_2
+                    start_index = data_start_ind -1 + (hfgs-1) * n_cords_1;
                     for hsk = 1:n_cords_1
-                        temp_data = test_input{data_start_ind + ck};
+                        temp_data = test_input{start_index + hsk};
                         temp_data_reg = regexp(temp_data, '\s*([0-9-+eE.]+)\s+([0-9-+eE.]+)\s+([0-9-+eE.]+)\s+.*', 'tokens');
                         Fx(hsk, hfgs, wns) = str2double(temp_data_reg{1}{1});
                         Fy(hsk, hfgs, wns) = str2double(temp_data_reg{1}{2});
                         Fz(hsk, hfgs, wns) = str2double(temp_data_reg{1}{3});
-                        ck = ck +1;
                     end %for
                 end %for
             else
@@ -176,10 +178,11 @@ for twm = 1:length(set_start_inds) -1
         end %for
         
         % Run through all datafiles in the fileset in order to populate the data grid.
-        parfor wns = 1:length(fileset)
+        timestamp = NaN(length(fileset),1);
+        for wns = 1:length(fileset)
             % Extract data into a variable.
             fprintf('.')
-            temp_name = gunzip(fileset{wns}, temp_unzip)
+            temp_name = gunzip(fileset{wns}, temp_unzip);
             test_input = {};
             for hsk = 1:10
                 try
@@ -201,24 +204,25 @@ for twm = 1:length(set_start_inds) -1
                 timestamp(wns) = str2double(time_temp{1}{1});
                 
                 data_start_ind = find(contains(test_input, 'ENDDO'),1, 'last')+2;
-                
-                ck = 0;
-                for jwad = 1:n_cords_z
+                tic
+                parfor jwad = 1:n_cords_z
+                    y_start_index = data_start_ind -1 + (jwad -1) * n_cords_x * n_cords_y;
                     for hfgs = 1:n_cords_y
+                        x_start_index = y_start_index + (hfgs-1) * n_cords_x;
                         for hsk = 1:n_cords_x
-                            temp_data = test_input{data_start_ind + ck};
+                            temp_data = test_input{x_start_index + hsk};
                             temp_data_reg = regexp(temp_data, '\s*([0-9-+eE.]+)\s+([0-9-+eE.]+)\s+([0-9-+eE.]+)\s+.*', 'tokens');
                             Fx(hsk, hfgs, jwad, wns) = str2double(temp_data_reg{1}{1});
                             Fy(hsk, hfgs, jwad, wns) = str2double(temp_data_reg{1}{2});
                             Fz(hsk, hfgs, jwad, wns) = str2double(temp_data_reg{1}{3});
-                            ck = ck +1;
                         end %for
                     end %for
-                end %for
+                end %parfor
+                toc
             else
                 disp(['Could not extract data from ', temp_name{1}])
             end %if
-        end %parfor
+        end %for
         fprintf('\n')
         fprintf('Combining data')
         % Combine data for all filesets
@@ -231,7 +235,7 @@ for twm = 1:length(set_start_inds) -1
         data.(field_type).snapshots.(fileset_name).timestamp = timestamp;
         fprintf('Done\n')
     end %if
-    clear n_cords_1
+    clear n_cords_1 timestamp Fx Fy Fz
 end %for
 
 
