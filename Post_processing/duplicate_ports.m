@@ -1,5 +1,12 @@
-function [port_names, port_data, tstart] = duplicate_ports(port_multiple, port_names_in, port_data_in, tstart_in)
+function pp_reconstruction_data = duplicate_ports(port_multiple, pp_reconstruction_data)
 % duplicate any required ports
+
+if all(port_multiple == 1)
+    return
+end %if
+port_names_in = pp_reconstruction_data.port_labels;
+port_data_in = pp_reconstruction_data.port_data;
+tstart_in = pp_reconstruction_data.port_t_start;
 
 substructure = fieldnames(port_data_in);
 port_data = replicate_structure(port_data_in, struct());
@@ -31,3 +38,6 @@ for wsh = 1:length(substructure)
     end %for
 end %for
 
+pp_reconstruction_data.port_labels = port_names;
+pp_reconstruction_data.port_data = port_data;
+pp_reconstruction_data.port_t_start = tstart;

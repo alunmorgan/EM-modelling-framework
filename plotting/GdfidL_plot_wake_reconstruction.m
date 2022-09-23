@@ -1,12 +1,19 @@
-function GdfidL_plot_pp_wake(run_inputs_loc, analysis_loc, ppi, output_folder)
+function GdfidL_plot_wake_reconstruction(run_inputs_loc, run_logs_loc, analysis_loc, reconstruction_loc, ppi, output_folder)
 % Generate the graphs based on the wake simulation data.
 % Graphs are saved in fig format and png, eps.
 %
+% output_folder is where the resulting files are saved to.
+% range is to do with peak identification for Q values, and
+% is the separation peaks have to have to be counted as separate.
 %
 % Example GdfidL_plot_wake(wake_data, ppi, mi, run_log,  pth, range)
 
-files_to_load = {run_inputs_loc, 'modelling_inputs';...
-    analysis_loc, 'pp_data'};
+% chosen_wake_length = str2double(chosen_wake_length);
+
+files_to_load = {run_inputs_loc, {'modelling_inputs'};...
+   analysis_loc, {'pp_data'};...
+    reconstruction_loc, {'wake_sweep_data', 'time_slice_data', 'sigma_sweep', 'bunch_charge_sweep_data', 'bunch_length_sweep_data'};...
+    run_logs_loc, {'run_logs'}};
 
 [temp, ~, ~] = fileparts(run_inputs_loc);
 [temp, ~, ~] = fileparts(temp);
@@ -15,7 +22,7 @@ files_to_load = {run_inputs_loc, 'modelling_inputs';...
 
 for rnf = 1:size(files_to_load,1)
     if exist(files_to_load{rnf,1}, 'file') == 2
-        load(files_to_load{rnf,1}, files_to_load{rnf,2});
+        load(files_to_load{rnf,1}, files_to_load{rnf,2}{:});
     else
         disp(['Unable to load ', files_to_load{rnf,1}])
         return
@@ -32,16 +39,42 @@ fig_left = 10560 - fig_width;
 fig_bottom = 1098 - fig_height;
 fig_pos = [fig_left fig_bottom fig_width fig_height];
 
+% Set the level vector to show the total energy loss on graphs (nJ).
+% y_lev_t = [wake_data.time_domain_data.loss_from_beam *1e9,...
+%     wake_data.time_domain_data.loss_from_beam * 1e9];
+% y_lev_f = [wake_data.frequency_domain_data.Total_bunch_energy_loss *1e9,...
+%     wake_data.frequency_domain_data.Total_bunch_energy_loss * 1e9];
+%
+% cut_off_freqs = wake_data.time_domain_data.port_data.voltage_port_mode.frequency_cutoffs;
+% cut_off_freqs = cellfun(@(x) x*1e-9,cut_off_freqs, 'UniformOutput', false);
+
 % setting up some style lists for the graphs.
 % cols = {'b','k','m','c','g',[1, 0.5, 0],[0.5, 1, 0],[1, 0, 0.5],[0.5, 0, 1],[0.5, 1, 0] };
 l_st ={'--',':','-.','--',':','-.','--',':','-.'};
+
+% Some pre processing to pull out trends.
+% [wl, freqs, Qs, mags, bws] = find_Q_trends(wake_sweep_data.frequency_domain_data, range, run_logs.wake_length);
+% Show the Q values of the resonances shows if the simulation has stablised.
+% for ehw = size(freqs,1):-1:1
+%     Q_leg{ehw} = [num2str(round(freqs(ehw,1)./1e7)./1e2), 'GHz'];
+% end %for
+% These are the plots to generate for a single value of sigma.
+% sigma = round(str2num(mi.beam_sigma) ./3E8 *1E12 *10)/10;
+% if isfield(pp_data.port, 'timebase')
+% end %if
 
 % Extracting  losses
 [model_mat_data, mat_loss, m_time, m_data] = ...
     extract_material_losses_from_wake_data(pp_data, modelling_inputs.extension_names);
 
+% [bunch_energy_loss, beam_port_energy_loss, signal_port_energy_loss, ...
+%     ] = extract_energy_loss_data_from_wake_data(wake_data);
+
 [structure_energy_loss, material_names] =  ...
     extract_energy_loss_data_from_pp_data(pp_data);
+
+% total_port_energy_loss = signal_port_energy_loss + beam_port_energy_loss;
+% pme = extract_port_energy_from_wake_data(wake_data);
 
 % Extracting wake impedances
 cut_freq_ind = find(pp_data.Wake_impedance.s.data(:,1)*1E-9 < graph_freq_lim,1,'last');
@@ -52,6 +85,9 @@ wi_dipole_x(:,1) = wi_dipole_x(:,1) .* 1E-9; % frequency in GHz
 wi_dipole_y = pp_data.Wake_impedance.y.data(1:cut_freq_ind,:);
 wi_dipole_y(:,1) = wi_dipole_y(:,1) .* 1E-9; % frequency in GHz
 
+% wi_im = pp_data.Wake_impedance_Im.s.data(1:cut_freq_ind,:);
+% wi_im(:,1) = wi_im(:,1) .* 1E-9; % frequency in GHz
+
 % Extracting time series
 wp = pp_data.Wake_potential.s.data; % V/pC
 wp(:,1) = wp(:,1) .* 1E9; % time in ns
@@ -60,10 +96,40 @@ wpdx(:,1) = wpdx(:,1) .* 1E9; % time in ns
 wpdy = pp_data.Wake_potential.y.data; % V/pC
 wpdy(:,1) = wpdy(:,1) .* 1E9; % time in ns
 
+
+% e_ports_cs = cat(1,wake_data.time_domain_data.port_data.power_port_mode.remnant_only.port_energy_cumsum(1:2,:),...
+%     wake_data.time_domain_data.port_data.power_port_mode.full_signal.port_energy_cumsum(3:end,:))' .* 1e9; %nJ
+% e_total_cs = sum(e_ports_cs,2); %nJ
+
+
+% port_mode_energy = cat(1,wake_data.time_domain_data.port_data.power_port_mode.remnant_only.port_mode_energy(1:2,:),...
+%     wake_data.time_domain_data.port_data.power_port_mode.full_signal.port_mode_energy(3:end,:));
+% port_mode_signals = cat(1,wake_data.time_domain_data.port_data.power_port_mode.remnant_only.port_mode_signals(1:2,:,:),...
+%     wake_data.time_domain_data.port_data.power_port_mode.full_signal.port_mode_signals(3:end, :, :));
+% [~, max_mode] = max(port_mode_energy,[],2);
+% for ens = size(port_mode_signals, 1):-1:1 % ports
+%     dominant_modes{ens} =  squeeze(port_mode_signals(ens,max_mode(ens), :));
+%     for seo = 1:size(port_mode_signals, 2) % modes
+%         modes{ens}{seo} =  squeeze(port_mode_signals(ens,seo, :));
+%     end %for
+% end %for
+
+
 % Extracting spectra
+
+% bs = extract_bunch_spectrum_from_wake_data(wake_data, cut_freq_ind);
 
 [peaks, Q, bw] = find_Qs(wi_re(:,1) .* 1e9, wi_re(:,2), 0.1, 'single_sided');
 R_over_Q = peaks(:,2) ./ Q;
+
+% bls = extract_bunch_loss_spectrum_from_wake_data(wake_data, cut_freq_ind);
+
+% pes = extract_port_energy_spectrum_from_wake_data(wake_data, cut_freq_ind);
+%
+% [beam_port_spectrum, ...
+%     signal_port_spectrum, port_spectra] = ...
+%     extract_port_spectra_from_wake_data(wake_data, cut_freq_ind);
+
 
 h_wake = figure('Position',fig_pos);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

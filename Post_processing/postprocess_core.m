@@ -62,6 +62,17 @@ if ~strcmpi(sim_type, 'eigenmode') && ~strcmpi(sim_type, 'lossy_eigenmode')
     end %parfor
 end %if
 delete temp_scratch/*.gld
+
+%% fixing the arrow plot file naming.
+[pic_names_temp ,~]= dir_list_gen('temp_scratch','',1);
+arrowplot_names = pic_names_temp(contains(pic_names_temp, '3D-Arrowplot'));
+new_arrowplot_names = regexprep(arrowplot_names, '3D-Arrowplot\.([0-9]+)ps', '3D-Arrowplot-$1.ps');
+for jas = 1:length(arrowplot_names)
+    % movefile crashes with unknown error so using a direct system call here
+    % instead.
+    system(['mv ' fullfile('temp_scratch',arrowplot_names{jas}), ' ', fullfile('temp_scratch',new_arrowplot_names{jas})]);
+end %for
+%% convert ps to png
 [pic_names ,~]= dir_list_gen('temp_scratch','ps',1);
 for eh = 1:length(pic_names)
     pName = pic_names{eh}(1:end-3);

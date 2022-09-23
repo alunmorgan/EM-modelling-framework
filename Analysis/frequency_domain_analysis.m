@@ -56,11 +56,11 @@ end
 
 %% Port analysis 
 time_domain_data.port_data.power_port_mode.full_signal.port_mode_signals(isnan(time_domain_data.port_data.power_port_mode.full_signal.port_mode_signals)==1)=0;
-    port_f_data = fft(time_domain_data.port_data.power_port_mode.full_signal.port_mode_signals,[],3);
-    bs = repmat(permute(bunch_spectra,[2,3,1]), size(port_f_data,1), size(port_f_data,2));
-    port_impedances = port_f_data ./abs(bs).^2;
-    trim_ind = find(f_raw > hfoi, 1, 'first');
-    port_impedances = port_impedances(:,:,1:trim_ind);
+    port_mode_f_data = fft(time_domain_data.port_data.power_port_mode.full_signal.port_mode_signals,[],3);
+    bs = repmat(permute(bunch_spectra,[2,3,1]), size(port_mode_f_data,1), size(port_mode_f_data,2));
+    port_impedances = port_mode_f_data ./abs(bs).^2;
+%     trim_ind = find(f_raw > hfoi, 1, 'first');
+%     port_impedances = port_impedances(:,:,1:trim_ind);
 
 %% scaling for the bunch spectra
 % Could either take the appropriate section from both the upper and lower
@@ -68,14 +68,14 @@ time_domain_data.port_data.power_port_mode.full_signal.port_mode_signals(isnan(t
 % (and ignore the small error due to counting DC twice).
 bunch_spectra = bunch_spectra .* sqrt(2);
 
-%% Remove all data above the highest frequency of interest (hfoi).
-Wake_Impedance_data = trim_to_hfoi(Wake_Impedance_data, f_raw,  hfoi);
-Wake_Impedance_data_im = trim_to_hfoi(Wake_Impedance_data_im, f_raw,  hfoi);
-Wake_Impedance_data_X = trim_to_hfoi(Wake_Impedance_data_X, f_raw,  hfoi);
-Wake_Impedance_data_im_X = trim_to_hfoi(Wake_Impedance_data_im_X, f_raw,  hfoi);
-Wake_Impedance_data_Y = trim_to_hfoi(Wake_Impedance_data_Y, f_raw,  hfoi);
-Wake_Impedance_data_im_Y = trim_to_hfoi(Wake_Impedance_data_im_Y, f_raw,  hfoi);
-bunch_spectra = trim_to_hfoi(bunch_spectra, f_raw,  hfoi);
+% %% Remove all data above the highest frequency of interest (hfoi).
+% Wake_Impedance_data = trim_to_hfoi(Wake_Impedance_data, f_raw,  hfoi);
+% Wake_Impedance_data_im = trim_to_hfoi(Wake_Impedance_data_im, f_raw,  hfoi);
+% Wake_Impedance_data_X = trim_to_hfoi(Wake_Impedance_data_X, f_raw,  hfoi);
+% Wake_Impedance_data_im_X = trim_to_hfoi(Wake_Impedance_data_im_X, f_raw,  hfoi);
+% Wake_Impedance_data_Y = trim_to_hfoi(Wake_Impedance_data_Y, f_raw,  hfoi);
+% Wake_Impedance_data_im_Y = trim_to_hfoi(Wake_Impedance_data_im_Y, f_raw,  hfoi);
+% bunch_spectra = trim_to_hfoi(bunch_spectra, f_raw,  hfoi);
 
 % The outputs from this function are for the model charge.
 % except for the wake loss factor which is V/C
@@ -104,9 +104,10 @@ frequency_domain_data.BLPS_Qs = Q;
 frequency_domain_data.BLPS_bw = bw;
 frequency_domain_data.Total_bunch_energy_loss = Total_bunch_energy_loss;
 % if exist('port_data','var')
-    frequency_domain_data.Total_port_spectrum = sum(port_f_data,1);
-    frequency_domain_data.signal_port_spectrum = sum(port_f_data(1:2,:),1);
-    frequency_domain_data.beam_port_spectrum = sum(port_f_data(3:end,:),1);
+port_f_data = squeeze(sum(port_mode_f_data,2));
+    frequency_domain_data.Total_port_spectrum = squeeze(sum(port_f_data,1));
+    frequency_domain_data.signal_port_spectrum = squeeze(sum(port_f_data(3:end,:),1));
+    frequency_domain_data.beam_port_spectrum = squeeze(sum(port_f_data(1:2,:),1));
     frequency_domain_data.port_impedances = port_impedances;
-    frequency_domain_data.port_specatra = port_f_data;
+    frequency_domain_data.port_specatra = port_mode_f_data;
 % end

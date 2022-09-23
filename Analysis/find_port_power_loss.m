@@ -3,7 +3,7 @@ function [beam_port_spectrum, Total_energy_from_beam_ports,...
     Total_port_spectrum, Total_energy_from_all_ports] = ...
     find_port_power_loss(raw_port_mode_energy_spectrum)
 %%%%%% This is all for model charge %%%%%%%%%%%%%%%%
-
+% for a single port
     %combining all the modes.
     for ne = 1:length(raw_port_mode_energy_spectrum)
     raw_port_energy_spectrum = squeeze(sum(raw_port_mode_energy_spectrum{ne},2));

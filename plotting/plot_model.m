@@ -7,7 +7,10 @@ for ind = 1:length(datasets)
     if isfield(datasets{ind}, 'wake') && any(contains(p_types, 'wake'))
         if isempty(dir_list_gen(fullfile(datasets{ind}.path_to_data, 'wake'), 'png',1)) 
             disp(['Generating wake graphs for ', datasets{ind}.model_name])
-            GdfidL_plot_pp_wake(datasets{ind}.wake, ppi)
+            run_inputs_loc = fullfile(datasets{ind}.wake, 'postprocessing', 'wake', 'run_inputs.mat');
+            analysis_loc = fullfile(datasets{ind}.wake, 'analysis', 'wake', 'data_analysed_wake.mat');
+            run_logs_loc = fullfile(datasets{ind}.wake, 'postprocessing', 'wake', 'run_inputs.mat');
+            GdfidL_plot_pp_wake(run_inputs_loc, analysis_loc, run_logs_loc, ppi)
         else
             disp(['Wake graphs already exists for ', datasets{ind}.model_name, '. Skipping...'])
         end

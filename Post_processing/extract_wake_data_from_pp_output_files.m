@@ -62,7 +62,9 @@ end %if
 %% Ports
 if ~isfield(output_file_locations, 'Port_mat')
     disp('postprocess_wakes:No ports to analyse')
-    raw_data.port.data = NaN;
+    raw_data.port.data.time = NaN;
+    raw_data.port.data.frequency = NaN;
+    raw_data.port.timebase = NaN;
 else
     [raw_data.port.timebase, raw_data.port.data] = read_port_datafiles(output_file_locations.Port_mat);
 end
@@ -128,10 +130,9 @@ if ~isempty(output_file_locations.WI_Im_y) && length(output_file_locations.WI_Im
     raw_data.Wake_impedance_Im.dy = GdfidL_read_graph_datafile(output_file_locations.WI_Im_y{2} );
 end
 
-% Calculate the energy lost from the beam (J)
-raw_data.wake_loss_factor = raw_data.Wake_impedance.s.loss.s ./ raw_data.Wake_impedance.s.charge.^2 ;
-%% Generate the data file which the analysis code is expecting.
+raw_data.wake_loss_factor = raw_data.Wake_impedance.s.loss.s ./ raw_data.Wake_impedance.s.charge.^2 ; % V/C
 
+%% Generate the data file which the analysis code is expecting.
 raw_data.port.labels = modelling_inputs.port_names;
 % raw_data.port.t_start = tstart;
 raw_data.wake_setup.Wake_length = raw_data.Wake_potential.s.data(end,1) .* 2.99792458E8;

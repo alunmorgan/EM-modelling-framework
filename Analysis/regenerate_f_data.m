@@ -73,8 +73,14 @@ if iscell(port_data)
         if sum(isnan(single_port)) > 0
             port_impedances(:,nsf) = NaN;
         else
-            single_port = cat(1,single_port,zeros(length(timescale) - ...
+            if any(size(single_port)==1) && any(size(single_port) == length(timescale))
+                if size(single_port, 1) == 1 && size(single_port,2) == length(timescale)
+                    single_port = single_port';
+                end %if   
+            else
+            single_port = cat(1,single_port, zeros(length(timescale) - ...
                 size(single_port,1), size(single_port,2)));
+            end %if
             % Calculating the fft of the port signals
             n_modes = size(single_port, 2); % number of modes
             port_mode_fft = zeros(hf_ind, n_modes); % Initialise with zeros.
@@ -85,16 +91,18 @@ if iscell(port_data)
                 if isempty(cut_off_freqs) == 0
                     % setting all values below the cutoff frequency for each port and mode to
                     % zero.
-                    tmp_ind = find(f_raw < cut_off_freqs{nsf}(kef),1,'last');
-                    % TEST
-                    % move the index n samples above cutoff to reduce the effect of
-                    % phase runaway. (set to zero now as I think that the error
-                    % committed doing this is larger than the error I am trying to
-                    % remove. If it is a gibbs like phenomina then the integral will be
-                    % correct so the energy losses and power will be correct even if
-                    % the cumulative sum graphs show some drops.)
-                    if tmp_ind <= length(f_raw)
-                        port_mode_fft_temp(1:tmp_ind) = 0;
+                    if ~isempty(cut_off_freqs{nsf}) % dealing with empty cutoff entries
+                        tmp_ind = find(f_raw < cut_off_freqs{nsf}(kef),1,'last');
+                        % TEST
+                        % move the index n samples above cutoff to reduce the effect of
+                        % phase runaway. (set to zero now as I think that the error
+                        % committed doing this is larger than the error I am trying to
+                        % remove. If it is a gibbs like phenomina then the integral will be
+                        % correct so the energy losses and power will be correct even if
+                        % the cumulative sum graphs show some drops.)
+                        if tmp_ind <= length(f_raw)
+                            port_mode_fft_temp(1:tmp_ind) = 0;
+                        end %if
                     end %if
                 end %if
                 port_mode_fft(:,kef) = port_mode_fft_temp;
