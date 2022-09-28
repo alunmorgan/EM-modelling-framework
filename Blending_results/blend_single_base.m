@@ -22,6 +22,10 @@ names_all.geometry = names_all.geometry(~contains(names_all.geometry, '_mat_swee
 
 ck = 2;
 names_in_sweeps{1} = names_all.geometry;
+basename = regexprep(names_all.geometry{contains(names_all.geometry, '_Base')}, '_Base', '');
+g_sweep = regexprep(names_all.geometry{2}, [basename,'_'] , '');
+sweep_names{1} = regexprep(g_sweep, '_sweep_value_.*', '');
+sweep_type{1} = 'geometry';
 for she = 1:length(names_all.geometry)
     sweep_sub_types = {'beam_offset_x', 'beam_offset_y', 'material', 'port_excitation'};
     for whw = 1:length(sweep_sub_types)
@@ -87,10 +91,11 @@ for ewh = 1:length(sweep_names)
             report_input.mesh_stepsize{psw} = modelling_inputs{psw}.mesh_stepsize;
         end %if
     end %for
-    if sum(good_data) ==0
-        disp('No valid data. Skipping report generation')
-        return
-    end %if
+        if sum(good_data) ==0
+            disp('No valid data. Skipping report generation')
+            return
+        end %if
+
     % Remove bad data
     param_names = param_names(good_data == 1,:);
     param_vals = param_vals(good_data == 1,:);
@@ -98,6 +103,7 @@ for ewh = 1:length(sweep_names)
     report_input.port_multiple = report_input.port_multiple(good_data == 1);
     report_input.port_fill_factor = report_input.port_fill_factor(good_data == 1);
     report_input.volume_fill_factor = report_input.volume_fill_factor(good_data == 1);
+    clear good_data
     
     % Identify which parameters vary.
     for sha = size(param_vals,2):-1:1
@@ -111,7 +117,7 @@ for ewh = 1:length(sweep_names)
         disp('No varying parameters found. Skipping this one.')
         continue
     end %if
-    
+
     report_input.sources = names_in_sweep;
     report_input.sweep_type = sweep_type{ewh};
     report_input.author = modelling_inputs{1}.author;
@@ -126,7 +132,7 @@ for ewh = 1:length(sweep_names)
         report_input.swept_name = param_names(1, varying_pars_ind);
         report_input.swept_vals = param_vals(:,varying_pars_ind);
     end %if
-    
+
     if ~exist(report_input.output_loc, 'dir')
         mkdir(report_input.output_loc)
     end %if
@@ -135,5 +141,5 @@ for ewh = 1:length(sweep_names)
     summary = Blend_summaries(report_input.source_path, report_input.sources);
     save(fullfile(report_input.output_loc, [report_input.swept_name{1}, '_summary.mat']), 'summary')
     Blend_single_report(report_input)
-    clear varying_pars_ind param_names param_vals good_data names_in_sweep report_input
+    clear varying_pars_ind param_names param_vals names_in_sweep report_input
 end %for
