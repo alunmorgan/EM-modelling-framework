@@ -34,7 +34,7 @@ out_T = add_blend_table(regexprep(base_name, '_', ' '),...
 ov = cat(1,ov,out_T);
 ov = cat(1,ov,' ');
 for pns = length(report_input.sources):-1:1
-    data_name = fullfile(report_input.source_path, report_input.sources{pns}, 'wake',  'data_from_run_logs.mat');
+    data_name = fullfile(report_input.source_path, report_input.sources{pns}, 'postprocessing', 'wake',  'data_from_run_logs.mat');
     run_log_data{pns} = load(data_name);
 end %for
 
