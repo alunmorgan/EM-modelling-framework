@@ -95,52 +95,9 @@ for set_id = 1:length(p.Results.sets)
         end %if
     end %if
     if any(matches(p.Results.stages, 'plot_fields'))
-        try
-            datasets = find_datasets(fullfile(paths.results_loc, p.Results.sets{set_id}));
-            for ind = 1:length(datasets)
-                if isempty(dir_list_gen(datasets{ind}.path_to_data, 'avi',1))
-                    if exist(fullfile(datasets{ind}.path_to_data, 'wake', 'field_data.mat'), 'file') == 2
-                        T = load(fullfile(datasets{ind}.path_to_data, 'wake', 'field_data.mat'), 'field_data', 'pointing_data');
-                        RL = load(fullfile(datasets{ind}.path_to_data, 'wake', 'data_from_run_logs.mat'), 'run_logs');
-                        disp(['Data loaded ', datasets{ind}.path_to_data])
-                        [~, prefix, ~] = fileparts(datasets{ind}.path_to_data);
-                        output_location = fullfile(datasets{ind}.path_to_data, 'wake');
-                        fprintf('Plotting field snapshots...')
-                        graph_limits{1} = [-20,20; -14, 14];
-                        graph_limits{2} = [-6,6; -6, 6];
-                        %                         plot_fexport_snapshots(T.field_data.e.snapshots, RL.run_logs.mesh_step_size, graph_limits, output_location, [prefix, 'e']);
-                        %                         plot_fexport_snapshots(T.field_data.h.snapshots, RL.run_logs.mesh_step_size, graph_limits, output_location, [prefix, 'h']);
-                        plot_poynting_snapshots(T.pointing_data.snapshots.pointing_real_1, RL.run_logs.mesh_step_size, graph_limits, output_location, [prefix, 'p'])
-                        
-                        fprintf('Plotting field slices...')
-                        fprintf('Plotting peak fields...')
-                        %                         plot_fexport_data_peak_field(T.field_data.e.slices, output_location, [prefix, 'e']);
-                        %                         plot_fexport_data_peak_field(T.field_data.h.slices, output_location, [prefix, 'h']);
-                        fprintf('Done\n')
-                        fprintf('Plotting selected fields...')
-                        selected_time = 2; %ns
-                        %                         plot_fexport_data_selected_timeslice(T.field_data.e.slices, output_location, [prefix, 'e'], selected_time)
-                        %                         plot_fexport_data_selected_timeslice(T.field_data.h.slices, output_location, [prefix, 'h'], selected_time)
-                        %                         plot_field_views_selected_timeslice(T.field_data.e.slices, output_location, [prefix, 'e'], selected_time)
-                        %                         plot_field_views_selected_timeslice(T.field_data.h.slices, output_location, [prefix, 'h'], selected_time)
-                        fprintf('Done\n')
-                        fprintf('Plotting slices...')
-                        %                         plot_fexport_data(T.field_data.e.slices, output_location, [prefix, 'e'])
-                        %                         plot_fexport_data(T.field_data.h.slices, output_location, [prefix, 'h'])
-                        fprintf('Done\n')
-                        fprintf('Making field images...')
-                        %                         make_field_images(T.field_data, output_location);
-                        fprintf('Done\n')
-                        fprintf('Making field videos...')
-                        %                         make_field_videos(output_location, prefix)
-                        fprintf('Done\n')
-                    end %if
-                end %if
-            end %for
-        catch ME6
-            warning([sets{set_id}, ' <strong>Problem with plotting fields</strong>'])
-            display_error_message(ME6)
-        end %try
+        if any(matches(p.Results.sim_types, 'wake'))
+            plot_wake_fields(p.Results, set_id, paths)
+        end %if
     end %if
     %         generate_report_single_set(sets{set_id});
 end %for

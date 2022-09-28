@@ -13,7 +13,7 @@ for herf = 1:length(input_settings.sim_types)
                 data_path = fullfile(paths.data_loc, modelling_inputs{awh}.base_model_name,...
                     modelling_inputs{awh}.model_name, 'wake');
                 output_path = fullfile(paths.results_loc, modelling_inputs{awh}.base_model_name,...
-                    modelling_inputs{awh}.model_name, 'wake', 'fields');
+                    modelling_inputs{awh}.model_name, 'fields', 'wake');
                 if ~exist(output_path, 'dir')
                     mkdir(output_path)
                 end
