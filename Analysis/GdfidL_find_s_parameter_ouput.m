@@ -4,18 +4,11 @@ function [s_mat, excitation_list, receiver_list] = GdfidL_find_s_parameter_ouput
 %
 % Example: s_mat = GdfidL_find_s_parameter_ouput(data_loc)
 
-%
-% Run name is the name prepended to the results by GdfidL.
 % data loc is the path to the scratch location where the results files are
 % stored.
 
 % get the full list of files in the scratch directory.
-run_list = dir_list_gen_tree(fullfile(data_loc, 'sparameter'), '',1);
-
-% % select only the results which contain the run name.
-% inds = find_position_in_cell_lst(strfind(full_list, [run_name,'_scratch']));
-% run_list = full_list(inds);
-% clear full_list
+run_list = dir_list_gen_tree(data_loc, '',1);
 
 % Find list of s parameter ports graphs.
 inds = find_position_in_cell_lst(strfind(run_list, 'freq-abs'));
