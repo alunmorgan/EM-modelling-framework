@@ -37,21 +37,29 @@ end %if
 %% wake graphs
 good_wake_data = zeros(length(report_input.sources),1);
 for hse = 1:length(report_input.sources)
-    if exist(fullfile(report_input.source_path, report_input.sources{hse}, 'wake', 'data_analysed_wake.mat'), 'file') == 2
+    if exist(fullfile(report_input.source_path, report_input.sources{hse}, 'analysis','wake', 'data_analysed_wake.mat'), 'file') == 2
         good_wake_data(hse) = 1;
     end %if
 end %for
-if sum(good_wake_data) > 0
+if sum(good_wake_data) > 1
     ck = 1;
     for hse = length(good_wake_data):-1 :1
         if good_wake_data(hse) == 1
-            load(fullfile(report_input.source_path, report_input.sources{hse}, 'wake', 'data_analysed_wake.mat'), 'pp_data');
-            data_out(ck, :) = blend_wake_data(pp_data, swept_vals{hse});
-            ck = ck +1;
+            load(fullfile(report_input.source_path, report_input.sources{hse}, 'analysis','wake', 'data_analysed_wake.mat'), 'pp_data');
+            if exist('data_out', 'var')
+                data_out = cat(2, data_out, blend_wake_data(pp_data, swept_vals{hse}));
+            else
+            data_out = blend_wake_data(pp_data, swept_vals{hse});
+            end %if
         end %if
     end %for
-    parfor egvn = 1:size(data_out,2)
-        Generate_2D_graph_with_legend(graph_metadata, squeeze(data_out(:,egvn)))
+    for kdr = 1:length(data_out)
+        names_all{kdr} = data_out(kdr).out_name; 
+    end %for
+    names = unique(names_all);
+    parfor egvn = 1:length(names)
+        temp_set = strcmp(names{egvn}, names_all)
+        Generate_2D_graph_with_legend(graph_metadata, squeeze(data_out(:,temp_set)))
     end
 end %if
 clear data_out
@@ -59,15 +67,15 @@ clear data_out
 %% S-parameter graphs
 good_s_data = zeros(length(report_input.sources),1);
 for hse = 1:length(report_input.sources)
-    if exist(fullfile(report_input.source_path, report_input.sources{hse}, 'sparameter', 'data_analysed_sparameter.mat'), 'file') == 2
+    if exist(fullfile(report_input.source_path, report_input.sources{hse}, 'analysis','sparameter', 'data_analysed_sparameter.mat'), 'file') == 2
         good_s_data(hse) = 1;
     end %if
 end %for
-if sum(good_s_data) > 0
+if sum(good_s_data) > 1
     ck = 1;
     for hse = length(good_s_data):-1 :1
         if good_s_data(hse) == 1
-            load(fullfile(report_input.source_path, report_input.sources{hse}, 'sparameter', 'data_analysed_sparameter.mat'), 'sparameter_data');
+            load(fullfile(report_input.source_path, report_input.sources{hse}, 'analysis','sparameter', 'data_analysed_sparameter.mat'), 'sparameter_data');
             
             data_out(ck, :) = blend_s_param_data(sparameter_data, swept_vals{hse});
             ck = ck +1;
@@ -90,7 +98,7 @@ for hse = 1:length(sources)
         good_field_data(hse) = 1;
     end %if
 end %for
-if sum(good_field_data) > 0
+if sum(good_field_data) > 1
     data_out_temp = cell(length(good_field_data),1);
     parfor hse = 1:length(good_field_data)
         if good_field_data(hse) == 1
