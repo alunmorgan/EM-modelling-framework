@@ -43,7 +43,11 @@ if contains(val, 'mm')
     out = str2double(regexprep(val, 'mm', '')) / 1000;
 elseif contains(val, 'deg')
     out = str2double(regexprep(val, 'deg', '')) /180 * pi;
+elseif contains('True')
+    out = 1;
+elseif contains('False')
+    out = 0;
 else
-    out = NaN;
+    out = str2double(val);
 end %if
 end %function
