@@ -43,9 +43,9 @@ if contains(val, 'mm')
     out = str2double(regexprep(val, 'mm', '')) / 1000;
 elseif contains(val, 'deg')
     out = str2double(regexprep(val, 'deg', '')) /180 * pi;
-elseif contains('True')
+elseif contains(val,'True')
     out = 1;
-elseif contains('False')
+elseif contains(val, 'False')
     out = 0;
 else
     out = str2double(val);
