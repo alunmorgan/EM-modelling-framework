@@ -14,16 +14,7 @@ parse(p, pp_data_directory, version, sim_type, s_set, excitation, varargin{:});
 
 pp_input_file = p.Results.pp_input_file;
 pp_log_file = [pp_input_file, '_log'];
-% if strcmpi(sim_type, 'wake')
-%     pp_input_file = p.Results.pp_input_file;
-%     pp_log_file = fullfile(pp_data_directory, ['model_', sim_type ,'_post_processing_log']);
-% elseif strcmpi(sim_type, 'eigenmode')|| strcmpi(sim_type, 'lossy_eigenmode')
-%     pp_input_file = fullfile(pp_data_directory,['model_', sim_type ,'_post_processing']);
-%     pp_log_file = fullfile(pp_data_directory, ['model_', sim_type ,'_post_processing_log']);
-% elseif strcmpi(sim_type, 's_parameter')
-%     pp_input_file = fullfile(pp_data_directory,['model_s_param_set_',s_set, '_',excitation,'_post_processing_input_file']);
-%     pp_log_file = fullfile(pp_data_directory, ['model_s_param_set_',s_set, '_',excitation,'_post_processing_log']);
-% end %if
+
 %% creating file structure
 temp_files('make', '.')
 if contains(pp_input_file, '_EfieldHistory')
