@@ -42,9 +42,11 @@ for cur_ind = 1:length(ppi.current)
             pulse = [];
             pulses_timescale = [];
             total_charge = 0;
+            n_bunches_in_input_pattern = 0;
             for jawe = 1:length(fill_pattern)
                 if fill_pattern(jawe) == 1
                     pulse = cat(2, pulse, new_pulse);
+                    n_bunches_in_input_pattern = n_bunches_in_input_pattern +1;
                 else
                     pulse = cat(2, pulse, zeros(1, length(pulse_timescale)));
                 end %if
@@ -68,14 +70,14 @@ for cur_ind = 1:length(ppi.current)
             [wake_loss_factor, ...
                 Bunch_loss_energy_spectrum, Total_bunch_energy_loss] = ...
                 find_wlf_and_power_loss(total_charge, pulses_timescale, bunch_spec_bc', ...
-                wakeimpedance_bc);
+                wakeimpedance_bc, n_bunches_in_input_pattern);
             
             for ehs = 1:size(port_impedances_bc,2)
                 single_port_impedance = port_impedances_bc(:,ehs);
                 [~, ...
                     port_loss_energy_spectrum(:,ehs), port_energy_loss(ehs)] = ...
                     find_wlf_and_power_loss(total_charge, pulses_timescale, bunch_spec_bc', ...
-                    single_port_impedance);
+                    single_port_impedance, n_bunches_in_input_pattern);
             end %for
             Total_energy_from_beam_ports = sum(port_energy_loss(1:2));
             Total_energy_from_signal_ports = sum(port_energy_loss(3:end));

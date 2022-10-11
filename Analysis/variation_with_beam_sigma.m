@@ -14,12 +14,12 @@ for odf = 1:length(beam_sigmas)
     % over the signal and combine the overlapping signals to preserve
     % the power.
     bunch_spec_sig = bunch_spec_sig(1:length(Wake_Impedance_data)) .* sqrt(2);
-    
+    n_bunches_in_input_pattern = 1;
     [beam_sigma_sweep.wlf(odf),...
         beam_sigma_sweep.Bunch_loss_energy_spectrum{odf},...
         beam_sigma_sweep.Total_bunch_energy_loss(odf)] = ...
         find_wlf_and_power_loss(charge, timebase, ...
-        bunch_spec_sig, Wake_Impedance_data);
+        bunch_spec_sig, Wake_Impedance_data, n_bunches_in_input_pattern);
     
     beam_sigma_sweep.sig_time(odf) = pulse_sig;
     clear pulse pulse_sig

@@ -1,4 +1,4 @@
-function wake_sweep_data = wake_analysis(raw_data, ppi, mi, log, wake_sweep_vals)
+function wake_sweep_data = wake_analysis(raw_data, mi, log, wake_sweep_vals)
 % Takes the model generated data and processes it in order to get an 
 %idea where the power/heat is going.
 %
@@ -29,5 +29,5 @@ function wake_sweep_data = wake_analysis(raw_data, ppi, mi, log, wake_sweep_vals
 % end
 
 %% Generating data for increasingly short wakes
-wake_sweep_data = wake_sweep(wake_sweep_vals, raw_data, mi, ppi, log);
+wake_sweep_data = wake_sweep(wake_sweep_vals, raw_data, mi, log);
 

@@ -1,4 +1,4 @@
-function run_wake_reconstruction(input_settings, set_id, paths)
+function run_wake_reconstruction(input_settings, set_id, paths, ppi, number_of_wake_lengths_to_analyse)
 
 reconstruct_root = fullfile(paths.results_loc, input_settings.sets{set_id});
         [r_folders] = dir_list_gen(reconstruct_root, 'dirs',1);
