@@ -1,13 +1,13 @@
 function [wake_loss_factor, ...
     Bunch_loss_energy_spectrum, Total_bunch_energy_loss] = ...
     find_wlf_and_power_loss(model_charge, timescale, bunch_spec, ...
-    wakeimpedance)
+    wakeimpedance, n_bunches_in_input_pattern)
 % Calculates the power loss and wake loss factor 
 %
 % Example: [wake_loss_factor, ...
 %     Bunch_loss_energy_spectrum, Total_bunch_energy_loss] = ...
 %     find_wlf_and_power_loss(model_charge, timescale, bunch_spec, ...
-%     wakeimpedance)
+%     wakeimpedance, n_bunches_in_input_pattern)
 
 
 %%%%This is all for a 1C bunch %%%%%%%%%
@@ -21,9 +21,10 @@ pwr_f(inds) = 0;
 % This is the power for a repeated bunch pattern with the spacing
 % set by the wake length. To get the power of one bunch you need to
 % divide by the number of bunches in 1 sec (as it is power).
-% Alternativly multiply by the simulation time.
+% Alternativly multiply by the simulation time and divide by the 
+% number of bunches in the input pattern.
 simulation_time = timescale(end) - timescale(1);
-Bunch_loss_energy_spectrum = pwr_f  .* simulation_time;
+Bunch_loss_energy_spectrum = pwr_f  .* simulation_time ./ n_bunches_in_input_pattern;
 pwr = sum(pwr_f);
 % multiply the power for an infinite train by the simulation time in
 % order to get the energy in one simulation run, i.e.1 bunch.
