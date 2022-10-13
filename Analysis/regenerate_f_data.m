@@ -46,15 +46,15 @@ f_raw = (linspace(0,1,n_freq_points) / time_stepsize)';
 % (and ignore the small error due to counting DC twice).
 % Doing the truncation after each variable is created in order to reduce
 % the maximum memory footprint.
-hf_ind = find(f_raw > hfoi, 1, 'first');
+hf_ind = find(f_raw < hfoi, 1, 'last');
 f_raw = f_raw(1:hf_ind);
 
 % Calculating the bunch spectra for a 1C charge.
-bunch_spectra = fft(Charge_distribution)/n_freq_points;
+bunch_spectra = fft(Charge_distribution);
 Charge_distribution = []; % Cannot use clear in a parfor loop but I need to reduce the size.
 bunch_spectra = bunch_spectra(1:hf_ind) .*sqrt(2);
 
-fft_wp = fft(wakepotential)/n_freq_points;
+fft_wp = fft(wakepotential);
 wakepotential = [];% Cannot use clear in a parfor loop but I need to reduce the size.
 fft_wp = fft_wp(1:hf_ind);
 % In order to get the proper impedence you need divide the fft of
