@@ -1,4 +1,4 @@
-function [diff_machine_conds] = loss_extrapolation(time_domain_data, frequency_domain_data, ppi)
+function [diff_machine_conds] = loss_extrapolation(time_domain_data, ppi)
 % calculates the change in wake loss factor and energy lost from the beam
 % and into the ports as the bunch and bunch train is varied.
 %
@@ -36,7 +36,12 @@ for cur_ind = 1:length(ppi.current)
             % added gap/2 so that the peak of the pulse does not happen at 0. So
             % we get a complete first pulse.
             % Generating a pulse train of 1C bunches
-            pulse_timescale = linspace(0, gap - abs(timebase(2) - timebase(1)), gap / abs(timebase(2) - timebase(1)));
+            timestep = abs(timebase(2) - timebase(1));
+            % using colon rather than linspace as it allow one to specify the
+            % stepsize explicitly. With linspace numerical noise meant that you
+            % would get a slightly different stepsize which would mess up later
+            % comparisons
+            pulse_timescale = 0:timestep:gap-timestep;
             new_pulse = ((1 ./ (sqrt(2 .* pi) .* bunch_length)) .* ...
                 exp(-((pulse_timescale - gap ./ 2).^2) ./ (2 .* bunch_length.^2)));
             pulse = [];
@@ -55,17 +60,17 @@ for cur_ind = 1:length(ppi.current)
             end
             pulse_timestep = (pulses_timescale(2) - pulses_timescale(1));
             pulse_f_scale = (linspace(0,1,length(pulses_timescale)) / pulse_timestep);
-            bunch_spec_bc = fft(pulse)/length(pulse);
+            bunch_spec_bc = fft(pulse);
             
             [time_domain_data_bc, port_data_bc] = pad_time_domain_data(time_domain_data, length(pulses_timescale));
-            hfoi = 2.5E10;
+            hfoi = 5E10;
             % Regenerate the frequency domain data.
             [f_raw_bc,~, wakeimpedance_bc,~, port_impedances_bc] = ...
                 regenerate_f_data(port_frequency_cutoffs, time_domain_data_bc,...
                 port_data_bc, '', hfoi);
-            cut_ind = find(pulse_f_scale > hfoi, 1, 'first');
-            bunch_spec_bc = bunch_spec_bc(1:cut_ind-2); %FIXME why do you need this -2 fudge?
-            pulse_f_scale = pulse_f_scale(1:cut_ind-2);
+            cut_ind = find(pulse_f_scale < hfoi, 1, 'last');
+            bunch_spec_bc = bunch_spec_bc(1:cut_ind);
+            pulse_f_scale = pulse_f_scale(1:cut_ind);
             
             [wake_loss_factor, ...
                 Bunch_loss_energy_spectrum, Total_bunch_energy_loss] = ...
@@ -82,6 +87,7 @@ for cur_ind = 1:length(ppi.current)
             Total_energy_from_beam_ports = sum(port_energy_loss(1:2));
             Total_energy_from_signal_ports = sum(port_energy_loss(3:end));
             
+            diff_machine_conds.port_labels{cur_ind, btl_ind, rf_ind} = time_domain_data.port_lables;
             diff_machine_conds.bunch_spec{cur_ind, btl_ind, rf_ind} = bunch_spec_bc;
             diff_machine_conds.wlf(cur_ind, btl_ind, rf_ind) = wake_loss_factor;
             diff_machine_conds.power_loss(cur_ind, btl_ind, rf_ind) = Total_bunch_energy_loss .* rev;
