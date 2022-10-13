@@ -65,7 +65,7 @@ elseif strcmp(length_type,'samples')
     % Find the step size (this should not change).
     time_stepsize = abs(timescale(2) - timescale(1));
     data_start = timescale(1);
-    data_end = timescale(1) + new_lengths * time_stepsize;
+    data_end = timescale(1) + (new_lengths - 1) * time_stepsize;
     % Create a new timescale using the original stepsize but with the length specified.
     timescale_out = linspace(data_start, data_end, (data_end - data_start)/time_stepsize + 1)';
     % padding the time domain data
