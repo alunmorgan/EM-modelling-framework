@@ -1,4 +1,4 @@
-function plot_machine_parameter_sweeps(bunch_charge_sweep_data, ppi, prefix_fp, fig_pos, graph_freq_lim, lw, output_folder)
+function plot_machine_parameter_sweeps(bunch_charge_sweep_data, ppi, prefix, fig_pos, graph_freq_lim, lw, output_folder)
 
 h_wake = figure('Position',fig_pos);
 
@@ -6,6 +6,8 @@ h_wake = figure('Position',fig_pos);
 ppi.bt_length
 ppi.current
 ppi.rf_volts
+
+port_names = regexprep(bunch_charge_sweep_data.port_labels{1,1,1}, '_', ' ');
 
 % for now assume a single value of current
 wlf = squeeze(bunch_charge_sweep_data.wlf(1,:, :));
@@ -23,6 +25,7 @@ port_loss_energy_spectrum = squeeze(bunch_charge_sweep_data.port_loss_energy_spe
 f_scale = squeeze(bunch_charge_sweep_data.f_scale(1,:, 2, :)) .* 1e-9;
 Bunch_loss_energy_spectrum = squeeze(bunch_charge_sweep_data.Bunch_loss_energy_spectrum(1,:, 2,:));
 
+prefix_fp = [prefix, '_fill_patterns_'];
 
 clf(h_wake)
 ax = axes('Parent', h_wake);
@@ -55,29 +58,29 @@ grid on
 savemfmt(h_wake, output_folder, [prefix_fp, 'bunch_loss_energy_spectrum'])
 
 clf(h_wake)
-[hwn, ksn] = num_subplots(length(port_names{1}));
-for ens = length(port_names{1}):-1:1 % ports
+[hwn, ksn] = num_subplots(length(port_names));
+for ens = length(port_names):-1:1 % ports
     ax_sp(ens) = subplot(hwn,ksn,ens);
-    for jse = 1:length(timebase)
+    for jse = 1:size(f_scale, 1)
         try
             hold on
             % This is to cope with the case of missing data files.
             plot(f_scale(jse,:), squeeze(port_loss_energy_spectrum(jse,:,ens)),...
                 'LineWidth',lw, 'Parent', ax_sp(ens))
         end %try
-        title(port_names{jse}{ens}, 'Parent', ax_sp(ens))
-        xlim([0 graph_freq_lim])
-        ylim([0 inf])
-        xlabel('Frequency (GHz)', 'Parent', ax_sp(ens))
-        ylabel('', 'Parent', ax_sp(ens))
-        grid on
     end %for
+    title(port_names{ens}, 'Parent', ax_sp(ens))
+    xlim([0 graph_freq_lim])
+    ylim([0 inf])
+    xlabel('Frequency (GHz)', 'Parent', ax_sp(ens))
+    ylabel('', 'Parent', ax_sp(ens))
+    grid on
 end %for
 savemfmt(h_wake, output_folder, [prefix_fp, 'port_loss_energy_spectrum'])
 
 prefix_rf = [prefix, '_fill_patterns_'];
 % for now assume a single value of current
-% fill pattern at a single RF voltage
+% fill pattern at a single fill pattern voltage
 bunch_spec = squeeze(bunch_charge_sweep_data.bunch_spec(1,2, :));
 port_energy_loss = squeeze(bunch_charge_sweep_data.port_energy_loss(1,2, :, :, :));
 port_loss_energy_spectrum = squeeze(bunch_charge_sweep_data.port_loss_energy_spectrum(1,2, :,: ,:));
@@ -115,23 +118,23 @@ grid on
 savemfmt(h_wake, output_folder, [prefix_rf, 'bunch_loss_energy_spectrum'])
 
 clf(h_wake)
-[hwn, ksn] = num_subplots(length(port_names{1}));
-for ens = length(port_names{1}):-1:1 % ports
+[hwn, ksn] = num_subplots(length(port_names));
+for ens = length(port_names):-1:1 % ports
     ax_sp(ens) = subplot(hwn,ksn,ens);
-    for jse = 1:length(timebase)
+    for jse = 1:size(f_scale, 1)
         try
             hold on
             % This is to cope with the case of missing data files.
             plot(f_scale(jse,:), squeeze(port_loss_energy_spectrum(jse,:,ens)),...
                 'LineWidth',lw, 'Parent', ax_sp(ens))
         end %try
-        title(port_names{jse}{ens}, 'Parent', ax_sp(ens))
-        xlim([0 graph_freq_lim])
-        ylim([0 inf])
-        xlabel('Frequency (GHz)', 'Parent', ax_sp(ens))
-        ylabel('', 'Parent', ax_sp(ens))
-        grid on
     end %for
+    title(port_names{ens}, 'Parent', ax_sp(ens))
+    xlim([0 graph_freq_lim])
+    ylim([0 inf])
+    xlabel('Frequency (GHz)', 'Parent', ax_sp(ens))
+    ylabel('', 'Parent', ax_sp(ens))
+    grid on
 end %for
 savemfmt(h_wake, output_folder, [prefix_rf, 'port_loss_energy_spectrum'])
 close(h_wake)
