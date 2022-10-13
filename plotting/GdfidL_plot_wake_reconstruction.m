@@ -47,6 +47,5 @@ plot_bunch_length_sweep(bunch_length_sweep_data, prefix_bls, fig_pos, graph_freq
 plot_timeslice_data(time_slice_data, prefix, fig_pos, output_folder)
 
 %% machine parameter sweeps 
-prefix_fp = [prefix, '_fill_patterns_'];
-plot_machine_parameter_sweeps(bunch_charge_sweep_data, ppi, prefix_fp, fig_pos, graph_freq_lim, lw, output_folder)
+plot_machine_parameter_sweeps(bunch_charge_sweep_data, ppi, prefix, fig_pos, graph_freq_lim, lw, output_folder)
 
