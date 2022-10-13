@@ -1,4 +1,4 @@
-function ov = GdfidL_write_pp_s_param_input_file(s_set, excite)
+function ov = GdfidL_write_pp_s_param_input_file(data_loc, s_set, excite)
 % Writes the post processing input file for a single port S-parameter.
 % 
 % excite is a string representing a port number 
@@ -7,7 +7,8 @@ function ov = GdfidL_write_pp_s_param_input_file(s_set, excite)
 % example: GdfidL_write_pp_s_param_input_file(excite)
 ov{1} = '';
 ov = cat(1,ov,'-general');
-ov = cat(1,ov,strcat('    infile= data_link/sparameter/set_', s_set,'_port_',excite,'_excitation'));
+% ov = cat(1,ov,strcat('    infile= ', data_loc,'set_', s_set,'_port_',excite,'_excitation'));
+ov = cat(1,ov,strcat('    infile= ', data_loc));
 ov = cat(1,ov,strcat('    scratchbase = temp_scratch/'));
 ov = cat(1,ov,'    2dplotopts = -geometry 1024x768');
 ov = cat(1,ov,'    plotopts = -geometry 1024x768');

@@ -1,10 +1,12 @@
-function run_pp = will_pp_run(sim_type)
+function run_pp = will_pp_run(input_data_location, output_data_location)
 
-if exist(fullfile('data_link', [sim_type,'/']), 'dir')
-    if ~exist(fullfile('pp_link', sim_type, ['model_', sim_type, '_post_processing']), 'file')
+[~, type_name, ~] = fileparts(input_data_location);
+
+if exist(input_data_location, 'dir')
+    if ~exist(fullfile(output_data_location, ['model_', type_name, '_post_processing']), 'file')
         run_pp = 1;
     else
-         disp(['Skipping ', sim_type, ' postprocessing data already exists'])
+         disp(['Skipping ', type_name, ' postprocessing data already exists'])
         run_pp = 0;
     end %if
 else
