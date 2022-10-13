@@ -35,40 +35,46 @@ end %for
 clf(h_wake)
 ax = axes('Parent', h_wake);
 hold on
-for jse = 1:length(wp)
-    plot(timebase{jse}, wp{jse}, 'LineWidth',lw, 'Parent', ax)
+for jse = length(wp):-1:1
+    plot(timebase{jse}, wp{jse}, 'LineWidth',lw, 'Parent', ax,...
+        'DisplayName', ['Wakelength = ', num2str(round(wakelength(jse)))])
 end %for
-title('Evolution of longitudinal wake potential in the structure', 'Parent', ax, 'DisplayName', ['Wakelength = ', num2str(round(wakelength(jse)))])
+title('Evolution of longitudinal wake potential in the structure', 'Parent', ax)
 xlabel('Time (ns)', 'Parent', ax)
-xlim([timebase{jse}(1) timebase{jse}(end)])
+xlim([timebase{end}(1) timebase{end}(end)])
 ylabel('Wake potential (V/pC)', 'Parent', ax)
 grid on
+legend
 savemfmt(h_wake, output_folder, [prefix_wls, 'wake_potential'])
 
 clf(h_wake)
 ax = axes('Parent', h_wake);
 hold on
-for jse = 1:length(wpdx)
-    plot(timebase{jse}, wpdx{jse}, 'LineWidth',lw, 'Parent', ax)
+for jse = length(wpdx):-1:1
+    plot(timebase{jse}, wpdx{jse}, 'LineWidth',lw, 'Parent', ax,...
+        'DisplayName', ['Wakelength = ', num2str(round(wakelength(jse)))])
 end %for
-title('Evolution of dipole transverse wake potential in the structure (x)', 'Parent', ax, 'DisplayName', ['Wakelength = ', num2str(round(wakelength(jse)))])
+title('Evolution of dipole transverse wake potential in the structure (x)', 'Parent', ax)
 xlabel('Time (ns)', 'Parent', ax)
-xlim([timebase{jse}(1) timebase{jse}(end)])
+xlim([timebase{end}(1) timebase{end}(end)])
 ylabel('Wake potential (V/pC)', 'Parent', ax)
 grid on
+legend
 savemfmt(h_wake, output_folder, [prefix_wls, 'transverse_dipole_x_wake_potential'])
 
 clf(h_wake)
 ax = axes('Parent', h_wake);
 hold on
-for jse = 1:length(wpdy)
-    plot(timebase{jse}, wpdy{jse}, 'LineWidth',lw, 'Parent', ax)
+for jse = length(wpdy):-1:1
+    plot(timebase{jse}, wpdy{jse}, 'LineWidth',lw, 'Parent', ax,...
+        'DisplayName', ['Wakelength = ', num2str(round(wakelength(jse)))])
 end %for
-title('Evolution of dipole transverse wake potential in the structure (y)', 'Parent', ax, 'DisplayName', ['Wakelength = ', num2str(round(wakelength(jse)))])
+title('Evolution of dipole transverse wake potential in the structure (y)', 'Parent', ax)
 xlabel('Time (ns)', 'Parent', ax)
-xlim([timebase{jse}(1) timebase{jse}(end)])
+xlim([timebase{end}(1) timebase{end}(end)])
 ylabel('Wake potential (V/pC)', 'Parent', ax)
 grid on
+legend
 savemfmt(h_wake, output_folder, [prefix_wls, 'transverse_dipole_y_wake_potential'])
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -76,8 +82,9 @@ savemfmt(h_wake, output_folder, [prefix_wls, 'transverse_dipole_y_wake_potential
 clf(h_wake)
 ax = axes('Parent', h_wake);
 hold on
-for jse = 1:length(wi_re)
-    plot(f_raw{jse}, wi_re{jse}, 'LineWidth',lw, 'Parent', ax, 'DisplayName', ['Wake loss factor = ',num2str(round(wlf_f(jse) .* 1E-9)),'mV/pC ','Wakelength = ', num2str(round(wakelength(jse)))]);
+for jse = length(wi_re):-1:1
+    plot(f_raw{jse}, wi_re{jse}, 'LineWidth',lw, 'Parent', ax,...
+        'DisplayName', ['Wake loss factor = ',num2str(round(wlf_f(jse) .* 1E-9)),'mV/pC ','Wakelength = ', num2str(round(wakelength(jse)))]);
 end %for
 title('Longditudinal real wake impedance', 'Parent', ax)
 xlabel('Frequency (GHz)', 'Parent', ax)
@@ -91,8 +98,9 @@ savemfmt(h_wake, output_folder, [prefix_wls, 'longditudinal_real_wake_impedance'
 clf(h_wake)
 ax = axes('Parent', h_wake);
 hold on
-for jse = 1:length(wi_dipole_x)
-    plot(f_raw{jse}, wi_dipole_x{jse}, 'LineWidth',lw, 'Parent', ax, 'DisplayName', ['Wake loss factor = ','mV/pC ', 'Wakelength = ', num2str(round(wakelength(jse)))]);
+for jse = length(wi_dipole_x):-1:1
+    plot(f_raw{jse}, wi_dipole_x{jse}, 'LineWidth',lw, 'Parent', ax,...
+        'DisplayName', ['Wake loss factor = ','mV/pC ', 'Wakelength = ', num2str(round(wakelength(jse)))]);
 end %for
 title('Transverse (x) real wake impedance', 'Parent', ax)
 xlabel('Frequency (GHz)', 'Parent', ax)
@@ -106,8 +114,9 @@ savemfmt(h_wake, output_folder, [prefix_wls, 'transverse_x_real_wake_impedance']
 clf(h_wake)
 ax = axes('Parent', h_wake);
 hold on
-for jse = 1:length(wi_dipole_y)
-    plot(f_raw{jse}, wi_dipole_y{jse}, 'LineWidth',lw, 'Parent', ax, 'DisplayName', ['Wake loss factor = ','mV/pC ', 'Wakelength = ', num2str(round(wakelength(jse)))]);
+for jse = length(wi_dipole_y):-1:1
+    plot(f_raw{jse}, wi_dipole_y{jse}, 'LineWidth',lw, 'Parent', ax,...
+        'DisplayName', ['Wake loss factor = ','mV/pC ', 'Wakelength = ', num2str(round(wakelength(jse)))]);
 end %for
 title('Transverse (y) real wake impedance', 'Parent', ax)
 xlabel('Frequency (GHz)', 'Parent', ax)
@@ -122,8 +131,9 @@ savemfmt(h_wake, output_folder, [prefix_wls, 'transverse_y_real_wake_impedance']
 clf(h_wake)
 ax = axes('Parent', h_wake);
 hold on
-for jse = 1:length(bunch_spectra)
-    plot(f_raw{jse}, abs(bunch_spectra{jse}), 'LineWidth',lw, 'Parent', ax, 'DisplayName', ['Wakelength = ', num2str(round(wakelength(jse)))]);
+for jse = length(bunch_spectra):-1:1
+    plot(f_raw{jse}, abs(bunch_spectra{jse}), 'LineWidth',lw, 'Parent', ax,...
+        'DisplayName', ['Wakelength = ', num2str(round(wakelength(jse)))]);
 end %for
 title('Bunch spectra', 'Parent', ax)
 xlabel('Frequency (GHz)', 'Parent', ax)
@@ -137,8 +147,9 @@ savemfmt(h_wake, output_folder, [prefix_wls, 'bunch_spectra'])
 clf(h_wake)
 ax = axes('Parent', h_wake);
 hold on
-for jse = 1:length(Bunch_loss_energy_spectrum)
-    plot(f_raw{jse}, Bunch_loss_energy_spectrum{jse}, 'LineWidth',lw, 'Parent', ax, 'DisplayName', ['Wakelength = ', num2str(round(wakelength(jse)))]);
+for jse = length(Bunch_loss_energy_spectrum):-1:1
+    plot(f_raw{jse}, Bunch_loss_energy_spectrum{jse}, 'LineWidth',lw, 'Parent', ax,...
+        'DisplayName', ['Wakelength = ', num2str(round(wakelength(jse)))]);
 end %for
 title('Bunch loss energy spectrum', 'Parent', ax)
 xlabel('Frequency (GHz)', 'Parent', ax)
@@ -152,7 +163,7 @@ savemfmt(h_wake, output_folder, [prefix_wls, 'Bunch_loss_energy_spectrum'])
 clf(h_wake)
 ax = axes('Parent', h_wake);
 hold on
-for jse = 1:length(signal_port_spectrum)
+for jse = length(signal_port_spectrum):-1:1
     plot(f_raw{jse}, signal_port_spectrum{jse}, 'LineWidth',lw, 'Parent', ax, 'DisplayName', ['Wakelength = ', num2str(round(wakelength(jse)))]);
 end %for
 title('signal port spectrum', 'Parent', ax)
@@ -168,7 +179,7 @@ savemfmt(h_wake, output_folder, [prefix_wls, 'signal_port_spectrum'])
 clf(h_wake)
 ax = axes('Parent', h_wake);
 hold on
-for jse = 1:length(beam_port_spectrum)
+for jse = length(beam_port_spectrum):-1:1
     plot(f_raw{jse}, beam_port_spectrum{jse}, 'LineWidth',lw, 'Parent', ax, 'DisplayName', ['Wakelength = ', num2str(round(wakelength(jse)))]);
 end %for
 title('beam port spectrum', 'Parent', ax)
@@ -186,7 +197,7 @@ clf(h_wake)
 [hwn, ksn] = num_subplots(length(port_names{1}));
 for ens = length(port_names{1}):-1:1 % ports
     ax_sp(ens) = subplot(hwn,ksn,ens);
-    for jse = 1:length(timebase)
+    for jse = length(timebase):-1:1
         try
             hold on
             % This is to cope with the case of missing data files.
@@ -194,7 +205,7 @@ for ens = length(port_names{1}):-1:1 % ports
                 'LineWidth',lw, 'Parent', ax_sp(ens))
         end %try
         title(port_names{jse}{ens}, 'Parent', ax_sp(ens))
-        xlim([timebase{jse}(1) timebase{jse}(end)])
+        xlim([timebase{end}(1) timebase{end}(end)])
         xlabel('Time (ns)', 'Parent', ax_sp(ens))
         ylabel('Power (W)', 'Parent', ax_sp(ens))
         grid on
