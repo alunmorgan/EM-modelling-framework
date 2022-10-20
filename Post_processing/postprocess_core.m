@@ -3,7 +3,7 @@ function postprocess_core(pp_data_directory, version, sim_type, s_set, excitatio
 p = inputParser;
 p.StructExpand = false;
 p.CaseSensitive = false;
-valid_string = @(x) ischar(x);
+% valid_string = @(x) ischar(x);
 addRequired(p, 'pp_data_directory');
 addRequired(p, 'version');
 addRequired(p, 'sim_type');

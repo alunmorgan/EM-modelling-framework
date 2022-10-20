@@ -164,7 +164,7 @@ clf(h_wake)
 ax = axes('Parent', h_wake);
 hold on
 for jse = length(signal_port_spectrum):-1:1
-    plot(f_raw{jse}, signal_port_spectrum{jse}, 'LineWidth',lw, 'Parent', ax, 'DisplayName', ['Wakelength = ', num2str(round(wakelength(jse)))]);
+    plot(f_raw{jse}, abs(signal_port_spectrum{jse}), '--', 'LineWidth',lw, 'Parent', ax, 'DisplayName', ['Wakelength = ', num2str(round(wakelength(jse)))]);
 end %for
 title('signal port spectrum', 'Parent', ax)
 xlabel('Frequency (GHz)', 'Parent', ax)
@@ -180,7 +180,7 @@ clf(h_wake)
 ax = axes('Parent', h_wake);
 hold on
 for jse = length(beam_port_spectrum):-1:1
-    plot(f_raw{jse}, beam_port_spectrum{jse}, 'LineWidth',lw, 'Parent', ax, 'DisplayName', ['Wakelength = ', num2str(round(wakelength(jse)))]);
+    plot(f_raw{jse}, abs(beam_port_spectrum{jse}), '--', 'LineWidth',lw, 'Parent', ax, 'DisplayName', ['Wakelength = ', num2str(round(wakelength(jse)))]);
 end %for
 title('beam port spectrum', 'Parent', ax)
 xlabel('Frequency (GHz)', 'Parent', ax)
@@ -202,7 +202,9 @@ for ens = length(port_names{1}):-1:1 % ports
             hold on
             % This is to cope with the case of missing data files.
             plot(timebase{jse}, port_signals{jse}(ens, :),...
-                'LineWidth',lw, 'Parent', ax_sp(ens))
+               '--', 'LineWidth',lw, 'Parent', ax_sp(ens))
+        catch
+            disp(['Missing data file for ', port_names{jse}{ens}])
         end %try
         title(port_names{jse}{ens}, 'Parent', ax_sp(ens))
         xlim([timebase{end}(1) timebase{end}(end)])

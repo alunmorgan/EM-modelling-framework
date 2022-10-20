@@ -31,7 +31,7 @@ clf(h_wake)
 ax = axes('Parent', h_wake);
 hold on
 for jse = 1:length(bunch_spec)
-    plot(f_scale(jse,:), bunch_spec{jse}, 'LineWidth',lw, 'Parent', ax, 'DisplayName', ['Fill pattern = ', num2str(ppi.bt_length(jse))]);
+    plot(f_scale(jse,:), abs(bunch_spec{jse}), '--', 'LineWidth',lw, 'Parent', ax, 'DisplayName', ['Fill pattern = ', num2str(ppi.bt_length(jse))]);
 end %for
 title('Bunch spectrum', 'Parent', ax)
 xlabel('Frequency (GHz)', 'Parent', ax)
@@ -46,7 +46,7 @@ clf(h_wake)
 ax = axes('Parent', h_wake);
 hold on
 for jse = 1:length(bunch_spec)
-    plot(f_scale(jse,:), Bunch_loss_energy_spectrum(jse,:), 'LineWidth',lw, 'Parent', ax, 'DisplayName', ['Fill pattern = ', num2str(ppi.bt_length(jse))]);
+    plot(f_scale(jse,:), Bunch_loss_energy_spectrum(jse,:), '--', 'LineWidth',lw, 'Parent', ax, 'DisplayName', ['Fill pattern = ', num2str(ppi.bt_length(jse))]);
 end %for
 title('Bunch loss energy spectrum', 'Parent', ax)
 xlabel('Frequency (GHz)', 'Parent', ax)
@@ -67,6 +67,8 @@ for ens = length(port_names):-1:1 % ports
             % This is to cope with the case of missing data files.
             plot(f_scale(jse,:), squeeze(port_loss_energy_spectrum(jse,:,ens)),...
                 'LineWidth',lw, 'Parent', ax_sp(ens))
+            catch
+            disp(['Missing data file for ', port_names{jse}{ens}])
         end %try
     end %for
     title(port_names{ens}, 'Parent', ax_sp(ens))
@@ -78,7 +80,7 @@ for ens = length(port_names):-1:1 % ports
 end %for
 savemfmt(h_wake, output_folder, [prefix_fp, 'port_loss_energy_spectrum'])
 
-prefix_rf = [prefix, '_fill_patterns_'];
+prefix_rf = [prefix, '_RF_voltages_'];
 % for now assume a single value of current
 % fill pattern at a single fill pattern voltage
 bunch_spec = squeeze(bunch_charge_sweep_data.bunch_spec(1,2, :));
@@ -91,7 +93,7 @@ clf(h_wake)
 ax = axes('Parent', h_wake);
 hold on
 for jse = 1:length(bunch_spec)
-    plot(f_scale(jse,:), bunch_spec{jse}, 'LineWidth',lw, 'Parent', ax, 'DisplayName', ['RF voltage = ', num2str(ppi.rf_volts(jse))]);
+    plot(f_scale(jse,:), abs(bunch_spec{jse}),'--', 'LineWidth',lw, 'Parent', ax, 'DisplayName', ['RF voltage = ', num2str(ppi.rf_volts(jse))]);
 end %for
 title('Bunch spectrum', 'Parent', ax)
 xlabel('Frequency (GHz)', 'Parent', ax)
@@ -106,7 +108,7 @@ clf(h_wake)
 ax = axes('Parent', h_wake);
 hold on
 for jse = 1:length(bunch_spec)
-    plot(f_scale(jse,:), Bunch_loss_energy_spectrum(jse,:), 'LineWidth',lw, 'Parent', ax, 'DisplayName', ['RF voltage = ', num2str(ppi.rf_volts(jse))]);
+    plot(f_scale(jse,:), Bunch_loss_energy_spectrum(jse,:), '--','LineWidth',lw, 'Parent', ax, 'DisplayName', ['RF voltage = ', num2str(ppi.rf_volts(jse))]);
 end %for
 title('Bunch loss energy spectrum', 'Parent', ax)
 xlabel('Frequency (GHz)', 'Parent', ax)
@@ -126,7 +128,9 @@ for ens = length(port_names):-1:1 % ports
             hold on
             % This is to cope with the case of missing data files.
             plot(f_scale(jse,:), squeeze(port_loss_energy_spectrum(jse,:,ens)),...
-                'LineWidth',lw, 'Parent', ax_sp(ens))
+                '--', 'LineWidth',lw, 'Parent', ax_sp(ens))
+        catch
+            disp(['Missing data file for ', port_names{jse}{ens}])
         end %try
     end %for
     title(port_names{ens}, 'Parent', ax_sp(ens))
