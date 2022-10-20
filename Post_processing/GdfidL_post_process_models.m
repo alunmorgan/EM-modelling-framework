@@ -48,9 +48,9 @@ if run_pp == 1
             if strcmp(p.Results.type_selection, 'wake')
                 postprocess_wakes(modelling_inputs, run_logs);
             elseif strcmp(p.Results.type_selection, 'eigenmode')
-                pp_data = postprocess_eigenmode(modelling_inputs, run_logs, 'eigenmode');
+                postprocess_eigenmode(modelling_inputs, run_logs, 'eigenmode');
             elseif strcmp(p.Results.type_selection, 'lossy_eigenmode')
-                pp_data = postprocess_eigenmode(modelling_inputs, run_logs, 'lossy_eigenmode');
+                postprocess_eigenmode(modelling_inputs, run_logs, 'lossy_eigenmode');
             end %if
         catch W_ERR
             disp( ['<strong>', p.Results.type_selection, ' Error</strong>'])
@@ -60,14 +60,13 @@ if run_pp == 1
     elseif any(contains({'sparameter', 'shunt'}, p.Results.type_selection))
         try
             % Reading logs and Running postprocessor
-            [freq_folders] = dir_list_gen(data_directory, 'dirs', 1);
+%             [freq_folders] = dir_list_gen(data_directory, 'dirs', 1);
             if strcmp(p.Results.type_selection, 'sparameter')
-                run_logs= GdfidL_read_s_parameter_log(freq_folders);
+%                 run_logs= GdfidL_read_s_parameter_log(freq_folders);
                 postprocess_s_parameters(data_directory, pp_directory);
             elseif strcmp(p.Results.type_selection, 'shunt')
-                run_logs.(['f_', f_name]) = GdfidL_read_rshunt_log(freq_folders);
-                pp_data = postprocess_shunt;
-                
+%                 run_logs.(['f_', f_name]) = GdfidL_read_rshunt_log(freq_folders);
+                postprocess_shunt;     
             end %if
         catch W_ERR
             disp( ['<strong>', p.Results.type_selection, ' Error</strong>'])

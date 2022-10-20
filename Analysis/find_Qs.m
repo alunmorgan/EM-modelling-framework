@@ -1,10 +1,7 @@
-function [peaks, Q, bw] = find_Qs(f_raw, spectrum, num, data_type)
+function [peaks, Q, bw] = find_Qs(f_raw, spectrum, num)
 % takes the full spectrum (both sides) and find the peaks greater than num% of the largest peak. then
 % calculates the Q value for each peak. Returns the num most highly resonant
 % frequencies.
-%
-% data_type (str): selects if the data is single sided or not (single_sided,
-%                  double_sided). Defaults to double sided.
 %
 % Example: [peaks, Q, bw] = find_Qs(f_raw, spectrum, num)
 
