@@ -23,6 +23,8 @@ for wsh = 1:length(substructure)
                         % problem with data transfer and some of the files are
                         % not present.
                         port_data.(substructure{wsh}).(data_fields{wga}).data(ck2) = port_data_in.(substructure{wsh}).(data_fields{wga}).data(ck1);
+                    catch
+                        disp(['Missing port data file ', port_names_in{une}])
                     end %try
                 end %for
                 tstart(ck2) = tstart_in{ck1,2};
