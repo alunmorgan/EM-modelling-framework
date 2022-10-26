@@ -1,4 +1,4 @@
-function [diff_machine_conds] = loss_extrapolation(time_domain_data, ppi)
+function [diff_machine_conds] = loss_extrapolation(time_domain_data, log, ppi)
 % calculates the change in wake loss factor and energy lost from the beam
 % and into the ports as the bunch and bunch train is varied.
 %
@@ -11,13 +11,13 @@ function [diff_machine_conds] = loss_extrapolation(time_domain_data, ppi)
 %
 % Example: [extrap_data] = loss_extrapolation(time_domain_data, port_data, beam_data, raw_data, log )
 timebase = time_domain_data.timebase;
-port_frequency_cutoffs = time_domain_data.port_data.voltage_port_mode.frequency_cutoffs;
-hfoi = 2.5E10;
+% port_frequency_cutoffs = time_domain_data.port_data.voltage_port_mode.frequency_cutoffs;
+% hfoi = 5E10;
 
 %% Find variation with different beam conditions.
 rev = ppi.RF_freq/936;
 gap = 1/ppi.RF_freq;
-rev_time = (1/ppi.RF_freq) * 936; %time of 1 revolution
+% rev_time = (1/ppi.RF_freq) * 936; %time of 1 revolution
 
 for cur_ind = 1:length(ppi.current)
     cur  = ppi.current(cur_ind);
@@ -58,56 +58,53 @@ for cur_ind = 1:length(ppi.current)
                 pulses_timescale = cat(2, pulses_timescale, pulse_timescale * jawe);
                 total_charge = total_charge + bunch_charge;
             end
-            pulse_timestep = (pulses_timescale(2) - pulses_timescale(1));
-            pulse_f_scale = (linspace(0,1,length(pulses_timescale)) / pulse_timestep);
-            bunch_spec_bc = fft(pulse);
+%             pulse_timestep = (pulses_timescale(2) - pulses_timescale(1));
+%             pulse_f_scale = (linspace(0,1,length(pulses_timescale)) / pulse_timestep);
+%             bunch_spec_bc = fft(pulse);
             
-            [time_domain_data_bc, port_data_bc] = pad_time_domain_data(time_domain_data, length(pulses_timescale));
-            hfoi = 5E10;
+            time_domain_data_bc = pad_time_domain_data(time_domain_data, length(pulses_timescale));
             % Regenerate the frequency domain data.
-            [f_raw_bc,~, wakeimpedance_bc,~, port_impedances_bc] = ...
-                regenerate_f_data(port_frequency_cutoffs, time_domain_data_bc,...
-                port_data_bc, '', hfoi);
-            cut_ind = find(pulse_f_scale < hfoi, 1, 'last');
-            bunch_spec_bc = bunch_spec_bc(1:cut_ind);
-            pulse_f_scale = pulse_f_scale(1:cut_ind);
+            frequency_domain_data_bc = frequency_domain_analysis(time_domain_data_bc, total_charge, n_bunches_in_input_pattern);
+%             [f_raw_bc,~, wakeimpedance_bc,~, port_impedances_bc] = ...
+%                 regenerate_f_data(port_frequency_cutoffs, time_domain_data_bc,...
+%                 port_data_bc, '', hfoi);
+%             cut_ind = find(pulse_f_scale < hfoi, 1, 'last');
+%             bunch_spec_bc = bunch_spec_bc(1:cut_ind);
+%             pulse_f_scale = pulse_f_scale(1:cut_ind);
             
-            [wake_loss_factor, ...
-                Bunch_loss_energy_spectrum, Total_bunch_energy_loss] = ...
-                find_wlf_and_power_loss(total_charge, pulses_timescale, bunch_spec_bc', ...
-                wakeimpedance_bc, n_bunches_in_input_pattern);
-            
-            for ehs = 1:size(port_impedances_bc,2)
-                single_port_impedance = port_impedances_bc(:,ehs);
-                [~, ...
-                    port_loss_energy_spectrum(:,ehs), port_energy_loss(ehs)] = ...
-                    find_wlf_and_power_loss(total_charge, pulses_timescale, bunch_spec_bc', ...
-                    single_port_impedance, n_bunches_in_input_pattern);
-            end %for
-            Total_energy_from_beam_ports = sum(port_energy_loss(1:2));
-            Total_energy_from_signal_ports = sum(port_energy_loss(3:end));
-            
+%             [wake_loss_factor, ...
+%                 Bunch_loss_energy_spectrum, Total_bunch_energy_loss] = ...
+%                 find_wlf_and_power_loss(total_charge, pulses_timescale, bunch_spec_bc', ...
+%                 wakeimpedance_bc, n_bunches_in_input_pattern);
+%             
+%             for ehs = 1:size(port_impedances_bc,2)
+%                 single_port_impedance = port_impedances_bc(:,ehs);
+%                 [~, ...
+%                     port_loss_energy_spectrum(:,ehs), port_energy_loss(ehs)] = ...
+%                     find_wlf_and_power_loss(total_charge, pulses_timescale, bunch_spec_bc', ...
+%                     single_port_impedance, n_bunches_in_input_pattern);
+%             end %for
+%             Total_energy_from_beam_ports = sum(port_energy_loss(1:2));
+%             Total_energy_from_signal_ports = sum(port_energy_loss(3:end));
+%             
             diff_machine_conds.port_labels{cur_ind, btl_ind, rf_ind} = time_domain_data.port_lables;
-            diff_machine_conds.bunch_spec{cur_ind, btl_ind, rf_ind} = bunch_spec_bc;
-            diff_machine_conds.wlf(cur_ind, btl_ind, rf_ind) = wake_loss_factor;
-            diff_machine_conds.power_loss(cur_ind, btl_ind, rf_ind) = Total_bunch_energy_loss .* rev;
+            diff_machine_conds.bunch_spec{cur_ind, btl_ind, rf_ind} = frequency_domain_data_bc.bunch_spectra;
+            diff_machine_conds.wlf(cur_ind, btl_ind, rf_ind) = frequency_domain_data_bc.wlf;
+            diff_machine_conds.power_loss(cur_ind, btl_ind, rf_ind) = frequency_domain_data_bc.Total_bunch_energy_loss .* rev; % CHECK this assumes pattern is one revolution
             diff_machine_conds.bunch_charge(cur_ind, btl_ind, rf_ind)= bunch_charge;
             diff_machine_conds.bunch_length(cur_ind, btl_ind, rf_ind)= bunch_length;
-            
-            diff_machine_conds.port_energy_loss(cur_ind, btl_ind, rf_ind, :, :) = port_energy_loss;
-            diff_machine_conds.port_loss_energy_spectrum(cur_ind, btl_ind, rf_ind, :, :) = port_loss_energy_spectrum;
-            diff_machine_conds.f_scale(cur_ind, btl_ind, rf_ind, :) = pulse_f_scale;
-            diff_machine_conds.Bunch_loss_energy_spectrum(cur_ind, btl_ind, rf_ind, :) = Bunch_loss_energy_spectrum;
-            if exist('Total_bunch_energy_loss', 'var')
-                diff_machine_conds.loss_beam_pipe(cur_ind, btl_ind, rf_ind) = Total_energy_from_beam_ports ./ Total_bunch_energy_loss;
-                diff_machine_conds.loss_signal_ports(cur_ind, btl_ind, rf_ind) = Total_energy_from_signal_ports ./ Total_bunch_energy_loss;
-                diff_machine_conds.loss_structure(cur_ind, btl_ind, rf_ind) = 1 - ((Total_energy_from_beam_ports+ Total_energy_from_signal_ports)./ Total_bunch_energy_loss);
-            else
-                diff_machine_conds.loss_beam_pipe(cur_ind, btl_ind, rf_ind) = 0;
-                diff_machine_conds.loss_signal_ports(cur_ind, btl_ind, rf_ind) = 0;
-                diff_machine_conds.loss_structure(cur_ind, btl_ind, rf_ind) = 0;
-            end %if
-            clear elpt wlf elpb_ports wake_loss_factor bunch_charge bunch_length pulse power_loss pwr tmp bunch_spec
+            diff_machine_conds.port_loss_energy_spectrum(cur_ind, btl_ind, rf_ind, :, :) = frequency_domain_data_bc.Total_port_spectrum;
+            diff_machine_conds.f_scale(cur_ind, btl_ind, rf_ind, :) = frequency_domain_data_bc.f_raw;
+            diff_machine_conds.Bunch_loss_energy_spectrum(cur_ind, btl_ind, rf_ind, :) = frequency_domain_data_bc.Bunch_loss_energy_spectrum;
+            diff_machine_conds. Total_energy_from_beam_ports(cur_ind, btl_ind, rf_ind) = sum(frequency_domain_data_bc.beam_port_spectrum);
+            diff_machine_conds.Total_bunch_energy_loss(cur_ind, btl_ind, rf_ind) = frequency_domain_data_bc.Total_bunch_energy_loss;
+            diff_machine_conds.Total_energy_from_signal_ports(cur_ind, btl_ind, rf_ind) =  sum(frequency_domain_data_bc.signal_port_spectrum);
+            diff_machine_conds.port_energy_loss(cur_ind, btl_ind, rf_ind) = diff_machine_conds.Total_energy_from_signal_ports(cur_ind, btl_ind, rf_ind) + ...
+                diff_machine_conds. Total_energy_from_beam_ports(cur_ind, btl_ind, rf_ind);
+            diff_machine_conds.loss_beam_pipe(cur_ind, btl_ind, rf_ind) = Total_energy_from_beam_ports ./diff_machine_conds.Total_bunch_energy_loss(cur_ind, btl_ind, rf_ind);
+            diff_machine_conds.loss_signal_ports(cur_ind, btl_ind, rf_ind) = Total_energy_from_signal_ports ./ diff_machine_conds.Total_bunch_energy_loss(cur_ind, btl_ind, rf_ind);
+            diff_machine_conds.loss_structure(cur_ind, btl_ind, rf_ind) = 1 - ( diff_machine_conds.port_energy_loss(cur_ind, btl_ind, rf_ind))./ diff_machine_conds.Total_bunch_energy_loss(cur_ind, btl_ind, rf_ind);
+            clear time_domain_data_bc  frequency_domain_data_bc pulse pulses_timescale total_charge
         end %for
     end %for
 end %for

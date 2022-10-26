@@ -45,7 +45,7 @@ if ~isfile(fullfile(output_folder, 'data_reconstructed_wake.mat'))
     t_data = time_domain_analysis(pp_reconstruction_data, run_logs);
     % Frequency domain analysis
     n_bunches_in_input_pattern = 1;
-    f_data = frequency_domain_analysis(t_data, run_logs, n_bunches_in_input_pattern);
+    f_data = frequency_domain_analysis(t_data, run_logs.charge, n_bunches_in_input_pattern);
     % Generating data for time slices
     time_slice_data = time_slices(t_data.timebase,t_data.wakepotential, ppi.hfoi);
     

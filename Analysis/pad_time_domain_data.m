@@ -1,4 +1,4 @@
-function [time_domain_data_pad, port_data_pad] = pad_time_domain_data(time_domain_data, n_samples)
+function [time_domain_data_pad] = pad_time_domain_data(time_domain_data, n_samples)
 %% Pad the time domain data.
 
 [time_domain_data_pad.timebase, time_domain_data_pad.charge_distribution] = ...
@@ -21,11 +21,13 @@ p3 = {'port_mode_signals'};%, 'port_mode_energy_time'};
 for hsh = 1:length(p1)
     for nrs = 1:length(p2)
         for whs = 1:length(p3)
-            port_sigs_temp = squeeze(sum(time_domain_data.port_data.(p1{hsh}).(p2{nrs}).(p3{whs}),2));
+            port_sigs_temp = squeeze(time_domain_data.port_data.(p1{hsh}).(p2{nrs}).(p3{whs}),2);
             for enf = 1:size(port_sigs_temp,1)
                 [~, port_data_pad{enf}] = pad_data(time_domain_data.timebase, port_sigs_temp(enf,:), n_samples, 'samples');
                 port_data_pad{enf} = port_data_pad{enf}';
             end %for
+            time_domain_data_pad.port_data.(p1{hsh}).(p2{nrs}).(p3{whs}) = port_data_pad;
+            clear port_data_pad
         end %for
     end %for
 end %for

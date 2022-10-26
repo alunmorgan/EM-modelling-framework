@@ -1,4 +1,4 @@
-function frequency_domain_data = frequency_domain_analysis(time_domain_data, log, n_bunches_in_input_pattern)
+function frequency_domain_data = frequency_domain_analysis(time_domain_data, charge, n_bunches_in_input_pattern)
 % Takes the time domain results and does additional frequency domain
 % analysis on it.
 %
@@ -70,7 +70,7 @@ bunch_spectra = bunch_spectra .* sqrt(2);
 % The outputs from this function are for the model charge.
 % except for the wake loss factor which is V/C
 [wlf, Bunch_loss_energy_spectrum, Total_bunch_energy_loss] = ...
-    find_wlf_and_power_loss(log.charge, time_domain_data.timebase, bunch_spectra, ...
+    find_wlf_and_power_loss(charge, time_domain_data.timebase, bunch_spectra, ...
     Wake_Impedance_data, n_bunches_in_input_pattern);
 
 [peaks, Q, bw] = find_Qs(f_raw, Bunch_loss_energy_spectrum, 25);

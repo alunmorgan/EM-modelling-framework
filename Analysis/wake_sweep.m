@@ -13,7 +13,7 @@ for se = length(sweep_lengths):-1:1
     t_data{se} = time_domain_analysis(r_data{se}, log);
     %% Frequency domain analysis
     n_bunches_in_input_pattern = 1;
-    f_data{se} = frequency_domain_analysis(t_data{se}, log, n_bunches_in_input_pattern);
+    f_data{se} = frequency_domain_analysis(t_data{se}, log.charge, n_bunches_in_input_pattern);
 end %for
 wake_sweep_data.frequency_domain_data = f_data;
 wake_sweep_data.time_domain_data = t_data;
