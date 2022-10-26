@@ -82,6 +82,10 @@ materials.macor.tan_delta = 0.0047; %
 materials.macor.epsilon_r = 5.67;% Relative permativity
 materials.macor.mu_r = 1;% Relative permiability
 
+materials.PTFE.tan_delta = 0.00028; %
+materials.PTFE.epsilon_r = 2.1;% Relative permativity
+materials.PTFE.mu_r = 1;% Relative permiability
+
 materials.lmbfceramic.tan_delta = 0.00026; %
 materials.lmbfceramic.epsilon_r = 2.21;% Relative permativity
 materials.lmbfceramic.mu_r = 1;% Relative permiability
