@@ -100,10 +100,13 @@ for cur_ind = 1:length(ppi.current)
             diff_machine_conds.Total_bunch_energy_loss(cur_ind, btl_ind, rf_ind) = frequency_domain_data_bc.Total_bunch_energy_loss;
             diff_machine_conds.Total_energy_from_signal_ports(cur_ind, btl_ind, rf_ind) =  sum(frequency_domain_data_bc.signal_port_spectrum);
             diff_machine_conds.port_energy_loss(cur_ind, btl_ind, rf_ind) = diff_machine_conds.Total_energy_from_signal_ports(cur_ind, btl_ind, rf_ind) + ...
-                diff_machine_conds. Total_energy_from_beam_ports(cur_ind, btl_ind, rf_ind);
-            diff_machine_conds.loss_beam_pipe(cur_ind, btl_ind, rf_ind) = Total_energy_from_beam_ports ./diff_machine_conds.Total_bunch_energy_loss(cur_ind, btl_ind, rf_ind);
-            diff_machine_conds.loss_signal_ports(cur_ind, btl_ind, rf_ind) = Total_energy_from_signal_ports ./ diff_machine_conds.Total_bunch_energy_loss(cur_ind, btl_ind, rf_ind);
-            diff_machine_conds.loss_structure(cur_ind, btl_ind, rf_ind) = 1 - ( diff_machine_conds.port_energy_loss(cur_ind, btl_ind, rf_ind))./ diff_machine_conds.Total_bunch_energy_loss(cur_ind, btl_ind, rf_ind);
+                diff_machine_conds.Total_energy_from_beam_ports(cur_ind, btl_ind, rf_ind);
+            diff_machine_conds.loss_beam_pipe(cur_ind, btl_ind, rf_ind) = diff_machine_conds.Total_energy_from_beam_ports(cur_ind, btl_ind, rf_ind) ./ ...
+                diff_machine_conds.Total_bunch_energy_loss(cur_ind, btl_ind, rf_ind);
+            diff_machine_conds.loss_signal_ports(cur_ind, btl_ind, rf_ind) = diff_machine_conds.Total_energy_from_signal_ports(cur_ind, btl_ind, rf_ind) ./ ...
+                diff_machine_conds.Total_bunch_energy_loss(cur_ind, btl_ind, rf_ind);
+            diff_machine_conds.loss_structure(cur_ind, btl_ind, rf_ind) = 1 - ( diff_machine_conds.port_energy_loss(cur_ind, btl_ind, rf_ind))./ ...
+                diff_machine_conds.Total_bunch_energy_loss(cur_ind, btl_ind, rf_ind);
             clear time_domain_data_bc  frequency_domain_data_bc pulse pulses_timescale total_charge
         end %for
     end %for
