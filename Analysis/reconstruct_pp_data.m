@@ -56,7 +56,7 @@ if ~isfile(fullfile(output_folder, 'data_reconstructed_wake.mat'))
 %     sigma_sweep = beam_sigma_sweep(t_data, f_data, run_logs.charge, run_logs.beam_sigma);
     
     %% and bunch charges.
-    bunch_charge_sweep_data = loss_extrapolation(t_data, ppi);
+    bunch_charge_sweep_data = loss_extrapolation(t_data, run_logs, ppi);
     
     fprintf('Reconstructed ... Saving...')
     save(fullfile(output_folder, 'data_reconstructed_wake.mat'),...
