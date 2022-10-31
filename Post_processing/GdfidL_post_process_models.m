@@ -38,7 +38,7 @@ if run_pp == 1
                 fullfile(pp_directory ,'run_inputs.mat'));
             
             % Reading logs
-            run_logs = GdfidL_read_logs(p.Results.type_selection);
+            run_logs = GdfidL_read_logs(pp_directory, p.Results.type_selection);
             save(fullfile(pp_directory, 'data_from_run_logs.mat'), 'run_logs')
             
             % Load up the original model input parameters.
@@ -46,7 +46,7 @@ if run_pp == 1
             
             % Running postprocessor
             if strcmp(p.Results.type_selection, 'wake')
-                postprocess_wakes(modelling_inputs, run_logs);
+                postprocess_wakes(modelling_inputs, run_logs, data_directory, pp_directory);
             elseif strcmp(p.Results.type_selection, 'eigenmode')
                 postprocess_eigenmode(modelling_inputs, run_logs, 'eigenmode');
             elseif strcmp(p.Results.type_selection, 'lossy_eigenmode')
