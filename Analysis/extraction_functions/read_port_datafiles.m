@@ -48,20 +48,22 @@ end %for
 port_timebase = linspace(timebase_start, timebase_end,(timebase_end - timebase_start)/timebase_step + 1);
 
 % for frequency domain data
-substructure = fieldnames(input.frequency);
-for hs = 1:length(substructure)
-    for hes = 1:size(input.frequency.(substructure{hs}),1) % simulated ports
-        for wha = 1:size(input.frequency.(substructure{hs}),2) % modes
-            if isempty(input.frequency.(substructure{hs}){hes,wha})
-                port_data_conditioned.frequency.(substructure{hs}){hes,wha} = 0;
-            else
-                temp_data  = GdfidL_read_graph_datafile(...
-                    input.frequency.(substructure{hs}){hes,wha} );
-                port_data_conditioned.frequency.(substructure{hs}){hes,wha} =...
-                    temp_data.data;
-            end %if
+if isfield(input, 'frequency')
+    substructure = fieldnames(input.frequency);
+    for hs = 1:length(substructure)
+        for hes = 1:size(input.frequency.(substructure{hs}),1) % simulated ports
+            for wha = 1:size(input.frequency.(substructure{hs}),2) % modes
+                if isempty(input.frequency.(substructure{hs}){hes,wha})
+                    port_data_conditioned.frequency.(substructure{hs}){hes,wha} = 0;
+                else
+                    temp_data  = GdfidL_read_graph_datafile(...
+                        input.frequency.(substructure{hs}){hes,wha} );
+                    port_data_conditioned.frequency.(substructure{hs}){hes,wha} =...
+                        temp_data.data;
+                end %if
+            end %for
         end %for
     end %for
-end %for
+end %if
 
 

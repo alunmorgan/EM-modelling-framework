@@ -13,8 +13,8 @@ for hwa = 1:length(wake_sweep_data.frequency_domain_data)
     %extracting the specra
     bunch_spectra{hwa} = wake_sweep_data.frequency_domain_data{hwa}.bunch_spectra(1:cut_freq_ind(hwa),:);
     Bunch_loss_energy_spectrum{hwa} = wake_sweep_data.frequency_domain_data{hwa}.Bunch_loss_energy_spectrum(1:cut_freq_ind(hwa),:);
-    signal_port_spectrum{hwa} = wake_sweep_data.frequency_domain_data{hwa}.signal_port_spectrum(:,1:cut_freq_ind(hwa));
-    beam_port_spectrum{hwa} = wake_sweep_data.frequency_domain_data{hwa}.beam_port_spectrum(:,1:cut_freq_ind(hwa));
+    signal_port_spectrum{hwa} = wake_sweep_data.frequency_domain_data{hwa}.signal_port_spectrum(1:cut_freq_ind(hwa),:);
+    beam_port_spectrum{hwa} = wake_sweep_data.frequency_domain_data{hwa}.beam_port_spectrum(1:cut_freq_ind(hwa),:);
     
     % Extracting time series
     timebase{hwa} = wake_sweep_data.time_domain_data{hwa}.timebase .* 1E9; % time in ns

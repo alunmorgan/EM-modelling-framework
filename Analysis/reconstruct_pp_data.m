@@ -1,8 +1,11 @@
 function reconstruct_pp_data(postprocess_folder, output_folder, ppi, number_of_wake_lengths_to_analyse)
 
 
-if ~isfile(fullfile(output_folder, 'data_reconstructed_wake.mat'))
-    
+if ~isfile(fullfile(output_folder,  'data_reconstructed_single_bunch_wake.mat')) && ...
+   ~isfile(fullfile(output_folder,  'data_reconstructed_wake_sweep.mat')) && ...
+   ~isfile(fullfile(output_folder,  'data_reconstructed_bunch_length_sweep_wake.mat')) && ...
+   ~isfile(fullfile(output_folder,  'data_reconstructed_varying_machine_conditions_wake.mat'))
+   
     run_logs = load(fullfile(postprocess_folder, 'data_from_run_logs.mat'), 'run_logs');
     run_logs = run_logs.run_logs;
     pp_logs = GdfidL_read_pp_wake_log(postprocess_folder);
@@ -39,7 +42,6 @@ if ~isfile(fullfile(output_folder, 'data_reconstructed_wake.mat'))
     timescale_common = pp_make_common_timebase(pp_reconstruction_data);
     pp_reconstruction_data = pp_apply_common_timebase(pp_reconstruction_data, timescale_common);
     
-    wake_sweep_data = wake_sweep(wake_lengths_to_analyse, pp_reconstruction_data, run_logs);
     %% Single bunch
     % Time domain analysis
     t_data = time_domain_analysis(pp_reconstruction_data, run_logs);
@@ -48,22 +50,32 @@ if ~isfile(fullfile(output_folder, 'data_reconstructed_wake.mat'))
     f_data = frequency_domain_analysis(t_data, run_logs.charge, n_bunches_in_input_pattern);
     % Generating data for time slices
     time_slice_data = time_slices(t_data.timebase,t_data.wakepotential, ppi.hfoi);
+    fprintf('Reconstructed single bunch ... Saving...')
+    save(fullfile(output_folder, 'data_reconstructed_single_bunch_wake.mat'),...
+        't_data', 'f_data', 'time_slice_data','-v7.3')
+    fprintf('Saved\n')
+    
+     %% Calculating the losses for different wake lengths
+    wake_sweep_data = wake_sweep(wake_lengths_to_analyse, pp_reconstruction_data, run_logs);
+    fprintf('Reconstructed wake sweep ... Saving...')
+    save(fullfile(output_folder, 'data_reconstructed_wake_sweep.mat'),...
+        'wake_sweep_data','-v7.3')
+    fprintf('Saved\n')
     
     %% Calculating the losses for different bunch lengths
-    bunch_length_sweep_data = variation_with_beam_sigma(ppi.bunch_lengths, t_data.timebase, ...
-        f_data.Wake_Impedance_data, run_logs.charge);
-%     %% Calculating the losses for different beam sigmas
-%     sigma_sweep = beam_sigma_sweep(t_data, f_data, run_logs.charge, run_logs.beam_sigma);
-    
-    %% and bunch charges.
-    bunch_charge_sweep_data = loss_extrapolation(t_data, run_logs, ppi);
-    
-    fprintf('Reconstructed ... Saving...')
-    save(fullfile(output_folder, 'data_reconstructed_wake.mat'),...
-        'wake_sweep_data', 'bunch_length_sweep_data', 't_data', 'f_data',...
-        'bunch_charge_sweep_data', 'time_slice_data','-v7.3')
+    bunch_length_sweep_data = variation_with_beam_sigma(ppi.bunch_lengths, t_data, run_logs.charge);
+ fprintf('Reconstructed bunch length sweep ... Saving...')
+    save(fullfile(output_folder, 'data_reconstructed_bunch_length_sweep_wake.mat'),...
+         'bunch_length_sweep_data','-v7.3')
     fprintf('Saved\n')
-    clear 'pp_data' 'run_logs' 'modelling_inputs' 'wake_sweep_data' 'current_folder'
+    
+    %% alculating the losses for different machine conditions
+    bunch_charge_sweep_data = loss_extrapolation(t_data, ppi);   
+    fprintf('Reconstructed varying machine conditions... Saving...')
+    save(fullfile(output_folder, 'data_reconstructed_varying_machine_conditions_wake.mat'),...
+        'bunch_charge_sweep_data','-v7.3')
+    fprintf('Saved\n')
+    
 else
     disp('Reconstruction already exists... Skipping')
 end %if

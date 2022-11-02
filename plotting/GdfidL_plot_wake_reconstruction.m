@@ -1,5 +1,4 @@
-function GdfidL_plot_wake_reconstruction(run_inputs_loc, run_logs_loc, ...
-    analysis_loc, reconstruction_loc, ppi, output_folder)
+function GdfidL_plot_wake_reconstruction(files_to_load, ppi, output_folder, prefix)
 % Generate the graphs based on the wake simulation data.
 % Graphs are saved in fig format and png, eps.
 %
@@ -7,17 +6,7 @@ function GdfidL_plot_wake_reconstruction(run_inputs_loc, run_logs_loc, ...
 % range is to do with peak identification for Q values, and
 % is the separation peaks have to have to be counted as separate.
 %
-% Example GdfidL_plot_wake(wake_data, ppi, mi, run_log,  pth, range)
-
-files_to_load = {run_inputs_loc, {'modelling_inputs'};...
-    analysis_loc, {'pp_data'};...
-    reconstruction_loc, {'wake_sweep_data', 'time_slice_data', 'bunch_charge_sweep_data', 'bunch_length_sweep_data', 't_data', 'f_data'};...
-    run_logs_loc, {'run_logs'}};
-
-[temp, ~, ~] = fileparts(run_inputs_loc);
-[temp, ~, ~] = fileparts(temp);
-[temp, ~, ~] = fileparts(temp);
-[~, prefix, ~] = fileparts(temp);
+% Example GdfidL_plot_wake_reconstruction(files_to_load, ppi, output_folder, prefix)
 
 for rnf = 1:size(files_to_load,1)
     if exist(files_to_load{rnf,1}, 'file') == 2

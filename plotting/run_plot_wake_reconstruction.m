@@ -17,8 +17,24 @@ try
             run_inputs_loc = fullfile(postprocess_folder, 'run_inputs.mat');
             run_logs_loc = fullfile(postprocess_folder, 'data_from_run_logs.mat');
             analysis_loc = fullfile(analysis_folder, 'data_analysed_wake.mat');
-            reconstruction_loc = fullfile(reconstruction_folder, 'data_reconstructed_wake.mat');
-            GdfidL_plot_wake_reconstruction(run_inputs_loc, run_logs_loc, analysis_loc, reconstruction_loc, ppi, plot_reconstruction_folder)
+            reconstruction_loc1 = fullfile(reconstruction_folder, 'data_reconstructed_single_bunch_wake.mat');
+            reconstruction_loc2 = fullfile(reconstruction_folder, 'data_reconstructed_wake_sweep.mat');
+            reconstruction_loc3 = fullfile(reconstruction_folder, 'data_reconstructed_bunch_length_sweep_wake.mat');
+            reconstruction_loc4 = fullfile(reconstruction_folder, 'data_reconstructed_varying_machine_conditions_wake.mat');
+            
+            files_to_load = {run_inputs_loc, {'modelling_inputs'};...
+                analysis_loc, {'pp_data'};...
+                reconstruction_loc1, {'time_slice_data', 't_data', 'f_data'};...
+                reconstruction_loc2, {'wake_sweep_data'};...
+                reconstruction_loc3, {'bunch_length_sweep_data'};...
+                reconstruction_loc4, {'bunch_charge_sweep_data'};...
+                run_logs_loc, {'run_logs'}};
+            
+            [temp, ~, ~] = fileparts(run_inputs_loc);
+            [temp, ~, ~] = fileparts(temp);
+            [temp, ~, ~] = fileparts(temp);
+            [~, prefix, ~] = fileparts(temp);
+            GdfidL_plot_wake_reconstruction(files_to_load, ppi, plot_reconstruction_folder, prefix)
         else
             disp('No plotting folder... skipping wake reconstruction plotting.')
         end %if
