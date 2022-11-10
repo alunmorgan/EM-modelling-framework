@@ -36,20 +36,22 @@ for hwa = 1:length(data)
     if ~isempty(strfind(data{hwa},'The End of File is reached')) ||...
             ~isempty(strfind(data{hwa},'The End of the File is reached')) ||...
             ~isempty(strfind(data{hwa},'This is the normal End'))
-        disp(['Postprocess ',sim_type , ': The post processor core has run to completion'])
+        sprintf(['\nPostprocess ',sim_type , ': The post processor core has run to completion'])
         break
     end %if
     if hwa == length(data)
-        disp(['Postprocess ',sim_type , ': The post processor core has not completed properly'])
+        sprintf(['\nPostprocess ',sim_type , ': The post processor core has not completed properly'])
     end %if
 end %for
 
 if ~strcmpi(sim_type, 'eigenmode') && ~strcmpi(sim_type, 'lossy_eigenmode')
     %% convert the gld files for the field output images to ps.
     gld_files = dir_list_gen('temp_scratch', 'gld', 1);
-    parfor fjh = 1:length(gld_files)
+    for fjh = 1:length(gld_files)
         [~,name,~] = fileparts(gld_files{fjh});
-        system(['gd1.3dplot -colorps -geometry 800x600 -o ',fullfile('temp_scratch', name), 'ps -i ' , gld_files{fjh}]);
+        [status,cmdout] = system(['gd1.3dplot -colorps -geometry 800x600 -o ',fullfile('temp_scratch', name), 'ps -i ' , gld_files{fjh}]);
+        disp(cmdout)
+        disp(['Status = ', status])
     end %parfor
 end %if
 delete temp_scratch/*.gld
@@ -61,13 +63,16 @@ new_arrowplot_names = regexprep(arrowplot_names, '3D-Arrowplot\.([0-9]+)ps', '3D
 for jas = 1:length(arrowplot_names)
     % movefile crashes with unknown error so using a direct system call here
     % instead.
-    system(['mv ' fullfile('temp_scratch',arrowplot_names{jas}), ' ', fullfile('temp_scratch',new_arrowplot_names{jas})]);
+    sprintf(['\n','Renaming ',  arrowplot_names{jas}, ' to ' new_arrowplot_names{jas}])
+    [status1,cmdout1] = system(['mv ' fullfile('temp_scratch',arrowplot_names{jas}), ' ', fullfile('temp_scratch',new_arrowplot_names{jas})], '-echo');
+    disp(cmdout1)
+    disp(['Status = ', status1])
 end %for
 %% convert ps to png
 [pic_names ,~]= dir_list_gen('temp_scratch','ps',1);
 for eh = 1:length(pic_names)
     pName = pic_names{eh}(1:end-3);
-    [sFlag, ~] = system(['convert ',fullfile('temp_scratch', pName),'.ps -rotate -90 ',fullfile('temp_scratch', pName),'.png']);
+    [sFlag, ~] = system(['convert ',fullfile('temp_scratch', pName),'.ps -rotate -90 ',fullfile('temp_scratch', pName),'.png'], '-echo');
     if sFlag == 0
         delete(fullfile('temp_scratch', [pName,'.ps'] ))
     end %if
