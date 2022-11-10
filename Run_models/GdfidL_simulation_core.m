@@ -10,7 +10,7 @@ shell_contents = {'#! /bin/bash'};
 % problems were found with differences in the shell vs matlab environment.
 % As a result this code now writes and executes a shell script so that the
 % system environment is reliably used.
-shell_contents = cat(1, shell_contents, 'ls -ah');
+% shell_contents = cat(1, shell_contents, 'ls -ah');
 if strcmp(precision, 'single')
     shell_contents = cat(1,shell_contents,['single.gd1 ',restart,'< model.gdf > model_log']);
 elseif strcmp(precision, 'double')

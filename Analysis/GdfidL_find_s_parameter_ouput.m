@@ -13,10 +13,12 @@ run_list = dir_list_gen_tree(data_loc, '',1);
 % Find list of s parameter ports graphs.
 inds = find_position_in_cell_lst(strfind(run_list, 'freq-abs'));
 s_param_files = run_list(inds);
+s_names_list = cell(length(s_param_files),1);
+s_modes_list = NaN(length(s_param_files),1);
 for hes = 1:length(s_param_files)
    tmp = regexp(s_param_files{hes}, '(.*)_(\d+)-freq-abs.mtv', 'tokens');
    s_names_list{hes} = tmp{1}{1};
-   s_modes_list(hes) = str2num(tmp{1}{2});
+   s_modes_list(hes) = str2double(tmp{1}{2});
 end
 
 % find the unique port names

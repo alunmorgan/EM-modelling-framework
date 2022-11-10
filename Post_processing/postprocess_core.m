@@ -3,7 +3,7 @@ function postprocess_core(pp_data_directory, version, sim_type, s_set, excitatio
 p = inputParser;
 p.StructExpand = false;
 p.CaseSensitive = false;
-valid_string = @(x) ischar(x);
+% valid_string = @(x) ischar(x);
 addRequired(p, 'pp_data_directory');
 addRequired(p, 'version');
 addRequired(p, 'sim_type');
@@ -36,11 +36,11 @@ for hwa = 1:length(data)
     if ~isempty(strfind(data{hwa},'The End of File is reached')) ||...
             ~isempty(strfind(data{hwa},'The End of the File is reached')) ||...
             ~isempty(strfind(data{hwa},'This is the normal End'))
-        sprintf(['\nPostprocess ',sim_type , ': The post processor core has run to completion'])
+        fprintf(['\nPostprocess ',sim_type , ': The post processor core has run to completion'])
         break
     end %if
     if hwa == length(data)
-        sprintf(['\nPostprocess ',sim_type , ': The post processor core has not completed properly'])
+        fprintf(['\nPostprocess ',sim_type , ': The post processor core has not completed properly'])
     end %if
 end %for
 
@@ -51,7 +51,7 @@ if ~strcmpi(sim_type, 'eigenmode') && ~strcmpi(sim_type, 'lossy_eigenmode')
         [~,name,~] = fileparts(gld_files{fjh});
         [status,cmdout] = system(['gd1.3dplot -colorps -geometry 800x600 -o ',fullfile('temp_scratch', name), 'ps -i ' , gld_files{fjh}]);
         disp(cmdout)
-        disp(['Status = ', status])
+        disp(['Status = ', num2str(status)])
     end %parfor
 end %if
 delete temp_scratch/*.gld
@@ -63,10 +63,9 @@ new_arrowplot_names = regexprep(arrowplot_names, '3D-Arrowplot\.([0-9]+)ps', '3D
 for jas = 1:length(arrowplot_names)
     % movefile crashes with unknown error so using a direct system call here
     % instead.
-    sprintf(['\n','Renaming ',  arrowplot_names{jas}, ' to ' new_arrowplot_names{jas}])
     [status1,cmdout1] = system(['mv ' fullfile('temp_scratch',arrowplot_names{jas}), ' ', fullfile('temp_scratch',new_arrowplot_names{jas})], '-echo');
     disp(cmdout1)
-    disp(['Status = ', status1])
+    disp(['Status = ', num2str(status1)])
 end %for
 %% convert ps to png
 [pic_names ,~]= dir_list_gen('temp_scratch','ps',1);

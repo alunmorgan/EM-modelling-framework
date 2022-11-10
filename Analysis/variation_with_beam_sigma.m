@@ -1,26 +1,23 @@
-function beam_sigma_sweep = variation_with_beam_sigma(beam_sigmas, timebase, ...
-    Wake_Impedance_data, charge)
+function beam_sigma_sweep = variation_with_beam_sigma(bunch_length, time_domain_data, charge)
 %% Find the variation with increasing beam sigma.
-for odf = 1:length(beam_sigmas)
-    pulse_sig = str2double(beam_sigmas(odf)) ./ 3E8;
+
+for odf = 1:length(bunch_length)
+    pulse_sig = bunch_length(odf) *1E-3 ./ 3E8; % bunch length is in mm
     % generate the time domain signal
     pulse = (1/(sqrt(2*pi)*pulse_sig)) * ...
-        exp(-(timebase.^2)/(2*pulse_sig^2));
+        exp(-(time_domain_data.timebase.^2)/(2*pulse_sig^2));
     
-    bunch_spec_sig = fft(pulse)/length(timebase);
-    % truncate the new bunch sigma in the same way as all the other
-    % frequency data.
-    % the sqrt(2) it to account for the fact that really you should fold
-    % over the signal and combine the overlapping signals to preserve
-    % the power.
-    bunch_spec_sig = bunch_spec_sig(1:length(Wake_Impedance_data)) .* sqrt(2);
-    
-    [beam_sigma_sweep.wlf(odf),...
-        beam_sigma_sweep.Bunch_loss_energy_spectrum{odf},...
-        beam_sigma_sweep.Total_bunch_energy_loss(odf)] = ...
-        find_wlf_and_power_loss(charge, timebase, ...
-        bunch_spec_sig, Wake_Impedance_data);
+    time_domain_data.pulse_for_reconstruction = pulse;
+    frequency_domain_data = frequency_domain_analysis(time_domain_data, charge, 1);
     
     beam_sigma_sweep.sig_time(odf) = pulse_sig;
-    clear pulse pulse_sig
+    fn_time = fieldnames(time_domain_data);
+    for nse = 1:length(fn_time)
+        beam_sigma_sweep.time.(fn_time{nse}){odf} = time_domain_data.(fn_time{nse});
+    end %for
+    fn_freq = fieldnames(frequency_domain_data);
+    for nre = 1:length(fn_freq)
+        beam_sigma_sweep.freq.(fn_freq{nre}){odf} = frequency_domain_data.(fn_freq{nre});
+    end %for
+    clear pulse pulse_sig fn_time fn_freq time_domain_data.pulse_for_reconstruction frequency_domain_data
 end

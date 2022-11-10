@@ -16,7 +16,6 @@ end %for
 savemfmt(h_wake, path_to_data,'dominant_port_signals')
 clf(h_wake)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-ax(15) = axes('Parent', h_wake);
 [hwn, ksn] = num_subplots(length(port_names));
 for ens = length(port_names):-1:1 % ports
     ax_sp2(ens) = subplot(hwn,ksn,ens);

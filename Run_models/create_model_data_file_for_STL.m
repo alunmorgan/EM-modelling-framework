@@ -2,35 +2,21 @@ function model_file = create_model_data_file_for_STL(modelling_inputs)
 % Combines the geometry-material-map, mesh_definition, and port_definition
 % files with the geometry STL files to form the core of the gdf input file.
 
-% geom = read_file_full_line(fullfile(storage_location, 'geometry-material-map.txt'));
-% mesh_def = read_file_full_line(fullfile(storage_location, 'mesh_definition.txt')); % <- start HERE
-% geom_params = read_file_full_line(fullfile(data_location, base_model_name, ...
-%     [base_model_name, '_parameters.txt']));
-
-% geom = reduce_cell_depth(geom);
-% stl_mapping = reduce_cell_depth(reduce_cell_depth(...
-%     regexp(geom, '(.*)\s:\s(.*)', 'tokens')));
 
 background = modelling_inputs.background;
 stl_mapping = modelling_inputs.stl_part_mapping;
-%  base_model_name = modelling_inputs.base_model_name;
-%  model_name = modelling_inputs.model_name;
 model_angle = modelling_inputs.model_angle;
 model_scaling = modelling_inputs.stl_scaling;
 
+% setting for if optional stagesgeometry graphs are requested.
+eyepos.twodxeyepos = '   eyeposition= (-1, 0, 0)';
+eyepos.twodyeyepos = '   eyeposition= (0, 1, 0)';
+eyepos.twodzeyepos = '   eyeposition= (0, 0, 1)';
+eyepos.threedxeyepos = '   eyeposition= (-2.3, 1, 0.5)';
+eyepos.threedyeyepos = '   eyeposition= (-0.5, 1, 2.3)';
+eyepos.threedzeyepos = '   eyeposition= (-1, 2.3, 0.5)';
+
 model_file = {'###################################################'};
-% for hes = 1:length(geom_params)
-%     temp_name = geom_params{hes};
-%     brk_ind = strfind(temp_name, ' : ');
-%     g_name = temp_name(1:brk_ind-1);
-%     g_val = regexprep(temp_name(brk_ind+3:end), '\s', '');
-%     model_file = cat(1, model_file, ['define(',g_name,',',g_val,')']);
-% end
-% model_file = cat(1, model_file, '###################################################');
-% for hes = 1:length(mesh_def)
-%     model_file = cat(1, model_file, mesh_def{hes});
-% end
-% model_file = cat(1, model_file, '###################################################');
 model_file = cat(1, model_file, '# Filling the initial volume with material');
 model_file = cat(1, model_file, '-brick');
 model_file = cat(1, model_file, ['material=',background]);
@@ -96,4 +82,10 @@ for lrd = 1:length(stls)
     model_file = cat(1, model_file, ['zscale = ', num2str(model_scaling)]);
     model_file = cat(1, model_file, ['material=', stl_mapping{mat_ind,2}]);
     model_file = cat(1, model_file, 'doit');
+    if strcmp(modelling_inputs.geometry_plotting, 'stages')
+        [~,part_name, ~]=fileparts(stls{lrd});
+        k = strfind(part_name, '-');
+        model_file_vols = create_3D_volume_plots(modelling_inputs, eyepos, [part_name(k+1:end), '_']);
+        model_file = cat(1, model_file, model_file_vols);
+    end %if
 end %for

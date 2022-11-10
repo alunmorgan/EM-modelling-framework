@@ -1,4 +1,4 @@
-function GdfidL_write_pp_input_file(log)
+function GdfidL_write_pp_input_file(log, data_directory, pp_directory)
 % Writes the post processing input file.
 %
 % log is a structure containing the information extracted from the log
@@ -31,7 +31,7 @@ end %for
 
 ov{1} = '';
 ov = cat(1,ov,'-general');
-ov = cat(1,ov,strcat('    infile= data_link/wake'));
+ov = cat(1,ov,strcat(['    infile= ',data_directory]));
 ov = cat(1,ov,strcat('    scratchbase = temp_scratch/'));
 ov = cat(1,ov,'    2dplotopts = -geometry 1024x768');
 ov = cat(1,ov,'    plotopts = -geometry 1024x768');
@@ -70,14 +70,14 @@ if isfield(log, 'field_data')
     if isfield(log.field_data, 'EF')
         for kew = 1:size(log.field_data.EF,1)
             ov = cat(1,ov,['symbol = EF_e_', num2str(kew)]);
-            ov = cat(1,ov,['outfile= pp_link/wake/EF_e_', num2str(kew)]);
+            ov = cat(1,ov,['outfile= ', pp_directory,'/EF_e_', num2str(kew)]);
             ov = cat(1,ov,'    doit');
         end %for
     end %if
     if isfield(log.field_data, 'ED')
         for kew = 1:size(log.field_data.ED, 1)
             ov = cat(1,ov,['symbol = ED_e_', num2str(kew)]);
-            ov = cat(1,ov,['outfile= pp_link/wake/ED_e_', num2str(kew)]);
+            ov = cat(1,ov,['outfile= ', pp_directory, '/ED_e_', num2str(kew)]);
             ov = cat(1,ov,'    doit');
         end %for
     end %if
@@ -93,48 +93,48 @@ ov = cat(1,ov,'    direction=z');
 ov = cat(1,ov,'    component=x');
 ov = cat(1,ov,'    doit');
 
-ov = cat(1,ov,'-pcombine');
-ov = cat(1,ov,'    a1=0.5');
-ov = cat(1,ov,'    b1=0');
-ov = cat(1,ov,'    a2=0');
-ov = cat(1,ov,'    b2=0');
-ov = cat(1,ov,'    eresymbol=field_snapshots_e_1');
-ov = cat(1,ov,'    erequantity=field_snapshots_e');                                                         
-ov = cat(1,ov,'    eresolution= 1');        
-ov = cat(1,ov,'    eimsymbol=field_snapshots_e_1');
-ov = cat(1,ov,'    eimquantity=field_snapshots_e');                                                        
-ov = cat(1,ov,'    eimsolution= 1');        
-ov = cat(1,ov,'    hresymbol=field_snapshots_h_1');
-ov = cat(1,ov,'    hrequantity=field_snapshots_h');                                                        
-ov = cat(1,ov,'    hresolution= 1');        
-ov = cat(1,ov,'    himsymbol=field_snapshots_h_1');
-ov = cat(1,ov,'    himquantity=field_snapshots_h');                                                        
-ov = cat(1,ov,'    himsolution= 1');        
-ov = cat(1,ov,'    sresymbol=sre_1');
-ov = cat(1,ov,'    simsymbol=sim_1');
-ov = cat(1,ov,'    srequantity=sre');
-ov = cat(1,ov,'    simquantity=sim');
-ov = cat(1,ov,'    sresolution=1');
-ov = cat(1,ov,'    simsolution=1');
-ov = cat(1,ov,'    doit');
-
-ov = cat(1,ov,'-fexport');
-ov = cat(1,ov,'    symbol  = sre_1'); 
-ov = cat(1,ov,'    quantity= sre');
-ov = cat(1,ov,'    solution= 1'); 
-ov = cat(1,ov,'    outfile = pp_link/wake/pointing_vectors_real'); 
-ov = cat(1,ov,'    doit');          
-
-ov = cat(1,ov,'-3darrowplot');
-ov = cat(1,ov,'    symbol=sre_1');
-ov = cat(1,ov,'    bbylow=0');
-ov = cat(1,ov,'    arrows = 20000');
-ov = cat(1,ov,'    lenarrows = 4.0');
-ov = cat(1,ov,'    onlyplotfiles= yes');
-ov = cat(1,ov,'    eyeposition = ( 0, -1, 0 )');
-ov = cat(1,ov,'    doit');
-ov = cat(1,ov,'    eyeposition= ( 1.0, -2.3, 0.5 )');
-ov = cat(1,ov,'    doit');
+% ov = cat(1,ov,'-pcombine');
+% ov = cat(1,ov,'    a1=0.5');
+% ov = cat(1,ov,'    b1=0');
+% ov = cat(1,ov,'    a2=0');
+% ov = cat(1,ov,'    b2=0');
+% ov = cat(1,ov,'    eresymbol=field_snapshots_e_1');
+% ov = cat(1,ov,'    erequantity=field_snapshots_e');                                                         
+% ov = cat(1,ov,'    eresolution= 1');        
+% ov = cat(1,ov,'    eimsymbol=field_snapshots_e_1');
+% ov = cat(1,ov,'    eimquantity=field_snapshots_e');                                                        
+% ov = cat(1,ov,'    eimsolution= 1');        
+% ov = cat(1,ov,'    hresymbol=field_snapshots_h_1');
+% ov = cat(1,ov,'    hrequantity=field_snapshots_h');                                                        
+% ov = cat(1,ov,'    hresolution= 1');        
+% ov = cat(1,ov,'    himsymbol=field_snapshots_h_1');
+% ov = cat(1,ov,'    himquantity=field_snapshots_h');                                                        
+% ov = cat(1,ov,'    himsolution= 1');        
+% ov = cat(1,ov,'    sresymbol=sre_1');
+% ov = cat(1,ov,'    simsymbol=sim_1');
+% ov = cat(1,ov,'    srequantity=sre');
+% ov = cat(1,ov,'    simquantity=sim');
+% ov = cat(1,ov,'    sresolution=1');
+% ov = cat(1,ov,'    simsolution=1');
+% ov = cat(1,ov,'    doit');
+% 
+% ov = cat(1,ov,'-fexport');
+% ov = cat(1,ov,'    symbol  = sre_1'); 
+% ov = cat(1,ov,'    quantity= sre');
+% ov = cat(1,ov,'    solution= 1'); 
+% ov = cat(1,ov,['    outfile = ', pp_directory, '/pointing_vectors_real']); 
+% ov = cat(1,ov,'    doit');          
+% 
+% ov = cat(1,ov,'-3darrowplot');
+% ov = cat(1,ov,'    symbol=sre_1');
+% ov = cat(1,ov,'    bbylow=0');
+% ov = cat(1,ov,'    arrows = 20000');
+% ov = cat(1,ov,'    lenarrows = 4.0');
+% ov = cat(1,ov,'    onlyplotfiles= yes');
+% ov = cat(1,ov,'    eyeposition = ( 0, -1, 0 )');
+% ov = cat(1,ov,'    doit');
+% ov = cat(1,ov,'    eyeposition= ( 1.0, -2.3, 0.5 )');
+% ov = cat(1,ov,'    doit');
 
 ov = cat(1,ov,'-3darrowplot');
 ov = cat(1,ov,'    symbol=field_snapshots_h_1');
@@ -200,7 +200,7 @@ if isfield(log, 'field_data')
         ov = cat(1,ov,'    fscale= 1.5 /  FARROWMAX');
         for ii = field_start:length(log.field_data.ALL)
             ov = cat(1,ov,['       solution= ', num2str(ii)]);
-            ov = cat(1,ov,['plotopts =  -geometry 1440X900 -colorps -o pp_link/wake/All_scaled_',num2str(ii,'%02d'),'.ps']);
+            ov = cat(1,ov,['plotopts =  -geometry 1440X900 -colorps -o ', pp_directory, '/All_scaled_',num2str(ii,'%02d'),'.ps']);
             ov = cat(1,ov,'       doit   # Create the gld-File.');
         end %for
         ov = cat(1,ov,'    fonmat= no');
@@ -210,7 +210,7 @@ if isfield(log, 'field_data')
         ov = cat(1,ov,'    fmaxonmat= auto');
         for ii = field_start:length(log.field_data.ALL)
             ov = cat(1,ov,['       solution= ', num2str(ii)]);
-            ov = cat(1,ov,['plotopts =  -geometry 1440X900 -colorps -o pp_link/wake/All_power_scaling_',num2str(ii,'%02d'),'.ps']);
+            ov = cat(1,ov,['plotopts =  -geometry 1440X900 -colorps -o ',pp_directory,'/All_power_scaling_',num2str(ii,'%02d'),'.ps']);
             ov = cat(1,ov,'       doit');
             ov = cat(1,ov,'define( FARROWMAX, max( FARROWMAX, @farrowmax ) )');
             ov = cat(1,ov,'define( FMAXONMAT, max( FMAXONMAT, @absfmax ) )');
@@ -224,7 +224,7 @@ if isfield(log, 'field_data')
         ov = cat(1,ov,'    fscale= 1.5 /  FARROWMAX');
         for ii = field_start:length(log.field_data.ALL)
             ov = cat(1,ov,['       solution= ', num2str(ii)]);
-            ov = cat(1,ov,['plotopts =  -geometry 1440X900 -colorps -o pp_link/wake/All_power_scaled_',num2str(ii,'%02d'),'.ps']);
+            ov = cat(1,ov,['plotopts =  -geometry 1440X900 -colorps -o ',pp_directory,'/All_power_scaled_',num2str(ii,'%02d'),'.ps']);
             ov = cat(1,ov,'       doit   # Create the gld-File.');
         end %for
     end %if
@@ -266,7 +266,7 @@ end %if
 %     ov = cat(1,ov,'      log=no');
 %     ov = cat(1,ov,'     doit');
 % end %if
-write_out_data( ov, 'pp_link/wake/model_wake_post_processing' )
+write_out_data( ov, fullfile(pp_directory, 'model_wake_post_processing') )
 
 for lae = 1:length(log.port_name)
     ov = cat(1,ov_setup,'-sparameter');
@@ -283,7 +283,7 @@ for lae = 1:length(log.port_name)
     ov = cat(1,ov,'    doit');
     ov = cat(1,ov,'-sparameter, showeh=no');
     ov = cat(1,ov,'    doit');
-    port_folder = ['pp_link/wake/wake_post_processing_ports-', log.port_name{lae}];
+    port_folder = fullfile(pp_directory, ['wake_post_processing_ports-', log.port_name{lae}]);
     mkdir(port_folder)
     write_out_data( ov, [port_folder,'/model_wake_post_processing_ports-', log.port_name{lae}] )
     

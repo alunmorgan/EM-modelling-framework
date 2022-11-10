@@ -5,7 +5,7 @@ function current_simulation(sets, varargin)
 sim_types = {'geometry','wake', 'sparameter', 'eigenmode', 'lossy_eigenmode', 'shunt'};
 
 default_sim_types = {'geometry', 'wake', 'sparameter', 'lossy_eigenmode'};
-default_stages = {'simulate', 'postprocess', 'field_extraction', 'analyse', 'reconstruct'  'plot_analysis_data', 'plot_reconstruction_data', 'plot_fields'};
+default_stages = {'simulate', 'postprocess', 'field_extraction', 'analyse', 'reconstruct'  'plot_analysis_data', 'plot_reconstruction_data', 'plot_fields', 'report'};
 default_version = {'220421'};
 default_number_of_cores = {'64'};
 default_precision = {'double'};
@@ -78,7 +78,7 @@ for set_id = 1:length(p.Results.sets)
     end %if
     if any(matches(p.Results.stages, 'reconstruct'))
         if any(matches(p.Results.sim_types, 'wake'))
-            run_wake_reconstruction(p.Results, set_id, paths)
+            run_wake_reconstruction(p.Results, set_id, paths, ppi, number_of_wake_lengths_to_analyse)
         end %if
     end %if
     if any(matches(p.Results.stages, 'plot_analysis_data'))
@@ -99,5 +99,7 @@ for set_id = 1:length(p.Results.sets)
             plot_wake_fields(p.Results, set_id, paths)
         end %if
     end %if
-    %         generate_report_single_set(sets{set_id});
+     if any(matches(p.Results.stages, 'report'))
+            generate_report_single_set(sets{set_id});
+     end %if
 end %for

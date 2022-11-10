@@ -34,7 +34,7 @@ fig_pos = [fig_left fig_bottom fig_width fig_height];
 
 % setting up some style lists for the graphs.
 % cols = {'b','k','m','c','g',[1, 0.5, 0],[0.5, 1, 0],[1, 0, 0.5],[0.5, 0, 1],[0.5, 1, 0] };
-l_st ={'--',':','-.','--',':','-.','--',':','-.'};
+% l_st ={'--',':','-.','--',':','-.','--',':','-.'};
 
 % Extracting  losses
 [model_mat_data, mat_loss, m_time, m_data] = ...
@@ -62,7 +62,7 @@ wpdy(:,1) = wpdy(:,1) .* 1E9; % time in ns
 
 % Extracting spectra
 
-[peaks, Q, bw] = find_Qs(wi_re(:,1) .* 1e9, wi_re(:,2), 0.1, 'single_sided');
+[peaks, Q, bw] = find_Qs(wi_re(:,1) .* 1e9, wi_re(:,2), 0.1);
 R_over_Q = peaks(:,2) ./ Q;
 
 h_wake = figure('Position',fig_pos);
@@ -95,10 +95,10 @@ end %if
 subplot(2,2,1)
 x1 = categorical({'Energy from beam'});
 y1 = abs(pp_data.Wake_potential.s.loss.s) * 1e9;
-b1 = bar(x1, y1);
+bar(x1, y1);
 subplot(2,2,2)
 plot_data2 = [plot_data; plot_data];
-b3 = bar(plot_data2, 'stacked');
+bar(plot_data2, 'stacked');
 legend(x, 'Location', 'EastOutside')
 subplot(2,2,3:4)
 b3 = bar(x, plot_data);
@@ -131,11 +131,11 @@ if isfield(pp_data, 'EfieldAtZerox')
         'LineWidth',lw, 'Parent', ax)
     title('Electric field at origin (x component)', 'Parent', ax)
     xlabel('Frequency (GHz)', 'Parent', ax)
-    if pp_data.EfieldAtZerox_freq.data(end,1) * 1E-9 > graph_freq_lim
-        upper_lim = graph_freq_lim;
-    else
-        upper_lim = pp_data.EfieldAtZerox_freq.data(end,1) * 1E-9;
-    end %if
+%     if pp_data.EfieldAtZerox_freq.data(end,1) * 1E-9 > graph_freq_lim
+%         upper_lim = graph_freq_lim;
+%     else
+%         upper_lim = pp_data.EfieldAtZerox_freq.data(end,1) * 1E-9;
+%     end %if
     xlim([0 graph_freq_lim])
     ylabel('Electric field (V/m/Hz)', 'Parent', ax)
     grid on
@@ -222,9 +222,9 @@ hold on;
 [~, Q_sort_inds] = sort(Q);
 if length(peaks) > 5
     plot(peaks(:,1)*1E-9, R_over_Q, '*b');
-    plot(peaks(Q_sort_inds(1:5),1) * 1E-9, R_over_Q(Q_sort_inds(1:5)), '*r')
+    plot(peaks(Q_sort_inds(1:5),1) * 1E-9, R_over_Q(Q_sort_inds(1:5)), '*r', 'Parent', ax)
 else
-    plot(peaks(:,1)*1E-9, R_over_Q, '*r');
+    plot(peaks(:,1)*1E-9, R_over_Q, '*r', 'Parent', ax);
 end %if
 
 for hs = 1:size(peaks,1)
@@ -241,9 +241,9 @@ hold on;
 [~, R_over_Q_sort_inds] = sort(R_over_Q);
 if length(peaks) > 5
     plot(peaks(:,1)*1E-9, Q, '*b');
-    plot(peaks(R_over_Q_sort_inds(1:5),1) * 1E-9, Q(R_over_Q_sort_inds(1:5)), '*r')
+    plot(peaks(R_over_Q_sort_inds(1:5),1) * 1E-9, Q(R_over_Q_sort_inds(1:5)), '*r', 'Parent', ax)
 else
-    plot(peaks(:,1)*1E-9, Q, '*r');
+    plot(peaks(:,1)*1E-9, Q, '*r', 'Parent', ax);
 end %if
 for hs = 1:size(peaks,1)
     text(peaks(hs,1)*1E-9, Q(hs), ['R/Q=',num2str(round(R_over_Q(hs)*10)/10)])
@@ -264,7 +264,9 @@ if isfield(pp_data.port, 'timebase')
         try
             % This is to cope with the case of missing data files.
         plot(pp_data.port.timebase .* 1E9, pp_data.port.data.time.power_port.data{ens}, 'b', 'Parent', ax_sp(ens))
-        end
+        catch
+            disp('Missing data file for port signals plotting')
+        end %try
         title(port_names{ens}, 'Parent', ax_sp(ens))
         xlim([pp_data.port.timebase(1) .* 1E9 pp_data.port.timebase(end) .* 1E9])
         xlabel('Time (ns)', 'Parent', ax_sp(ens))
@@ -287,7 +289,9 @@ if isfield(pp_data, 'voltages')
         try
             % This is to cope with the case of missing data files.
         plot(pp_data.voltages{ens}.data(:,1) .* 1E9, pp_data.voltages{ens}.data(:,2), 'b', 'Parent', ax_sp(ens))
-        end
+        catch
+            disp('Missing data files for voltage monitor plotting')
+        end %try
         title(regexprep(pp_data.voltages{ens}.title, 'voltage ',''), 'Parent', ax_sp(ens))
         xlim([pp_data.voltages{ens}.data(1,1) .* 1E9 pp_data.voltages{ens}.data(end, 1) .* 1E9])
         xlabel('Time (ns)', 'Parent', ax_sp(ens))
@@ -331,14 +335,14 @@ if ~isnan(energy)
     maxxlim = energy(end,1);
     if ~isnan(minlim)
         if minlim >0
-            semilogy(energy(:,1),energy(:,2),'b', 'LineWidth',lw, 'DisplayName', 'Energy decay')
+            semilogy(energy(:,1),energy(:,2),'b', 'LineWidth',lw, 'DisplayName', 'Energy decay', 'Parent', ax)
             if minlim < maxlim
                 ylim([minlim maxlim])
                 ylabel('Energy (J)')
                 
             end %if
         else
-            plot(energy(:,1), energy(:,2),'LineWidth',lw)
+            plot(energy(:,1), energy(:,2),'LineWidth',lw, 'Parent', ax)
             ylim([minlim 0])
             ylabel('Energy (relative)')
         end %if
@@ -358,7 +362,7 @@ plot(wp(:,1), ...
     wp(:,2) ./ max(abs(wp(:,2))),'b',...
     pp_data.Charge_distribution.data(:,1) .* 1E9, ...
     pp_data.Charge_distribution.data(:,2) ./ max(pp_data.Charge_distribution.data(:,2)),'r',...
-    'LineWidth',lw)
+    'LineWidth',lw, 'Parent', ax)
 xlim([-inf, 0.1])
 ylim([-1.05 1.05])
 xlabel('time (ns)')

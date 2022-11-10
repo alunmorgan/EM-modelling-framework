@@ -23,6 +23,7 @@ base.port_multiple = mi.simulation_defs.port_multiple{selected_geometry_frac_loc
 base.port_fill_factor = mi.simulation_defs.port_fill_factor{selected_geometry_frac_loc};
 base.volume_fill_factor = mi.simulation_defs.volume_fill_factor(selected_geometry_frac_loc);
 
+base.geometry_plotting = mi.geometry_plotting;
 % This is the locaton of the parameter file for the base model. The code
 % will default to using this if there is no model specific parameter file
 % present. (i.e. if meshing parameters are being changed rather

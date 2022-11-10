@@ -28,7 +28,6 @@ for awh = 1:length(modelling_inputs)
     
     for ksbi = 1:length(sim_types)
         try
-            %             sim_loc = find_position_in_cell_lst(strfind(sim_types, 'wake'));
             restart_loc_tmp =fullfile(restart_loc_base, sim_types{ksbi}, '.iMod-1');
             if exist(restart_loc_tmp, 'dir')
                 restart_line = [' -restartfiles=',restart_loc_tmp, ' '];
@@ -40,9 +39,6 @@ for awh = 1:length(modelling_inputs)
         catch ERR
             display_modelling_error(ERR, sim_types{ksbi})
             cd(default_location)
-            %             if strcmp(sims{ksbi}, 's_parameter')
-            %                 cd ..
-            %             end %if
             continue
         end %try
     end %for

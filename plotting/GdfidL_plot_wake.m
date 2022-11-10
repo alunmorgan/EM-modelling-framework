@@ -147,7 +147,7 @@ frequency_scale = wake_data.frequency_domain_data.f_raw(1:cut_freq_ind)*1E-9;
 
 bs = extract_bunch_spectrum_from_wake_data(wake_data, cut_freq_ind);
 
-[peaks, Q, bw] = find_Qs(frequency_scale*1e9, wi_re, 0.1, 'single_sided');
+[peaks, Q, bw] = find_Qs(frequency_scale*1e9, wi_re, 0.1);
 R_over_Q = peaks(:,2) ./ Q;
 
 bls = extract_bunch_loss_spectrum_from_wake_data(wake_data, cut_freq_ind);
