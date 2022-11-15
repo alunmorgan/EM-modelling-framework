@@ -3,6 +3,8 @@ function raw_data = extract_wake_data_from_pp_output_files(output_file_locations
 % get the Total energy in the structure
 raw_data.Energy = GdfidL_read_graph_datafile(output_file_locations.Energy{1});
 
+% get the bunch spectrum
+raw_data.bunch_spectrum = GdfidL_read_graph_datafile(output_file_locations.bunch_spectrum{1});
 
 %% Material losses
 if iscell(output_file_locations.Energy_in_ceramics)
