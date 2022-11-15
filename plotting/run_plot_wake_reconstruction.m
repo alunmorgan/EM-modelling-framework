@@ -34,6 +34,7 @@ try
             [temp, ~, ~] = fileparts(temp);
             [temp, ~, ~] = fileparts(temp);
             [~, prefix, ~] = fileparts(temp);
+            GdfidL_plot_pp_wake(run_inputs_loc, reconstruction_loc1, ppi, plot_reconstruction_folder)
             GdfidL_plot_wake_reconstruction(files_to_load, ppi, plot_reconstruction_folder, prefix)
         else
             disp('No plotting folder... skipping wake reconstruction plotting.')
