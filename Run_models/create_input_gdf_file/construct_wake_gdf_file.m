@@ -1,4 +1,4 @@
-function construct_wake_gdf_file(modelling_inputs, restart_out)
+function construct_wake_gdf_file(modelling_inputs, out_loc, scratch_loc, restart_out)
 % Write the input gdf file for an wake simulation of the requested
 % model.
 %
@@ -17,7 +17,7 @@ else
     material_override = [];
 end %if
 
-fs = gdf_wake_header_construction('', restart_out, 'temp', ...
+fs = gdf_wake_header_construction(out_loc, scratch_loc, restart_out, ...
     modelling_inputs.NPMLs,...
     modelling_inputs.n_cores, ...
     modelling_inputs.mesh_stepsize,...
@@ -59,4 +59,4 @@ mon = gdf_wake_monitor_construction(modelling_inputs.dtsafety, modelling_inputs.
 % construct the full input file.
 data = cat(1,fs, modelling_inputs.defs', geom, mesh_def, mesh_fixed_planes, ...
     data, port_defs, excitation, mon, '-fdtd   ','    doit');
-write_out_data( data, 'model.gdf' )
+write_out_data( data, fullfile(out_loc, 'model.gdf'))

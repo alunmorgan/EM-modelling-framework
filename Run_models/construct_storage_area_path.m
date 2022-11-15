@@ -1,5 +1,5 @@
 function arch_out = construct_storage_area_path(results_storage_location, sim_f_name, port_name_in, sparameter_set, frequency)
-% Constructs the output path for the final storage of the simulation
+% Constructs the path for the simulation.
 % results. The details of this depend on the simulation type.
 % if the folder does not exist it is made.
 if iscell(port_name_in) == 0

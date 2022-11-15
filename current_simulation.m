@@ -31,10 +31,10 @@ if any(matches(p.Results.stages, 'simulate'))
     orig_loc = pwd;
     for set_id = 1:length(p.Results.sets)
         try
-            cd(fullfile(orig_loc, p.Results.sets{set_id}))
+            cd(fullfile(paths.inputfile_location, p.Results.sets{set_id}))
             run_inputs = feval(p.Results.sets{set_id});
-            run_models(run_inputs, p.Results.sim_types, paths.restart_files_path, ...
-                p.Results.versions, p.Results.n_cores, p.Results.precision)
+            run_models(run_inputs, p.Results.sim_types, paths, ...
+                p.Results.versions, p.Results.n_cores, p.Results.precision, '')
             cd(orig_loc)
         catch ME
             cd(orig_loc)

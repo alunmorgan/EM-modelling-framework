@@ -1,9 +1,12 @@
-function run_models(mi, sim_types, restart_root, versions, n_cores, precision)
+function run_models(mi, sim_types, paths, versions, n_cores, precision, restart)
 % Runs all the geometric and simulation variations set up.
+% if restart is not an empty string then is shows the location to the .iMod-1
+% restart file.
 
 if ispc ==1
     error('This needs to be run on the linux modelling machine')
 end %if
+
 default_location = pwd;
 modelling_inputs = run_inputs_setup_STL(mi, versions, n_cores, precision);
 
@@ -12,7 +15,6 @@ for awh = 1:length(modelling_inputs)
     disp(datestr(now))
     disp(['Running ',num2str(awh), ' of ',...
         num2str(length(modelling_inputs)), ' simulations'])
-    restart_loc_base =fullfile(restart_root, modelling_inputs{awh}.base_model_name, modelling_inputs{awh}.model_name);
     % only want to run the geometry simulations for the geometry sweeps.
     % remove it from the list otherwise.
     if ~strcmp(modelling_inputs{awh}.sweep_type, 'Geometry')
@@ -28,13 +30,12 @@ for awh = 1:length(modelling_inputs)
     
     for ksbi = 1:length(sim_types)
         try
-            restart_loc_tmp =fullfile(restart_loc_base, sim_types{ksbi}, '.iMod-1');
-            if exist(restart_loc_tmp, 'dir')
+            if ~isempty(restart)
                 restart_line = [' -restartfiles=',restart_loc_tmp, ' '];
             else
                 restart_line = '';
             end %if
-            GdfidL_run_simulation(sim_types{ksbi}, mi.paths, modelling_inputs{awh}, ...
+            GdfidL_run_simulation(sim_types{ksbi}, paths, modelling_inputs{awh}, ...
                 restart_line);
         catch ERR
             display_modelling_error(ERR, sim_types{ksbi})
