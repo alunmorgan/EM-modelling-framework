@@ -71,7 +71,7 @@ end %for
 [pic_names ,~]= dir_list_gen('temp_scratch','ps',1);
 for eh = 1:length(pic_names)
     pName = pic_names{eh}(1:end-3);
-    [sFlag, ~] = system(['convert ',fullfile('temp_scratch', pName),'.ps -rotate -90 ',fullfile('temp_scratch', pName),'.png']);
+    [sFlag, ~] = system(['convert ',fullfile('temp_scratch', pName),'.ps -rotate -90 ',fullfile('temp_scratch', pName),'.png'], '-echo');
     if sFlag == 0
         delete(fullfile('temp_scratch', [pName,'.ps'] ))
     end %if
