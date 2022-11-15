@@ -42,15 +42,16 @@ for cur_ind = 1:length(ppi.current)
             
             % added gap/2 so that the peak of the pulse does not happen at 0. So
             % we get a complete first pulse.
-            % Generating a pulse train of 1C bunches
             timestep = abs(timebase(2) - timebase(1));
             % using colon rather than linspace as it allow one to specify the
             % stepsize explicitly. With linspace numerical noise meant that you
             % would get a slightly different stepsize which would mess up later
             % comparisons
             pulse_timescale = 0:timestep:gap-timestep;
-            new_pulse = ((1 ./ (sqrt(2 .* pi) .* bunch_length)) .* ...
-                exp(-((pulse_timescale - gap ./ 2).^2) ./ (2 .* bunch_length.^2)));
+            new_pulse = 1 .* exp(-((pulse_timescale - gap ./ 2).^2) ./ (2 .* bunch_length.^2));
+            % scale pulse to desired bunch charge.
+            pulse_charge = sum(new_pulse) * timestep;
+            new_pulse = new_pulse ./ pulse_charge .* bunch_charge;
             pulse = [];
             pulses_timescale = [];
             total_charge = 0;
@@ -67,6 +68,7 @@ for cur_ind = 1:length(ppi.current)
             end
                         
             time_domain_data_bc = pad_time_domain_data(time_domain_data, length(pulses_timescale));
+            time_domain_data_bc.pulse_total_charge = total_charge;
             time_domain_data_bc.pulse_for_reconstruction = pulse';
             
             clear pulse pulses_timescale new_pulse

@@ -7,6 +7,8 @@ time_domain_data_pad = time_domain_data;
 % now overwrite the relavent variables.
 [time_domain_data_pad.timebase, time_domain_data_pad.charge_distribution] = ...
     pad_data(time_domain_data.timebase, time_domain_data.charge_distribution, n_samples, 'samples');
+[~, time_domain_data_pad.charge_distribution_1C] = ...
+    pad_data(time_domain_data.timebase, time_domain_data.charge_distribution_1C, n_samples, 'samples');
 [~, time_domain_data_pad.wakepotential] = ...
     pad_data(time_domain_data.timebase, time_domain_data.wakepotential, n_samples, 'samples');
 [~, time_domain_data_pad.wakepotential_trans_x] = ...
@@ -15,6 +17,7 @@ time_domain_data_pad = time_domain_data;
     pad_data(time_domain_data.timebase, time_domain_data.wakepotential_trans_y, n_samples, 'samples');
 
 time_domain_data_pad.charge_distribution(isnan(time_domain_data_pad.charge_distribution)) = 0;
+time_domain_data_pad.charge_distribution_1C(isnan(time_domain_data_pad.charge_distribution_1C)) = 0;
 time_domain_data_pad.wakepotential(isnan(time_domain_data_pad.wakepotential)) = 0;
 time_domain_data_pad.wakepotential_trans_x(isnan(time_domain_data_pad.wakepotential_trans_x)) = 0;
 time_domain_data_pad.wakepotential_trans_y(isnan(time_domain_data_pad.wakepotential_trans_y)) = 0;

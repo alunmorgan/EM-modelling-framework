@@ -10,6 +10,10 @@ function output_file_locations = GdfidL_find_ouput(data_loc)
 % get the full list of files in the input directory.
 run_list = dir_list_gen_tree(data_loc, '',1);
 
+% Find the bunch spectrum file.
+inds = find_position_in_cell_lst(strfind(run_list, 'SpectrumOfTheCurrent'));
+output_file_locations.bunch_spectrum = run_list(inds);
+
 % Find the longditudinal wakepotential file, for at the origin.
 inds = find_position_in_cell_lst(strfind(run_list, 'W_AT_XY'));
 output_file_locations.WP_origin.s = run_list(inds);

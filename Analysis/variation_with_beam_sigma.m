@@ -4,10 +4,12 @@ function beam_sigma_sweep = variation_with_beam_sigma(bunch_length, time_domain_
 for odf = 1:length(bunch_length)
     pulse_sig = bunch_length(odf) *1E-3 ./ 3E8; % bunch length is in mm
     % generate the time domain signal
-    pulse = (1/(sqrt(2*pi)*pulse_sig)) * ...
-        exp(-(time_domain_data.timebase.^2)/(2*pulse_sig^2));
+    pulse = 1 * exp(-(time_domain_data.timebase.^2)/(2*pulse_sig^2));
+    pulse_sum = sum(pulse) .* (time_domain_data.timebase(2) - time_domain_data.timebase(1));
+    pulse = pulse ./ pulse_sum .* charge;
     
     time_domain_data.pulse_for_reconstruction = pulse;
+    time_domain_data.pulse_total_charge = charge;
     frequency_domain_data = frequency_domain_analysis(time_domain_data, charge, 1);
     
     beam_sigma_sweep.sig_time(odf) = pulse_sig;

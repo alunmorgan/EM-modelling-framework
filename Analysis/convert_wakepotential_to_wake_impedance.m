@@ -30,7 +30,7 @@ n_freq_points = length(timescale);
 f_raw = (linspace(0,1,n_freq_points) / time_stepsize)';
 % Calculating the bunch spectra for a 1C charge.
 
-bunch_spectra = (fft(Charge_distribution));
+bunch_spectra = (fft(Charge_distribution)); % for a 1C charge
 fft_wp = fft(wakepotential);
 % In order to get the proper impedence you need divide the fft of
 %the wake potential by the bunch spectrum. We take the real as this
