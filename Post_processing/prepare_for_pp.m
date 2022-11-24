@@ -6,9 +6,9 @@ function [old_loc, tmp_name, data_path, output_path] = prepare_for_pp(model_base
 data_path = fullfile(paths.data_loc, model_base_name, model_name);
 output_path = fullfile(paths.results_loc, model_base_name, model_name, 'postprocessing');
 
-% if ~exist(output_path, 'dir')
-%     mkdir(output_path)
-% end
+if ~exist(output_path, 'dir')
+    mkdir(output_path)
+end
 % % make soft links to the data folder and output folder into /scratch.
 % % this is because the post processor does not handle long paths well.
 % % this makes things more controlled.
