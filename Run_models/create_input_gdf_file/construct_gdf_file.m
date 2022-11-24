@@ -2,9 +2,9 @@ function construct_gdf_file(paths, sim_name, modelling_inputs, out_loc, scratch_
 % Generate the correct gdf file for the requested simulation.
 
 if strcmp(sim_name, 'sparameter')
-    construct_s_param_gdf_file(modelling_inputs, port_name, sparameter_set, restart_out)
+    construct_s_param_gdf_file(modelling_inputs, out_loc, scratch_loc, restart_out, port_name, sparameter_set)
 elseif strcmp(sim_name, 'geometry')
-    construct_geometry_gdf_file(modelling_inputs, restart_out)
+    construct_geometry_gdf_file(modelling_inputs, out_loc, scratch_loc, restart_out)
 elseif strcmp(sim_name, 'wake')
     construct_wake_gdf_file(modelling_inputs, out_loc, scratch_loc, restart_out)
 elseif strcmp(sim_name, 'eigenmode')

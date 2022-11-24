@@ -1,12 +1,11 @@
-function construct_geometry_gdf_file(modelling_inputs, restart_out)
+function construct_geometry_gdf_file(modelling_inputs, out_loc, scratch_loc, restart_out)
 % Write the input gdf file to generate the geometry of the requested
 % model.
 %
-% input_file_path is the path to the geometry model gdf file.
 % modelling_inputs is the structure containing the input data for a single
 % simulation run.
 %
-% Example: construct_wake_gdf_file(models_location, storage_location, modelling_inputs, plots)
+% Example: construct_geometry_gdf_file(modelling_inputs, out_loc, scratch_loc, restart_out)
 
 if ~isempty(modelling_inputs.mat_list)
     materials = modelling_inputs.mat_list(:,1);
@@ -18,7 +17,7 @@ else
     material_override = [];
 end %if
 
-fs = gdf_wake_header_construction('',restart_out, 'temp', ...
+fs = gdf_wake_header_construction(out_loc, scratch_loc, restart_out, ...
     modelling_inputs.NPMLs,...
     modelling_inputs.n_cores, ...
     modelling_inputs.mesh_stepsize,...
@@ -54,4 +53,4 @@ plots = create_geometry_plots(modelling_inputs);
 % construct the full input file.
 data = cat(1,fs, modelling_inputs.defs', geom, mesh_def, mesh_fixed_planes, ...
     data, plots);
-write_out_data( data, 'model.gdf' )
+write_out_data( data, fullfile(out_loc, 'model.gdf'))

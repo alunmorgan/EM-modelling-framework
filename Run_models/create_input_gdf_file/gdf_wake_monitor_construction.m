@@ -1,4 +1,4 @@
-function fs = gdf_wake_monitor_construction(dtsafety, mov, voltage_monitors, field_setup)
+function fs = gdf_wake_monitor_construction(dtsafety, mov, voltage_monitors, field_setup, out_loc)
 % Constructs the monitor part of the gdf input file for GdfidL
 %
 % fs is
@@ -48,17 +48,17 @@ if mov == 1
     fs = cat(1,fs,'       firstsaved= FIRSTSAV');
     fs = cat(1,fs,'       lastsaved= MODELLENTIME');
     fs = cat(1,fs,'       distancesaved= DISTSAV');
-    fs = cat(1,fs,'       outfile= ./efieldsx');
+    fs = cat(1,fs,['       outfile= ',fullfile(out_loc, 'efieldsx')]);
     fs = cat(1,fs,'       bbylow=0');
     fs = cat(1,fs,'       bbyhigh=0');
     fs = cat(1,fs,'       doit');
-    fs = cat(1,fs,'       outfile= ./efieldsy');
+    fs = cat(1,fs,['       outfile= ',fullfile(out_loc, 'efieldsy')]);
     fs = cat(1,fs,'       bbylow=-1E30');
     fs = cat(1,fs,'       bbyhigh=1E30');
     fs = cat(1,fs,'       bbxlow=0');
     fs = cat(1,fs,'       bbxhigh=0');
     fs = cat(1,fs,'       doit');
-    fs = cat(1,fs,'       outfile= ./efieldsz');
+    fs = cat(1,fs,['       outfile= ',fullfile(out_loc, 'efieldsz')]);
     fs = cat(1,fs,'       bbxlow=-1E30');
     fs = cat(1,fs,'       bbxhigh=1E30');
     fs = cat(1,fs,'       bbzlow=0');
@@ -71,17 +71,17 @@ if mov == 1
     fs = cat(1,fs,'       firstsaved= FIRSTSAV');
     fs = cat(1,fs,'       lastsaved= MODELLENTIME');
     fs = cat(1,fs,'       distancesaved= DISTSAV');
-    fs = cat(1,fs,'       outfile= ./hfieldsx');
+    fs = cat(1,fs,['       outfile= ',fullfile(out_loc, 'hfieldsx')]);
     fs = cat(1,fs,'       bbylow=0');
     fs = cat(1,fs,'       bbyhigh=0');
     fs = cat(1,fs,'       doit');
-    fs = cat(1,fs,'       outfile= ./hfieldsy');
+    fs = cat(1,fs,['       outfile= ',fullfile(out_loc, 'hfieldsy')]);
     fs = cat(1,fs,'       bbylow=-1E30');
     fs = cat(1,fs,'       bbyhigh=1E30');
     fs = cat(1,fs,'       bbxlow=0');
     fs = cat(1,fs,'       bbxhigh=0');
     fs = cat(1,fs,'       doit');
-    fs = cat(1,fs,'       outfile= ./hfieldsz');
+    fs = cat(1,fs,['       outfile= ',fullfile(out_loc, 'hfieldsz')]);
     fs = cat(1,fs,'       bbxlow=-1E30');
     fs = cat(1,fs,'       bbxhigh=1E30');
     fs = cat(1,fs,'       bbzlow=0');
@@ -95,10 +95,10 @@ if mov == 1
             fs = cat(1,fs,'       what= e-fields');
             fs = cat(1,fs,['       firstsaved=', field_setup.full_field_snapshot_times{wld}]);
             fs = cat(1,fs,['       lastsaved=', field_setup.full_field_snapshot_times{wld}, ' + DISTSAV']);
-            fs = cat(1,fs,['       outfile= ./efields_full_snapshot_', field_setup.full_field_snapshot_times{wld}]);
+            fs = cat(1,fs,['       outfile= ',fullfile(out_loc, ['efields_full_snapshot_', field_setup.full_field_snapshot_times{wld}])]);
             fs = cat(1,fs,'       doit');
             fs = cat(1,fs,'       what= h-fields');
-            fs = cat(1,fs,['       outfile= ./hfields_full_snapshot_', field_setup.full_field_snapshot_times{wld}]);
+            fs = cat(1,fs,['       outfile= ',fullfile(out_loc, ['hfields_full_snapshot_', field_setup.full_field_snapshot_times{wld}])]);
             fs = cat(1,fs,'       doit');
             fs = cat(1,fs,'    -storefieldsat');
             fs = cat(1,fs,'       whattosave=both');
