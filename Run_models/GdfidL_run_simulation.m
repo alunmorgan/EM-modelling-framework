@@ -46,12 +46,12 @@ for nes = 1:n_cycles
     restart_root = fullfile(paths.restart_files_path, modelling_inputs.base_model_name, modelling_inputs.model_name);
     scratch_root = fullfile(paths.scratch_loc, modelling_inputs.base_model_name, modelling_inputs.model_name);
     out_root = fullfile(paths.data_loc, modelling_inputs.base_model_name, modelling_inputs.model_name);
-    
-    if ~exist(out_root, 'dir')
+    out_loc = define_instance_path(out_root, sim_type, active_ports(nes), sparameter_set(nes), frequency);
+
+    if ~exist(out_loc, 'dir')
         restart_out = construct_storage_area_path(restart_root, sim_type, active_ports(nes), sparameter_set(nes), frequency);
-        out_loc = construct_storage_area_path(out_root, sim_type, active_ports(nes), sparameter_set(nes), frequency);
-        scratch_loc = construct_storage_area_path(scratch_root, sim_type, active_ports(nes), sparameter_set(nes), frequency);
-        
+    out_loc = construct_storage_area_path(out_root, sim_type, active_ports(nes), sparameter_set(nes), frequency);
+    scratch_loc = construct_storage_area_path(scratch_root, sim_type, active_ports(nes), sparameter_set(nes), frequency);
         construct_gdf_file(paths, sim_type, modelling_inputs, out_loc, scratch_loc, restart_out, active_ports(nes), sparameter_set(nes), frequency)
         save(fullfile(out_loc,'run_inputs.mat'), 'paths', 'modelling_inputs')
         disp(['Running ', sim_type,' simulation for ', modelling_inputs.model_name, '.'])
@@ -67,6 +67,12 @@ for nes = 1:n_cycles
                 [~] = system(['convert ',pic_nme,'.ps -rotate -90 ',pic_nme,'.png']);
                 delete([pic_nme,'.ps'])
             end %for
+        end %if
+    else
+        if strcmp(sim_type, 'sparameter')
+        disp(strcat(sim_type, ' data already exists (', active_ports(nes), ')'))
+        else
+        disp(strcat(sim_type, ' data already exists '))
         end %if
     end %if
 end %for
