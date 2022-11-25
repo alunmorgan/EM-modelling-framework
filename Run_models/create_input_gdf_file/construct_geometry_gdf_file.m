@@ -49,7 +49,7 @@ mesh_def = cat(1,mesh_def, '#');
 mesh_fixed_planes = gdf_write_mesh_fixed_planes(modelling_inputs.beam_offset_x, ...
     modelling_inputs.beam_offset_y);
 data = create_model_data_file_for_STL(modelling_inputs);
-plots = create_geometry_plots(modelling_inputs);
+plots = create_geometry_plots(modelling_inputs, out_loc);
 % construct the full input file.
 data = cat(1,fs, modelling_inputs.defs', geom, mesh_def, mesh_fixed_planes, ...
     data, plots);
