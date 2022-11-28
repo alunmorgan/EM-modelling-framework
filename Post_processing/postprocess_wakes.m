@@ -17,11 +17,15 @@ GdfidL_write_pp_input_file(log, data_directory, pp_directory);
 %% run the wake postprocessor
 a=dir_list_gen_tree(pp_directory, '',1);
 c = a(contains(a, 'wake_post_processing'));
-for kwe = 1:length(c)
-    postprocess_core(fileparts(c{kwe}), modelling_inputs.version, 'wake', 0, 0, 'pp_input_file', c{kwe});
+pp_instances = fileparts(c);
+for kwe = 1:length(pp_instances)
+    temp = dir_list_gen(pp_instances{kwe}, '', 1);
+    in_file_temp = temp(contains(temp, 'model_wake_post_processing'));
+    postprocess_core(pp_instances{kwe}, modelling_inputs.version, 'wake', 0, 0, 'pp_input_file', in_file_temp{1});
 end %for
+fprintf('\n');
 %% Extract the wake data
-rename_port_files(fullfile(pp_directory, 'wake'));
+rename_port_files(pp_directory);
 % % FIXME move the following two line into analysis so that separation between the
 % % data folder and the analysis folder is clear.
 % output_file_locations = GdfidL_find_ouput(wake_output_directory);

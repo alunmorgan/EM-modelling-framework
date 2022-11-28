@@ -50,6 +50,7 @@ ov = cat(1,ov,'    wyatxy = (0,0)');
 % ov = cat(1,ov,'    xyref = (0,0)');
 ov = cat(1,ov,'    usexyref = no');
 ov = cat(1,ov,'    showchargemax = yes');
+ov = cat(1,ov,'    sbunchspectrum= yes');
 ov = cat(1,ov,'    onlyplotfiles = yes');
 ov = cat(1,ov,'    watsfiles = no');
 ov = cat(1,ov,'    doit');

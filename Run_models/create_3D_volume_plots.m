@@ -1,8 +1,8 @@
-function model_file = create_3D_volume_plots(modelling_inputs, eyepos, geom_prefix)
+function model_file = create_3D_volume_plots(modelling_inputs, eyepos, geom_prefix, out_loc)
 model_file = {'-volumeplot'};
 model_file = cat(1, model_file, eyepos.threedxeyepos);
 model_file = cat(1, model_file, '   scale=3.5');
-model_file = cat(1, model_file,['    plotopts = -o ./', geom_prefix, '3Dmodel.ps -colorps']);
+model_file = cat(1, model_file,['    plotopts = -o ' fullfile(out_loc, [geom_prefix, '3Dmodel.ps -colorps'])]);
 model_file = cat(1, model_file, 'doit');
 
 x3d_count = 0;
@@ -30,6 +30,6 @@ for ndw = 1:size(modelling_inputs.cuts,1)
         z3d_count = z3d_count +1;
         count3d = y3d_count;
     end %if
-    model_file = cat(1, model_file, ['   plotopts = -o ./', geom_prefix, '3Dmodel_cut_',modelling_inputs.cuts{ndw, 1},'_user',num2str(count3d),'.ps -colorps']);
+    model_file = cat(1, model_file, ['   plotopts = -o ', fullfile(out_loc, [geom_prefix, '3Dmodel_cut_',modelling_inputs.cuts{ndw, 1},'_user',num2str(count3d),'.ps']),' -colorps']);
     model_file = cat(1, model_file, 'doit');
 end %for

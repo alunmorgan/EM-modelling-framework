@@ -12,10 +12,10 @@ wake_potential_trans_y = raw_data.Wake_potential_trans_Y ./ log.charge;
 % Scale the charge distribution to have the normalised integral value of 1C.
 time_step = abs(raw_data.timebase(2) - raw_data.timebase(1));
 cd_scaling = sum(raw_data.Charge_distribution .* time_step, 'omitnan');
-charge_distribution = raw_data.Charge_distribution ./ cd_scaling;
+charge_distribution_1C = raw_data.Charge_distribution ./ cd_scaling;
 
 % Calculate the wake loss distribution
-wake_loss_dist = charge_distribution .* wake_potential; %(V\C)
+wake_loss_dist = charge_distribution_1C .* wake_potential; %(V\C)
 
 % Calculate the wake loss factor (V\C)
 wake_loss_factor = -sum(wake_loss_dist, 'omitnan') .* time_step; %(V\C)
@@ -23,7 +23,8 @@ wake_loss_factor = -sum(wake_loss_dist, 'omitnan') .* time_step; %(V\C)
 % Calculate the energy lost from the beam (J)
 loss_from_beam = wake_loss_factor * log.charge.^2 ;
 
-time_domain_analysed_data.charge_distribution = charge_distribution;
+time_domain_analysed_data.charge_distribution_1C = charge_distribution_1C; % for 1C
+time_domain_analysed_data.charge_distribution = raw_data.Charge_distribution; % for model charge.
 time_domain_analysed_data.wakepotential = wake_potential;
 time_domain_analysed_data.wakepotential_trans_x = wake_potential_trans_x;
 time_domain_analysed_data.wakepotential_trans_y = wake_potential_trans_y;

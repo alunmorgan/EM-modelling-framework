@@ -11,7 +11,9 @@ for herf = 1:length(input_settings.sim_types)
         for awh = 1:length(modelling_inputs)
             [old_loc, tmp_name, data_path, output_path] = prepare_for_pp(modelling_inputs{awh}.base_model_name,...
                 modelling_inputs{awh}.model_name, paths);
-            GdfidL_post_process_models(data_path, output_path, modelling_inputs{awh}.model_name,...
+            [stat_datalink, ~]=system(['ln -s -T ',data_path, ' data_link']);
+             [stat_pplink, ~]=system(['ln -s -T ',output_path, ' output_link']);
+            GdfidL_post_process_models(fullfile(pwd, 'data_link'), fullfile(pwd, 'output_link'), modelling_inputs{awh}.model_name,...
                 'type_selection', input_settings.sim_types{herf});
             cleanup_after_pp(old_loc, tmp_name)
         end %for

@@ -10,7 +10,7 @@ function [wake_loss_factor, ...
 %     wakeimpedance, n_bunches_in_input_pattern)
 
 
-%%%%This is all for a 1C bunch %%%%%%%%%
+%%%%This is all for a 1C bunch pattern %%%%%%%%%
 % power of a repeated bunch. (The FFT implies that the bunch is
 % repeated after each simulation time)
 pwr_f = abs(bunch_spec).^2 .* wakeimpedance;

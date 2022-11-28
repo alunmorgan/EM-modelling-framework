@@ -1,4 +1,4 @@
-function construct_wake_gdf_file(modelling_inputs, restart_out)
+function construct_wake_gdf_file(modelling_inputs, out_loc, scratch_loc, restart_out)
 % Write the input gdf file for an wake simulation of the requested
 % model.
 %
@@ -17,7 +17,7 @@ else
     material_override = [];
 end %if
 
-fs = gdf_wake_header_construction('', restart_out, 'temp', ...
+fs = gdf_wake_header_construction(out_loc, scratch_loc, restart_out, ...
     modelling_inputs.NPMLs,...
     modelling_inputs.n_cores, ...
     modelling_inputs.mesh_stepsize,...
@@ -55,7 +55,7 @@ port_defs = gdf_write_port_definitions( modelling_inputs.ports,...
     modelling_inputs.port_location, modelling_inputs.port_modes, port_selection);
 excitation = gdf_wake_port_excitation(modelling_inputs.port_excitation_wake);
 mon = gdf_wake_monitor_construction(modelling_inputs.dtsafety, modelling_inputs.mov, ...
-    modelling_inputs.voltage_monitoring, modelling_inputs.field_capture);
+    modelling_inputs.voltage_monitoring, modelling_inputs.field_capture, out_loc);
 if isfield(modelling_inputs, 'voltage_sources')
     vs = gdf_wake_voltage_sources(modelling_inputs.voltage_sources);
     % construct the full input file.
@@ -65,4 +65,5 @@ else
     data = cat(1,fs, modelling_inputs.defs', geom, mesh_def, mesh_fixed_planes, ...
         data, port_defs, excitation,  mon, '-fdtd   ','    doit');
 end %if
-write_out_data( data, 'model.gdf' )
+
+write_out_data( data, fullfile(out_loc, 'model.gdf'))
