@@ -17,7 +17,7 @@ for herf = 1:length(input_settings.sim_types)
                 if ~exist(output_path, 'dir')
                     mkdir(output_path)
                 end
-                extract_field_data(data_path, output_path, paths.scratch_loc)
+                read_fexport_files(data_path, output_path, paths.scratch_loc);
             catch ME
                 warning([input_settings.sets{set_id}, ' <strong>Problem with field extraction</strong>'])
                 display_error_message(ME)
