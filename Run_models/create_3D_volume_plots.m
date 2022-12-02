@@ -2,7 +2,7 @@ function model_file = create_3D_volume_plots(modelling_inputs, eyepos, geom_pref
 model_file = {'-volumeplot'};
 model_file = cat(1, model_file, eyepos.threedxeyepos);
 model_file = cat(1, model_file, '   scale=3.5');
-model_file = cat(1, model_file,['    plotopts = -o ' fullfile(out_loc, [geom_prefix, '3Dmodel.ps -colorps'])]);
+model_file = cat(1, model_file,['    plotopts = -o ' fullfile(out_loc, [geom_prefix, '3Dmodel.ps']), ' -colorps']);
 model_file = cat(1, model_file, 'doit');
 
 x3d_count = 0;

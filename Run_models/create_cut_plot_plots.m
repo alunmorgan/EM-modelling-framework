@@ -42,16 +42,16 @@ for ndfd = 1:length(modelling_inputs.subsections)
     model_file = cat(1, model_file, '    normal=x');
     model_file = cat(1, model_file, ['   cutat= (',modelling_inputs.subsections{ndfd}.xmax, ') - (', modelling_inputs.subsections{ndfd}.xmin, ')']);
     model_file = cat(1, model_file, eyepos.twodxeyepos);
-    model_file = cat(1, model_file, ['   plotopts = -o ', fullfile(out_loc, [geom_prefix, '2Dsub',num2str(ndfd),'_cutplot_x.ps']),  -colorps']);
+    model_file = cat(1, model_file, ['   plotopts = -o ', fullfile(out_loc, [geom_prefix, '2Dsub',num2str(ndfd),'_cutplot_x.ps']), ' -colorps']);
     model_file = cat(1, model_file, 'doit');
     model_file = cat(1, model_file, '    normal=y');
     model_file = cat(1, model_file, ['   cutat= (',modelling_inputs.subsections{ndfd}.ymax, ') - (', modelling_inputs.subsections{ndfd}.ymin, ')']);
     model_file = cat(1, model_file, eyepos.twodyeyepos);
-    model_file = cat(1, model_file, ['   plotopts = -o ', fullfile(out_loc, [geom_prefix, '2Dsub',num2str(ndfd),'_cutplot_y.ps']),  -colorps']);
+    model_file = cat(1, model_file, ['   plotopts = -o ', fullfile(out_loc, [geom_prefix, '2Dsub',num2str(ndfd),'_cutplot_y.ps']), ' -colorps']);
     model_file = cat(1, model_file, 'doit');
     model_file = cat(1, model_file, '    normal=z');
     model_file = cat(1, model_file, ['   cutat= (',modelling_inputs.subsections{ndfd}.zmax, ') - (', modelling_inputs.subsections{ndfd}.zmin, ')']);
     model_file = cat(1, model_file, eyepos.twodzeyepos);
-    model_file = cat(1, model_file, ['   plotopts = -o ', fullfile(out_loc, [geom_prefix, '2Dsub',num2str(ndfd),'_cutplot_z.ps']),  -colorps']);
+    model_file = cat(1, model_file, ['   plotopts = -o ', fullfile(out_loc, [geom_prefix, '2Dsub',num2str(ndfd),'_cutplot_z.ps']), ' -colorps']);
     model_file = cat(1, model_file, 'doit');
 end %for
