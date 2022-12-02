@@ -54,6 +54,9 @@ end %if
 if isfield(mi.simulation_defs.wake, 'voltage_monitoring')
     base.voltage_monitoring = mi.simulation_defs.wake.voltage_monitoring;
 end %if
+if isfield(mi.simulation_defs.wake, 'voltage_sources')
+    base.voltage_sources = mi.simulation_defs.wake.voltage_sources;
+end %if
 if isfield(mi.simulation_defs.wake, 'field_capture')
     base.field_capture = mi.simulation_defs.wake.field_capture;
 end %if

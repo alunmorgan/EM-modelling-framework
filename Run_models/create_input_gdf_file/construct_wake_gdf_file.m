@@ -56,7 +56,14 @@ port_defs = gdf_write_port_definitions( modelling_inputs.ports,...
 excitation = gdf_wake_port_excitation(modelling_inputs.port_excitation_wake);
 mon = gdf_wake_monitor_construction(modelling_inputs.dtsafety, modelling_inputs.mov, ...
     modelling_inputs.voltage_monitoring, modelling_inputs.field_capture, out_loc);
-% construct the full input file.
-data = cat(1,fs, modelling_inputs.defs', geom, mesh_def, mesh_fixed_planes, ...
-    data, port_defs, excitation, mon, '-fdtd   ','    doit');
+if isfield(modelling_inputs, 'voltage_sources')
+    vs = gdf_wake_voltage_sources(modelling_inputs.voltage_sources);
+    % construct the full input file.
+    data = cat(1,fs, modelling_inputs.defs', geom, mesh_def, mesh_fixed_planes, ...
+        data, port_defs, excitation, vs,  mon, '-fdtd   ','    doit');
+else
+    data = cat(1,fs, modelling_inputs.defs', geom, mesh_def, mesh_fixed_planes, ...
+        data, port_defs, excitation,  mon, '-fdtd   ','    doit');
+end %if
+
 write_out_data( data, fullfile(out_loc, 'model.gdf'))
