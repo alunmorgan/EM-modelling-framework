@@ -20,16 +20,38 @@ end
 lg = struct;
 
 %% Find the information on the stored fields.
-field_data = regexp(data,'\s*#+\s*I am storing at t=\s*([.0-9e-+]+)\s*s, Name: "(.*)".\s*The sequential Number is\s*([0-9]+)\.', 'tokens');
+field_data = regexp(data, '\s*#+\s-fexport: "(.*)" is available.', 'tokens');
+% field_data = regexp(data,'\s*#+\s*I am storing at t=\s*([.0-9e-+]+)\s*s, Name: "(.*)".\s*The sequential Number is\s*([0-9]+)\.', 'tokens');
 field_inds = find_position_in_cell_lst(field_data);
 if ~isempty(field_inds) % This is for the case where the simulation terminates early / unexpectedly
     field_data = field_data(field_inds);
     field_data = reduce_cell_depth(field_data);
     field_data = reduce_cell_depth(field_data);
-    field_sets = unique(field_data(:,2));
+    [~, field_names, ~] = fileparts(field_data);
+    [field_groups] = regexp(field_names, '(.*)-([0-9]*)', 'tokens');
+    field_groups = reduce_cell_depth(field_groups);
+    field_groups = reduce_cell_depth(field_groups);
+    field_sequence_numbers = field_groups(:,2);
+    % FIXME this does depend on a particular user set naiming scheme - fragile.
+    field_times = regexp(field_groups(:,1), '.*_full_snapshot_(.*)', 'tokens');
+    field_times = reduce_cell_depth(field_times);
+    field_times = reduce_cell_depth(field_times);
+    field_times = cat(1, field_times, cell(length(field_names) - length(field_times) ,1));
+    field_groups = regexprep(field_groups(:,1), '_full_snapshot_(.*)', '_full_snapshot');
+    field_sets = unique(field_groups(:,1));
+%     field_sets = unique(field_data(:,2));
+
     for whj = 1:length(field_sets)
-        temp = field_data(strcmp(field_data(:,2), field_sets{whj}), [1,3]);
-        lg.field_data.(field_sets{whj}) = cellfun(@str2num, temp);
+        temp = contains(field_names, field_sets{whj});
+        lg.field_data.(field_sets{whj}).field_data = field_data(temp);
+        lg.field_data.(field_sets{whj}).field_names = field_names(temp);
+        lg.field_data.(field_sets{whj}).field_sequence_numbers = cellfun(@str2num, field_sequence_numbers(temp));
+        temp_field_times = field_times(temp);
+        if ~any(cellfun(@isempty, temp_field_times))
+            lg.field_data.(field_sets{whj}).field_times = cellfun(@str2num, temp_field_times);
+        end%if
+        %         temp = field_data(strcmp(field_data(:,2), field_sets{whj}), [1,3]);
+%         lg.field_data.(field_sets{whj}) = cellfun(@str2num, temp);
     end %for
 end %if
 %% Remove the commented out parts of the input file
@@ -126,7 +148,7 @@ if ~isempty(metal_loss_inds)
     % combine the metals and ceramic losses into a single list.
     if n_ceramics >0
         mat_num = cat(2, metal_num, ceramic_num);
-        materials = cat(1, metals, ceramics);
+        materials = cat(2, metals, ceramics');
     else
         mat_num = metal_num;
         materials = metals;
