@@ -34,6 +34,7 @@ base.parameter_file_path = fullfile(mi.paths.path_to_models, ...
 base.extension_names = mi.simulation_defs.extension_names;
 base.version = versions{1};
 % base.defs = defs{1};
+base.bunch_charge = mi.simulation_defs.bunch_charge;
 base.beam_sigma = mi.simulation_defs.beam_sigma{1};
 base.beam_offset_x = mi.simulation_defs.beam_offset_x{1};
 base.beam_offset_y = mi.simulation_defs.beam_offset_y{1};

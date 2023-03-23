@@ -1,4 +1,4 @@
-function fs = gdf_wake_header_construction(out_loc, scratch_loc, restart_files_loc, npmls, num_threads, mesh, mesh_scaling, sigma,...
+function fs = gdf_wake_header_construction(out_loc, scratch_loc, restart_files_loc, npmls, num_threads, mesh, mesh_scaling, charge, sigma,...
     beam_offset_x, beam_offset_y, wake_length, materials, material_labels)
 % Constructs the initial part of the gdf input file for GdfidL
 %
@@ -18,13 +18,10 @@ function fs = gdf_wake_header_construction(out_loc, scratch_loc, restart_files_l
 % TEMP knock out PEC from the list as it is already dealt with.
 % there is probably a better place to put it.
 ind = find(strcmp(materials, 'PEC')==1);
-materials(ind) = [];
-material_labels(ind) = [];
-
-% set bunch charge to 1E-9C. This couls be settable but I have a feeling
-% that some later analysis assumes it is 1nC. Needs further investigation
-% before changing it.
-charge = '1E-9';
+if ~isempty(ind)
+    materials(ind) = [];
+    material_labels(ind) = [];
+end %if
 
 fs = {'###################################################'};
 fs = cat(1,fs,'define(INF, 10000)');
@@ -32,7 +29,7 @@ fs = cat(1,fs,'define(LargeNumber, 1000)');
 fs = cat(1,fs,['define(STPSZE, ',num2str(mesh / mesh_scaling),') # Step size of mesh']);
 fs = cat(1,fs,['define(SIGMA, ',sigma,') # bunch length in mm']);
 fs = cat(1,fs,['define(NPMLs, ',npmls,') # number of perfect matching layers used']);
-fs = cat(1,fs,['define(CHARGE, ', charge,') # Bunch charge in C']);
+fs = cat(1,fs,['define(CHARGE, ', num2str(charge),') # Bunch charge in C']);
 fs = cat(1,fs,'define(vacuum, 0)');
 fs = cat(1,fs,'define(PEC, 1)');
 if ~isempty(materials)
