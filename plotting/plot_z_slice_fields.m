@@ -1,63 +1,66 @@
-function plot_z_slice_fields(f_handle, xaxis, yaxis, slice, slice_dir, field_dir, actual_time, field_limits)
+function plot_z_slice_fields(f_handle, xaxis, yaxis, slice, slice_dir, field_component, field_type, actual_time, field_limits)
+
+
+if strcmp(slice_dir, 'z')
+    xlab = 'Horizontal (mm)';
+    ylab = 'Vertical (mm)';
+elseif strcmp(slice_dir, 'y')
+    xlab = 'Vertical (mm)';
+    ylab = 'Longitudinal (mm)';
+elseif strcmp(slice_dir, 'x')
+    xlab = 'Horizontal (mm)';
+    ylab = 'Longitudinal (mm)';
+end %if
+if strcmp(field_type, 'e')
+    field_label = 'Field (Vm^{-1})';
+elseif strcmp(field_type, 'h')
+    field_label = 'Field (H TEMP)';
+end %if
+
 figure(f_handle)
+drawnow; pause(0.1)
 subplot(2,2,1)
 contourf(xaxis.*1e3, yaxis.*1e3, slice', 'LineStyle', 'none')
-if contains(slice_dir, 'fieldsz')
-    xlabel('Horizontal (mm)')
-    ylabel('Vertical (mm)')
-    x_cut_ind = find(abs(diff(sign(xaxis(1,:)),1)) > 0, 1, 'first');
-    y_cut_ind = find(abs(diff(sign(yaxis(:,1)),1)) > 0, 1, 'first');
-elseif contains(slice_dir, 'fieldsy')
-    xlabel('Vertical (mm)')
-    ylabel('Longitudinal (mm)')
-    y_cut_ind = find(abs(diff(sign(xaxis(1,:)),1)) > 0, 1, 'first');
-    x_cut_ind = find(abs(diff(sign(yaxis(:,1)),1)) > 0, 1, 'first');
-elseif contains(slice_dir, 'fieldsx')
-    xlabel('Horizontal (mm)')
-    ylabel('Longitudinal (mm)')
-    y_cut_ind = find(abs(diff(sign(xaxis(1,:)),1)) > 0, 1, 'first');
-    x_cut_ind = find(abs(diff(sign(yaxis(:,1)),1)) > 0, 1, 'first');
-end %if
-title([slice_dir, '=0 - ', field_dir, ' time=', actual_time])
+xlabel(xlab)
+ylabel(ylab)
+title(strcat(slice_dir, '=0 - ',field_type, field_component, ' time=', actual_time))
 axis equal
 colorbar
+drawnow
+
+xax = xaxis(1,:);
+yax = yaxis(:,1);
+x_cut_ind = find(abs(diff(sign(xax),1)) > 0, 1, 'first');
+y_cut_ind = find(abs(diff(sign(yax),1)) > 0, 1, 'first');
+
 subplot(2,2,3)
-
-
-plot(squeeze(xaxis(1,:)).*1E3, slice(:, x_cut_ind), 'LineWidth', 2)
-if contains(slice_dir, 'fieldsz')
-    xlabel('Horizontal (mm)')
-elseif contains(slice_dir, 'fieldsy')
-    xlabel('Vertical (mm)')
-elseif contains(slice_dir, 'fieldsx')
-    xlabel('Horizontal (mm)')
-end %if
-if strcmp(slice_dir(1), 'e')
-    ylabel('Field (Vm^{-1})')
-elseif strcmp(slice_dir(1), 'h')
-    ylabel('Field (H TEMP)')
-end %if
+plot(xax.*1E3, slice(:, y_cut_ind), 'LineWidth', 2)
+xlabel(xlab)
+ylabel(field_label)
 axis tight
-if nargin > 7
+if nargin > 8
     ylim(field_limits)
 end %if
-
+drawnow
 
 subplot(2,2,2)
-plot(slice(y_cut_ind,:),squeeze(yaxis(:,1)).*1E3, 'LineWidth', 2)
-xlabel('Field (Vm^{-1})')
-if contains(slice_dir, 'fieldsz')
-    ylabel('Vertical (mm)')
-elseif contains(slice_dir, 'fieldsy')
-    ylabel('Longitudinal (mm)')
-elseif contains(slice_dir, 'fieldsx')
-    ylabel('Longitudinal (mm)')
-end %if
+plot(slice(x_cut_ind,:),yax.*1E3, 'LineWidth', 2)
+xlabel(field_label)
+ylabel(ylab)
 axis tight
-if nargin > 7
+if nargin > 8
     xlim(field_limits)
 end %if
+drawnow; pause(0.1)
 
-end %function
-
+subplot(2,2,4)
+waterfall(xaxis.*1e3, yaxis.*1e3, slice')
+xlabel(xlab)
+ylabel(ylab)
+zlabel('Field magnitude')
+axis tight
+if nargin > 8
+    zlim(field_limits)
+end %if
+drawnow; pause(0.1)
 

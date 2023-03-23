@@ -1,11 +1,19 @@
-function make_field_videos(output_location, prefix)
+function make_field_videos(output_location)
 
-load(fullfile(output_location, 'fieldFrames.mat'), 'field_images')
-for hsw = 1:size(field_images,1)
-    for aks = 1:size(field_images,2)
-        for oas = 1:size(field_images,3)
-            write_vid(field_images{hsw, aks, oas}.frames, fullfile(output_location,...
-                [prefix, field_images{hsw, aks, oas}.field_type, 'fields_', field_images{hsw, aks, oas}.slice_dir, '_', field_images{hsw, aks, oas}.field_dir]))
-        end %for
+[frame_files, ~] = dir_list_gen(output_location, 'mat', 1);
+selected_inds = contains(frame_files, 'fieldFrames');
+frame_files = frame_files(selected_inds);
+for shz = 1:length(frame_files)
+    load(fullfile(output_location, frame_files{shz}), 'field_images')
+    output_name = frame_files{shz};
+    output_name = output_name(1:end-4);
+    output_name = regexprep(output_name, '_fieldFrames', '');
+    for oas = 1:length(field_images)
+        if length(field_images) >1
+            write_vid(field_images{oas}.frames, fullfile(output_location, strcat(output_name,'_', field_images{oas}.field_component)))
+        else
+            write_vid(field_images{oas}.frames, fullfile(output_location, output_name))
+        end %if
     end %for
+    clear field_images
 end %for

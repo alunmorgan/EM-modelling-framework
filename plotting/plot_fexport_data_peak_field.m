@@ -1,17 +1,15 @@
-function plot_fexport_data_peak_field(data, output_location, prefix)
+function plot_fexport_data_peak_field(data, field_type, slice_dir, output_location, name_of_model)
 
-sets = fields(data);
-field_dirs = {'Fx','Fy','Fz'};
-xslice_ind = contains(sets, 'fieldsx');
-xslice = sets(xslice_ind);
-xslice = xslice{1};
-test2 = squeeze(data.(xslice).Fx);
-test = squeeze(sum(sum(abs(test2))));
-[~,selected_timeslice] = max(test);
-
-
-f1 = figure('Position',[30,30, 1500, 600]);
-plot_field_slices(f1, sets, field_dirs, data, selected_timeslice, NaN)
-savemfmt(f1, output_location, [prefix, 'peak_field_through_centre']);
-close(f1)
-
+out_name = strcat(name_of_model, '_', field_type, '-field_', slice_dir, '_slice_direction_peak_field_through_centre');
+if ~isfile(fullfile(output_location,[out_name, '.png']))
+    test2 = squeeze(data.Fx);
+    test = squeeze(sum(sum(abs(test2))));
+    [~,selected_timeslice] = max(test);
+    
+    f1 = figure('Position',[30,30, 1500, 400]);
+    drawnow
+    plot_field_slices(f1, data, field_type, slice_dir, selected_timeslice, NaN)
+    savemfmt(f1, output_location, out_name);
+    close(f1)
+    drawnow; pause(0.2);  % this innocent line prevents the Matlab hang
+end %if
