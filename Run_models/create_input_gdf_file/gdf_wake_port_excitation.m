@@ -6,7 +6,7 @@ if isempty(excitation_structure.port_names{1})
     fs =  cat(1, fs, '# NO port excitations requested #');
 else
     fs = cat(1,fs,'-lcharge');
-    fs = cat(1,fs,'charge=1e-30');% reduce the charge in the original bunch (still needed for timing.)
+    fs = cat(1,fs,'charge=1e-40');% reduce the charge in the original bunch (still needed for timing.)
     fs = cat(1,fs,'nextcharge');
     fs = cat(1,fs,['charge=', num2str(excitation_structure.bunch_charge)]);
     fs = cat(1,fs,['sigma=', num2str(excitation_structure.bunch_sigma)]);
