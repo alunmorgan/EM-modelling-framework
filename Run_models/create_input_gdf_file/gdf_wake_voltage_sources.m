@@ -15,7 +15,10 @@ for nse = 1:length(voltage_sources)
     fs = cat(1,fs,['            startpoint= ', voltage_sources{nse}.startpoint]);
     fs = cat(1,fs,['            endpoint= ', voltage_sources{nse}.endpoint]);
     fs = cat(1,fs,['            resistance= ', voltage_sources{nse}.resistance]);
+    fs = cat(1,fs,['            inductance= ', voltage_sources{nse}.inductance]);
     fs = cat(1,fs,['            amplitude= ', voltage_sources{nse}.voltage]');
+    fs = cat(1,fs,['            risetime= ', voltage_sources{nse}.risetime]);
+%     fs = cat(1,fs,['            frequency= ', voltage_sources{nse}.frequency]');
     fs = cat(1,fs,'         doit');
 end %for
 
