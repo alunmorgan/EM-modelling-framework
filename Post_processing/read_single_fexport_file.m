@@ -16,6 +16,7 @@ for hsk = 1:10
         pause(5)
     end %try
 end %for
-if isempty('test_input')
+if isempty('file_data')
     disp(['Could not extract data from ', temp_name{1}])
 end %if
+delete(temp_name{1})
