@@ -6,7 +6,7 @@ sim_types = {'geometry','wake', 'sparameter', 'eigenmode', 'lossy_eigenmode', 's
 
 default_sim_types = {'geometry', 'wake', 'sparameter', 'lossy_eigenmode'};
 default_stages = {'simulate', 'postprocess', 'field_extraction', 'analyse', 'reconstruct'  'plot_analysis_data', 'plot_reconstruction_data', 'plot_fields', 'report'};
-default_version = {'220421'};
+default_version = {'221231'};
 default_number_of_cores = {'56'}; % less than max to avoid contension with other users
 default_precision = {'double'};
 
