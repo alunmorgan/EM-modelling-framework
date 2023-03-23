@@ -33,11 +33,13 @@ for lse = 1:length(logs)
         % Find the variable values.
         variable_regexp = '.*\s+defining:\s*"(.*)"\s*[,to]+\s+Value:\s+"(.*)"';
         test= regexp(data, variable_regexp, 'tokens');
-        test_ind = cellfun(@isempty,test);
-        test2=test(~test_ind);
+        test = reduce_cell_depth(test);
+        test = reduce_cell_depth(test);
+        test_ind = cellfun(@isempty,test(:,1));
+        test2=test(~test_ind,:);
         for hs = 1:length(test2)
-            val_name_temp = regexprep(test2{hs,1}{1}{1}, '@', '');
-            lg.(val_name_temp)= test2{hs}{1}{2};
+            val_name_temp = regexprep(test2{hs,1}, '@', '');
+            lg.(val_name_temp)= test2{hs, 2};
         end %for
     else
         % tfirsts
