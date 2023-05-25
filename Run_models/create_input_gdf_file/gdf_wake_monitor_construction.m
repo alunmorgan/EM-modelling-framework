@@ -38,81 +38,79 @@ fs = cat(1,fs,'        whattosave = pdielectrics');
 fs = cat(1,fs,'        doit');
 fs = cat(1,fs,'');
 
-if mov == 1
-    fs = cat(1,fs,'# Store field data.');
-    fs = cat(1,fs,' define( FIRSTSAV, 20e-3  / @clight )');
-    fs = cat(1,fs,' define( DISTSAV, 10e-3 / @clight )');
-    fs = cat(1,fs,[' define( MODELLENTIME, ', field_setup.stop_time,')']);
-    fs = cat(1,fs,'    -fexport');
-    fs = cat(1,fs,'       what= e-fields');
-    fs = cat(1,fs,'       firstsaved= FIRSTSAV');
-    fs = cat(1,fs,'       lastsaved= MODELLENTIME');
-    fs = cat(1,fs,'       distancesaved= DISTSAV');
-    fs = cat(1,fs,['       outfile= ',fullfile(out_loc, 'efieldsx')]);
-    fs = cat(1,fs,'       bbylow=0');
-    fs = cat(1,fs,'       bbyhigh=0');
-    fs = cat(1,fs,'       doit');
-    fs = cat(1,fs,['       outfile= ',fullfile(out_loc, 'efieldsy')]);
-    fs = cat(1,fs,'       bbylow=-1E30');
-    fs = cat(1,fs,'       bbyhigh=1E30');
-    fs = cat(1,fs,'       bbxlow=0');
-    fs = cat(1,fs,'       bbxhigh=0');
-    fs = cat(1,fs,'       doit');
-    fs = cat(1,fs,['       outfile= ',fullfile(out_loc, 'efieldsz')]);
-    fs = cat(1,fs,'       bbxlow=-1E30');
-    fs = cat(1,fs,'       bbxhigh=1E30');
-    fs = cat(1,fs,'       bbzlow=0');
-    fs = cat(1,fs,'       bbzhigh=0');
-    fs = cat(1,fs,'       doit');
-    fs = cat(1,fs,'       bbzlow=-1E30');
-    fs = cat(1,fs,'       bbzhigh=1E30');
-    
-    fs = cat(1,fs,'       what= h-fields');
-    fs = cat(1,fs,'       firstsaved= FIRSTSAV');
-    fs = cat(1,fs,'       lastsaved= MODELLENTIME');
-    fs = cat(1,fs,'       distancesaved= DISTSAV');
-    fs = cat(1,fs,['       outfile= ',fullfile(out_loc, 'hfieldsx')]);
-    fs = cat(1,fs,'       bbylow=0');
-    fs = cat(1,fs,'       bbyhigh=0');
-    fs = cat(1,fs,'       doit');
-    fs = cat(1,fs,['       outfile= ',fullfile(out_loc, 'hfieldsy')]);
-    fs = cat(1,fs,'       bbylow=-1E30');
-    fs = cat(1,fs,'       bbyhigh=1E30');
-    fs = cat(1,fs,'       bbxlow=0');
-    fs = cat(1,fs,'       bbxhigh=0');
-    fs = cat(1,fs,'       doit');
-    fs = cat(1,fs,['       outfile= ',fullfile(out_loc, 'hfieldsz')]);
-    fs = cat(1,fs,'       bbxlow=-1E30');
-    fs = cat(1,fs,'       bbxhigh=1E30');
-    fs = cat(1,fs,'       bbzlow=0');
-    fs = cat(1,fs,'       bbzhigh=0');
-    fs = cat(1,fs,'       doit');
-    fs = cat(1,fs,'       bbzlow=-1E30');
-    fs = cat(1,fs,'       bbzhigh=1E30');
+% if mov == 1
+%     fs = cat(1,fs,'# Store field data.');
+%     fs = cat(1,fs,' define( FIRSTSAV, 20e-3  / @clight )');
+%     fs = cat(1,fs,' define( DISTSAV, 10e-3 / @clight )');
+%     fs = cat(1,fs,[' define( MODELLENTIME, ', field_setup.stop_time,')']);
+%     fs = cat(1,fs,'    -fexport');
+%     fs = cat(1,fs,'       what= e-fields');
+%     fs = cat(1,fs,'       firstsaved= FIRSTSAV');
+%     fs = cat(1,fs,'       lastsaved= MODELLENTIME');
+%     fs = cat(1,fs,'       distancesaved= DISTSAV');
+%     fs = cat(1,fs,['       outfile= ',fullfile(out_loc, 'efieldsx')]);
+%     fs = cat(1,fs,'       bbylow=0');
+%     fs = cat(1,fs,'       bbyhigh=0');
+%     fs = cat(1,fs,'       doit');
+%     fs = cat(1,fs,['       outfile= ',fullfile(out_loc, 'efieldsy')]);
+%     fs = cat(1,fs,'       bbylow=-1E30');
+%     fs = cat(1,fs,'       bbyhigh=1E30');
+%     fs = cat(1,fs,'       bbxlow=0');
+%     fs = cat(1,fs,'       bbxhigh=0');
+%     fs = cat(1,fs,'       doit');
+%     fs = cat(1,fs,['       outfile= ',fullfile(out_loc, 'efieldsz')]);
+%     fs = cat(1,fs,'       bbxlow=-1E30');
+%     fs = cat(1,fs,'       bbxhigh=1E30');
+%     fs = cat(1,fs,'       bbzlow=0');
+%     fs = cat(1,fs,'       bbzhigh=0');
+%     fs = cat(1,fs,'       doit');
+%     fs = cat(1,fs,'       bbzlow=-1E30');
+%     fs = cat(1,fs,'       bbzhigh=1E30');
+%     fs = cat(1,fs,'       what= h-fields');
+%     fs = cat(1,fs,'       firstsaved= FIRSTSAV');
+%     fs = cat(1,fs,'       lastsaved= MODELLENTIME');
+%     fs = cat(1,fs,'       distancesaved= DISTSAV');
+%     fs = cat(1,fs,['       outfile= ',fullfile(out_loc, 'hfieldsx')]);
+%     fs = cat(1,fs,'       bbylow=0');
+%     fs = cat(1,fs,'       bbyhigh=0');
+%     fs = cat(1,fs,'       doit');
+%     fs = cat(1,fs,['       outfile= ',fullfile(out_loc, 'hfieldsy')]);
+%     fs = cat(1,fs,'       bbylow=-1E30');
+%     fs = cat(1,fs,'       bbyhigh=1E30');
+%     fs = cat(1,fs,'       bbxlow=0');
+%     fs = cat(1,fs,'       bbxhigh=0');
+%     fs = cat(1,fs,'       doit');
+%     fs = cat(1,fs,['       outfile= ',fullfile(out_loc, 'hfieldsz')]);
+%     fs = cat(1,fs,'       bbxlow=-1E30');
+%     fs = cat(1,fs,'       bbxhigh=1E30');
+%     fs = cat(1,fs,'       bbzlow=0');
+%     fs = cat(1,fs,'       bbzhigh=0');
+%     fs = cat(1,fs,'       doit');
+%     fs = cat(1,fs,'       bbzlow=-1E30');
+%     fs = cat(1,fs,'       bbzhigh=1E30');
     if ~isempty(field_setup.full_field_snapshot_times)
-        for wld = 1:length(field_setup.full_field_snapshot_times)
-            fs = cat(1,fs,'    -fexport');
-            fs = cat(1,fs,'       what= e-fields');
-            fs = cat(1,fs,['       firstsaved=', field_setup.full_field_snapshot_times{wld}]);
-            fs = cat(1,fs,['       lastsaved=', field_setup.full_field_snapshot_times{wld}]);
-            fs = cat(1,fs,['       outfile= ',fullfile(out_loc, ['efields_full_snapshot_', field_setup.full_field_snapshot_times{wld}])]);
-            fs = cat(1,fs,'       doit');
-            fs = cat(1,fs,'       what= h-fields');
-            fs = cat(1,fs,['       outfile= ',fullfile(out_loc, ['hfields_full_snapshot_', field_setup.full_field_snapshot_times{wld}])]);
-            fs = cat(1,fs,'       doit');
-            fs = cat(1,fs,'    -storefieldsat');
-            fs = cat(1,fs,'       whattosave=both');
-            fs = cat(1,fs,'       name=field_snapshots');
-            fs = cat(1,fs,['       firstsaved=', field_setup.full_field_snapshot_times{wld}]);
-            fs = cat(1,fs,['       lastsaved=', field_setup.full_field_snapshot_times{wld}]);
-            fs = cat(1,fs,'       distancesaved= DISTSAV');
-            fs = cat(1,fs,'       doit');  
-        end %for
+        fs = cat(1,fs,'    -storefieldsat');
+        fs = cat(1,fs,'       whattosave=both');
+        fs = cat(1,fs,'       name=field_snapshots');
+        fs = cat(1,fs,['       firstsaved=', field_setup.full_field_snapshot_times.start]);
+        fs = cat(1,fs,['       lastsaved=', field_setup.full_field_snapshot_times.stop]);
+        fs = cat(1,fs,['       distancesaved= ', field_setup.full_field_snapshot_times.step]);
+        fs = cat(1,fs,'       doit');
+%         fs = cat(1,fs,'    -fexport');
+%         fs = cat(1,fs,['       firstsaved=', field_setup.full_field_snapshot_times.start]);
+%         fs = cat(1,fs,['       distancesaved= ', field_setup.full_field_snapshot_times.step]);
+%         fs = cat(1,fs,['       lastsaved=', field_setup.full_field_snapshot_times.stop]);
+%         fs = cat(1,fs,'       what= e-fields');
+%         fs = cat(1,fs,['       outfile= ',fullfile(out_loc, 'efields_full_snapshot_')]);
+%         fs = cat(1,fs,'       doit');
+%         fs = cat(1,fs,'       what= h-fields');
+%         fs = cat(1,fs,['       outfile= ',fullfile(out_loc, 'hfields_full_snapshot_')]);
+%         fs = cat(1,fs,'       doit');
     end %if
-    
-else
-    fs = cat(1,fs,'# No field output requested... not storing additional files.');
-end %if
+
+% else
+%     fs = cat(1,fs,'# No field output requested... not storing additional files.');
+% end %if
 
 % fs = cat(1,fs,'-fdtd   ');
 % % fs = cat(1,fs,'    doit');

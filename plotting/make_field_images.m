@@ -1,11 +1,26 @@
-function varargout = make_field_images(data, field_type, slice_dir, ...
+function varargout = make_field_images(data, metadata, timestamps, max_field_component, ...
     output_location , name_of_model, ROI)
 
+field_types = fieldnames(data);
+slices = {'x','y','z'};
 field_components = {'Fx','Fy','Fz'};
 field_images = cell(1, 3);
 
+if strcmp(slice_dir, 'z')
+    [xaxis, yaxis] = meshgrid(metadata.coord_x, metadata.coord_y);
+    xlab = 'Horizontal (mm)';
+    ylab = 'Vertical (mm)';
+elseif strcmp(slice_dir, 'x')
+    [xaxis, yaxis] = meshgrid(metadata.coord_y, metadata.coord_z);
+    xlab = 'Vertical (mm)';
+    ylab = 'Beam direction (mm)';
+elseif strcmp(slice_dir, 'y')
+    [xaxis, yaxis] = meshgrid(metadata.coord_x, metadata.coord_z);
+    xlab = 'Horizontal (mm)';
+    ylab = 'Beam direction (mm)';
+end %if
+
 geometry_slice = geometry_from_slice_data(data);
-[xaxis, yaxis] = meshgrid(data.coord_1, data.coord_2);
 if ~isnan(ROI)
     xax = xaxis(1,:);
     yax = yaxis(:,1);

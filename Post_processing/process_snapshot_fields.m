@@ -1,8 +1,8 @@
-function process_snapshot_fields(fileset, fileset_name, out_path, scratch_path)
+function process_snapshot_fields(fileset, fileset_name, out_path)
 
 
 % Load in inital data file in order to do some setup.
-test_input_limits = read_single_fexport_file(fileset{1}, scratch_path);
+test_input_limits = read_single_fexport_file(fileset{1});
 
 % Find boundary limits using the first data file of the set.
 temp_boundary1 = test_input_limits(find(contains(test_input_limits, [': ','ix1']),1, 'first'));
@@ -61,24 +61,26 @@ for wns = 1:length(fileset)
     Fz = NaN(n_coords_x, n_coords_y, n_coords_z);
     
     % Extract data into a variable.
+    fprintf(' Reading datafile:')
     if wns == 1
         test_input = test_input_limits;
     else
-        test_input = read_single_fexport_file(fileset{wns}, scratch_path);
+        test_input = read_single_fexport_file(fileset{wns});
     end %if
     if isempty('test_input')
         continue
     else
         % populate data grid
-        timestamp_temp = test_input(find(contains(test_input, 'subtitle: "t='),1, 'first'));
-        time_temp = regexp(timestamp_temp, 'subtitle: "t=\s*([0-9\.eE-+]+)".*', 'tokens');
-        timestamp = str2double(time_temp{1}{1});
+        timestamp_temp = test_input(find(contains(test_input, 'subtitle:'),1, 'first'));
+        time_temp = regexp(timestamp_temp, '(E|H)_[0-9]+,\st=\s*([0-9\.eE-+]+)".*', 'tokens');
+        timestamp = str2double(time_temp{1}{1}{2});
+        field_type = time_temp{1}{1}{1};
         data.timestamp = timestamp;
         
         % reducing the file size to only the required data.
-        data_start_ind = find(contains(test_input, 'ENDDO'),1, 'last')+2;
+        data_start_ind = find(contains(test_input, 'END DO'),1, 'last')+2;
         test_input = test_input(data_start_ind:end);
-        fprintf('Processing       ')
+        fprintf(' Processing       ')
         temp_slices = cell(1, n_coords_z);
         for sha = 1:n_coords_z
             start_index = (sha -1) * n_coords_x * n_coords_y +1;
@@ -107,7 +109,7 @@ for wns = 1:length(fileset)
                     if hsk > length(temp_slice2)
                         continue
                     else
-                        temp_data_reg = regexp(temp_slice2{hsk}, '\s*([0-9-+eE.]+)\s+([0-9-+eE.]+)\s+([0-9-+eE.]+)\s+.*', 'tokens');
+                        temp_data_reg = regexp(temp_slice2{hsk}, '\s*([0-9-+eE.]+)\s+([0-9-+eE.]+)\s+([0-9-+eE.]+)\s*.*', 'tokens');
                         Fx(hsk, hfgs, jwad) = str2double(temp_data_reg{1}{1}); %#ok<PFOUS>
                         Fy(hsk, hfgs, jwad) = str2double(temp_data_reg{1}{2}); %#ok<PFOUS>
                         Fz(hsk, hfgs, jwad) = str2double(temp_data_reg{1}{3}); %#ok<PFOUS>
@@ -115,11 +117,12 @@ for wns = 1:length(fileset)
                 end %for
             end %for
         end %parfor
-        fprintf('\nSaving snapshot datafile...')
-        save(fullfile(out_path,['field_data_snapshots_Fx', fileset_name, num2str(timestamp)]), 'Fx', 'data')
-        save(fullfile(out_path,['field_data_snapshots_Fy', fileset_name, num2str(timestamp)]), 'Fy', 'data')
-        save(fullfile(out_path,['field_data_snapshots_Fz', fileset_name, num2str(timestamp)]), 'Fz', 'data')
-        fprintf('Done\n')
+        fprintf(' Saving snapshot datafile...')
+        timestamp_label = regexprep(num2str(timestamp), '\.', 'p');
+        save(fullfile(out_path,['field_data_snapshots_Fx', field_type, fileset_name, timestamp_label, '.mat']), 'Fx', 'data')
+        save(fullfile(out_path,['field_data_snapshots_Fy', field_type, fileset_name, timestamp_label, '.mat']), 'Fy', 'data')
+        save(fullfile(out_path,['field_data_snapshots_Fz', field_type, fileset_name, timestamp_label, '.mat']), 'Fz', 'data')
+        fprintf('Done')
         clear timestamp Fx Fy Fz data
     end %if
 end %for

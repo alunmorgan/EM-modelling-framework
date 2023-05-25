@@ -30,6 +30,8 @@ for jes = 1:length(log.port_name)
 end %for
 
 ov{1} = '';
+ov = cat(1,ov,'-debug');
+ov = cat(1,ov,'bemout= yes');
 ov = cat(1,ov,'-general');
 ov = cat(1,ov,strcat(['    infile= ',data_directory]));
 ov = cat(1,ov,strcat('    scratchbase = temp_scratch/'));
@@ -82,17 +84,53 @@ if isfield(log, 'field_data')
             ov = cat(1,ov,'    doit');
         end %for
     end %if
+    if isfield(log.field_data, 'stored')
+        stored_sets = fieldnames(log.field_data.stored);
+        for kew = 1:length(stored_sets)
+            for nsw = 1:length(log.field_data.stored.(stored_sets{kew}).field_sequence_numbers)
+                cap_time_temp = num2str(log.field_data.stored.(stored_sets{kew}).capture_times(nsw));
+                cap_time_temp = regexprep(cap_time_temp, '\.', 'p');
+                ov = cat(1,ov,['symbol = ', stored_sets{kew},'_e_', num2str(log.field_data.stored.(stored_sets{kew}).field_sequence_numbers(nsw))]);
+                ov = cat(1,ov,['outfile= ', pp_directory, '/', stored_sets{kew},'_e_', cap_time_temp]);
+                ov = cat(1,ov,'    doit');
+                ov = cat(1,ov,['symbol = ', stored_sets{kew},'_h_', num2str(log.field_data.stored.(stored_sets{kew}).field_sequence_numbers(nsw))]);
+                ov = cat(1,ov,['outfile= ', pp_directory, '/', stored_sets{kew},'_h_', cap_time_temp]);
+                ov = cat(1,ov,'    doit');
+            end %for
+        end %for
+    end %if
 end %if
+%
+% ov = cat(1,ov,'-lintegral');
+% ov = cat(1,ov,'    symbol=field_snapshots_e_1');
+% ov = cat(1,ov,'    quantity=field_snapshots_e');
+% ov = cat(1,ov,'    solution=1');
+% ov = cat(1,ov,'    beta=1E10');
+% ov = cat(1,ov,'    startpoint=(0,0,@zmin)');
+% ov = cat(1,ov,'    direction=z');
+% ov = cat(1,ov,'    component=x');
+% ov = cat(1,ov,'    doit');
 
-ov = cat(1,ov,'-lintegral');
+ov = cat(1,ov,'    -lineplot');
 ov = cat(1,ov,'    symbol=field_snapshots_e_1');
 ov = cat(1,ov,'    quantity=field_snapshots_e');
 ov = cat(1,ov,'    solution=1');
-ov = cat(1,ov,'    beta=1E10');
+ov = cat(1,ov,'    component=x');
 ov = cat(1,ov,'    startpoint=(0,0,@zmin)');
 ov = cat(1,ov,'    direction=z');
-ov = cat(1,ov,'    component=x');
+ov = cat(1,ov,'    onlyplotfiles = yes');
 ov = cat(1,ov,'    doit');
+
+ov = cat(1,ov,'    -lineplot');
+ov = cat(1,ov,'    symbol=field_snapshots_h_1');
+ov = cat(1,ov,'    quantity=field_snapshots_h');
+ov = cat(1,ov,'    solution=1');
+ov = cat(1,ov,'    component=y');
+ov = cat(1,ov,'    startpoint=(0,0,@zmin)');
+ov = cat(1,ov,'    direction=z');
+ov = cat(1,ov,'    onlyplotfiles = yes');
+ov = cat(1,ov,'    doit');
+
 
 % ov = cat(1,ov,'-pcombine');
 % ov = cat(1,ov,'    a1=0.5');
@@ -100,17 +138,17 @@ ov = cat(1,ov,'    doit');
 % ov = cat(1,ov,'    a2=0');
 % ov = cat(1,ov,'    b2=0');
 % ov = cat(1,ov,'    eresymbol=field_snapshots_e_1');
-% ov = cat(1,ov,'    erequantity=field_snapshots_e');                                                         
-% ov = cat(1,ov,'    eresolution= 1');        
+% ov = cat(1,ov,'    erequantity=field_snapshots_e');
+% ov = cat(1,ov,'    eresolution= 1');
 % ov = cat(1,ov,'    eimsymbol=field_snapshots_e_1');
-% ov = cat(1,ov,'    eimquantity=field_snapshots_e');                                                        
-% ov = cat(1,ov,'    eimsolution= 1');        
+% ov = cat(1,ov,'    eimquantity=field_snapshots_e');
+% ov = cat(1,ov,'    eimsolution= 1');
 % ov = cat(1,ov,'    hresymbol=field_snapshots_h_1');
-% ov = cat(1,ov,'    hrequantity=field_snapshots_h');                                                        
-% ov = cat(1,ov,'    hresolution= 1');        
+% ov = cat(1,ov,'    hrequantity=field_snapshots_h');
+% ov = cat(1,ov,'    hresolution= 1');
 % ov = cat(1,ov,'    himsymbol=field_snapshots_h_1');
-% ov = cat(1,ov,'    himquantity=field_snapshots_h');                                                        
-% ov = cat(1,ov,'    himsolution= 1');        
+% ov = cat(1,ov,'    himquantity=field_snapshots_h');
+% ov = cat(1,ov,'    himsolution= 1');
 % ov = cat(1,ov,'    sresymbol=sre_1');
 % ov = cat(1,ov,'    simsymbol=sim_1');
 % ov = cat(1,ov,'    srequantity=sre');
@@ -118,14 +156,14 @@ ov = cat(1,ov,'    doit');
 % ov = cat(1,ov,'    sresolution=1');
 % ov = cat(1,ov,'    simsolution=1');
 % ov = cat(1,ov,'    doit');
-% 
+%
 % ov = cat(1,ov,'-fexport');
-% ov = cat(1,ov,'    symbol  = sre_1'); 
+% ov = cat(1,ov,'    symbol  = sre_1');
 % ov = cat(1,ov,'    quantity= sre');
-% ov = cat(1,ov,'    solution= 1'); 
-% ov = cat(1,ov,['    outfile = ', pp_directory, '/pointing_vectors_real']); 
-% ov = cat(1,ov,'    doit');          
-% 
+% ov = cat(1,ov,'    solution= 1');
+% ov = cat(1,ov,['    outfile = ', pp_directory, '/pointing_vectors_real']);
+% ov = cat(1,ov,'    doit');
+%
 % ov = cat(1,ov,'-3darrowplot');
 % ov = cat(1,ov,'    symbol=sre_1');
 % ov = cat(1,ov,'    bbylow=0');
@@ -287,5 +325,5 @@ for lae = 1:length(log.port_name)
     port_folder = fullfile(pp_directory, ['wake_post_processing_ports-', log.port_name{lae}]);
     mkdir(port_folder)
     write_out_data( ov, [port_folder,'/model_wake_post_processing_ports-', log.port_name{lae}] )
-    
+
 end
