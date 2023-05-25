@@ -37,7 +37,7 @@ else
     % if on linux use the system convert function as it is faster and more
     % robust.
     if any(contains(requested_formats, 'fig'))
-        savefig(fig_h,fullfile(output_path, strcat(name, 'fig')))
+        savefig(fig_h,fullfile(output_path, name))
     end %if
     saveas(fig_h,fullfile(output_path, name), 'tif')
     % convert from tif in order to get manageble file sizes.
