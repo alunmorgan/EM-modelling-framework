@@ -15,7 +15,9 @@ s_parameter_output_directory = cell(length(s_names),1);
 for osw = 1:length(s_names)
         s_parameter_data_directory{osw} = fullfile(data_directory, s_names{osw});
         s_parameter_output_directory{osw} = fullfile(output_directory, s_names{osw});
-    mkdir(s_parameter_output_directory{osw});
+   if ~exist(s_parameter_output_directory{osw}, 'dir')
+        mkdir(s_parameter_output_directory{osw});
+   end %if
 end %for
 
 s_port = cell(length(s_names),1);
@@ -27,7 +29,7 @@ s_port = cell(length(s_names),1);
 for osw = 1:length(s_names)
 
     if exist(fullfile(s_parameter_data_directory{osw},'model_log'), 'file') ~= 2
-        disp(['Missing log file in ' s_parameter_data_directory{osw}]);
+        fprinf(['\nMissing log file in ' s_parameter_data_directory{osw}]);
         continue
     end %if
     copyfile(fullfile(s_parameter_data_directory{osw},'model.gdf'),...
