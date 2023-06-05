@@ -29,7 +29,7 @@ if ispc ==1
                 saveas(fig_h, name, requested_formats{fhw})
             end %if
         catch
-            disp(['Unable to save as ',requested_formats{fhw},' file at ', output_path])
+            fprinf(['\nUnable to save as ',requested_formats{fhw},' file at ', output_path])
         end %try
     end %for
     cd(old_loc)

@@ -85,7 +85,7 @@ if ~isempty(inds)
         %     output_file_locations.EfieldAtZerox_freq = run_list(inds(4));
     end %for
 else
-    disp('No Energy graphs - This is a problem')
+    fprintf('\nNo Energy graphs - This is a problem')
     output_file_locations.Energy = NaN;
     output_file_locations.Energy_in_ceramics = NaN;
 end

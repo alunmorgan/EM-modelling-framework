@@ -6,11 +6,11 @@ if exist(input_data_location, 'dir')
     if ~exist(fullfile(output_data_location, ['model_', type_name, '_post_processing']), 'file')
         run_pp = 1;
     else
-         disp(['Skipping ', type_name, ' postprocessing data already exists'])
+         fprinf(['\nSkipping ', type_name, ' postprocessing data already exists'])
         run_pp = 0;
     end %if
 else
-    disp('No source data for postprocessing')
+    fprinf('\nNo source data for postprocessing')
     run_pp =0;
 end %if
 

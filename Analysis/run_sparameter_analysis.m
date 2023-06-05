@@ -10,10 +10,10 @@ try
             if ~exist(analysis_folder, 'dir')
                 mkdir(analysis_folder)
             end
-            disp(['Starting S-parameter analysis <strong>', name_of_model, '</strong>'])
+            fprinf(['\nStarting S-parameter analysis <strong>', name_of_model, '</strong>'])
             analyse_sparameter_data(postprocess_folder, analysis_folder)
         else
-            disp('No postprocessing folder... skipping S-Parameter analysis.')
+            fprinf('\nNo postprocessing folder... skipping S-Parameter analysis.')
         end %if
     end %for
 catch ME

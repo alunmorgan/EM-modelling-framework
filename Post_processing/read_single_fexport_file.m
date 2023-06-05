@@ -11,10 +11,10 @@ for hsk = 1:10
     catch
         % If the filesystem is slow then the new file will not appear by the
         % time you want to read it in. Wait for a bit and then try again.
-        disp(['file ', input_file, ' unavailable... retrying'])
+        fprinf(['\nfile ', input_file, ' unavailable... retrying'])
         pause(5)
     end %try
 end %for
 if isempty('file_data')
-    disp(['Could not extract data from ', input_file])
+    fprinf(['\nCould not extract data from ', input_file])
 end %if

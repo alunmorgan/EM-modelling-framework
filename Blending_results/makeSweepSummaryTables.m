@@ -128,7 +128,7 @@ end %for
 if ~isempty(varnames_port_signals)
     ports_present = not(cellfun(@isempty,varnames_port_signals));
     if max(diff(sum(ports_present,2))) > 0
-        disp('makeSweepSummaryTables: The number of ports changes. Please check that this is expected (This mainly occurs with geometry fraction changes)')
+        fprinf('\nmakeSweepSummaryTables: The number of ports changes. Please check that this is expected (This mainly occurs with geometry fraction changes)')
     end %if
     [~, max_num_pots_ind] = max(sum(ports_present,2));
     T_port_signals = array2table(port_signals_table_data,...

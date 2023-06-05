@@ -16,7 +16,7 @@ end %for
 chosen_wake_ind = find(wake_sweep_vals == str2double(chosen_wake_length));
 if isempty(chosen_wake_ind)
     [~,chosen_wake_ind] = min(abs((wake_sweep_vals ./ str2double(chosen_wake_length)) - 1));
-    disp('Chosen wake length not found. Setting the wakelength to maximum value.')
+    fprinf('\nChosen wake length not found. Setting the wakelength to maximum value.')
 end %if
 wake_data.port_time_data = wake_sweep_data.time_domain_data{chosen_wake_ind}.port_data;
 wake_data.time_domain_data = wake_sweep_data.time_domain_data{chosen_wake_ind};

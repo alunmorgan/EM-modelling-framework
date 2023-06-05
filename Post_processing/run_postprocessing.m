@@ -20,7 +20,7 @@ for herf = 1:length(input_settings.sim_types)
         cd(orig_loc)
     catch ME
         cd(orig_loc)
-        disp([input_settings.sets{set_id},' <strong>Problem with postprocessing models.</strong>'])
+        fprinf(['\n', input_settings.sets{set_id},' <strong>Problem with postprocessing models.</strong>'])
         display_error_message(ME)
     end %try
 end %for

@@ -19,25 +19,25 @@ write_out_data( shell_contents, fullfile(loc, 'run_model.sh') )
 pause(5)
 [status, cmd_out] = fileattrib(fullfile(loc, 'run_model.sh'), '+x', 'a');
 if status == 0
-    disp(['ERROR setting permissions on run file', cmd_out])
+    fprinf(['\nERROR setting permissions on run file', cmd_out])
     % probably a slow file system update
-    disp('Waiting for filesystem')
+    fprinf('\nWaiting for filesystem')
     pause(5)
     [status, cmd_out] = fileattrib(fullfile(loc, 'run_model.sh'), '+x', 'a');
     if status == 1
         pause(20) % problem with slow filesystem update
         [run_script_status, run_script_command] = system(['sh ', fullfile(loc, 'run_model.sh')]);
         if run_script_status ~= 0
-            disp(run_script_command)
+            fprinf(run_script_command)
         end %if
     else
-        disp(['ERROR setting permissions on run file', cmd_out])
+        fprinf(['\nERROR setting permissions on run file', cmd_out])
     end %if
 else
     pause(20) % problem with slow filesystem update
     [run_script_status, run_script_command] = system(['sh "', fullfile(loc, 'run_model.sh"')]);
     if run_script_status ~= 0
-        disp(run_script_command) % a 127 error probably means the simulation is complaining about something. Check the model log.
+        fprinf(run_script_command) % a 127 error probably means the simulation is complaining about something. Check the model log.
     end %if
 end %if
 % restoring the original version.

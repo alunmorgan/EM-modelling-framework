@@ -17,13 +17,13 @@ for rnf = 1:size(files_to_load,1)
     if exist(files_to_load{rnf,1}, 'file') == 2
         load(files_to_load{rnf,1}, files_to_load{rnf,2}{:});
     else
-        disp(['Unable to load ', files_to_load{rnf,1}])
+        fprinf(['\nUnable to load ', files_to_load{rnf,1}])
         return
     end %if
 end %for
 
 if ~exist('pp_data','var') && exist('t_data', 'var') && exist('f_data', 'var')
-    disp('Reconstituting pp_data from t_data and f_data');
+    fprinf('\nReconstituting pp_data from t_data and f_data');
     pp_data = f_data;
     t_fields = fieldnames(t_data);
     for seh = 1:length(t_fields)
@@ -327,7 +327,7 @@ if isfield(pp_data, 'port')
                 % This is to cope with the case of missing data files.
                 plot(pp_data.port.timebase .* 1E9, pp_data.port.data.time.power_port.data{ens}, 'b', 'Parent', ax_sp(ens))
             catch
-                disp('Missing data file for port signals plotting')
+                fprinf('\nMissing data file for port signals plotting')
             end %try
             title(port_names{ens}, 'Parent', ax_sp(ens))
             xlim([pp_data.port.timebase(1) .* 1E9 pp_data.port.timebase(end) .* 1E9])
@@ -352,7 +352,7 @@ if isfield(pp_data, 'voltages')
             % This is to cope with the case of missing data files.
             plot(pp_data.voltages{ens}.data(:,1) .* 1E9, pp_data.voltages{ens}.data(:,2), 'b', 'Parent', ax_sp(ens))
         catch
-            disp('Missing data files for voltage monitor plotting')
+            fprinf('\nMissing data files for voltage monitor plotting')
         end %try
         title(regexprep(pp_data.voltages{ens}.title, 'voltage ',''), 'Parent', ax_sp(ens))
         xlim([pp_data.voltages{ens}.data(1,1) .* 1E9 pp_data.voltages{ens}.data(end, 1) .* 1E9])

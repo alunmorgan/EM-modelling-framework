@@ -34,7 +34,7 @@ t1 = squeeze(modelling_inputs.stl_part_mapping(:,1));
 for lwfc = 1:length(stl_list_from_directory)
     nd = find(strcmp(stl_list_from_directory, t1{lwfc}));
     if isempty(nd)
-        disp(['Unable to find file for component ', t1{lwfc}])
+        fprinf(['\nUnable to find file for component ', t1{lwfc}])
     else
         tmep(lwfc) = nd;
     end %if
@@ -46,7 +46,7 @@ for lrd = 1:length(stls)
     tmp = tmp{end}(1:end-4);
     mat_ind = find(strcmp(stl_mapping(:,1), tmp));
     if isempty(mat_ind)
-        disp(['create_model_data_file_for_STL: mat_ind is empty. ' ,...
+        fprinf(['\ncreate_model_data_file_for_STL: mat_ind is empty. ' ,...
             'This probably means that there is a name mismatch ',...
             'between the STL files and the mapping to part names.'])
     end %if

@@ -5,7 +5,7 @@ if exist(fullfile(simulation_name, 'postprocessing','wake'),'dir') == 7
         try
             load(fullfile(simulation_name, 'postprocessing','wake','run_inputs.mat'), 'modelling_inputs')
         catch
-            disp(['corrupted run_inputs file for ', simulation_name])
+            fprinf(['\ncorrupted run_inputs file for ', simulation_name])
             good_data = 0;
             param_names = {NaN};
             param_vals = {NaN};
@@ -13,7 +13,7 @@ if exist(fullfile(simulation_name, 'postprocessing','wake'),'dir') == 7
             return
         end %try
     else
-        disp(['missing modelling_inputs for ', simulation_name])
+        fprinf(['\nmissing modelling_inputs for ', simulation_name])
         good_data = 0;
         param_names = {NaN};
         param_vals = {NaN};
@@ -23,7 +23,7 @@ if exist(fullfile(simulation_name, 'postprocessing','wake'),'dir') == 7
     if exist(fullfile(simulation_name, 'postprocessing', 'wake','data_from_run_logs.mat'), 'file') == 2
         load(fullfile(simulation_name, 'postprocessing', 'wake', 'data_from_run_logs.mat'), 'run_logs')
     else
-        disp(['missing wake data files for ', simulation_name])
+        fprinf(['\nmissing wake data files for ', simulation_name])
         good_data = 0;
         param_names = {NaN};
         param_vals = {NaN};
@@ -35,7 +35,7 @@ elseif exist(fullfile(simulation_name, 'postprocessing', 's_parameter'),'dir') =
     if exist(fullfile(s_sub_folders{1},'run_inputs.mat'), 'file') == 2
         load(fullfile(s_sub_folders{1},'run_inputs.mat'), 'modelling_inputs')
     else
-        disp(['missing modelling_inputs for ', simulation_name])
+        fprinf(['\nmissing modelling_inputs for ', simulation_name])
         good_data = 0;
         param_names = {NaN};
         param_vals = {NaN};
@@ -45,7 +45,7 @@ elseif exist(fullfile(simulation_name, 'postprocessing', 's_parameter'),'dir') =
     if exist(fullfile(s_sub_folders{1},'data_from_run_logs.mat'), 'file') == 2
         load(fullfile(s_sub_folders{1}, 'data_from_run_logs.mat'), 'run_logs')
     else
-        disp(['missing data files for ', simulation_name])
+        fprinf(['\nmissing data files for ', simulation_name])
         good_data = 0;
         param_names = {NaN};
         param_vals = {NaN};
@@ -53,7 +53,7 @@ elseif exist(fullfile(simulation_name, 'postprocessing', 's_parameter'),'dir') =
         return
     end %if
 else
-    disp(['No data folder found for ', simulation_name])
+    fprinf(['\nNo data folder found for ', simulation_name])
     good_data = 0;
     param_names = {NaN};
     param_vals = {NaN};

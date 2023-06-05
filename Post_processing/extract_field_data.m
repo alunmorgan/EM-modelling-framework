@@ -7,14 +7,14 @@ if ~exist(fullfile(out_path, 'field_data.mat'),'file')
         field_data = read_fexport_files(in_path, out_path, scratch_path);
 %     pointing_data = read_pointing_vector_file(out_path);
     if ~isfield(field_data, 'nofiles')
-        disp('Saving field datafile')
+        fprinf('\nSaving field datafile...')
 %         if ~isfield(pointing_data, 'nofiles')
 %             save(fullfile(out_path,'field_data'), 'field_data', 'pointing_data')
 %         else
             save(fullfile(out_path,'field_data'), 'field_data')
 %         end %if
-        disp('Saved')
+        fprinf('Saved')
     end %if
 else
-    disp('Field_data file already exists... Skipping extraction.')
+    fprinf('Field_data file already exists... Skipping extraction.')
 end %if

@@ -4,7 +4,7 @@ function plot_field_views_selected_timeslice(data, field_type, slice_dir, ...
 field_components = {'Fx','Fy','Fz'};
 selected_timeslice = find(data.timestamp > selected_time * 1E-9, 1, 'first');
 if isempty(selected_timeslice)
-    disp('Selected time is not in dataset')
+    fprinf('\nSelected time is not in dataset')
 else
     actual_time = num2str(round(data.timestamp(selected_timeslice)*1E9*100)/100);
     

@@ -9,7 +9,7 @@ inds = find_position_in_cell_lst(inds);
 if isempty(inds)
     return
 end %if
-disp('Extracting field data')
+fprinf('\nExtracting field data')
 fileset = field_files(inds);
     if contains(fileset_name, 'field_snapshots_')
         % dealing with a full snapshot.

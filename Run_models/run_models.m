@@ -12,8 +12,8 @@ modelling_inputs = run_inputs_setup_STL(mi, versions, n_cores, precision);
 
 % Running the different simulators for each model.
 for awh = 1:length(modelling_inputs)
-    disp(datestr(now))
-    disp(['Running ',num2str(awh), ' of ',...
+    fprinf(['\n', datestr(now)])
+    fprinf(['\nRunning ',num2str(awh), ' of ',...
         num2str(length(modelling_inputs)), ' simulations'])
     % only want to run the geometry simulations for the geometry sweeps.
     % remove it from the list otherwise.

@@ -12,7 +12,7 @@ for rnf = 1:size(files_to_load,1)
     if exist(files_to_load{rnf,1}, 'file') == 2
         load(files_to_load{rnf,1}, files_to_load{rnf,2}{:});
     else
-        disp(['Unable to load ', files_to_load{rnf,1}])
+        fprinf(['\nUnable to load ', files_to_load{rnf,1}])
         return
     end %if
 end %for

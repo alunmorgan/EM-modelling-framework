@@ -101,7 +101,7 @@ for ens = length(port_names):-1:1 % ports
                 'LineWidth',lw, 'Parent', ax_sp(ens), 'DisplayName',...
         ['Fill pattern = ', num2str(sweep_vals(jse))])
             catch
-            disp(['Missing data file for ', port_names{ens}])
+            fprinf(['\nMissing data file for ', port_names{ens}])
         end %try
     end %for
     title(port_names{ens}, 'Parent', ax_sp(ens))
@@ -114,61 +114,5 @@ for ens = length(port_names):-1:1 % ports
 end %for
 savemfmt(h_wake, output_folder, [data_prefix, 'port_spectra'])
 
-
-
-% 
-% clf(h_wake)
-% ax = axes('Parent', h_wake);
-% hold on
-% for jse = 1:length(bunch_spec)
-%     plot(f_scale(jse,:), abs(bunch_spec{jse}),'--', 'LineWidth',lw, 'Parent', ax, 'DisplayName', ...
-%         ['RF voltage = ', num2str(ppi.rf_volts(jse)), ' Loss = ', ]);
-% end %for
-% title('Bunch spectrum', 'Parent', ax)
-% xlabel('Frequency (GHz)', 'Parent', ax)
-% ylabel('', 'Parent', ax)
-% xlim([0 graph_freq_lim])
-% ylim([0 inf])
-% legend
-% grid on
-% savemfmt(h_wake, output_folder, [prefix_rf, 'bunch_spectrum'])
-% 
-% clf(h_wake)
-% ax = axes('Parent', h_wake);
-% hold on
-% for jse = 1:length(bunch_spec)
-%     plot(f_scale(jse,:), Bunch_loss_energy_spectrum(jse,:), '--','LineWidth',lw, 'Parent', ax, 'DisplayName', ['RF voltage = ', num2str(ppi.rf_volts(jse))]);
-% end %for
-% title('Bunch loss energy spectrum', 'Parent', ax)
-% xlabel('Frequency (GHz)', 'Parent', ax)
-% ylabel('', 'Parent', ax)
-% xlim([0 graph_freq_lim])
-% ylim([0 inf])
-% legend
-% grid on
-% savemfmt(h_wake, output_folder, [prefix_rf, 'bunch_loss_energy_spectrum'])
-% 
-% clf(h_wake)
-% [hwn, ksn] = num_subplots(length(port_names));
-% for ens = length(port_names):-1:1 % ports
-%     ax_sp(ens) = subplot(hwn,ksn,ens);
-%     for jse = 1:size(f_scale, 1)
-%         try
-%             hold on
-%             % This is to cope with the case of missing data files.
-%             plot(f_scale(jse,:), abs(squeeze(port_loss_energy_spectrum(jse,:,ens))),...
-%                 '--', 'LineWidth',lw, 'Parent', ax_sp(ens))
-%         catch
-%             disp(['Missing data file for ', port_names{jse}{ens}])
-%         end %try
-%     end %for
-%     title(port_names{ens}, 'Parent', ax_sp(ens))
-%     xlim([0 graph_freq_lim])
-%     ylim([0 inf])
-%     xlabel('Frequency (GHz)', 'Parent', ax_sp(ens))
-%     ylabel('', 'Parent', ax_sp(ens))
-%     grid on
-% end %for
-% savemfmt(h_wake, output_folder, [prefix_rf, 'port_loss_energy_spectrum'])
 close(h_wake)
 end %function

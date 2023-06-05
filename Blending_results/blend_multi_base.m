@@ -5,7 +5,7 @@ ck = 1;
         set_results_loc = fullfile(paths.results_loc, sets{jse});
         names_temp = dir_list_gen(set_results_loc, 'dirs', 1);
         if isempty(names_temp)
-            disp(['No data available for ', sets{jse}])
+            fprinf(['\nNo data available for ', sets{jse}])
             continue
         end %if
         % select only the non blended folders.
@@ -87,7 +87,7 @@ ck = 1;
         end %if
     end %for
     if sum(good_data) ==0
-        disp('No valid data. Skipping report generation')
+        fprinf('\nNo valid data. Skipping report generation')
         return
     end %if
     % Remove bad data

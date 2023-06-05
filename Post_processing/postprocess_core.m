@@ -50,8 +50,7 @@ if ~strcmpi(sim_type, 'eigenmode') && ~strcmpi(sim_type, 'lossy_eigenmode')
     for fjh = 1:length(gld_files)
         [~,name,~] = fileparts(gld_files{fjh});
         [status,cmdout] = system(['gd1.3dplot -colorps -geometry 800x600 -o ',fullfile('temp_scratch', name), 'ps -i ' , gld_files{fjh}]);
-        disp(cmdout)
-%         disp(['Status = ', num2str(status)])
+        fprinf(cmdout)
     end %parfor
 end %if
 delete temp_scratch/*.gld
@@ -64,8 +63,7 @@ for jas = 1:length(arrowplot_names)
     % movefile crashes with unknown error so using a direct system call here
     % instead.
     [status1,cmdout1] = system(['mv ' fullfile('temp_scratch',arrowplot_names{jas}), ' ', fullfile('temp_scratch',new_arrowplot_names{jas})], '-echo');
-    disp(cmdout1)
-%     disp(['Status = ', num2str(status1)])
+    fprinf(cmdout1)
 end %for
 %% convert ps to png
 [pic_names ,~]= dir_list_gen('temp_scratch','ps',1);

@@ -35,7 +35,7 @@ for hse = 1:length(names)
         summary.mesh_spacing{hse} = [num2str(run_logs.mesh_step_size * 1E6), '\mu{}m'];
         summary.name{hse} = [];
     catch
-        disp(['Summary not available for ', num2str(names{hse})])
+        fprinf(['\nSummary not available for ', num2str(names{hse})])
         summary.wlf{hse} = '';
         summary.date{hse} = '';
         summary.soft_ver{hse} = '';

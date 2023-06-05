@@ -13,7 +13,7 @@ try
             if ~exist(plot_reconstruction_folder, 'dir')
                 mkdir(plot_reconstruction_folder)
             end %if
-            disp(['Starting wake reconstruction plotting <strong>', name_of_model, '</strong>'])
+            fprinf(['\nStarting wake reconstruction plotting <strong>', name_of_model, '</strong>'])
             run_inputs_loc = fullfile(postprocess_folder, 'run_inputs.mat');
             run_logs_loc = fullfile(postprocess_folder, 'data_from_run_logs.mat');
             analysis_loc = fullfile(analysis_folder, 'data_analysed_wake.mat');
@@ -37,7 +37,7 @@ try
             GdfidL_plot_pp_wake(run_inputs_loc, reconstruction_loc1, ppi, plot_reconstruction_folder)
             GdfidL_plot_wake_reconstruction(files_to_load, ppi, plot_reconstruction_folder, prefix)
         else
-            disp('No plotting folder... skipping wake reconstruction plotting.')
+            fprinf('\nNo plotting folder... skipping wake reconstruction plotting.')
         end %if
     end %for
 catch ME5

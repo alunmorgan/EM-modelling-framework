@@ -20,39 +20,28 @@ end %if
 if exist(fullfile(path_to_data, 'run_inputs.mat'), 'file') == 2
     load(fullfile(path_to_data, 'run_inputs.mat'), 'modelling_inputs');
 else
-    disp(['Unable to load ', fullfile(path_to_data, 'run_inputs.mat')])
+    fprinf(['\nUnable to load ', fullfile(path_to_data, 'run_inputs.mat')])
     return
 end %if
 if exist(fullfile(path_to_data,'data_postprocessed.mat'), 'file') == 2
     load(fullfile(path_to_data,'data_postprocessed.mat'), 'pp_data');
 else
-    disp(['Unable to load ', fullfile(path_to_data,'data_postprocessed.mat')])
+    fprinf(['\nUnable to load ', fullfile(path_to_data,'data_postprocessed.mat')])
     return
 end %if
 if exist(fullfile(path_to_data, 'data_analysed_wake.mat'), 'file') == 2
     load(fullfile(path_to_data, 'data_analysed_wake.mat'),'wake_sweep_data');
 else
-    disp(['Unable to load ', fullfile(path_to_data, 'data_analysed_wake.mat')])
+    fprinf(['\nUnable to load ', fullfile(path_to_data, 'data_analysed_wake.mat')])
     return
 end %if
 if exist(fullfile(path_to_data, 'data_from_run_logs.mat'), 'file') == 2
     load(fullfile(path_to_data, 'data_from_run_logs.mat'), 'run_logs')
 else
-    disp(['Unable to load ', fullfile(path_to_data, 'data_from_run_logs.mat')])
+    fprinf(['\nUnable to load ', fullfile(path_to_data, 'data_from_run_logs.mat')])
     return
 end %if
 
-% for nw = 1:length(wake_sweep_data.raw)
-%     wake_sweep_vals(nw) = wake_sweep_data.raw{1, nw}.wake_setup.Wake_length;
-% end %for
-% chosen_wake_ind = find(wake_sweep_vals == chosen_wake_length);
-% if isempty(chosen_wake_ind)
-%     [~,chosen_wake_ind] = min(abs((wake_sweep_vals ./ chosen_wake_length) - 1));
-%     disp('Chosen wake length not found. Setting the wakelength closest value.')
-% end %if
-% wake_data.port_time_data = wake_sweep_data.time_domain_data{chosen_wake_ind}.port_data;
-% wake_data.time_domain_data = wake_sweep_data.time_domain_data{chosen_wake_ind};
-% wake_data.frequency_domain_data = wake_sweep_data.frequency_domain_data{chosen_wake_ind};
 wake_data.time_domain_data = wake_sweep_data.time_domain_data{1};
 wake_data.frequency_domain_data = wake_sweep_data.frequency_domain_data{1};
 %Line width of the graphs
@@ -82,13 +71,6 @@ cut_off_freqs = cellfun(@(x) x*1e-9,cut_off_freqs, 'UniformOutput', false);
 % setting up some style lists for the graphs.
 % cols = {'b','k','m','c','g',[1, 0.5, 0],[0.5, 1, 0],[1, 0, 0.5],[0.5, 0, 1],[0.5, 1, 0] };
 l_st ={'--',':','-.','--',':','-.','--',':','-.'};
-
-% Identifying the non replica ports.
-% for sjew = length(pp_data.port.labels_table):-1:1
-%     lab_ind(sjew) = find(strcmp(pp_data.port.labels,...
-%         pp_data.port.labels_table{sjew}));
-% end %for
-% can I just do a search using the original names in raw data?
 
 % Some pre processing to pull out trends.
 [wl, freqs, Qs, mags, bws] = find_Q_trends(wake_sweep_data.frequency_domain_data, range, run_logs.wake_length);
@@ -157,15 +139,6 @@ pes = extract_port_energy_spectrum_from_wake_data(wake_data, cut_freq_ind);
 [beam_port_spectrum, ...
     signal_port_spectrum, port_spectra] = ...
     extract_port_spectra_from_wake_data(wake_data, cut_freq_ind);
-
-
-
-% [frequency_scale_ts, spectra_ts, peaks_start_ts, peaks_end_ts, n_slices, ...
-%     slice_length, slice_timestep] =  ...
-%     extract_time_slice_results_from_wake_data(wake_data);
-
-% [frequency_scale_mc, spectra_mc] = ...
-%     extract_machine_conditions_results_from_wake_data(wake_data);
 
 h_wake = figure('Position',fig_pos);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -432,8 +405,6 @@ if wake_data.time_domain_data.port_data.power_port_mode.full_signal.total_energy
     ylabel('Cumlative sum of Energy (nJ)')
     xlim([0 graph_freq_lim])
     savemfmt(h_wake, path_to_data,'cumulative_energy_loss_port_types')
-    %     xlim([0 frequency_scale_ports(power_dist_ind)])
-    %     savemfmt(h(19), pth,'cumulative_energy_loss_distribution_ports')
     clf(h_wake)
 end %if
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

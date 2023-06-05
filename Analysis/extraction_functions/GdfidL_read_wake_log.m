@@ -9,11 +9,11 @@ function lg  = GdfidL_read_wake_log( log_file )
 %% read in the file put the data into a cell array.
 data = read_in_text_file(log_file);
 if isempty(data)
-    disp('Wake log file is empty... aborting')
+    fprinf('\nWake log file is empty... aborting')
     return
 end %if
 if strcmp(data{end}, ' rc:  -1')
-    disp('Wake simulation did not exit cleanly')
+    fprinf('\nWake simulation did not exit cleanly')
     lg = data;
     return
 end
@@ -22,7 +22,7 @@ lg = struct;
 %% Find the information on the exported fields.
 field_data = regexp(data, '\s*#+\s-fexport: "(.*)" is available.', 'tokens');
 field_inds = find_position_in_cell_lst(field_data);
-if ~isempty(field_inds) % This is for the case where the simulation terminates early / unexpectedly
+if ~isempty(field_inds)
     field_data = field_data(field_inds);
     field_data = reduce_cell_depth(field_data);
     field_data = reduce_cell_depth(field_data);
@@ -56,7 +56,7 @@ end %if
 %% Find the information on the stored fields.
 field_data = regexp(data,'\s*#+\s*I am storing at t=\s*([.0-9e-+]+)\s*s, Name: "(.*)".\s*The sequential Number is\s*([0-9]+)\.', 'tokens');
 field_inds = find_position_in_cell_lst(field_data);
-if ~isempty(field_inds) % This is for the case where the simulation terminates early / unexpectedly
+if ~isempty(field_inds) 
     field_data = field_data(field_inds);
     field_data = reduce_cell_depth(field_data);
     field_data = reduce_cell_depth(field_data);
@@ -64,8 +64,8 @@ if ~isempty(field_inds) % This is for the case where the simulation terminates e
     for ns = 1:length(field_names)
         inds = find_position_in_cell_lst(strfind(field_data(:,2), field_names{ns}));
         stored_field_set = field_data(inds,:);
-        lg.field_data.stored.(field_names{ns}).capture_times =  str2num(cell2mat(stored_field_set(:,1)));
-        lg.field_data.stored.(field_names{ns}).field_sequence_numbers = str2num(cell2mat(stored_field_set(:,3)));
+        lg.field_data.stored.(field_names{ns}).capture_times =  cellfun(@str2num,stored_field_set(:,1));
+        lg.field_data.stored.(field_names{ns}).field_sequence_numbers = cellfun(@str2num,stored_field_set(:,3));
     end %for
 end %if
 
@@ -194,7 +194,7 @@ if ~isempty(metal_loss_inds)
         if sum(dat_loc) > 1
             %If more than one component has the same material then split the
             %power equally.
-            disp('Multiple parts share he same material. Assuming an even split.')
+            fprinf('\nMultiple parts share he same material. Assuming an even split.')
             dat_inds =  find(dat_loc ==1);
             tmp2(:,2) = tmp2(:,2) ./ length(dat_inds);
             for nwa = 1:length(dat_inds)

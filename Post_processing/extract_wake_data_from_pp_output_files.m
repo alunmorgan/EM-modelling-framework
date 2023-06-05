@@ -63,7 +63,7 @@ end %if
 
 %% Ports
 if ~isfield(output_file_locations, 'Port_mat')
-    disp('postprocess_wakes:No ports to analyse')
+    fprinf('\npostprocess_wakes:No ports to analyse')
     raw_data.port.data.time = NaN;
     raw_data.port.data.frequency = NaN;
     raw_data.port.timebase = NaN;
