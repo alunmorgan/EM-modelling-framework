@@ -38,7 +38,7 @@ if any(matches(p.Results.stages, 'simulate'))
             cd(orig_loc)
         catch ME
             cd(orig_loc)
-            disp(['Problem simulating model ', p.Results.sets{set_id}])
+            fprinf(['\nProblem simulating model ', p.Results.sets{set_id}])
             display_error_message(ME)
         end %try
     end %for
@@ -97,6 +97,11 @@ for set_id = 1:length(p.Results.sets)
     if any(matches(p.Results.stages, 'plot_fields'))
         if any(matches(p.Results.sim_types, 'wake'))
             plot_wake_fields(p.Results, set_id, paths)
+        end %if
+    end %if
+    if any(matches(p.Results.stages, 'plot_thermals'))
+        if any(matches(p.Results.sim_types, 'wake'))
+           extract_wall_losses(p.Results, set_id, paths);
         end %if
     end %if
      if any(matches(p.Results.stages, 'report'))
