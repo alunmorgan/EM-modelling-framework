@@ -89,11 +89,9 @@ else
                         lims = lims/2;
                     end
                 track_ind(ck,ena) = tmp_ind;
-%                 disp(['Temp value while', num2str(tmp_ind)])
                  target_freq = peaks_2(tmp_ind, ena);
                 else
                     track_ind(ck,ena) = tmp_ind;
-%                     disp(['Temp value ', num2str(tmp_ind)])
                      target_freq = peaks_2(tmp_ind, ena);
                 end
                
