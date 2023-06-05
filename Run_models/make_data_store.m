@@ -3,7 +3,7 @@ function run_sim = make_data_store(model_name, results_storage_location, sim_typ
 % the run_sim flag to 0 normally, or 1 if the override flag is set.
 
 if exist(fullfile(results_storage_location, sim_type),'dir')
-            fprinf(['\nSkipping ', model_name, '. ' ,sim_type, ' data already exists'])
+            fprintf(['\nSkipping ', model_name, '. ' ,sim_type, ' data already exists'])
         run_sim = 0;
 else
     if ~exist(fullfile(results_storage_location, sim_type), 'dir')

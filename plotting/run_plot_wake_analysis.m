@@ -12,7 +12,7 @@ try
             if ~exist(plot_analysis_folder, 'dir')
                 mkdir(plot_analysis_folder)
             end %if
-            fprinf(['\nStarting wake analysis plotting <strong>', name_of_model, '</strong>'])
+            fprintf(['\nStarting wake analysis plotting <strong>', name_of_model, '</strong>'])
             
             %             datasets = find_datasets(fullfile(paths.results_loc, p.Results.sets{set_id}));
             run_inputs_loc = fullfile(postprocess_folder, 'run_inputs.mat');
@@ -20,7 +20,7 @@ try
             GdfidL_plot_pp_wake(run_inputs_loc, analysis_loc, ppi, plot_analysis_folder)
             %             plot_model(datasets, ppi, p.Results.sim_types);
         else
-            fprinf('\nNo plotting folder... skipping wake analysis plotting.')
+            fprintf('\nNo plotting folder... skipping wake analysis plotting.')
         end %if
     end %for
 catch ME5

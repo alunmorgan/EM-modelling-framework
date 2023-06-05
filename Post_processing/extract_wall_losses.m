@@ -13,7 +13,7 @@ for nrs = 1:length(a_folders)
     if ~exist(thermal_plotting_folder, 'dir')
         mkdir(thermal_plotting_folder)
     end %if
-    fprinf(['\nStarting wake thermal plotting <strong>', name_of_model, '</strong>'])
+    fprintf(['\nStarting wake thermal plotting <strong>', name_of_model, '</strong>'])
 
     if exist(fullfile(thermal_plotting_folder, 'wall_losses.png'), 'file')
         fprintf('\nThermal output already generated... skipping')

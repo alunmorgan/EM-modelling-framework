@@ -204,7 +204,7 @@ for ens = length(port_names{1}):-1:1 % ports
             plot(timebase{jse}, port_signals{jse}(ens, :),...
                '--', 'LineWidth',lw, 'Parent', ax_sp(ens))
         catch
-            fprinf(['\nMissing data file for ', port_names{jse}{ens}])
+            fprintf(['\nMissing data file for ', port_names{jse}{ens}])
         end %try
         title(port_names{jse}{ens}, 'Parent', ax_sp(ens))
         xlim([timebase{end}(1) timebase{end}(end)])

@@ -12,10 +12,10 @@ try
             if ~exist(analysis_folder, 'dir')
                 mkdir(analysis_folder)
             end
-            fprinf(['\nStarting wake analysis <strong>', name_of_model, '</strong>'])
+            fprintf(['\nStarting wake analysis <strong>', name_of_model, '</strong>'])
             analyse_pp_data(postprocess_folder, analysis_folder);
         else
-            fprinf('\nNo postprocessing folder... skipping wake analysis.')
+            fprintf('\nNo postprocessing folder... skipping wake analysis.')
         end %if
     end %for
 catch ME

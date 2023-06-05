@@ -12,11 +12,11 @@ reconstruct_root = fullfile(paths.results_loc, input_settings.sets{set_id});
                         if ~exist(reconstruction_folder, 'dir')
                             mkdir(reconstruction_folder)
                         end
-                        fprinf(['\nStarting wake reconstruction <strong>', name_of_model, '</strong>'])
+                        fprintf(['\nStarting wake reconstruction <strong>', name_of_model, '</strong>'])
                         reconstruct_pp_data(postprocess_folder, reconstruction_folder, ...
                             ppi, number_of_wake_lengths_to_analyse);
                     else
-                        fprinf('\nNo postprocessing folder... skipping wake reconstruction.')
+                        fprintf('\nNo postprocessing folder... skipping wake reconstruction.')
                     end %if
                 end %for
             catch ME

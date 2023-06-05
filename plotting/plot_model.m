@@ -6,51 +6,51 @@ for ind = 1:length(datasets)
     
     if isfield(datasets{ind}, 'wake') && any(contains(p_types, 'wake'))
         if isempty(dir_list_gen(fullfile(datasets{ind}.path_to_data, 'wake'), 'png',1)) 
-            fprinf(['\nGenerating wake graphs for ', datasets{ind}.model_name])
+            fprintf(['\nGenerating wake graphs for ', datasets{ind}.model_name])
             run_inputs_loc = fullfile(datasets{ind}.wake, 'postprocessing', 'wake', 'run_inputs.mat');
             analysis_loc = fullfile(datasets{ind}.wake, 'analysis', 'wake', 'data_analysed_wake.mat');
             run_logs_loc = fullfile(datasets{ind}.wake, 'postprocessing', 'wake', 'run_inputs.mat');
             GdfidL_plot_pp_wake(run_inputs_loc, analysis_loc, run_logs_loc, ppi)
         else
-            fprinf(['\nWake graphs already exists for ', datasets{ind}.model_name, '. Skipping...'])
+            fprintf(['\nWake graphs already exists for ', datasets{ind}.model_name, '. Skipping...'])
         end
     end %if
     
     if isfield(datasets{ind}, 'eigenmode') && any(contains(p_types, 'eigenmode'))
         if isempty(dir_list_gen(fullfile(datasets{ind}.path_to_data, 'eigenmode'), 'png',1)) 
-            fprinf(['\nGenerating eigenmode graphs for ', datasets{ind}.model_name])
+            fprintf(['\nGenerating eigenmode graphs for ', datasets{ind}.model_name])
             GdfidL_plot_eigenmode(datasets{ind}.eigenmode, datasets{ind}.path_to_data)
         else
-            fprinf(['\neigenmode graphs already exists for ', datasets{ind}.model_name, '. Skipping...'])
+            fprintf(['\neigenmode graphs already exists for ', datasets{ind}.model_name, '. Skipping...'])
         end
     end %if
     
     
     if isfield(datasets{ind}, 'lossy_eigenmode') && any(contains(p_types, 'lossy_eigenmode'))
         if isempty(dir_list_gen(fullfile(datasets{ind}.path_to_data, 'lossy_eigenmode'), 'png',1)) 
-            fprinf(['\nGenerating lossy eigenmode graphs for ', datasets{ind}.model_name])
+            fprintf(['\nGenerating lossy eigenmode graphs for ', datasets{ind}.model_name])
             GdfidL_plot_eigenmode_lossy(datasets{ind}.lossy_eigenmode, datasets{ind}.path_to_data)
         else
-            fprinf(['\nlossy eigenmode graphs already exists for ', datasets{ind}.model_name, '. Skipping...'])
+            fprintf(['\nlossy eigenmode graphs already exists for ', datasets{ind}.model_name, '. Skipping...'])
         end
     end %if
     
     
     if isfield(datasets{ind}, 'sparameter') && any(contains(p_types, 'sparameter'))
         if isempty(dir_list_gen(fullfile(datasets{ind}.path_to_data, 'sparameter'), 'png',1)) 
-            fprinf(['\nGenerating s_parameter graphs for ', datasets{ind}.model_name])
+            fprintf(['\nGenerating s_parameter graphs for ', datasets{ind}.model_name])
             GdfidL_plot_s_parameters(datasets{ind}.sparameter, fig_pos);
         else
-            fprinf(['\ns_parameter graphs already exists for ', datasets{ind}.model_name, '. Skipping...'])
+            fprintf(['\ns_parameter graphs already exists for ', datasets{ind}.model_name, '. Skipping...'])
         end
     end %if
     
     if isfield(datasets{ind}, 'shunt') && any(contains(p_types, 'shunt'))
         if isempty(dir_list_gen(fullfile(datasets{ind}.path_to_data, 'shunt'), 'png',1)) 
-            fprinf(['\nGenerating shunt graphs for ', datasets{ind}.model_name])
+            fprintf(['\nGenerating shunt graphs for ', datasets{ind}.model_name])
             GdfidL_plot_shunt(datasets{ind}.shunt)
         else
-            fprinf(['\nshunt graphs already exists for ', datasets{ind}.model_name, '. Skipping...'])
+            fprintf(['\nshunt graphs already exists for ', datasets{ind}.model_name, '. Skipping...'])
         end
     end %if
 end %if

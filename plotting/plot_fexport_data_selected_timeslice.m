@@ -6,7 +6,7 @@ out_name = strcat(name_of_model, field_type, '-field_',slice_dir,'_slice_directi
 
 if ~isfile(fullfile(output_location,[out_name, '.png']))
     if isempty(selected_timeslice)
-        fprinf('\nSelected time is not in dataset')
+        fprintf('\nSelected time is not in dataset')
     else
         f1 = figure('Position',[30,30, 1500, 400]);
         plot_field_slices(f1, data, field_type, slice_dir, selected_timeslice, NaN)

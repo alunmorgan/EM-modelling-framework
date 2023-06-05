@@ -31,7 +31,7 @@ end
 try
 scale = scales{sel};
 catch
-    fprinf('\nrescale_value: scaling range exceeded')
+    fprintf('\nrescale_value: scaling range exceeded')
 end %try
 if strcmp(scale, '0')
     scale = '';

@@ -4,7 +4,7 @@ paths = load_local_paths;
 set_results_loc = fullfile(paths.results_loc, single_set);
 [names,~] = dir_list_gen(set_results_loc, 'dirs', 1);
 if isempty(names)
-    fprinf(['\nNo data available for ', single_set])
+    fprintf(['\nNo data available for ', single_set])
     return
 end %if
 %select only those folders whos names start with the base name.
@@ -92,7 +92,7 @@ for ewh = 1:length(sweep_names)
         end %if
     end %for
         if sum(good_data) ==0
-            fprinf('\nNo valid data. Skipping report generation')
+            fprintf('\nNo valid data. Skipping report generation')
             return
         end %if
 
@@ -111,10 +111,10 @@ for ewh = 1:length(sweep_names)
     end %for
     varying_pars_ind = find(stable ==0);
     if length(varying_pars_ind) >1
-        fprinf('\nMore than one variable changing during the sweep. Only using the first one.')
+        fprintf('\nMore than one variable changing during the sweep. Only using the first one.')
     end %if
     if isempty(varying_pars_ind)
-        fprinf('\nNo varying parameters found. Skipping this one.')
+        fprintf('\nNo varying parameters found. Skipping this one.')
         continue
     end %if
 

@@ -77,7 +77,7 @@ if ~isfile(fullfile(output_folder,  'data_reconstructed_single_bunch_wake.mat'))
     fprintf('Saved\n')
     
 else
-    fprinf('\nReconstruction already exists... Skipping')
+    fprintf('\nReconstruction already exists... Skipping')
 end %if
 
 

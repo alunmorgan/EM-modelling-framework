@@ -1,11 +1,11 @@
 function [output, reduction]= matrix_reduction_1D(input, dim, reduction)
 
 if rem(size(input,dim), reduction) ~= 0 
-    fprinf('\nThe value of the reduction requested is not a factor of the size of the matrix provided')
+    fprintf('\nThe value of the reduction requested is not a factor of the size of the matrix provided')
     while rem(size(input,dim), reduction) ~= 0 && reduction ~= 0
         reduction = reduction - 1;
     end %while
-    fprinf(['\nUsing ', num2str(reduction), ' for reduction value.'])
+    fprintf(['\nUsing ', num2str(reduction), ' for reduction value.'])
     
 end %if
 

@@ -101,7 +101,7 @@ for ens = length(port_names):-1:1 % ports
                 'LineWidth',lw, 'Parent', ax_sp(ens), 'DisplayName',...
         ['Fill pattern = ', num2str(sweep_vals(jse))])
             catch
-            fprinf(['\nMissing data file for ', port_names{ens}])
+            fprintf(['\nMissing data file for ', port_names{ens}])
         end %try
     end %for
     title(port_names{ens}, 'Parent', ax_sp(ens))

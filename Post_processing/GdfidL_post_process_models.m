@@ -17,7 +17,7 @@ addParameter(p,'input_data_location',{''}, validate_is_cell);
 addParameter(p,'type_selection','wake', validate_is_char);
 parse(p, data_directory_base, pp_directory_base, model_name, varargin{:});
 
-fprinf(['\nStarted post processing of <strong>', model_name,'</strong> - ', p.Results.type_selection])
+fprintf(['\nStarted post processing of <strong>', model_name,'</strong> - ', p.Results.type_selection])
 
 data_directory = fullfile(data_directory_base, p.Results.type_selection);
 pp_directory = fullfile(pp_directory_base, p.Results.type_selection);
@@ -53,7 +53,7 @@ if run_pp == 1
                 postprocess_eigenmode(modelling_inputs, run_logs, 'lossy_eigenmode');
             end %if
         catch W_ERR
-            fprinf(['\n<strong>', p.Results.type_selection, ' Error</strong>'])
+            fprintf(['\n<strong>', p.Results.type_selection, ' Error</strong>'])
             display_error_message(W_ERR)
         end %try
         %% Post processing S-parameters and shunt
@@ -69,7 +69,7 @@ if run_pp == 1
                 postprocess_shunt;     
             end %if
         catch W_ERR
-            fprinf( ['\n<strong>', p.Results.type_selection, ' Error</strong>'])
+            fprintf( ['\n<strong>', p.Results.type_selection, ' Error</strong>'])
             display_error_message(W_ERR)
         end %try
     end %if

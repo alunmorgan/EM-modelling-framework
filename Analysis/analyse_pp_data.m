@@ -22,7 +22,7 @@ if ~isfile(fullfile(postprocess_folder, 'data_analysed_wake.mat'))
     save(fullfile(output_folder, 'data_analysed_wake.mat'), 'pp_data','-v7.3')
     fprintf('Saved\n')
 else
-    fprinf('Analysis already exists... Skipping')
+    fprintf('Analysis already exists... Skipping')
 end %if
 
 

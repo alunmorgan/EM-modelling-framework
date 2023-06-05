@@ -13,7 +13,7 @@ for js = 1:length(freq_folders)
     if exist(log_file, 'file') == 2 
     data = read_in_text_file(log_file);
     else
-        fprinf(['\nMissing log file in ' freq_folders{js}]);
+        fprintf(['\nMissing log file in ' freq_folders{js}]);
         continue
     end %if
     

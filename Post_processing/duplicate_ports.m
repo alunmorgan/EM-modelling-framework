@@ -24,7 +24,7 @@ for wsh = 1:length(substructure)
                         % not present.
                         port_data.(substructure{wsh}).(data_fields{wga}).data(ck2) = port_data_in.(substructure{wsh}).(data_fields{wga}).data(ck1);
                     catch
-                        fprinf(['\nMissing port data file ', port_names_in{une}])
+                        fprintf(['\nMissing port data file ', port_names_in{une}])
                     end %try
                 end %for
                 tstart(ck2) = tstart_in{ck1,2};

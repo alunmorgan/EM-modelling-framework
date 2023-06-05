@@ -7,7 +7,7 @@ if ~all(isnan(temp_data))
         % find the data length required.
         trimmed = find(tmp_timebase <= (sweep_length / 3E8), 1, 'last');
         if isempty(trimmed)
-            fprinf(['\nSweep length ', num2str(sweep_length) ,' not found.'])
+            fprintf(['\nSweep length ', num2str(sweep_length) ,' not found.'])
         end %if
         tmp_timebase = tmp_timebase(1:trimmed);
     end %if

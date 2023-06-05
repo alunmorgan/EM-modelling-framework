@@ -12,17 +12,17 @@ try
         if ~exist(field_plotting_folder, 'dir')
             mkdir(field_plotting_folder)
         end %if
-        fprinf(['\nStarting wake field plotting <strong>', name_of_model, '</strong>'])
+        fprintf(['\nStarting wake field plotting <strong>', name_of_model, '</strong>'])
 
         [field_data_files,~] = dir_list_gen(field_data_folder, 'mat',1);
         if isempty(field_data_files)
-            fprinf('\nNo data field datafiles')
+            fprintf('\nNo data field datafiles')
             continue
         end %if
         try
             RL = load(fullfile(postprocess_folder, 'data_from_run_logs.mat'), 'run_logs');
         catch
-            fprinf('\nMissing run logs... skipping')
+            fprintf('\nMissing run logs... skipping')
             continue
         end %try
 

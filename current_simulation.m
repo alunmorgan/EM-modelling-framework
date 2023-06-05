@@ -38,7 +38,7 @@ if any(matches(p.Results.stages, 'simulate'))
             cd(orig_loc)
         catch ME
             cd(orig_loc)
-            fprinf(['\nProblem simulating model ', p.Results.sets{set_id}])
+            fprintf(['\nProblem simulating model ', p.Results.sets{set_id}])
             display_error_message(ME)
         end %try
     end %for

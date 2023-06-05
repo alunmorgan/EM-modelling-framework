@@ -20,25 +20,25 @@ end %if
 if exist(fullfile(path_to_data, 'run_inputs.mat'), 'file') == 2
     load(fullfile(path_to_data, 'run_inputs.mat'), 'modelling_inputs');
 else
-    fprinf(['\nUnable to load ', fullfile(path_to_data, 'run_inputs.mat')])
+    fprintf(['\nUnable to load ', fullfile(path_to_data, 'run_inputs.mat')])
     return
 end %if
 if exist(fullfile(path_to_data,'data_postprocessed.mat'), 'file') == 2
     load(fullfile(path_to_data,'data_postprocessed.mat'), 'pp_data');
 else
-    fprinf(['\nUnable to load ', fullfile(path_to_data,'data_postprocessed.mat')])
+    fprintf(['\nUnable to load ', fullfile(path_to_data,'data_postprocessed.mat')])
     return
 end %if
 if exist(fullfile(path_to_data, 'data_analysed_wake.mat'), 'file') == 2
     load(fullfile(path_to_data, 'data_analysed_wake.mat'),'wake_sweep_data');
 else
-    fprinf(['\nUnable to load ', fullfile(path_to_data, 'data_analysed_wake.mat')])
+    fprintf(['\nUnable to load ', fullfile(path_to_data, 'data_analysed_wake.mat')])
     return
 end %if
 if exist(fullfile(path_to_data, 'data_from_run_logs.mat'), 'file') == 2
     load(fullfile(path_to_data, 'data_from_run_logs.mat'), 'run_logs')
 else
-    fprinf(['\nUnable to load ', fullfile(path_to_data, 'data_from_run_logs.mat')])
+    fprintf(['\nUnable to load ', fullfile(path_to_data, 'data_from_run_logs.mat')])
     return
 end %if
 

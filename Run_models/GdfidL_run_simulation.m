@@ -62,7 +62,7 @@ for nes = 1:n_cycles
         system(['ln -s ', restart_loc, ' ', current_restart]);
         construct_gdf_file(paths, sim_type, modelling_inputs, current_out, current_scratch, current_restart, active_ports(nes), sparameter_set(nes), frequency)
         save(fullfile(out_loc,'run_inputs.mat'), 'paths', 'modelling_inputs')
-        fprinf(['\nRunning ', sim_type,' simulation for ', modelling_inputs.model_name, '.'])
+        fprintf(['\nRunning ', sim_type,' simulation for ', modelling_inputs.model_name, '.'])
         GdfidL_simulation_core(current_out, modelling_inputs.version, modelling_inputs.precision, restart)
         % Converting any images from ps to png to reduce the file
         % size. For larger models keeping the ps files can break the
@@ -80,9 +80,9 @@ for nes = 1:n_cycles
         system(['unlink ', current_restart]);
     else
         if strcmp(sim_type, 'sparameter')
-            fprinf(strcat('\n', sim_type, ' data already exists (', active_ports(nes), ')'))
+            fprintf(strcat('\n', sim_type, ' data already exists (', active_ports(nes), ')'))
         else
-            fprinf(strcat('\n', sim_type, ' data already exists '))
+            fprintf(strcat('\n', sim_type, ' data already exists '))
         end %if
     end %if
 end %for

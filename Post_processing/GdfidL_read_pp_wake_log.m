@@ -20,11 +20,11 @@ for lse = 1:length(logs)
     %% read in the file put the data into a cell array.
     data = read_in_text_file(log_file);
     if isempty(data)
-        fprinf('\nWake log file is empty... aborting')
+        fprintf('\nWake log file is empty... aborting')
         return
     end %if
     if strcmp(data{end}, ' rc:  -1')
-        fprinf('\nWake simulation did not exit cleanly')
+        fprintf('\nWake simulation did not exit cleanly')
         return
     end
     

@@ -46,7 +46,7 @@ end
 %% Getting intial list
 a = dir(directory_name);
 if isempty(a)
-    fprinf('\nDirectory does not exist')
+    fprintf('\nDirectory does not exist')
     names = [];
     directory_name = '';
     return
@@ -86,12 +86,12 @@ if strcmp(file_type,'dirs')
     if isempty(dirs)
         names = [];
         if quiet_flag ~= 1
-            fprinf('\nNo directories found');
+            fprintf('\nNo directories found');
         end %if
     else
         names = dirs;
         if quiet_flag ~= 1
-            fprinf(['\n', num2str(size(names,1)) ' directories found']);
+            fprintf(['\n', num2str(size(names,1)) ' directories found']);
         end %if
     end %if
 elseif strcmp(file_type,'')
@@ -112,13 +112,13 @@ else
     end
     if exist('ind2','var') == 0
         if quiet_flag ~= 1
-            fprinf(['\nNo files with extension ' file_type ' found']);
+            fprintf(['\nNo files with extension ' file_type ' found']);
         end
         names = [];
     else
         names = names(ind2);
         if quiet_flag ~= 1
-            fprinf(['\n', num2str(size(names,1)) ' files with extension ' file_type ' found']);
+            fprintf(['\n', num2str(size(names,1)) ' files with extension ' file_type ' found']);
         end
     end
 end

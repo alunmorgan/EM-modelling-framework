@@ -41,7 +41,7 @@ else
         [log, ~] = GdfidL_read_log(['/tmp/',r,'/gdfidl_log']);
         data_rate = log.wall_rate;
     catch
-        fprinf('\nTrying a slightly longer wake')
+        fprintf('\nTrying a slightly longer wake')
         for sswe = 2:10
             tmp_inputs = run_inputs;
             tmp_inputs{11} = num2str(sswe/10);
@@ -68,6 +68,6 @@ catch
     try
         rmdir(['/tmp/',r], 's')
     catch
-        fprinf(['\nCould not remove the ', r,' folder in the /tmp directory'])
+        fprintf(['\nCould not remove the ', r,' folder in the /tmp directory'])
     end
 end

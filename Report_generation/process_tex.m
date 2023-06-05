@@ -4,7 +4,7 @@ function process_tex(output_path, file_name)
 % example: process_tex(output_path, file_name)
 old_path = pwd;
 cd(output_path)
-fprinf(['\nProcessing latex file. ', output_path, '/',file_name])
+fprintf(['\nProcessing latex file. ', output_path, '/',file_name])
 if ispc == 1
     latex_cmd = '"C:\Program Files\MiKTeX 2.9\miktex\bin\x64\pdflatex.exe" -etex -interaction nonstopmode -halt-on-error ';
 else
@@ -20,16 +20,16 @@ file_ID = fopen([file_name, '_latex_log'], 'w');
 fwrite(file_ID,log);
 fclose(file_ID);
 if sum(status) >0
-    fprinf(['\nError in latex processing. See ', output_path, '/', file_name, '_latex_log for details'])
+    fprintf(['\nError in latex processing. See ', output_path, '/', file_name, '_latex_log for details'])
 end
 if exist([file_name, '.dvi'],'file') ~= 0
     [conversion_status, ~] = system(['dvipdf ', file_name,'.dvi']);
     fprintf('. ')
     if conversion_status >0
-        fprinf('\nError in converting dvi to pdf')
+        fprintf('\nError in converting dvi to pdf')
     end
 end %if
-fprinf('\nCleaning up')
+fprintf('\nCleaning up')
 if exist([file_name, '.dvi'],'file') ~= 0
     delete([file_name, '.dvi'])
 end %if

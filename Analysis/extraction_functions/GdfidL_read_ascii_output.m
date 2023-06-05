@@ -22,7 +22,7 @@ x_data_length = y_ind  - x_ind -1;
 y_data_length = z_ind  - y_ind - 1;
 z_data_length = f_ind -z_ind - 1;
 f_data = data(f_ind+9:end);
-fprinf('GdfidL_read_ascii_output: Have data')
+fprintf('GdfidL_read_ascii_output: Have data')
 
 parfor jd = 1:length(f_data)
 f_d = regexp(f_data{jd}, '\s*([0-9-Ee+.]+)\s+([0-9-Ee+.])+\s+([0-9-Ee+.]+)', 'tokens');
@@ -32,7 +32,7 @@ fy(jd) = str2double(f_d{2});
 fz(jd) = str2double(f_d{3});
 end
 clear f_data
-fprinf('\nGdfidL_read_ascii_output: Done F')
+fprintf('\nGdfidL_read_ascii_output: Done F')
 
 fz2 = reshape(fz',x_data_length, y_data_length, z_data_length);
 fy2 = reshape(fy',x_data_length, y_data_length, z_data_length);

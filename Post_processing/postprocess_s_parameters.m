@@ -29,7 +29,7 @@ s_port = cell(length(s_names),1);
 for osw = 1:length(s_names)
 
     if exist(fullfile(s_parameter_data_directory{osw},'model_log'), 'file') ~= 2
-        fprinf(['\nMissing log file in ' s_parameter_data_directory{osw}]);
+        fprintf(['\nMissing log file in ' s_parameter_data_directory{osw}]);
         continue
     end %if
     copyfile(fullfile(s_parameter_data_directory{osw},'model.gdf'),...

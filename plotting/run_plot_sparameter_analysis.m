@@ -12,14 +12,14 @@ try
             if ~exist(plot_analysis_folder, 'dir')
                 mkdir(plot_analysis_folder)
             end %if
-            fprinf(['\nStarting S-Parameter analysis plotting <strong>', name_of_model, '</strong>'])
+            fprintf(['\nStarting S-Parameter analysis plotting <strong>', name_of_model, '</strong>'])
             temp  = dir_list_gen(postprocess_folder, 'dirs',1);
             run_inputs_loc = fullfile(temp{1}, 'run_inputs.mat');
             analysis_loc = fullfile(analysis_folder, 'data_analysed_sparameter.mat');
             GdfidL_plot_s_parameters(run_inputs_loc, analysis_loc, plot_analysis_folder)
             %             plot_model(datasets, ppi, p.Results.sim_types);
         else
-            fprinf('\nNo plotting folder... skipping wake analysis plotting.')
+            fprintf('\nNo plotting folder... skipping wake analysis plotting.')
         end %if
     end %for
 catch ME5
