@@ -7,6 +7,10 @@ function modelling_inputs = run_inputs_setup_STL(mi, versions, n_cores, precisio
 % Example: modelling_inputs = run_inputs_setup_STL(mi)
 
 %%%% Generating mappings %%%%%
+for krd = 1:length(mi.stl_input_data)
+    mi.mat_params{krd} = {mi.stl_input_data{krd}{1}, [mi.stl_input_data{krd}{1}, '_mat'],...
+        mi.stl_input_data{krd}{1}, mi.stl_input_data{krd}{1}, mi.stl_input_data{krd}{2}, krd};
+end %for
 for nwe = 1:length(mi.mat_params)
     % Structure is {stl file name, material name, order to apply the stl files}
     mi.stl_part_mapping{nwe,1} = [mi.base_model_name, '-', mi.mat_params{nwe}{1}];
@@ -49,7 +53,7 @@ for fdhs = 1:length(mi.model_names)
         if strcmpi(mi.movie_flag, 'Base')
             modelling_inputs{model_num}.mov = 1;
         end %if
-        
+
     end %if
     modelling_inputs{model_num}.defs = defs{1};
     modelling_inputs{model_num}.stl_location = fullfile(mi.paths.path_to_models, ...
@@ -57,7 +61,7 @@ for fdhs = 1:length(mi.model_names)
     modelling_inputs{model_num}.parameter_file_path = fullfile(mi.paths.path_to_models, ...
         mi.base_model_name,mi.model_names{fdhs},...
         [mi.model_names{fdhs}, '_parameters.txt']);
-    
+
     if exist(modelling_inputs{model_num}.parameter_file_path, 'file') == 2
         modelling_inputs{model_num}.geometry_defs = ...
             get_parameters_from_sidecar_file(modelling_inputs{model_num}.parameter_file_path);
