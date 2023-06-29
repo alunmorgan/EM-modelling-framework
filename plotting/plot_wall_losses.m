@@ -40,21 +40,21 @@ ylimits = f1.Children.YLim;
 zlimits = f1.Children.ZLim;
 
 for isw = 1: length(materials)
-   ind = find(mat_nums==materials(isw), 1, 'first');
-   material_name = mat_names{ind};
-   component = component_names{ind};
+    ind = find(mat_nums==materials(isw), 1, 'first');
+    material_name = mat_names{ind};
+    component = component_names{ind};
     clf(f1)
     scatter3(X(M==materials(isw)), Y(M==materials(isw)), Z(M==materials(isw)),...
         3, C(M==materials(isw)),'filled', 'MarkerFaceAlpha',0.5,...
         'MarkerEdgeColor','none')
-xlim(xlimits);
-ylim(ylimits);
-zlim(zlimits);
-% axis equal
-title([regexprep(component, '_', ' ') ': material ', regexprep(material_name,'_', ' ')])
-xlabel('X(mm)')
-ylabel('Y(mm)')
-zlabel('Z(mm)')
-savemfmt(f1, out_folder, ['wall_losses_material', num2str(materials(isw))], {'png', 'eps'})
+    xlim(xlimits);
+    ylim(ylimits);
+    zlim(zlimits);
+    axis equal
+    title([regexprep(component, '_', ' ') ': material ', regexprep(material_name,'_', ' ')])
+    xlabel('X(mm)')
+    ylabel('Y(mm)')
+    zlabel('Z(mm)')
+    savemfmt(f1, out_folder, ['wall_losses_material', num2str(materials(isw))], {'png', 'eps'})
 end %for
 close(f1)

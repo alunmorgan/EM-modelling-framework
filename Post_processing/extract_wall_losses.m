@@ -33,13 +33,20 @@ for nrs = 1:length(a_folders)
         material_info_inds = regexp(bem_data, '\s*[0-9]\s+[0-9]+\s+[0-9]+\s+[0-9Ee\-\.]+\s+BEM-Datum');
         material_info_sel = find_position_in_cell_lst(material_info_inds);
         losses = NaN(length(material_info_sel), 1);
+        fprintf('\nProcessing Energy deposition data.......')
         for ajq = 1:length(material_info_sel)
             material_line_temp = bem_data{material_info_sel(ajq)};
             tok_temp1 = regexp(material_line_temp, '\s*([0-9])\s+([0-9]+)\s+([0-9]+)\s+([0-9Ee\+\-\.]+)\s+BEM-Datum', 'tokens');
             wall_loss_data.(['patch', num2str(ajq)]).('poly_shape') = str2double(tok_temp1{1}{1});
-            wall_loss_data.(['patch', num2str(ajq)]).('mat1') = str2double(tok_temp1{1}{2});
-            wall_loss_data.(['patch', num2str(ajq)]).('mat2') = str2double(tok_temp1{1}{3});
-            wall_loss_data.(['patch', num2str(ajq)]).('loss') = str2double(tok_temp1{1}{4});
+            if sign(tok_temp1{1}{4}) == 1 | sign(tok_temp1{1}{4}) == 0
+                wall_loss_data.(['patch', num2str(ajq)]).('mat1') = str2double(tok_temp1{1}{2});
+                wall_loss_data.(['patch', num2str(ajq)]).('mat2') = str2double(tok_temp1{1}{3});
+                wall_loss_data.(['patch', num2str(ajq)]).('loss') = str2double(tok_temp1{1}{4});
+            else
+                wall_loss_data.(['patch', num2str(ajq)]).('mat2') = str2double(tok_temp1{1}{2});
+                wall_loss_data.(['patch', num2str(ajq)]).('mat1') = str2double(tok_temp1{1}{3});
+                wall_loss_data.(['patch', num2str(ajq)]).('loss') = abs(str2double(tok_temp1{1}{4}));
+            end %if
             losses(ajq) = str2double(tok_temp1{1}{4});
             clear tok_temp1
             for hfd = 1:wall_loss_data.(['patch', num2str(ajq)]).('poly_shape')
@@ -51,7 +58,7 @@ for nrs = 1:length(a_folders)
                 clear tok_temp2
             end %for
             if rem(ajq,10000)==0
-                fprintf([num2str(round(ajq/length(material_info_sel)*100)),'% '])
+                fprintf(['\b\b\b\b', num2str(round(ajq/length(material_info_sel)*100),'%03.f'),'%%'])
             end %if
         end %for
         maxloss = max(losses);
