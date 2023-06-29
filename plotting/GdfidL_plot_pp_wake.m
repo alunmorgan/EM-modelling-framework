@@ -326,18 +326,18 @@ if isfield(pp_data, 'port')
             try
                 % This is to cope with the case of missing data files.
                 plot(pp_data.port.timebase .* 1E9, pp_data.port.data.time.power_port.data{ens}, 'b', 'Parent', ax_sp(ens))
+                xlim([pp_data.port.timebase(1) .* 1E9 pp_data.port.timebase(end) .* 1E9])
             catch
                 fprintf('\nMissing data file for port signals plotting')
             end %try
             title(port_names{ens}, 'Parent', ax_sp(ens))
-            xlim([pp_data.port.timebase(1) .* 1E9 pp_data.port.timebase(end) .* 1E9])
             xlabel('Time (ns)', 'Parent', ax_sp(ens))
             ylabel('Power (W)', 'Parent', ax_sp(ens))
             grid on
         end %for
         savemfmt(h_wake, output_folder, [prefix, 'port_signals'])
         for ens = length(port_names):-1:1 % ports
-            xlim(ax_sp(ens),[pp_data.port.timebase(1) .* 1E9 4])
+            xlim(ax_sp(ens),[0 4])
         end %for
         savemfmt(h_wake, output_folder, [prefix, 'port_signals_first4ns'])
     end %if
