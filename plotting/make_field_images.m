@@ -70,8 +70,8 @@ if ~isfile(fullfile(output_location, out_name))
         graph_lims(1) = min(min(min(dirfields_trim_temp)));
         graph_lims(2) = max(max(max(dirfields_trim_temp)));
         timescale = data.timestamp;
-        
-        parfor ifen = 1:size(dirfields_trim_temp,3)
+        Frames = cell(size(dirfields_trim_temp,3), 1);
+        for ifen = 1:size(dirfields_trim_temp,3) %using parfor locks the server
             f2 = figure('Position',[30,30, 1500, 600]);
             slice = squeeze(dirfields_trim_temp(:,:,ifen));
             actual_time = num2str(round(timescale(ifen)*1E9*100)/100);
@@ -85,7 +85,7 @@ if ~isfile(fullfile(output_location, out_name))
             clf(f2)
             drawnow; pause(0.2);  % this innocent line prevents the Matlab hang
             fprintf('.')
-        end %parfor
+        end %for
         fprintf('\n')
         field_images{oas}.frames = Frames;
         field_images{oas}.field_component = field_components{oas};

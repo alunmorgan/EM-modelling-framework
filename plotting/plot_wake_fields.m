@@ -6,7 +6,6 @@ try
     a_folders = a_folders(~contains(a_folders, ' - Blended'));
     for nrs = 1:length(a_folders)
         field_data_folder = fullfile(a_folders{nrs}, 'fields', 'wake');
-        postprocess_folder = fullfile(a_folders{nrs}, 'postprocessing', 'wake');
         field_plotting_folder = fullfile(a_folders{nrs}, 'field_plotting', 'wake');
         [~,name_of_model,~] = fileparts(a_folders{nrs});
         if ~exist(field_plotting_folder, 'dir')
@@ -19,21 +18,28 @@ try
             fprintf('\nNo data field datafiles')
             continue
         end %if
-        try
-            RL = load(fullfile(postprocess_folder, 'data_from_run_logs.mat'), 'run_logs');
-        catch
-            fprintf('\nMissing run logs... skipping')
-            continue
-        end %try
 
         snapshot_inds = contains(field_data_files, 'snapshot');
         field_snapshots = field_data_files(snapshot_inds);
         if exist(fullfile(field_plotting_folder, 'CSV_files'), 'dir')~=7
             mkdir(field_plotting_folder, 'CSV_files')
         end %if
-        fprintf('Processing field snapshots...')
+        fprintf('\nProcessing field snapshots...')
+        field_types = cell(length(field_snapshots),1);
+        field_components = cell(length(field_snapshots),1);
+        field_timestamps = NaN(length(field_snapshots),1);
+        snapshot_Frames = cell(length(field_snapshots),1);
         f1 = figure('Position',[30,30, 600, 600]);
-        for nes = 1:length(field_snapshots)
+        n_snapshots = length(field_snapshots);
+        t_temp = cell(n_snapshots, 1);
+        c_temp = cell(n_snapshots, 1);
+        slice_data_x = cell(n_snapshots, 1);
+        slice_data_y = cell(n_snapshots, 1);
+        slice_data_z = cell(n_snapshots, 1);
+        slice_metadata_coord_x = cell(1,1);
+        slice_metadata_coord_y = cell(1,1);
+        slice_metadata_coord_z = cell(1,1);
+        for nes = 1:n_snapshots %using parfor locks the server
             S = load(fullfile(field_data_folder, field_snapshots{nes}));
             temp = regexp(field_snapshots{nes},'field_data_snapshots_F([xyz])([EH]).*\.mat','tokens');
             field_types{nes} = temp{1}{2};
@@ -41,22 +47,33 @@ try
             field_timestamps(nes) = S.data.timestamp;
             export_snapshots_csvs(S, field_types{nes}, fullfile(field_plotting_folder, 'CSV_files'), [name_of_model, field_types{nes}])
             plot_fexport_snapshots(f1, S, field_types{nes}, field_plotting_folder, [name_of_model, field_types{nes}]);
-            snapshot_Frames(nes) = getframe(f1);
+            snapshot_Frames{nes} = getframe(f1);
             clf(f1)
-            t_temp = ['T' regexprep(num2str(field_timestamps(nes)),'\.', 'p')];
-            t_temp = regexprep(t_temp, '-', 'm');
-            c_temp = ['F', field_components{nes}];
-            slice_data.(field_types{nes}).(t_temp).('x').(c_temp) = squeeze(S.(c_temp)(floor(size(S.(c_temp),1)./2), :, :));
-            slice_data.(field_types{nes}).(t_temp).('y').(c_temp)  = squeeze(S.(c_temp)(:, floor(size(S.(c_temp),2)./2), :));
-            slice_data.(field_types{nes}).(t_temp).('z').(c_temp)  = squeeze(S.(c_temp)(:, :, floor(size(S.(c_temp),3)./2)));
-            if nes==1
-                slice_metadata.coord_x = S.data.coord_x;
-                slice_metadata.coord_y = S.data.coord_y;
-                slice_metadata.coord_z = S.data.coord_z;
+            t_temp{nes} = ['T' regexprep(num2str(field_timestamps(nes)),'\.', 'p')];
+            t_temp{nes} = regexprep(t_temp{nes}, '-', 'm');
+            c_temp{nes} = ['F', field_components{nes}];
+            slice_data_x{nes} = squeeze(S.(c_temp{nes})(floor(size(S.(c_temp{nes}),1)./2), :, :));
+            slice_data_y{nes} = squeeze(S.(c_temp{nes})(:, floor(size(S.(c_temp{nes}),2)./2), :));
+            slice_data_z{nes} = squeeze(S.(c_temp{nes})(:, :, floor(size(S.(c_temp{nes}),3)./2)));
+            if nes == 1
+                slice_metadata_coord_x{nes} = S.data.coord_x;
+                slice_metadata_coord_y{nes} = S.data.coord_y;
+                slice_metadata_coord_z{nes} = S.data.coord_z;
             end %if
+            fprintf('.')
             clear S
+            clf(f1)
         end %for
         close(f1)
+        slice_metadata.coord_x = slice_metadata_coord_x{1};
+        slice_metadata.coord_y = slice_metadata_coord_y{1};
+        slice_metadata.coord_z = slice_metadata_coord_z{1};
+        for kse = 1:length(field_snapshots)
+            slice_data.(field_types{kse}).(t_temp{kse}).('x').(c_temp{kse}) = slice_data_x{kse};
+            slice_data.(field_types{kse}).(t_temp{kse}).('y').(c_temp{kse}) = slice_data_y{kse};
+            slice_data.(field_types{kse}).(t_temp{kse}).('z').(c_temp{kse}) = slice_data_z{kse};
+        end %for
+
         fts = unique(field_types);
         fcs = unique(field_components);
         for kdq = 1:length(fts)

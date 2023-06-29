@@ -31,7 +31,7 @@ X(inds) = [];
 Y(inds) = [];
 Z(inds) = [];
 figure(fig_h)
-scatter3(Z, Y, X, round(graph_data), round(graph_data), "filled")
+scatter3(Z, Y, X, 3, round(graph_data), "filled", 'MarkerEdgeAlpha', 0.5, 'MarkerFaceAlpha', 0.5)
 title_text = ['snapshot ',  graph_timestamp, ' ', field_dir, field_units];
 title_text = regexprep(title_text, '_', ' ');
 title(title_text)
