@@ -29,6 +29,9 @@ if run_pp == 1
     %% Post processing wakes, eigenmode and lossy eigenmode
     if any(contains({'wake', 'eigenmode', 'lossy_eigenmode'}, p.Results.type_selection))
         try
+            if ~exist(fullfile(pp_directory, p.Results.type_selection), "dir")
+                mkdir(fullfile(pp_directory, p.Results.type_selection))
+            end %if
             % Move files to the post processing folder.
             copyfile(fullfile(data_directory, 'model.gdf'),...
                 fullfile(pp_directory, 'model.gdf'));
