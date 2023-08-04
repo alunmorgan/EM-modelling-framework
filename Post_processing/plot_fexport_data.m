@@ -6,9 +6,11 @@ end %if
 
 field_types = fieldnames(data_rearranged);
 slices = {'x','y','z'};
-
+f1 = figure('Position',[30,30, 1500, 600]);
 for sdw = 1:length(field_types)
+    field_type = field_types{sdw};
     for bea = 1:length(slices)
+        slice_dir = slices{bea};
         out_name = strcat(name_of_model,'_', field_types{sdw}, '-fields_fixed_slice_', slices{bea});
         max_field_Fx = max(max_field_components.(field_types{sdw}).(slices{bea}).Fx);
         max_field_Fy = max(max_field_components.(field_types{sdw}).(slices{bea}).Fy);
@@ -24,16 +26,30 @@ for sdw = 1:length(field_types)
         data_temp_Fx = data_rearranged.(field_types{sdw}).(slices{bea}).Fx;
         data_temp_Fy = data_rearranged.(field_types{sdw}).(slices{bea}).Fy;
         data_temp_Fz = data_rearranged.(field_types{sdw}).(slices{bea}).Fz;
-        field_type = field_types{sdw};
-        slice_dir = slices{bea};
-        for oird = 1:length(data_timestamps.(field_type).(slice_dir).Fx) %Do not use parfor as it chokes the server
-            f1 = figure('Position',[30,30, 1500, 600]);
+        % Sort the order to be in increasing time
+        [t_tmp_Fx, I_Fx] = sort(t_tmp_Fx);
+        data_temp_Fx = data_temp_Fx(I_Fx,:,:);
+        [t_tmp_Fy, I_Fy] = sort(t_tmp_Fy);
+        data_temp_Fy = data_temp_Fy(I_Fy,:,:);
+        [t_tmp_Fz, I_Fz] = sort(t_tmp_Fz);
+        data_temp_Fz = data_temp_Fz(I_Fz,:,:);
+
+        n_fieldslices = length(data_timestamps.(field_type).(slice_dir).Fx);
+        F_fixed(1:n_fieldslices) = struct('cdata',nan(1, 1, 3), 'colormap', []);
+        Fx_fixed(1:n_fieldslices) = struct('cdata',nan(1, 1, 3), 'colormap', []);
+        Fy_fixed(1:n_fieldslices) = struct('cdata',nan(1, 1, 3), 'colormap', []);
+        Fz_fixed(1:n_fieldslices) = struct('cdata',nan(1, 1, 3), 'colormap', []);
+        Fx_plots(1:n_fieldslices) = struct('cdata',nan(1, 1, 3), 'colormap', []);
+        Fy_plots(1:n_fieldslices) = struct('cdata',nan(1, 1, 3), 'colormap', []);
+        Fz_plots(1:n_fieldslices) = struct('cdata',nan(1, 1, 3), 'colormap', []);
+
+        for oird = 1:n_fieldslices%Do not use parfor as it chokes the server
             data_Fx = squeeze(data_temp_Fx(oird,:,:));
             data_Fy = squeeze(data_temp_Fy(oird,:,:));
             data_Fz = squeeze(data_temp_Fz(oird,:,:));
 
             geometry_slice = geometry_from_slice_data(data_Fx, data_Fy, data_Fz);
-           
+
             plot_field_slices(f1, data_Fx, data_Fy, data_Fz, metadata, t_tmp_Fx(oird), field_type, slice_dir, level_list, geometry_slice)
             F_fixed(oird) = getframe(f1);
             clf(f1)
@@ -66,36 +82,32 @@ for sdw = 1:length(field_types)
             clf(f1)
             drawnow; pause(0.1);  % this reduces the risk of a java race condition
             fprintf('*')
-            close(f1)
         end %for
         fprintf('\\')
-        field_images{1}.frames = F_fixed;
-        field_images{1}.field_component = 'all';
-        field_images{1}.slice_dir = slices{bea};
-        field_images{1}.field_type = field_types{sdw};
+        field_images.frames = F_fixed;
+        field_images.field_component = 'all';
+        field_images.slice_dir = slices{bea};
+        field_images.field_type = field_types{sdw};
         save(fullfile(output_location, [out_name, '_fieldFrames']), 'field_images')
-        field_images{1}.frames = Fx_fixed;
-        field_images{1}.field_component = 'Fx';
+        field_images.frames = Fx_fixed;
+        field_images.field_component = 'Fx';
         save(fullfile(output_location, [out_name, '-Fx_fieldFrames']), 'field_images')
-        field_images{1}.frames = Fy_fixed;
-        field_images{1}.field_component = 'Fy';
+        field_images.frames = Fy_fixed;
+        field_images.field_component = 'Fy';
         save(fullfile(output_location, [out_name, '-Fy_fieldFrames']), 'field_images')
-        field_images{1}.frames = Fz_fixed;
-        field_images{1}.field_component = 'Fz';
+        field_images.frames = Fz_fixed;
+        field_images.field_component = 'Fz';
         save(fullfile(output_location, [out_name, '-Fz_fieldFrames']), 'field_images')
-        field_images{1}.frames = Fx_plots;
-        field_images{1}.field_component = 'Fx';
+        field_images.frames = Fx_plots;
+        field_images.field_component = 'Fx';
         save(fullfile(output_location, [out_name, '-lineplots-Fx_fieldFrames']), 'field_images')
-        field_images{1}.frames = Fy_plots;
-        field_images{1}.field_component = 'Fy';
+        field_images.frames = Fy_plots;
+        field_images.field_component = 'Fy';
         save(fullfile(output_location, [out_name, '-lineplots-Fy_fieldFrames']), 'field_images')
-        field_images{1}.frames = Fz_plots;
-        field_images{1}.field_component = 'Fz';
+        field_images.frames = Fz_plots;
+        field_images.field_component = 'Fz';
         save(fullfile(output_location, [out_name, '-lineplots-Fz_fieldFrames']), 'field_images')
-        %         write_vid(F_fixed, fullfile(output_location, out_name))
-        %         write_vid(Fx_fixed, fullfile(output_location, [out_name(1:end-4),'-Fx.avi']))
-        %         write_vid(Fy_fixed, fullfile(output_location, [out_name(1:end-4),'-Fy.avi']))
-        %         write_vid(Fz_fixed, fullfile(output_location, [out_name(1:end-4),'-Fz.avi']))
         clear F_fixed Fx_fixed Fy_fixed Fz_fixed
     end %for
 end %for
+close(f1)
