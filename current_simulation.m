@@ -7,7 +7,7 @@ sim_types = {'geometry','wake', 'sparameter', 'eigenmode', 'lossy_eigenmode', 's
 default_sim_types = {'geometry', 'wake', 'sparameter', 'lossy_eigenmode'};
 default_stages = {'simulate', 'postprocess', 'field_extraction', 'analyse', 'reconstruct'  'plot_analysis_data', 'plot_reconstruction_data', 'plot_fields', 'plot_thermals','report'};
 default_version = {'230330'};
-default_number_of_cores = {'48'}; % less than max to avoid contension with other users
+default_number_of_cores = {'60'}; % less than max to avoid contension with other users
 default_precision = {'double'};
 
 p = inputParser;
@@ -97,6 +97,7 @@ for set_id = 1:length(p.Results.sets)
     if any(matches(p.Results.stages, 'plot_fields'))
         if any(matches(p.Results.sim_types, 'wake'))
             plot_wake_fields(p.Results, set_id, paths)
+            generate_wake_field_vids(p.Results, set_id, paths)
         end %if
     end %if
     if any(matches(p.Results.stages, 'plot_thermals'))
