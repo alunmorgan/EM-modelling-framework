@@ -28,21 +28,19 @@ orig_ver = getenv('GDFIDL_VERSION');
 setenv('GDFIDL_VERSION',version);
 [~]=system(['gd1.pp < ', pp_input_file, ' > ', pp_log_file]);
 % restoring the original version.
+fprintf('\n')
 setenv('GDFIDL_VERSION',orig_ver);
 
 %% Check that the post processor has completed
-data = read_file_full_line(pp_log_file);
-for hwa = 1:length(data)
-    if ~isempty(strfind(data{hwa},'The End of File is reached')) ||...
-            ~isempty(strfind(data{hwa},'The End of the File is reached')) ||...
-            ~isempty(strfind(data{hwa},'This is the normal End'))
+[~, data] = system(['tail ', pp_log_file]);
+    if contains(data,'The End of File is reached') ||...
+            contains(data,'The End of the File is reached') ||...
+            contains(data,'This is the normal End')
         fprintf(['\nPostprocess ',sim_type , ': The post processor core has run to completion'])
-        break
-    end %if
-    if hwa == length(data)
+%         break
+    else
         fprintf(['\nPostprocess ',sim_type , ': The post processor core has not completed properly'])
     end %if
-end %for
 
 if ~strcmpi(sim_type, 'eigenmode') && ~strcmpi(sim_type, 'lossy_eigenmode')
     %% convert the gld files for the field output images to ps.
