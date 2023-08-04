@@ -25,12 +25,6 @@ end %if
 if exist(store, 'dir') ~= 7
     mkdir(store)
 end %if
-%% Copying the EM setup files.
-%geometry-material-map.txt is used for mapping materials to geometric parts.
-% mesh_definition.txt is used for defining the extent and the density of the mesh.
-%Also boundary conditions.
-% port_definition.txt is used for defining port locations and parameters.
-%copyfile(fullfile(path_to_input_files, '*.txt'), store);
 
 %% Adding locations to the data structure.
 % Location of the temporary file space. Nothing is kept here.
