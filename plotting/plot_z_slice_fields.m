@@ -23,13 +23,13 @@ elseif strcmpi(field_type, 'h')
     field_label = 'Field (Am^{-1})';
 end %if
 
-figure(f_handle)
+set(0,'CurrentFigure',f_handle) % grab figure window to make plots in it WITHOUT stealing focus.
 drawnow; pause(0.1)
 subplot(2,2,1)
 contourf(xaxis.*1e3, yaxis.*1e3, slice', 'LineStyle', 'none')
 xlabel(xlab)
 ylabel(ylab)
-title(strcat(slice_dir, '=0 - ',field_type, field_component, ' time=', num2str(actual_time)))
+title(strcat(slice_dir, '=0 - ',field_type, field_component, ' time=', num2str(round(actual_time*1E9*100)/100)))
 axis equal
 colorbar
 drawnow

@@ -4,7 +4,8 @@ function plot_field_component(fig_handle, slice, metadata, timestamp, field_type
 
 time_val = num2str(round(timestamp*1E9*100)/100);
 main_title_string = strcat(field_type, '-field ','component ', field_component, ' slice direction: ', slice_dir, ' at ', time_val, 'ns');
-figure(fig_handle)
+set(0,'CurrentFigure',fig_handle) % grab figure window to make plots in it WITHOUT stealing focus.
+
 clf(fig_handle)
 annotation('textbox', [0.2, 0.3, 0.3, 0.6], 'String', main_title_string, ...
     'Linestyle', 'none', 'FontWeight', 'bold');

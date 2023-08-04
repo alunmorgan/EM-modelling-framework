@@ -30,6 +30,7 @@ else
     end %if
     xaxis_trim = xaxis(y_ind1:y_ind2, x_ind1:x_ind2);
     yaxis_trim = yaxis(y_ind1:y_ind2, x_ind1:x_ind2);
+                f2 = figure('Position',[30,30, 1500, 600]);
     for oas = 1:length(field_components)
         output_name = strcat(name_of_model,'_', field_type, '-field_through_centre_', slice_dir, '_slice_direction_', field_components{oas}, '_at_slice_', num2str(selected_timeslice));
         if ~isfile(fullfile(output_location,[output_name, '.png']))
@@ -37,7 +38,7 @@ else
             dirfields_trim = dirfields(x_ind1:x_ind2, y_ind1:y_ind2, :);
             geometry_slice_trim = geometry_slice(x_ind1:x_ind2, y_ind1:y_ind2);
             field_name = field_components{oas};
-            f2 = figure('Position',[30,30, 1500, 600]);
+            set(0,'CurrentFigure',f2) % grab figure window to make plots in it WITHOUT stealing focus.
             slice = squeeze(dirfields_trim(:,:,selected_timeslice));
             slice(geometry_slice_trim==0) = NaN;
             plot_z_slice_fields(f2, ...
@@ -46,9 +47,10 @@ else
                 slice, ...
                 slice_dir, field_name, field_type, actual_time)
             savemfmt(f2, output_location, output_name{1});
-            close(f2)
+            clf(f2)
             drawnow; pause(0.05);  % this innocent line prevents the Matlab hang
             fprintf('.')
         end %if
     end %for
+    close(f2)
 end %if

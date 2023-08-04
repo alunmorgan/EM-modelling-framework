@@ -1,5 +1,6 @@
 function plot_field_data(field_data, metadata, graph_handle) 
-figure(graph_handle)
+
+set(0,'CurrentFigure',graph_handle) % grab figure window to make plots in it WITHOUT stealing focus.
 field_data = permute(field_data,[3,1,2]);
 [X,Y,Z] = meshgrid(...
     metadata.horizontal_scale,...

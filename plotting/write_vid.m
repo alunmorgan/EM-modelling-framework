@@ -5,6 +5,10 @@ v = VideoWriter(output_loc);
 v.FrameRate = 5;
 open(v);
 for kwh = 1:length(data)
-    writeVideo(v, data(kwh));
+    if iscell(data(kwh))
+        writeVideo(v, data{kwh});
+    else
+        writeVideo(v, data(kwh));
+    end %if
 end %for
 close(v)

@@ -64,15 +64,16 @@ end %if
 
 out_name = strcat(name_of_model, '_', field_type, '-field_', slice_dir, '_slice_direction', ROI_tag, '_fieldFrames.mat');
 if ~isfile(fullfile(output_location, out_name))
+     f2 = figure('Position',[30,30, 1500, 600]);
     for oas = 1:length(field_components)
         field_name = field_components{oas};
         dirfields_trim_temp = dirfields_trim.(field_name);
         graph_lims(1) = min(min(min(dirfields_trim_temp)));
         graph_lims(2) = max(max(max(dirfields_trim_temp)));
         timescale = data.timestamp;
-        Frames = cell(size(dirfields_trim_temp,3), 1);
+        Frames(1:size(dirfields_trim_temp,3)) = struct('cdata',nan(1, 1, 3), 'colormap', []);
         for ifen = 1:size(dirfields_trim_temp,3) %using parfor locks the server
-            f2 = figure('Position',[30,30, 1500, 600]);
+            set(0,'CurrentFigure',f2) % grab figure window to make plots in it WITHOUT stealing focus.
             slice = squeeze(dirfields_trim_temp(:,:,ifen));
             actual_time = num2str(round(timescale(ifen)*1E9*100)/100);
             slice(geometry_slice_trim==0) = NaN;
@@ -93,7 +94,7 @@ if ~isfile(fullfile(output_location, out_name))
         field_images{oas}.field_type = field_type;
         clear Frames
     end %for
-    
+    close(f2)
     save(fullfile(output_location, out_name), 'field_images' )
     if nargout > 0
         varargout{1} = field_images;

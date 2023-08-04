@@ -8,14 +8,10 @@ data.Fz = data_Fz;
 field_components = {'Fx','Fy','Fz'};
 time_val = num2str(round(timestamp*1E9*100)/100);
 main_title_string = strcat(field_type, '-field ', ' slice direction: ', slice_dir, ' at ', time_val, 'ns');
-figure(fig_handle)
+set(0,'CurrentFigure',fig_handle) % grab figure window to make plots in it WITHOUT stealing focus.
 clf(fig_handle)
 annotation('textbox', [0.2, 0.3, 0.3, 0.6], 'String', main_title_string, ...
     'Linestyle', 'none', 'FontWeight', 'bold');
-% a = sum(geometry_slice,1);
-% b = sum(geometry_slice,2);
-% valid_c = (find(a>0, 1, 'first'):find(a>0, 1, 'last'));
-% valid_r = (find(b>0, 1, 'first'):find(b>0, 1, 'last'));
 
 temp_accum = NaN(size(data.Fx,1), size(data.Fx,2), length(field_components));
 
@@ -37,7 +33,6 @@ end %if
 for igr = 1:length(field_components)
     slice = data.(field_components{igr});
     slice(geometry_slice==0) = NaN;
-    %     slice = slice(valid_r, valid_c);
     temp_accum(:,:,igr) = slice;
     subplot(1, length(field_components) +1, igr)
 
