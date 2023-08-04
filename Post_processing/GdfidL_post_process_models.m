@@ -17,7 +17,7 @@ addParameter(p,'input_data_location',{''}, validate_is_cell);
 addParameter(p,'type_selection','wake', validate_is_char);
 parse(p, data_directory_base, pp_directory_base, model_name, varargin{:});
 
-fprintf(['\nStarted post processing of <strong>', model_name,'</strong> - ', p.Results.type_selection])
+fprintf(['\nStarted post processing of <strong>', model_name,'</strong> - ', p.Results.type_selection, '\n'])
 
 data_directory = fullfile(data_directory_base, p.Results.type_selection);
 pp_directory = fullfile(pp_directory_base, p.Results.type_selection);
