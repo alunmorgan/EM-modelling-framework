@@ -4,7 +4,7 @@ function data = read_in_text_file(file_location)
 % data is the resulting cell array.
 %
 % Example: data = read_in_text_file(file_location)
-
+fprintf('\n')
 fid = fopen(file_location);
 % finding the length of the file first. For large files this allows for the
 % correct level of preallocation and thus prevents slowdowns.
@@ -31,6 +31,6 @@ while true
 end %while
 fclose(fid);
 data = data';
-
+fprintf('\n')
 
 
