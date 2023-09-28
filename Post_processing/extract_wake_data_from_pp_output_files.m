@@ -58,6 +58,9 @@ if isfield(log, 'mat_losses')
         
     else
         log.mat_losses.total_loss = 0;
+        for ern = 1:size(log.mat_losses.single_mat_data,1)
+            log.mat_losses.single_mat_data{ern,4} = 0;
+        end %for
     end %if
 end %if
 

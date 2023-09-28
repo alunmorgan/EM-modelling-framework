@@ -12,18 +12,22 @@ if isfield(pp_data, 'mat_losses') && iscell(pp_data.mat_losses.single_mat_data)
     % TODO find the code which generates the zeros and change so that the
     % output type is constant.
     if ~isempty(pp_data.mat_losses.loss_time)
-        
+
         for hsa = size(pp_data.mat_losses.single_mat_data,1):-1:1
-            tmp = strcmp(extension_names, pp_data.mat_losses.single_mat_data{hsa,2});
-            if sum(tmp) == 0
-                % material is part of the model.
+            if isempty(extension_names)
                 model_mat_index(hsa) = 1;
             else
-                % material is part of the port extensions.
-                model_mat_index(hsa) = 0;
+                tmp = strcmp(extension_names, pp_data.mat_losses.single_mat_data{hsa,2});
+                if sum(tmp) == 0
+                    % material is part of the model.
+                    model_mat_index(hsa) = 1;
+                else
+                    % material is part of the port extensions.
+                    model_mat_index(hsa) = 0;
+                end %if
             end %if
         end %for
-        
+
         %select on only those materials which are in the model proper.
         model_mat_data = pp_data.mat_losses.single_mat_data(model_mat_index == 1,:);
         if ~isempty(model_mat_data)

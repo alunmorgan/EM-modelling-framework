@@ -121,23 +121,26 @@ ov = cat(1,ov,'    direction=z');
 ov = cat(1,ov,'    onlyplotfiles = yes');
 ov = cat(1,ov,'    doit');
 
-ov = cat(1,ov,'-3darrowplot');
-ov = cat(1,ov,'    symbol=field_snapshots_e_1');
-% ov = cat(1,ov,'    bbylow=0');
-ov = cat(1,ov,'    arrows = 20000');
-ov = cat(1,ov,'    lenarrows = 4.0');
-ov = cat(1,ov,'    onlyplotfiles= yes');
-ov = cat(1,ov,'    eyeposition = ( 0, -1, 0 )');
-ov = cat(1,ov,'    doit');
+fsns = log.field_data.stored.field_snapshots.field_sequence_numbers;
+for sef = 1:length(fsns)
+    ov = cat(1,ov,'-3darrowplot');
+    ov = cat(1,ov,['    symbol=field_snapshots_e_', num2str(fsns(sef))]);
+    % ov = cat(1,ov,'    bbylow=0');
+    ov = cat(1,ov,'    arrows = 20000');
+    ov = cat(1,ov,'    lenarrows = 4.0');
+    ov = cat(1,ov,'    onlyplotfiles= yes');
+    ov = cat(1,ov,'    eyeposition = ( 0, -1, 0 )');
+    ov = cat(1,ov,'    doit');
 
-ov = cat(1,ov,'-3darrowplot');
-ov = cat(1,ov,'    symbol=field_snapshots_h_1');
-% ov = cat(1,ov,'    bbylow=0');
-ov = cat(1,ov,'    arrows = 20000');
-ov = cat(1,ov,'    lenarrows = 4.0');
-ov = cat(1,ov,'    onlyplotfiles= yes');
-ov = cat(1,ov,'    eyeposition = ( 0, -1, 0 )');
-ov = cat(1,ov,'    doit');
+    ov = cat(1,ov,'-3darrowplot');
+    ov = cat(1,ov,['    symbol=field_snapshots_h_', num2str(fsns(sef))]);
+    % ov = cat(1,ov,'    bbylow=0');
+    ov = cat(1,ov,'    arrows = 20000');
+    ov = cat(1,ov,'    lenarrows = 4.0');
+    ov = cat(1,ov,'    onlyplotfiles= yes');
+    ov = cat(1,ov,'    eyeposition = ( 0, -1, 0 )');
+    ov = cat(1,ov,'    doit');
+end %for
 
 if isfield(log, 'field_data')
     if isfield(log.field_data, 'ALL')

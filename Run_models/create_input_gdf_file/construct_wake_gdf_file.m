@@ -55,8 +55,13 @@ port_selection = modelling_inputs.port_multiple ~=0;
 port_defs = gdf_write_port_definitions( modelling_inputs.ports,...
     modelling_inputs.port_location, modelling_inputs.port_modes, port_selection);
 excitation = gdf_wake_port_excitation(modelling_inputs.port_excitation_wake);
+if isfield(modelling_inputs, 'voltage_monitoring')
 mon = gdf_wake_monitor_construction(modelling_inputs.dtsafety, modelling_inputs.mov, ...
     modelling_inputs.voltage_monitoring, modelling_inputs.field_capture, out_loc);
+else
+mon = gdf_wake_monitor_construction(modelling_inputs.dtsafety, modelling_inputs.mov, ...
+    cell(0,0), modelling_inputs.field_capture, out_loc);
+end %if
     % FIXME FIND THE CORRECT DATA STRUCTURE IN MODDELING INPUTS FOR THE 2 FIELD DEFS
     if isfield(modelling_inputs.port_excitation_wake, 'full_field_snapshot_times')
     field_ss = gdf_wake_field_snapshots(modelling_inputs.port_excitation_wake);

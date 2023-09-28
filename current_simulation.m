@@ -103,6 +103,7 @@ for set_id = 1:length(p.Results.sets)
     if any(matches(p.Results.stages, 'plot_thermals'))
         if any(matches(p.Results.sim_types, 'wake'))
            extract_wall_losses(p.Results, set_id, paths);
+           plot_wall_losses(p.Results, set_id, paths)
         end %if
     end %if
      if any(matches(p.Results.stages, 'report'))

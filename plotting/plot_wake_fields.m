@@ -12,7 +12,7 @@ try
             mkdir(field_plotting_folder)
         else
             fprintf('\nField plotting folder already exists... Skipping image generation')
-            return
+            continue
         end %if
         fprintf(['\nStarting wake field plotting <strong>', name_of_model, '</strong>'])
 

@@ -18,7 +18,7 @@ for nse = 1:length(voltage_sources)
     fs = cat(1,fs,strcat('            inductance= ', voltage_sources{nse}.inductance));
     fs = cat(1,fs,strcat('            amplitude= ', voltage_sources{nse}.voltage));
     fs = cat(1,fs,strcat('            risetime= ', voltage_sources{nse}.risetime));
-%     fs = cat(1,fs,strcat('            frequency= ', voltage_sources{nse}.frequency)');
+    fs = cat(1,fs,strcat('            frequency= ', voltage_sources{nse}.frequency)');
     fs = cat(1,fs,'         doit');
 end %for
 
