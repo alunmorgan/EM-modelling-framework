@@ -38,7 +38,7 @@ if ~isempty(field_inds)
     field_times = cat(1, field_times, cell(length(field_names) - length(field_times) ,1));
     field_groups = regexprep(field_groups(:,1), '_full_snapshot_(.*)', '_full_snapshot');
     field_sets = unique(field_groups(:,1));
-%     field_sets = unique(field_data(:,2));
+    %     field_sets = unique(field_data(:,2));
 
     for whj = 1:length(field_sets)
         temp = contains(field_names, field_sets{whj});
@@ -50,13 +50,13 @@ if ~isempty(field_inds)
             lg.field_data.exported.(field_sets{whj}).field_times = cellfun(@str2num, temp_field_times);
         end%if
         %         temp = field_data(strcmp(field_data(:,2), field_sets{whj}), [1,3]);
-%         lg.field_data.(field_sets{whj}) = cellfun(@str2num, temp);
+        %         lg.field_data.(field_sets{whj}) = cellfun(@str2num, temp);
     end %for
 end %if
 %% Find the information on the stored fields.
 field_data = regexp(data,'\s*#+\s*I am storing at t=\s*([.0-9e-+]+)\s*s, Name: "(.*)".\s*The sequential Number is\s*([0-9]+)\.', 'tokens');
 field_inds = find_position_in_cell_lst(field_data);
-if ~isempty(field_inds) 
+if ~isempty(field_inds)
     field_data = field_data(field_inds);
     field_data = reduce_cell_depth(field_data);
     field_data = reduce_cell_depth(field_data);
@@ -115,15 +115,23 @@ for ng = length(mat_names_ind):-1:1
     tokens = regexp(temp2, 'material>\s*type\s*=\s*(.*)', 'tokens');
     lg.mat_losses.single_mat_data{ng,3} = (tokens{1}{1});
     mat_index(ng) = lg.mat_losses.single_mat_data{ng,1};
+    %Initially setting the losses to zero so that is no losses are recorded the
+    %data structure is still present.
+     lg.mat_losses.single_mat_data{ng,4} = [0,0];
 end
 clear ng tokens temp mat_names_ind
 % find the total material loss.
 total_loss_inds = find_position_in_cell_lst(strfind(data,'IntegratedSumPowerAll'));
-for nse = length(total_loss_inds):-1:1
-    temp = sscanf(regexprep(data{total_loss_inds(nse)},'<=.*',''),'%f%f');
-    lg.mat_losses.loss_time(nse) = temp(1);
-    lg.mat_losses.total_loss(nse) = temp(2);
-end
+if ~isempty(total_loss_inds)
+    for nse = length(total_loss_inds):-1:1
+        temp = sscanf(regexprep(data{total_loss_inds(nse)},'<=.*',''),'%f%f');
+        lg.mat_losses.loss_time(nse) = temp(1);
+        lg.mat_losses.total_loss(nse) = temp(2);
+    end %for
+else
+    lg.mat_losses.loss_time = 0;
+    lg.mat_losses.total_loss = 0;
+end %if
 clear nse temp
 
 % find the loss for each metal.
@@ -137,16 +145,16 @@ if ~isempty(metal_loss_inds)
         metal_num(jse) = str2double(tmp{1}{1});
     end
     clear tmp jse
-    
+
     cer = strcmp(lg.mat_losses.single_mat_data(:,3), 'normal');
     % Find the number of ceramics in the model
-    
+
     n_ceramics = sum(cer);
     num_ceramics = lg.mat_losses.single_mat_data((cer ==1),1);
     % find the total loss for each all ceramics.
     ceramic_loss_inds = find_position_in_cell_lst(strfind(data,'IntegratedSumPower-'));
     ceramics_tmp = data(ceramic_loss_inds);
-    
+
     cer_ck = 0;
     n = length(ceramics_tmp) * n_ceramics;
     ceramic_num = zeros(1, n);
@@ -159,7 +167,7 @@ if ~isempty(metal_loss_inds)
         end
     end
     clear tmp jse
-    
+
     % combine the metals and ceramic losses into a single list.
     if n_ceramics >0
         mat_num = cat(2, metal_num, ceramic_num);
@@ -189,7 +197,7 @@ if ~isempty(metal_loss_inds)
         if strcmp(type_mat, 'normal')
             tmp2(:,2) = tmp2(:,2) ./ n_ceramics;
         end
-        
+
         % Write the loss data to the structure.
         if sum(dat_loc) > 1
             %If more than one component has the same material then split the
