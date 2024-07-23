@@ -1,15 +1,8 @@
-function fs = gdf_wake_monitor_construction(dtsafety, mov, voltage_monitors, field_setup, out_loc)
+function fs = gdf_wake_monitor_construction(dtsafety, voltage_monitors)
 % Constructs the monitor part of the gdf input file for GdfidL
 %
-% fs is
-% wake_length is
-% mov is a flag as to whether to export files for movie generation.
-%
-% Example: fs = gdf_wake_monitor_construction(dtsafety, mov)
+% Example: fs = gdf_wake_monitor_construction(dtsafety, voltage_monitors)
 
-if nargin < 2
-    mov = 0; % defaulting to no movie generation.
-end
 fs = {''};
 fs = cat(1,fs,'     -voltages');
 fs = cat(1,fs,'            logcurrent= yes');

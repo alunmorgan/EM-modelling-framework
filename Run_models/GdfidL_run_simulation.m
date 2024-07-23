@@ -1,4 +1,4 @@
-function GdfidL_run_simulation(sim_type, paths, modelling_inputs, restart)
+function GdfidL_run_simulation(sim_type, paths, modelling_inputs)
 % Takes the geometry specification, adds the setup for a  simulation and
 % runs the simulation with the desired calculational precision.
 %
@@ -49,35 +49,18 @@ for nes = 1:n_cycles
     out_loc = define_instance_path(out_root, sim_type, active_ports(nes), sparameter_set(nes), frequency);
     
     if ~exist(out_loc, 'dir')
+        % Making destination folders
         restart_loc = construct_storage_area_path(restart_root, sim_type, active_ports(nes), sparameter_set(nes), frequency);
         out_loc = construct_storage_area_path(out_root, sim_type, active_ports(nes), sparameter_set(nes), frequency);
         scratch_loc = construct_storage_area_path(scratch_root, sim_type, active_ports(nes), sparameter_set(nes), frequency);
-        % Using soft links to truncate the file paths as this causes problems
-        % with the underlying FORTRAN.
-        current_out = fullfile(paths.data_loc, 'current_out');
-        current_scratch = fullfile(paths.data_loc, 'current_scratch');
-        current_restart = fullfile(paths.data_loc, 'current_restart');
-        system(['ln -s ', out_loc, ' ' , current_out]);
-        system(['ln -s ', scratch_loc, ' ', current_scratch]);
-        system(['ln -s ', restart_loc, ' ', current_restart]);
-        construct_gdf_file(paths, sim_type, modelling_inputs, current_out, current_scratch, current_restart, active_ports(nes), sparameter_set(nes), frequency)
+        % Making setup files
+        %adding random number to prevent clash if multiple simulations are run.
+        tail = round(rand*1e4);
+        construct_gdf_file(out_loc, paths, tail, sim_type, modelling_inputs, current_out, current_scratch, current_restart, active_ports(nes), sparameter_set(nes), frequency)
         save(fullfile(out_loc,'run_inputs.mat'), 'paths', 'modelling_inputs')
-        fprintf(['\nRunning ', sim_type,' simulation for ', modelling_inputs.model_name, '.'])
-        GdfidL_simulation_core(current_out, modelling_inputs.version, modelling_inputs.precision, restart)
-        % Converting any images from ps to png to reduce the file
-        % size. For larger models keeping the ps files can break the
-        % filesystem.
-        pic_names = dir_list_gen(out_loc,'ps',1); % CHECK does this work now it is not a local folder?
-        if ~isempty(pic_names)
-            for ns = 1:length(pic_names)
-                pic_nme = pic_names{ns}(1:end-3);
-                [~] = system(['convert ',pic_nme,'.ps -rotate -90 ',pic_nme,'.png']);
-                delete([pic_nme,'.ps'])
-            end %for
-        end %if
-        system(['unlink ', current_out]);
-        system(['unlink ', current_scratch]);
-        system(['unlink ', current_restart]);
+%         fprintf(['\nRunning ', sim_type,' simulation for ', modelling_inputs.model_name, '.'])
+        write_single_simulation_batch_file(paths, restart_loc, out_loc, scratch_loc, tail, modelling_inputs.precision, modelling_inputs.version)
+%         GdfidL_simulation_core(current_out, modelling_inputs.version, modelling_inputs.precision, restart)
     else
         if strcmp(sim_type, 'sparameter')
             fprintf(strcat('\n', sim_type, ' data already exists (', active_ports(nes), ')'))

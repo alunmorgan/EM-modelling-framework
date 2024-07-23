@@ -1,4 +1,4 @@
-function run_models(mi, sim_types, paths, versions, n_cores, precision, restart)
+function run_models(mi, sim_types, paths, versions, n_cores, precision)
 % Runs all the geometric and simulation variations set up.
 % if restart is not an empty string then is shows the location to the .iMod-1
 % restart file.
@@ -30,13 +30,7 @@ for awh = 1:length(modelling_inputs)
     
     for ksbi = 1:length(sim_types)
         try
-            if ~isempty(restart)
-                restart_line = [' -restartfiles=',restart_loc_tmp, ' '];
-            else
-                restart_line = '';
-            end %if
-            GdfidL_run_simulation(sim_types{ksbi}, paths, modelling_inputs{awh}, ...
-                restart_line);
+            GdfidL_run_simulation(sim_types{ksbi}, paths, modelling_inputs{awh});
         catch ERR
             display_modelling_error(ERR, sim_types{ksbi})
             cd(default_location)

@@ -14,7 +14,7 @@ try
                 mkdir(field_plotting_folder, 'vids')
             else
                 fprintf('\nField video folder already exists... Skipping field video generation.')
-                return
+                continue
             end %if
             make_field_videos(field_plotting_folder, fullfile(field_plotting_folder, 'vids'))
             fprintf('Done\n')

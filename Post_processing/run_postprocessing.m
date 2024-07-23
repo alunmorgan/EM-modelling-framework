@@ -13,8 +13,12 @@ for herf = 1:length(input_settings.sim_types)
                 modelling_inputs{awh}.model_name, paths);
             [stat_datalink, ~]=system(['ln -s -T ',data_path, ' data_link']);
              [stat_pplink, ~]=system(['ln -s -T ',output_path, ' output_link']);
-            GdfidL_post_process_models(fullfile(pwd, 'data_link'), fullfile(pwd, 'output_link'), modelling_inputs{awh}.model_name,...
+            if stat_datalink == 0 && stat_pplink == 0
+             GdfidL_post_process_models(fullfile(pwd, 'data_link'), fullfile(pwd, 'output_link'), modelling_inputs{awh}.model_name,...
                 'type_selection', input_settings.sim_types{herf});
+            else
+                warning('run_postprocessing:filesystemError','file linking not successful.')
+            end %if
             cleanup_after_pp(old_loc, tmp_name)
         end %for
         cd(orig_loc)

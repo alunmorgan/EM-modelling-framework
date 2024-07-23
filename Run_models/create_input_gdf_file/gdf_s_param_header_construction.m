@@ -1,4 +1,4 @@
-function fs = gdf_s_param_header_construction(out_loc, scratch_loc, restart_files_loc, npmls, num_threads, mesh, mesh_scaling, materials, material_labels)
+function fs = gdf_s_param_header_construction(paths, tail, npmls, num_threads, mesh, mesh_scaling, materials, material_labels)
 % Constructs the initial part of the gdf input file for GdfidL 
 %
 % fs is a cell array of tect to form part of the postprocessing input file.
@@ -30,10 +30,10 @@ fs = cat(1,fs,'define(beam_dir, +z)');
 fs = cat(1,fs,' ');
 fs = cat(1,fs,'###################################################');
 fs = cat(1,fs,'-general');
-fs = cat(1,fs,['    outfile= ', out_loc]);
-fs = cat(1,fs,['    scratch= ', scratch_loc]);
+fs = cat(1,fs,['    outfile= ', paths.data_loc,'/temp_out',num2str(tail), '/']);
+fs = cat(1,fs,['    scratch= ', paths.data_loc, '/temp_scratch',num2str(tail), '/']);
 fs = cat(1,fs,['    nrofthreads= ', num_threads]);
-fs = cat(1,fs,['    restartfiles = ',restart_files_loc]);
+fs = cat(1,fs,['    restartfiles = ',paths.data_loc, '/temp_restart',num2str(tail), '/']);
 fs = cat(1,fs,'    t1restartfiles = 1440');
 fs = cat(1,fs,'    dtrestartfiles = 1440');
 fs = cat(1,fs,'    stopafterrestartfiles=1000000');

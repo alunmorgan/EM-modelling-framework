@@ -1,4 +1,4 @@
-function construct_shunt_gdf_file(path_to_model_data_file, modelling_inputs, frequency)
+function construct_shunt_gdf_file(out_loc, modelling_inputs, path_to_model_data_file, tail, frequency)
 
 materials = modelling_inputs.mat_list(:,1);
 material_labels = modelling_inputs.mat_list(:,2);
