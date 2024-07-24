@@ -84,7 +84,7 @@ for set_id = 1:length(p.Results.sets)
             try
                 makeLossyEigenmodeSummaryTable(p.Results.sets{set_id}, results_loc)
             catch ME3
-                warning([sets{set_id}, ' <strong>Problem with losy eigenmode analysis</strong>'])
+                warning('top_level_post_processing:analysis', [sets{set_id}, ' <strong>Problem with losy eigenmode analysis</strong>'])
                 display_error_message(ME3)
             end %try
         end %if
