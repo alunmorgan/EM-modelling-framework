@@ -1,4 +1,4 @@
-function GdfidL_run_simulation(sim_type, paths, modelling_inputs)
+function file_locs = GdfidL_run_simulation(sim_type, paths, modelling_inputs)
 % Takes the geometry specification, adds the setup for a  simulation and
 % runs the simulation with the desired calculational precision.
 %
@@ -19,7 +19,7 @@ if strcmp(sim_type, 'sparameter')
         active_port_inds = active_port_inds(3:end); % removing the beam ports from the list.
     end %if
     if isempty(active_port_inds)
-        warning('no active ports found. Have you correctly set the presence of beam?')
+        warning('GdfidL_run_simulation:no_ports','no active ports found. Have you correctly set the presence of beam?')
     end %if
     active_ports = modelling_inputs.ports(active_port_inds);
     s_sets = length(modelling_inputs.s_param);
@@ -42,12 +42,14 @@ else
     frequency = NaN;
 end %if
 
+file_locs = {};
+ck = 1;
 for nes = 1:n_cycles
     restart_root = fullfile(paths.restart_files_path, modelling_inputs.base_model_name, modelling_inputs.model_name);
     scratch_root = fullfile(paths.scratch_loc, modelling_inputs.base_model_name, modelling_inputs.model_name);
     out_root = fullfile(paths.data_loc, modelling_inputs.base_model_name, modelling_inputs.model_name);
     out_loc = define_instance_path(out_root, sim_type, active_ports(nes), sparameter_set(nes), frequency);
-    
+    % Only set up a simulation if there is no existing output.
     if ~exist(out_loc, 'dir')
         % Making destination folders
         restart_loc = construct_storage_area_path(restart_root, sim_type, active_ports(nes), sparameter_set(nes), frequency);
@@ -56,14 +58,20 @@ for nes = 1:n_cycles
         % Making setup files
         %adding random number to prevent clash if multiple simulations are run.
         tail = round(rand*1e4);
-        construct_gdf_file(out_loc, paths, tail, sim_type, modelling_inputs, current_out, current_scratch, current_restart, active_ports(nes), sparameter_set(nes), frequency)
+        construct_gdf_file(out_loc, paths, tail, sim_type, modelling_inputs, active_ports(nes), sparameter_set(nes), frequency)
         save(fullfile(out_loc,'run_inputs.mat'), 'paths', 'modelling_inputs')
-%         fprintf(['\nRunning ', sim_type,' simulation for ', modelling_inputs.model_name, '.'])
-        write_single_simulation_batch_file(paths, restart_loc, out_loc, scratch_loc, tail, modelling_inputs.precision, modelling_inputs.version)
-%         GdfidL_simulation_core(current_out, modelling_inputs.version, modelling_inputs.precision, restart)
+        %         fprintf(['\nRunning ', sim_type,' simulation for ', modelling_inputs.model_name, '.'])
+        file_locs{ck} = write_single_simulation_batch_file(paths, restart_loc,...
+            out_loc, scratch_loc, tail, modelling_inputs.precision, modelling_inputs.version);
+        if ~isempty(file_locs{ck})
+        % adding syntax to make it runable
+        file_locs{ck} = ['.', file_locs{ck}];
+        end %if
+        ck = ck +1;
+        fprintf('\nDone')
     else
         if strcmp(sim_type, 'sparameter')
-            fprintf(strcat('\n', sim_type, ' data already exists (', active_ports(nes), ')'))
+            fprintf(strcat('\n', sim_type, ' data already exists (', active_ports{nes}, ')'))
         else
             fprintf(strcat('\n', sim_type, ' data already exists '))
         end %if

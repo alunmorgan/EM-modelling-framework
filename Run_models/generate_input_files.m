@@ -1,4 +1,4 @@
-function generate_input_files(sets, varargin)
+function generate_input_files(paths, sets, varargin)
 
 %sets(cell of strings/char): Names of the model sets to run.
 
@@ -13,28 +13,29 @@ default_precision = {'double'};
 p = inputParser;
 p.StructExpand = false;
 p.CaseSensitive = false;
+addRequired(p, 'paths');
 addRequired(p, 'sets');
 addParameter(p, 'sim_types', default_sim_types, @(x) any(matches(x,sim_types)))
 addParameter(p, 'versions', default_version)
 addParameter(p, 'n_cores', default_number_of_cores)
 addParameter(p, 'precision', default_precision)
 
-parse(p, sets, varargin{:});
-
-paths = load_local_paths;
+parse(p, paths, sets, varargin{:});
 
 %% Simulation setup
-    orig_loc = pwd;
-    for set_id = 1:length(p.Results.sets)
-        try
-            cd(fullfile(paths.inputfile_location, p.Results.sets{set_id}))
-            run_inputs = feval(p.Results.sets{set_id});
-            run_models(run_inputs, p.Results.sim_types, paths, ...
-                p.Results.versions, p.Results.n_cores, p.Results.precision)
-            cd(orig_loc)
-        catch ME
-            cd(orig_loc)
-            fprintf(['\nProblem generating input file for ', p.Results.sets{set_id}])
-            display_error_message(ME)
-        end %try
-    end %for
+orig_loc = pwd;
+for set_id = 1:length(p.Results.sets)
+    try
+        cd(fullfile(paths.inputfile_location, p.Results.sets{set_id}))
+        % Read in the simulation settings for the model
+        run_inputs = feval(p.Results.sets{set_id});
+        % generate the input files for the simulations
+        run_models(run_inputs, p.Results.sim_types, paths, ...
+            p.Results.versions, p.Results.n_cores, p.Results.precision)
+        cd(orig_loc)
+    catch ME
+        cd(orig_loc)
+        fprintf(['\nProblem generating input file for ', p.Results.sets{set_id}])
+        display_error_message(ME)
+    end %try
+end %for
