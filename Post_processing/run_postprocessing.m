@@ -1,30 +1,33 @@
-function run_postprocessing(input_settings, set_id, paths)
-
+function run_postprocessing(input_settings, set_id)
 % postprocess the current set for all simulation types
-for herf = 1:length(input_settings.sim_types)
-    orig_loc = pwd;
-    try
-        cd(fullfile(paths.inputfile_location, input_settings.sets{set_id}))
-        run_inputs = feval(input_settings.sets{set_id});
-        modelling_inputs = run_inputs_setup_STL(run_inputs, input_settings.versions,...
-            input_settings.n_cores, input_settings.precision);
-        for awh = 1:length(modelling_inputs)
-            [old_loc, tmp_name, data_path, output_path] = prepare_for_pp(modelling_inputs{awh}.base_model_name,...
-                modelling_inputs{awh}.model_name, paths);
-            [stat_datalink, ~]=system(['ln -s -T ',data_path, ' data_link']);
-             [stat_pplink, ~]=system(['ln -s -T ',output_path, ' output_link']);
-            if stat_datalink == 0 && stat_pplink == 0
-             GdfidL_post_process_models(fullfile(pwd, 'data_link'), fullfile(pwd, 'output_link'), modelling_inputs{awh}.model_name,...
-                'type_selection', input_settings.sim_types{herf});
-            else
-                warning('run_postprocessing:filesystemError','file linking not successful.')
-            end %if
-            cleanup_after_pp(old_loc, tmp_name)
+
+pp_list = {'#! /bin/bash'};
+
+orig = pwd;
+cd(fullfile(input_settings.paths.inputfile_location, input_settings.sets{set_id}));
+% run_inputs = feval(input_settings.sets{set_id});
+cd(orig);
+% modelling_inputs = run_inputs_setup_STL(run_inputs, input_settings.versions,...
+%     input_settings.n_cores, input_settings.precision);
+for awh = 1:length(input_settings.sets)
+    [model_varients_folders, ~] = dir_list_gen(fullfile(input_settings.paths.results_loc, input_settings.sets{awh}),'dirs', 1);
+    for nes = 1:length(model_varients_folders)
+        for herf = 1:length(input_settings.sim_types)
+            try
+                data_directory = fullfile(input_settings.paths.data_loc, input_settings.sets{awh}, model_varients_folders{nes}, input_settings.sim_types{herf});
+                pp_directory = fullfile(input_settings.paths.results_loc, input_settings.sets{awh}, model_varients_folders{nes}, 'postprocessing', input_settings.sim_types{herf});
+                pp_list_temp = GdfidL_post_process_models(data_directory, pp_directory);
+                pp_list = cat(1, pp_list, pp_list_temp);
+            catch ME
+                fprintf(['\n', input_settings.sets{set_id},' <strong>Problem with postprocessing models.</strong>'])
+                display_error_message(ME)
+            end %try
         end %for
-        cd(orig_loc)
-    catch ME
-        cd(orig_loc)
-        fprintf(['\n', input_settings.sets{set_id},' <strong>Problem with postprocessing models.</strong>'])
-        display_error_message(ME)
-    end %try
+    end %for
 end %for
+fprintf('\n')
+
+top_pp_name = fullfile(input_settings.paths.results_loc, 'postprocessing_script.sh');
+write_out_data(pp_list, top_pp_name)
+pause(5)
+make_file_executable(top_pp_name)

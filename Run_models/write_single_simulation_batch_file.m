@@ -15,10 +15,6 @@ shell_contents = cat(1,shell_contents,['export GDFIDL_VERSION="', num2str(versio
 shell_contents = cat(1,shell_contents,['TEMP_OUT=', paths.data_loc,'/temp_out',num2str(tail)]);
 shell_contents = cat(1,shell_contents,['TEMP_SCRATCH=', paths.data_loc, '/temp_scratch',num2str(tail)]);
 shell_contents = cat(1,shell_contents,['TEMP_RESTART=', paths.data_loc, '/temp_restart',num2str(tail)]);
-% Making temporaray files
-shell_contents = cat(1,shell_contents,'mkdir $TEMP_OUT');
-shell_contents = cat(1,shell_contents,'mkdir $TEMP_SCRATCH');
-shell_contents = cat(1,shell_contents,'mkdir $TEMP_RESTART');
 % Using soft links to truncate the file paths as this causes problems
 % with the underlying FORTRAN.
 shell_contents = cat(1,shell_contents,['ln -s ', out_loc, ' $TEMP_OUT']);
@@ -30,11 +26,13 @@ if strcmp(precision, 'single')
 elseif strcmp(precision, 'double')
     shell_contents = cat(1,shell_contents,'gd1 < $TEMP_OUT/model.gdf > $TEMP_OUT/model_log');
 end %if
-shell_contents = cat(1,shell_contents,'unlink $TEMP_OUT');
-shell_contents = cat(1,shell_contents,'unlink $TEMP_SCRATCH');
-shell_contents = cat(1,shell_contents,'unlink $TEMP_RESTART');
 % restoring the original version.
 shell_contents = cat(1,shell_contents,['export GDFIDL_VERSION="', num2str(orig_ver),'"']);
+% removing the soft links
+shell_contents = cat(1,shell_contents,'rm $TEMP_OUT');
+shell_contents = cat(1,shell_contents,'rm $TEMP_SCRATCH');
+shell_contents = cat(1,shell_contents,'rm $TEMP_RESTART');
+
 %% Write file
 file_loc = fullfile(out_loc, 'run_model.sh');
 write_out_data( shell_contents, file_loc )

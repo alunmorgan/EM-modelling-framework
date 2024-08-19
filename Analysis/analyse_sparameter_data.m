@@ -7,4 +7,3 @@ function analyse_sparameter_data(postprocess_folder, output_folder)
 fprintf('Analysed ... Saving...')
 save(fullfile(output_folder, 'data_analysed_sparameter.mat'), 'sparameter_data','-v7.3')
 fprintf('Saved\n')
-clear sparameter_data s_mat

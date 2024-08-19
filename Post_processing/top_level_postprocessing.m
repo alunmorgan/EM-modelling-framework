@@ -1,11 +1,11 @@
-function top_level_postprocessing(sets, varargin)
+function top_level_postprocessing(paths, ppi, sets, varargin)
 
 %sets(cell of strings/char): Names of the model sets to run.
 
 
-sim_types = {'geometry','wake', 'sparameter', 'eigenmode', 'lossy_eigenmode', 'shunt'};
+sim_types = {'setup', 'geometry','wake', 'sparameter', 'eigenmode', 'lossy_eigenmode', 'shunt'};
 
-default_sim_types = {'geometry', 'wake', 'sparameter', 'lossy_eigenmode'};
+default_sim_types = {'setup', 'geometry', 'wake', 'sparameter', 'lossy_eigenmode'};
 default_stages = {'postprocess', 'field_extraction', 'analyse', 'reconstruct'  'plot_analysis_data', 'plot_reconstruction_data', 'plot_fields', 'plot_thermals','report'};
 default_version = {'230330'};
 default_number_of_cores = {'60'}; % less than max to avoid contension with other users
@@ -14,6 +14,8 @@ default_precision = {'double'};
 p = inputParser;
 p.StructExpand = false;
 p.CaseSensitive = false;
+addRequired(p, 'paths');
+addRequired(p, 'ppi'); % analysis_settings
 addRequired(p, 'sets');
 addParameter(p, 'sim_types', default_sim_types, @(x) any(matches(x,sim_types)))
 addParameter(p, 'stages', default_stages)
@@ -21,14 +23,17 @@ addParameter(p, 'versions', default_version)
 addParameter(p, 'n_cores', default_number_of_cores)
 addParameter(p, 'precision', default_precision)
 
-parse(p, sets, varargin{:});
+parse(p, paths, ppi, sets, varargin{:});
 
-paths = load_local_paths;
-ppi = analysis_settings;
+% ppi = analysis_settings;
 number_of_wake_lengths_to_analyse = 4;
 
 %% Post simulation
 for set_id = 1:length(p.Results.sets)
+    % Making a copy of data folder structure for post processing
+%     make_pp_folder_structure(paths, sets, set_id)
+
+
 
     %% Setting up log file
     stamp = regexprep(datestr(now),':', '-');
@@ -36,49 +41,32 @@ for set_id = 1:length(p.Results.sets)
         mkdir(fullfile(paths.logfile_location, p.Results.sets{set_id}))
     end %if
     diary(fullfile(paths.logfile_location, p.Results.sets{set_id}, stamp));
+    % Setup directory structure and copy across setup datafiles
+    if any(matches(p.Results.stages, 'setup'))
+%         if ~any(matches(p.Results.sim_types, 'geometry'))
+            run_setup(p.Results, set_id);
+%         end %if
+    end %if
 
     %% Postprocessing
     if any(matches(p.Results.stages, 'postprocess'))
-        if any(matches(p.Results.sim_types, 'geometry'))
-            % Converting any images from ps to png to reduce the file
-            % size. For larger models keeping the ps files can break the
-            % filesystem.
-            source_loc = fullfile(paths.data_loc, sets{set_id});
-            dest_loc = fullfile(paths.results_loc, sets{set_id});
-            [sim_names, ~] = dir_list_gen(source_loc, 'dirs',1);
-            for jse = 1:length(sim_names)
-                sim_pic_folder = fullfile(source_loc, sim_names{jse});
-                sim_pic_dest_folder = fullfile(dest_loc, sim_names{jse});
-                if exist(fullfile(sim_pic_dest_folder, 'geometry'),'dir') == 0
-                    mkdir(fullfile(sim_pic_dest_folder, 'geometry'))
-                end %if
-                [pic_names, ~] = dir_list_gen(fullfile(sim_pic_folder, 'geometry'),'ps',1);
-                if ~isempty(pic_names)
-                    for ns = 1:length(pic_names)
-                        pic_nme = pic_names{ns}(1:end-3);
-                        [~] = system(['convert ',fullfile(sim_pic_folder, 'geometry', pic_nme),...
-                            '.ps -rotate -90 ',...
-                            fullfile(sim_pic_dest_folder, 'geometry', pic_nme),'.png']);
-                    end %for
-                end %if
-            end %for
-        else
-            run_postprocessing(p.Results, set_id, paths);
-        end %if
+%         if ~any(matches(p.Results.sim_types, 'geometry'))
+            run_postprocessing(p.Results, set_id);
+%         end %if
     end %if
 
     %% Field extraction
     if any(matches(p.Results.stages, 'field_extraction'))
-        run_field_extraction(p.Results, set_id, paths);
+        run_field_extraction(p.Results, set_id, p.Results.paths);
     end %if
 
     %% Analysis
     if any(matches(p.Results.stages, 'analyse'))
         if any(matches(p.Results.sim_types, 'wake'))
-            run_wake_analysis(p.Results, set_id, paths)
+            run_wake_analysis(p.Results, set_id, p.Results.paths)
         end %if
         if any(matches(p.Results.sim_types, 'sparameter'))
-            run_sparameter_analysis(p.Results, set_id, paths)
+            run_sparameter_analysis(p.Results, set_id, p.Results.paths)
         end %if
         if any(matches(p.Results.sim_types, 'lossy_eigenmode'))
             try

@@ -1,4 +1,4 @@
-function [structure_energy_loss, material_names] =  extract_energy_loss_data_from_pp_data(pp_data)
+function [structure_energy_loss, material_names] =  extract_energy_loss_data_from_analysed_data(pp_data)
 
 if isfield(pp_data, 'mat_losses') && iscell(pp_data.mat_losses.single_mat_data)
     % I think that if the only material is PEC then this returns a 0 rather

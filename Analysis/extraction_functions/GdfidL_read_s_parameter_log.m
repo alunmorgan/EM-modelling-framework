@@ -1,4 +1,4 @@
-function run_logs = GdfidL_read_s_parameter_log( freq_folders )
+function run_logs = GdfidL_read_s_parameter_log( freq_folder )
 %Reads in the log file and extracts parameter data from it.
 %
 % log file is a string containing the full path to the file.
@@ -6,15 +6,14 @@ function run_logs = GdfidL_read_s_parameter_log( freq_folders )
 %
 % Example:log = GdfidL_read_s_parameter_log( log_file )
 
-for js = 1:length(freq_folders)
-    [~, f_name, ~] = fileparts(freq_folders{js});
-    log_file =  fullfile(freq_folders{js},'model_log');
+
     %% read in the file put the data into a cell array.
-    if exist(log_file, 'file') == 2 
-    data = read_in_text_file(log_file);
+    if exist(freq_folder, 'file') == 2 
+    data = read_in_text_file(freq_folder);
     else
-        fprintf(['\nMissing log file in ' freq_folders{js}]);
-        continue
+        fprintf(['\nMissing log file in ' freq_folder]);
+        run_logs = struct;
+       return
     end %if
     
     %% Remove the commented out parts of the input file
@@ -193,6 +192,6 @@ for js = 1:length(freq_folders)
         end
     end
     
-    run_logs.(f_name) =log;
+    run_logs =log;
     clear log
 end %for

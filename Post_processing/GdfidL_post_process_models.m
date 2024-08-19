@@ -1,80 +1,73 @@
-function GdfidL_post_process_models(data_directory_base, pp_directory_base, model_name, varargin)
+function pp_list = GdfidL_post_process_models(data_directory, pp_directory)
 % Takes the output of the GdfidL run and postprocesses it to generate
 % reports.
 %
-% Example: GdfidL_post_process_models(paths, model_name, 'input_data_location', '/home');
+% Example: GdfidL_post_process_models(paths, run_inputs, modelling_inputs, type_selection);
+[stub, type_selection, ~] = fileparts(pp_directory);
+[stub2, ~, ~] = fileparts(stub);
+[~, model_name, ~] = fileparts(stub2);
+fprintf(['\nWriting post processing input file for <strong>', model_name,'</strong> - ', type_selection])
 
-p = inputParser;
-p.StructExpand = false;
-validate_is_char = @(x) ischar(x);
-validate_is_cell = @(x) iscell(x);
-% validate_is_structure = @(x) isstruct(x);
-% addRequired(p,'paths', validate_is_structure);
-addRequired(p,'data_directory_base');
-addRequired(p,'pp_directory_base');
-addRequired(p,'model_name', validate_is_char);
-addParameter(p,'input_data_location',{''}, validate_is_cell);
-addParameter(p,'type_selection','wake', validate_is_char);
-parse(p, data_directory_base, pp_directory_base, model_name, varargin{:});
-
-fprintf(['\nStarted post processing of <strong>', model_name,'</strong> - ', p.Results.type_selection, '\n'])
-
-data_directory = fullfile(data_directory_base, p.Results.type_selection);
-pp_directory = fullfile(pp_directory_base, p.Results.type_selection);
-
-run_pp = will_pp_run(data_directory, pp_directory);
-
+pp_list = {};
+% run_pp = will_pp_run(data_directory, pp_directory);
+run_pp=1;
 if run_pp == 1
-%     creating_space_for_postprocessing(pp_directory, p.Results.type_selection, model_name);
     %% Post processing wakes, eigenmode and lossy eigenmode
-    if any(contains({'wake', 'eigenmode', 'lossy_eigenmode'}, p.Results.type_selection))
+    if any(contains({'wake', 'eigenmode', 'lossy_eigenmode'}, type_selection))
         try
-            if ~exist(fullfile(pp_directory, p.Results.type_selection), "dir")
-                mkdir(fullfile(pp_directory, p.Results.type_selection))
-            end %if
-            % Move files to the post processing folder.
-            copyfile(fullfile(data_directory, 'model.gdf'),...
-                fullfile(pp_directory, 'model.gdf'));
-            copyfile(fullfile(data_directory, 'model_log'),...
-                fullfile(pp_directory, 'model_log'));
-            copyfile(fullfile(data_directory, 'run_inputs.mat'),...
-                fullfile(pp_directory ,'run_inputs.mat'));
-            
-            % Reading logs
-            run_logs = GdfidL_read_logs(pp_directory, p.Results.type_selection);
-            save(fullfile(pp_directory, 'data_from_run_logs.mat'), 'run_logs')
-            
-            % Load up the original model input parameters.
-            load(fullfile(pp_directory, 'run_inputs.mat'), 'modelling_inputs')
-            
-            % Running postprocessor
-            if strcmp(p.Results.type_selection, 'wake')
-                postprocess_wakes(modelling_inputs, run_logs, data_directory, pp_directory);
-            elseif strcmp(p.Results.type_selection, 'eigenmode')
-                postprocess_eigenmode(modelling_inputs, run_logs, 'eigenmode');
-            elseif strcmp(p.Results.type_selection, 'lossy_eigenmode')
-                postprocess_eigenmode(modelling_inputs, run_logs, 'lossy_eigenmode');
+            % Writing postprocessor input files
+            if strcmp(type_selection, 'wake')
+                pp_directory = fullfile(pp_directory, 'wake');
+                run_logs = GdfidL_read_wake_log(fullfile(pp_directory, 'model_log'));
+                [ip_files, scratch_locs] = GdfidL_write_pp_wake_input_file(run_logs, data_directory, pp_directory, fullfile('/scratch2',model_name, type_selection));
+                for wh = 1:length(ip_files)
+                    file_loc = write_single_postprocessing_batch_file(ip_files{wh}, scratch_locs{wh}, run_logs.ver);
+                    pp_list = cat(1, pp_list, ['source "', file_loc, '"']);
+                end %for
+            elseif strcmp(type_selection, 'eigenmode')
+                run_logs = GdfidL_read_eigenmode_log(fullfile(pp_directory, 'model_log'), 'eigenmode');
+                e_scratch = fullfile('/scratch2',model_name, type_selection);
+                e_file = GdfidL_write_pp_eigenmode_input_file(data_directory, pp_directory, run_logs, 'eigenmode', run_inputs.ppi, e_scratch);
+                file_loc = write_single_postprocessing_batch_file(e_file, e_scratch, run_logs.ver);
+                pp_list = cat(1, pp_list, ['source "', file_loc, '"']);
+            elseif strcmp(type_selection, 'lossy_eigenmode')
+                run_logs = GdfidL_read_eigenmode_log(fullfile(pp_directory, 'model_log'), 'lossy_eigenmode');
+                le_scratch = fullfile('/scratch2',model_name, type_selection);
+                le_file = GdfidL_write_pp_eigenmode_input_file(data_directory, pp_directory, run_logs, 'lossy_eigenmode', run_inputs.ppi, le_scratch);
+                file_loc = write_single_postprocessing_batch_file(le_file, le_scratch, run_logs.ver);
+                pp_list = cat(1, pp_list, ['source "', file_loc, '"']);
+
             end %if
         catch W_ERR
-            fprintf(['\n<strong>', p.Results.type_selection, ' Error</strong>'])
+            fprintf(['\n<strong>', type_selection, ' Error</strong>'])
             display_error_message(W_ERR)
         end %try
         %% Post processing S-parameters and shunt
-    elseif any(contains({'sparameter', 'shunt'}, p.Results.type_selection))
+    elseif any(contains({'sparameter', 'shunt'}, type_selection))
         try
             % Reading logs and Running postprocessor
-%             [freq_folders] = dir_list_gen(data_directory, 'dirs', 1);
-            if strcmp(p.Results.type_selection, 'sparameter')
-%                 run_logs= GdfidL_read_s_parameter_log(freq_folders);
-                postprocess_s_parameters(data_directory, pp_directory);
-            elseif strcmp(p.Results.type_selection, 'shunt')
-%                 run_logs.(['f_', f_name]) = GdfidL_read_rshunt_log(freq_folders);
-                postprocess_shunt;     
+            if strcmp(type_selection, 'sparameter')
+                [s_names, ~] = dir_list_gen(data_directory, 'dirs', 1);
+                for osw = 1:length(s_names)
+                    s_parameter_data_directory = fullfile(data_directory, s_names{osw});
+                    s_parameter_output_directory = fullfile(pp_directory, s_names{osw});
+                    if exist(fullfile(s_parameter_data_directory,'model_log'), 'file') ~= 2
+                        fprintf(['\nMissing log file in ' s_parameter_data_directory]);
+                        continue
+                    end %if
+                    run_logs = GdfidL_read_s_parameter_log(fullfile(s_parameter_output_directory, 'model_log'));
+                    s_scratch = fullfile('/scratch2',model_name, type_selection);
+                    s_file = GdfidL_write_pp_s_param_input_file(s_parameter_data_directory, s_parameter_output_directory, s_scratch);
+                    file_loc = write_single_postprocessing_batch_file(s_file, s_scratch, run_logs.ver);
+                    pp_list = cat(1, pp_list, ['source "', file_loc, '"']);
+                end
+            elseif strcmp(type_selection, 'shunt')
+                %                 run_logs.(['f_', f_name]) = GdfidL_read_rshunt_log(freq_folders);
+                postprocess_shunt;
             end %if
         catch W_ERR
-            fprintf( ['\n<strong>', p.Results.type_selection, ' Error</strong>'])
+            fprintf( ['\n<strong>', type_selection, ' Error</strong>'])
             display_error_message(W_ERR)
         end %try
     end %if
 end %if
-

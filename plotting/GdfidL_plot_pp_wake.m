@@ -6,9 +6,10 @@ function GdfidL_plot_pp_wake(run_inputs_loc, analysis_loc, ppi, output_folder)
 % Example GdfidL_plot_wake(wake_data, ppi, mi, run_log,  pth, range)
 
 files_to_load = {run_inputs_loc, {'modelling_inputs'};...
-    analysis_loc, {'pp_data', 't_data', 'f_data'}};
+    analysis_loc, {'analysed_data'}};
 
 [temp, ~, ~] = fileparts(run_inputs_loc);
+[temp, ~, ~] = fileparts(temp);
 [temp, ~, ~] = fileparts(temp);
 [temp, ~, ~] = fileparts(temp);
 [~, prefix, ~] = fileparts(temp);
@@ -22,33 +23,33 @@ for rnf = 1:size(files_to_load,1)
     end %if
 end %for
 
-if ~exist('pp_data','var') && exist('t_data', 'var') && exist('f_data', 'var')
-    fprintf('\nReconstituting pp_data from t_data and f_data');
-    pp_data = f_data;
-    t_fields = fieldnames(t_data);
-    for seh = 1:length(t_fields)
-        pp_data.(t_fields{seh}) = t_data.(t_fields{seh});
-    end %for
-    pp_data.Wake_impedance.s.data(:,1) = pp_data.f_raw;
-    pp_data.Wake_impedance.s.data(:,2) = pp_data.Wake_Impedance_data;
-    pp_data.Wake_impedance.x.data(:,1) = pp_data.f_raw;
-    pp_data.Wake_impedance.x.data(:,2) = pp_data.Wake_Impedance_trans_X;
-    pp_data.Wake_impedance.y.data(:,1) = pp_data.f_raw;
-    pp_data.Wake_impedance.y.data(:,2) = pp_data.Wake_Impedance_trans_Y;
-    pp_data.Wake_potential.s.data(:,1) = pp_data.timebase;
-    pp_data.Wake_potential.s.data(:,2) = pp_data.wakepotential;
-    pp_data.Wake_potential.x.data(:,1) = pp_data.timebase;
-    pp_data.Wake_potential.x.data(:,2) = pp_data.wakepotential_trans_x;
-    pp_data.Wake_potential.y.data(:,1) = pp_data.timebase;
-    pp_data.Wake_potential.y.data(:,2) = pp_data.wakepotential_trans_y;
-    pp_data.Charge_distribution.data(:,1) = pp_data.timebase;
-    pp_data.Charge_distribution.data(:,2) = pp_data.charge_distribution;
-    pp_data.bunch_spectrum.data(:,1) = pp_data.f_raw;
-    pp_data.bunch_spectrum.data(:,2) = pp_data.bunch_spectra;
-    pp_data.Wake_impedance.s.loss.s = pp_data.wake_loss_factor;
-    pp_data.Wake_impedance.x.loss.x = NaN;
-    pp_data.Wake_impedance.y.loss.y = NaN;
-end %if
+% if ~exist('analysed_data','var') && exist('t_data', 'var') && exist('f_data', 'var')
+%     fprintf('\nReconstituting analysed_data from t_data and f_data');
+%     analysed_data = f_data;
+%     t_fields = fieldnames(t_data);
+%     for seh = 1:length(t_fields)
+%         analysed_data.(t_fields{seh}) = t_data.(t_fields{seh});
+%     end %for
+%     analysed_data.Wake_impedance.s.data(:,1) = analysed_data.f_raw;
+%     analysed_data.Wake_impedance.s.data(:,2) = analysed_data.Wake_Impedance_data;
+%     analysed_data.Wake_impedance.x.data(:,1) = analysed_data.f_raw;
+%     analysed_data.Wake_impedance.x.data(:,2) = analysed_data.Wake_Impedance_trans_X;
+%     analysed_data.Wake_impedance.y.data(:,1) = analysed_data.f_raw;
+%     analysed_data.Wake_impedance.y.data(:,2) = analysed_data.Wake_Impedance_trans_Y;
+%     analysed_data.Wake_potential.s.data(:,1) = analysed_data.timebase;
+%     analysed_data.Wake_potential.s.data(:,2) = analysed_data.wakepotential;
+%     analysed_data.Wake_potential.x.data(:,1) = analysed_data.timebase;
+%     analysed_data.Wake_potential.x.data(:,2) = analysed_data.wakepotential_trans_x;
+%     analysed_data.Wake_potential.y.data(:,1) = analysed_data.timebase;
+%     analysed_data.Wake_potential.y.data(:,2) = analysed_data.wakepotential_trans_y;
+%     analysed_data.Charge_distribution.data(:,1) = analysed_data.timebase;
+%     analysed_data.Charge_distribution.data(:,2) = analysed_data.charge_distribution;
+%     analysed_data.bunch_spectrum.data(:,1) = analysed_data.f_raw;
+%     analysed_data.bunch_spectrum.data(:,2) = analysed_data.bunch_spectra;
+%     analysed_data.Wake_impedance.s.loss.s = analysed_data.wake_loss_factor;
+%     analysed_data.Wake_impedance.x.loss.x = NaN;
+%     analysed_data.Wake_impedance.y.loss.y = NaN;
+% end %if
 
 %Line width of the graphs
 lw = 2;
@@ -66,27 +67,27 @@ fig_pos = [fig_left fig_bottom fig_width fig_height];
 % l_st ={'--',':','-.','--',':','-.','--',':','-.'};
 
 % Extracting  losses
-[model_mat_data, mat_loss, m_time, m_data] = ...
-    extract_material_losses_from_wake_data(pp_data, modelling_inputs.extension_names);
+% [model_mat_data, mat_loss, m_time, m_data] = ...
+%     extract_material_losses_from_wake_data(analysed_data, modelling_inputs.extension_names);
 
 [structure_energy_loss, material_names] =  ...
-    extract_energy_loss_data_from_pp_data(pp_data);
+    extract_energy_loss_data_from_analysed_data(analysed_data);
 
 % Extracting wake impedances
-cut_freq_ind = find(pp_data.Wake_impedance.s.data(:,1)*1E-9 < graph_freq_lim,1,'last');
-wi_re = pp_data.Wake_impedance.s.data(1:cut_freq_ind,:);
+cut_freq_ind = find(analysed_data.Wake_impedance.s.data(:,1)*1E-9 < graph_freq_lim,1,'last');
+wi_re = analysed_data.Wake_impedance.s.data(1:cut_freq_ind,:);
 wi_re(:,1) = wi_re(:,1) .* 1E-9; % frequency in GHz
-wi_dipole_x = pp_data.Wake_impedance.x.data(1:cut_freq_ind,:);
+wi_dipole_x = analysed_data.Wake_impedance.x.data(1:cut_freq_ind,:);
 wi_dipole_x(:,1) = wi_dipole_x(:,1) .* 1E-9; % frequency in GHz
-wi_dipole_y = pp_data.Wake_impedance.y.data(1:cut_freq_ind,:);
+wi_dipole_y = analysed_data.Wake_impedance.y.data(1:cut_freq_ind,:);
 wi_dipole_y(:,1) = wi_dipole_y(:,1) .* 1E-9; % frequency in GHz
 
 % Extracting time series
-wp = pp_data.Wake_potential.s.data; % V/pC
+wp = analysed_data.Wake_potential.s.data; % V/pC
 wp(:,1) = wp(:,1) .* 1E9; % time in ns
-wpdx = pp_data.Wake_potential.x.data; % V/pC
+wpdx = analysed_data.Wake_potential.x.data; % V/pC
 wpdx(:,1) = wpdx(:,1) .* 1E9; % time in ns
-wpdy = pp_data.Wake_potential.y.data; % V/pC
+wpdy = analysed_data.Wake_potential.y.data; % V/pC
 wpdy(:,1) = wpdy(:,1) .* 1E9; % time in ns
 
 % Extracting spectra
@@ -99,13 +100,13 @@ h_wake = figure('Position',fig_pos);
 %% Thermal graphs
 if ~isnan(structure_energy_loss)
     clf(h_wake)
-    if isfield(pp_data.port, 'timebase') && isfield(pp_data.port.data, 'time') && isfield(pp_data.port.data.time, 'power_port')
-        time_step = pp_data.port.timebase(2) - pp_data.port.timebase(1);
-        beam_ports = sum(pp_data.port.data.time.power_port.data{1}) .* time_step + ...
-            sum(pp_data.port.data.time.power_port.data{2}) .* time_step;
+    if isfield(analysed_data.port, 'timebase') && isfield(analysed_data.port.data, 'time') && isfield(analysed_data.port.data.time, 'power_port')
+        time_step = analysed_data.port.timebase(2) - analysed_data.port.timebase(1);
+        beam_ports = sum(analysed_data.port.data.time.power_port.data{1}) .* time_step + ...
+            sum(analysed_data.port.data.time.power_port.data{2}) .* time_step;
         signal_ports = 0;
-        for jas = 3:length(pp_data.port.data.time.power_port.data)
-            signal_ports = signal_ports + sum(pp_data.port.data.time.power_port.data{jas}) .* time_step;
+        for jas = 3:length(analysed_data.port.data.time.power_port.data)
+            signal_ports = signal_ports + sum(analysed_data.port.data.time.power_port.data{jas}) .* time_step;
         end %for
     else
         beam_ports = 0;
@@ -116,15 +117,15 @@ if ~isnan(structure_energy_loss)
     % lables. This just makes any zero values a very small  positive value to avoid
     % this.
     plot_data(plot_data == 0) = 1e-12;
-    
+
     if iscell(material_names)
         x = categorical(cellstr(['Beam ports', 'Signal ports',material_names]));
     elseif isnan(material_names)
         x = categorical(cellstr(['Beam ports', 'Signal ports']));
     end %if
-    
+
     subplot(2,1,1)
-    y1 = abs(pp_data.Wake_potential.s.loss.s) * 1e9;
+    y1 = abs(analysed_data.Wake_potential.s.loss.s) * 1e9;
     temp = zeros(1, length(plot_data));
     temp(1) = y1;
     plot_data2 = [plot_data; temp];
@@ -132,7 +133,7 @@ if ~isnan(structure_energy_loss)
     legend(x, 'Location', 'EastOutside')
     xticklabels({'Energy accounted for', 'Energy from beam'})
     b(1).CData(2,:) = [0, 0, 0];
-    
+
     subplot(2,1,2)
     b3 = bar(x, plot_data, 'FaceColor','flat');
     xtips1 = b3(1).XEndPoints;
@@ -150,28 +151,28 @@ end %if
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Electric field at the origin over time.
-if isfield(pp_data, 'EfieldAtZerox')
+if isfield(analysed_data, 'EfieldAtZerox')
     clf(h_wake)
     ax = axes('Parent', h_wake);
-    plot(pp_data.EfieldAtZerox.data(:,1) * 1E9, pp_data.EfieldAtZerox.data(:,2),...
+    plot(analysed_data.EfieldAtZerox.data(:,1) * 1E9, analysed_data.EfieldAtZerox.data(:,2),...
         'LineWidth',lw, 'Parent', ax)
     title('Electric field at origin (x component)', 'Parent', ax)
     xlabel('Time (ns)', 'Parent', ax)
-    xlim([pp_data.EfieldAtZerox.data(1,1) * 1E9 pp_data.EfieldAtZerox.data(end,1) * 1e9])
+    xlim([analysed_data.EfieldAtZerox.data(1,1) * 1E9 analysed_data.EfieldAtZerox.data(end,1) * 1e9])
     ylabel('Electric field (V/m)', 'Parent', ax)
     grid on
     savemfmt(h_wake, output_folder, [prefix, 'EfieldAtZerox'])
-    
+
     clf(h_wake)
     ax = axes('Parent', h_wake);
-    plot(pp_data.EfieldAtZerox_freq.data(:,1) * 1E-9, pp_data.EfieldAtZerox_freq.data(:,2),...
+    plot(analysed_data.EfieldAtZerox_freq.data(:,1) * 1E-9, analysed_data.EfieldAtZerox_freq.data(:,2),...
         'LineWidth',lw, 'Parent', ax)
     title('Electric field at origin (x component)', 'Parent', ax)
     xlabel('Frequency (GHz)', 'Parent', ax)
-    %     if pp_data.EfieldAtZerox_freq.data(end,1) * 1E-9 > graph_freq_lim
+    %     if analysed_data.EfieldAtZerox_freq.data(end,1) * 1E-9 > graph_freq_lim
     %         upper_lim = graph_freq_lim;
     %     else
-    %         upper_lim = pp_data.EfieldAtZerox_freq.data(end,1) * 1E-9;
+    %         upper_lim = analysed_data.EfieldAtZerox_freq.data(end,1) * 1E-9;
     %     end %if
     xlim([0 graph_freq_lim])
     ylabel('Electric field (V/m/Hz)', 'Parent', ax)
@@ -182,7 +183,7 @@ end %if
 %% Charge
 clf(h_wake)
 ax = axes('Parent', h_wake);
-plot(pp_data.Charge_distribution.data(:,1)*1E12, pp_data.Charge_distribution.data(:,2),...
+plot(analysed_data.Charge_distribution.data(:,1)*1E12, analysed_data.Charge_distribution.data(:,2),...
     'LineWidth',lw, 'Parent', ax)
 title('Charge distribution', 'Parent', ax)
 xlabel('Time (ps)', 'Parent', ax)
@@ -194,7 +195,7 @@ savemfmt(h_wake, output_folder, [prefix, 'charge_distribution'])
 
 clf(h_wake)
 ax = axes('Parent', h_wake);
-plot(pp_data.bunch_spectrum.data(:,1)*1E-9, abs(pp_data.bunch_spectrum.data(:,2)),...
+plot(analysed_data.bunch_spectrum.data(:,1)*1E-9, abs(analysed_data.bunch_spectrum.data(:,2)),...
     'LineWidth',lw, 'Parent', ax)
 title('Bunch Spectrum', 'Parent', ax)
 xlabel('Frequency (GHz)', 'Parent', ax)
@@ -248,7 +249,7 @@ xlabel('Frequency (GHz)', 'Parent', ax)
 ylabel('Impedance (Ohms)', 'Parent', ax)
 xlim([0 graph_freq_lim])
 ylim([0 inf])
-legend(['Wake loss factor = ',num2str(pp_data.Wake_impedance.s.loss.s .* 1E9),'mV/pC'])
+legend(['Wake loss factor = ',num2str(analysed_data.Wake_impedance.s.loss.s .* 1E9),'mV/pC'])
 grid on
 savemfmt(h_wake, output_folder, [prefix, 'longditudinal_real_wake_impedance'])
 
@@ -260,7 +261,7 @@ xlabel('Frequency (GHz)', 'Parent', ax)
 ylabel('Impedance (Ohms)', 'Parent', ax)
 xlim([0 graph_freq_lim])
 ylim([0 inf])
-legend(['Wake loss factor = ',num2str(pp_data.Wake_impedance.x.loss.x .* 1E9),'mV/pC'])
+legend(['Wake loss factor = ',num2str(analysed_data.Wake_impedance.x.loss.x .* 1E9),'mV/pC'])
 grid on
 savemfmt(h_wake, output_folder, [prefix, 'transverse_x_real_wake_impedance'])
 
@@ -272,7 +273,7 @@ xlabel('Frequency (GHz)', 'Parent', ax)
 ylabel('Impedance (Ohms)', 'Parent', ax)
 xlim([0 graph_freq_lim])
 ylim([0 inf])
-legend(['Wake loss factor = ',num2str(pp_data.Wake_impedance.y.loss.y .* 1E9),'mV/pC'])
+legend(['Wake loss factor = ',num2str(analysed_data.Wake_impedance.y.loss.y .* 1E9),'mV/pC'])
 grid on
 savemfmt(h_wake, output_folder, [prefix, 'transverse_y_real_wake_impedance'])
 
@@ -316,53 +317,94 @@ savemfmt(h_wake, output_folder, [prefix, 'Q_from_wake'])
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Port signals
-if isfield(pp_data, 'port')
-    port_names = regexprep(pp_data.port.labels,'_',' ');
+if isfield(analysed_data, 'port')
+    port_names = regexprep(analysed_data.port.labels,'_',' ');
     clf(h_wake)
-    if isfield(pp_data.port, 'timebase')
-        [hwn, ksn] = num_subplots(length(port_names));
-        for ens = length(port_names):-1:1 % ports
-            ax_sp(ens) = subplot(hwn,ksn,ens);
+    if isfield(analysed_data.port, 'timebase')
+        t1 = tiledlayout(ceil(length(port_names)/2),2, 'TileSpacing', 'compact');
+        title(t1, 'Port signals')
+        xlabel(t1, 'Time (ns)')
+        ylabel(t1, 'Power (W)')
+        for ens = 1:length(port_names) % ports
+            nt{ens} = nexttile;
             try
                 % This is to cope with the case of missing data files.
-                plot(pp_data.port.timebase .* 1E9, pp_data.port.data.time.power_port.data{ens}, 'b', 'Parent', ax_sp(ens))
-                xlim([pp_data.port.timebase(1) .* 1E9 pp_data.port.timebase(end) .* 1E9])
+                plot(analysed_data.port.timebase .* 1E9, analysed_data.port.data.time.power_port.data{ens}, 'b', 'Linewidth', 2)
+                xlim([analysed_data.port.timebase(1) .* 1E9 analysed_data.port.timebase(end) .* 1E9])
             catch
                 fprintf('\nMissing data file for port signals plotting')
             end %try
-            title(port_names{ens}, 'Parent', ax_sp(ens))
-            xlabel('Time (ns)', 'Parent', ax_sp(ens))
-            ylabel('Power (W)', 'Parent', ax_sp(ens))
+            title(port_names{ens})
             grid on
         end %for
         savemfmt(h_wake, output_folder, [prefix, 'port_signals'])
-        for ens = length(port_names):-1:1 % ports
-            xlim(ax_sp(ens),[0 4])
+        for ens = 1:length(port_names) % ports
+            xlim(nt{ens},[0 4])
         end %for
         savemfmt(h_wake, output_folder, [prefix, 'port_signals_first4ns'])
     end %if
 end %if
+if isfield(analysed_data, 'port')
+    port_names = regexprep(analysed_data.port.labels,'_',' ');
+    clf(h_wake)
+    if isfield(analysed_data.port, 'timebase')
+        t1 = tiledlayout(ceil(length(port_names)/2),2, 'TileSpacing', 'compact');
+        title(t1, 'Per mode port signals')
+        xlabel(t1, 'Time (ns)')
+        ylabel(t1, 'Power (W)')
+        port_plot_flag = 0;
+
+        for ens = 1:length(port_names) % ports
+            nt{ens} = nexttile;
+            try
+                % This is to cope with the case of missing data files.
+                hold on
+                for haw = 1:size(analysed_data.port.data.time.power_port_mode.data{ens}, 2)
+                    plot(analysed_data.port.timebase .* 1E9, analysed_data.port.data.time.power_port_mode.data{ens}(:,haw),...
+                        'Linewidth', 2, 'DisplayName',['Mode ', num2str(haw)])
+                end %for
+                xlim([analysed_data.port.timebase(1) .* 1E9 analysed_data.port.timebase(end) .* 1E9])
+                if port_plot_flag == 0
+                    leg = legend;
+                    leg.Layout.Tile = 'east';
+                    port_plot_flag = 1;
+                end %if
+                hold off
+            catch
+                fprintf('\nMissing data file for port signals plotting')
+            end %try
+            title(port_names{ens})
+            grid on
+        end %for
+        savemfmt(h_wake, output_folder, [prefix, 'port_mode_signals'])
+        for ens = 1:length(port_names) % ports
+            xlim(nt{ens},[0 4])
+        end %for
+        savemfmt(h_wake, output_folder, [prefix, 'port_mode_signals_first4ns'])
+    end %if
+end %if
 %% Voltage monitors
 clf(h_wake)
-if isfield(pp_data, 'voltages')
-    [hwn, ksn] = num_subplots(length(pp_data.voltages));
-    for ens = length(pp_data.voltages):-1:1
-        ax_sp(ens) = subplot(hwn,ksn,ens);
+if isfield(analysed_data, 'voltages')
+            t1 = tiledlayout(ceil(length(analysed_data.voltages)/2),2, 'TileSpacing', 'compact');
+        title(t1, 'Voltage monitors')
+        xlabel(t1, 'Time (ns)')
+        ylabel(t1, 'Voltage (V)')
+    for ens = 1:length(analysed_data.voltages)
+                    nt{ens} = nexttile;
         try
             % This is to cope with the case of missing data files.
-            plot(pp_data.voltages{ens}.data(:,1) .* 1E9, pp_data.voltages{ens}.data(:,2), 'b', 'Parent', ax_sp(ens))
+            plot(analysed_data.voltages{ens}.data(:,1) .* 1E9, analysed_data.voltages{ens}.data(:,2), 'b', 'Linewidth', 2)
         catch
             fprintf('\nMissing data files for voltage monitor plotting')
         end %try
-        title(regexprep(pp_data.voltages{ens}.title, 'voltage ',''), 'Parent', ax_sp(ens))
-        xlim([pp_data.voltages{ens}.data(1,1) .* 1E9 pp_data.voltages{ens}.data(end, 1) .* 1E9])
-        xlabel('Time (ns)', 'Parent', ax_sp(ens))
-        ylabel('Voltage (V)', 'Parent', ax_sp(ens))
+        title(regexprep(analysed_data.voltages{ens}.title, 'voltage ',''))
+        xlim([analysed_data.voltages{ens}.data(1,1) .* 1E9 analysed_data.voltages{ens}.data(end, 1) .* 1E9])
         grid on
     end %for
     savemfmt(h_wake, output_folder, [prefix, 'voltage_monitors'])
-    for ens = length(pp_data.voltages):-1:1
-        xlim(ax_sp(ens),[pp_data.voltages{ens}.data(1,1) .* 1E9 4])
+    for ens = 1:length(analysed_data.voltages)
+        xlim(nt{ens},[analysed_data.voltages{ens}.data(1,1) .* 1E9 4])
     end %for
     savemfmt(h_wake, output_folder, [prefix, 'voltage_monitors_first4ns'])
 end %if
@@ -373,23 +415,23 @@ end %if
 % for ens = length(port_names):-1:1 % ports
 %     ax_sp2(ens) = subplot(hwn,ksn,ens);
 %     hold(ax_sp2(ens), 'all')
-%     for seo = 1:size(pp_data.port.data.time.power_port_mode{ens},2) % modes
-%         plot(pp_data.port.timebase, pp_data.port.data.time.power_port_mode{ens}(:,seo), 'Parent',ax_sp2(ens))
+%     for seo = 1:size(analysed_data.port.data.time.power_port_mode{ens},2) % modes
+%         plot(analysed_data.port.timebase, analysed_data.port.data.time.power_port_mode{ens}(:,seo), 'Parent',ax_sp2(ens))
 %     end %for
 %     hold(ax_sp2(ens), 'off')
 %     title(port_names{ens}, 'Parent', ax_sp2(ens))
 %     xlabel('Time (ns)', 'Parent', ax_sp2(ens))
 %     ylabel('', 'Parent', ax_sp2(ens))
-%     xlim([pp_data.port.timebase(1) pp_data.port.timebase(end)])
-% %     graph_add_background_patch(pp_data.port.t_start(ens) * 1E9)
+%     xlim([analysed_data.port.timebase(1) analysed_data.port.timebase(end)])
+% %     graph_add_background_patch(analysed_data.port.t_start(ens) * 1E9)
 % end %for
 % savemfmt(h_wake, output_folder,'port_signals_separated_modes')
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Energy over time.
-if isfield(pp_data, 'Energy')
+if isfield(analysed_data, 'Energy')
     clf(h_wake)
-    energy = pp_data.Energy.data .* 1E9;
+    energy = analysed_data.Energy.data .* 1E9;
     ax = axes('Parent', h_wake);
     if ~isnan(energy)
         minlim = energy(end,2);
@@ -402,7 +444,7 @@ if isfield(pp_data, 'Energy')
                 if minlim < maxlim
                     ylim([minlim maxlim])
                     ylabel('Energy (J)')
-                    
+
                 end %if
             else
                 plot(energy(:,1), energy(:,2),'LineWidth',lw, 'Parent', ax)
@@ -423,8 +465,8 @@ clf(h_wake)
 ax = axes('Parent', h_wake);
 plot(wp(:,1), ...
     wp(:,2) ./ max(abs(wp(:,2))),'b',...
-    pp_data.Charge_distribution.data(:,1) .* 1E9, ...
-    pp_data.Charge_distribution.data(:,2) ./ max(pp_data.Charge_distribution.data(:,2)),'r',...
+    analysed_data.Charge_distribution.data(:,1) .* 1E9, ...
+    analysed_data.Charge_distribution.data(:,2) ./ max(analysed_data.Charge_distribution.data(:,2)),'r',...
     'LineWidth',lw, 'Parent', ax)
 xlim([-inf, 0.1])
 ylim([-1.05 1.05])
@@ -441,8 +483,8 @@ ax = axes('Parent', h_wake);
 beg_ind = find(wp(:,1) > -0.05, 1, 'first');
 scaled_wp = wp(:,2) ./ max(abs(wp(:,2)));
 wp_time = wp(:,1);
-scaled_cd = interp1(pp_data.Charge_distribution.data(:,1) .* 1E9, ...
-    pp_data.Charge_distribution.data(:,2),wp_time);
+scaled_cd = interp1(analysed_data.Charge_distribution.data(:,1) .* 1E9, ...
+    analysed_data.Charge_distribution.data(:,2),wp_time);
 [~ ,centre_ind] = min(abs(wp(:,1)));
 span = centre_ind - beg_ind;
 scaled_wp = scaled_wp(centre_ind - span:centre_ind + span);

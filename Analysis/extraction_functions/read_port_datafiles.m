@@ -1,4 +1,4 @@
-function [port_timebase, port_data_conditioned] = read_port_datafiles(input)
+function [port_timebase, port_data_conditioned, port_labels] = read_port_datafiles(input)
 % Extracts ports data from the GdfidL output graphs.
 %
 % Example: [port_timebase, port_data] = read_port_datafiles(Port_mat)
@@ -12,6 +12,13 @@ timebase_step = 1;
 
 for hs = 1:length(substructure)
     for hes = 1:size(input.time.(substructure{hs}),1) % simulated ports
+        if hs == 1
+        temp = input.time.(substructure{hs}){hes, 1};
+        [~, temp_label, ~] = fileparts(temp);
+        temp_label = regexprep(temp_label, 'Port=', '');
+        temp_label = regexprep(temp_label, '-[eh]_amp_of_mode.*', '');
+        port_labels{hes} = temp_label;
+        end %if
         for wha = 1:size(input.time.(substructure{hs}),2) % modes
             if ~isempty(input.time.(substructure{hs}){hes,wha})
                 if isempty(input.time.(substructure{hs}){hes,wha})

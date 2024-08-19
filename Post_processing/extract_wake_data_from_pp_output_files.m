@@ -71,7 +71,7 @@ if ~isfield(output_file_locations, 'Port_mat')
     raw_data.port.data.frequency = NaN;
     raw_data.port.timebase = NaN;
 else
-    [raw_data.port.timebase, raw_data.port.data] = read_port_datafiles(output_file_locations.Port_mat);
+    [raw_data.port.timebase, raw_data.port.data, raw_data.port.labels] = read_port_datafiles(output_file_locations.Port_mat);
 end
 
 %% Electric field at origin
@@ -138,7 +138,7 @@ end
 raw_data.wake_loss_factor = raw_data.Wake_impedance.s.loss.s ./ raw_data.Wake_impedance.s.charge.^2 ; % V/C
 
 %% Generate the data file which the analysis code is expecting.
-raw_data.port.labels = modelling_inputs.port_names;
+% raw_data.port.labels = modelling_inputs.port_names;
 % raw_data.port.t_start = tstart;
 raw_data.wake_setup.Wake_length = raw_data.Wake_potential.s.data(end,1) .* 2.99792458E8;
 if isfield(log.mat_losses, 'loss_time')

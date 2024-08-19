@@ -15,7 +15,7 @@ try
             fprintf(['\nStarting wake analysis plotting <strong>', name_of_model, '</strong>'])
             
             %             datasets = find_datasets(fullfile(paths.results_loc, p.Results.sets{set_id}));
-            run_inputs_loc = fullfile(postprocess_folder, 'run_inputs.mat');
+            run_inputs_loc = fullfile(postprocess_folder, 'wake', 'run_inputs.mat');
             analysis_loc = fullfile(analysis_folder, 'data_analysed_wake.mat');
             GdfidL_plot_pp_wake(run_inputs_loc, analysis_loc, ppi, plot_analysis_folder)
             %             plot_model(datasets, ppi, p.Results.sim_types);

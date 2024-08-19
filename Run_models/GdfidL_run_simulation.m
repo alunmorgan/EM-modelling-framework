@@ -65,7 +65,7 @@ for nes = 1:n_cycles
             out_loc, scratch_loc, tail, modelling_inputs.precision, modelling_inputs.version);
         if ~isempty(file_locs{ck})
         % adding syntax to make it runable
-        file_locs{ck} = ['.', file_locs{ck}];
+        file_locs{ck} = ['source "', file_locs{ck}, '"'];
         end %if
         ck = ck +1;
         fprintf('\nDone')
