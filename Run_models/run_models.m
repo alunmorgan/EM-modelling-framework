@@ -46,5 +46,7 @@ for awh = 1:length(modelling_inputs)
 end %for
 sim_list_loc = fullfile(paths.data_loc, 'simulation_run_list.sh');
 write_out_data( sim_list, sim_list_loc)
+disp(" ")
+disp("input file written to " + sim_list_loc)
 pause(5)
 make_file_executable(sim_list_loc)

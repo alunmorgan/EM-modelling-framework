@@ -11,7 +11,7 @@ for herf = 1:length(input_settings.sim_types)
         for awh = 1:length(modelling_inputs)
             try
                 data_path = fullfile(paths.results_loc, modelling_inputs{awh}.base_model_name,...
-                    modelling_inputs{awh}.model_name, 'postprocessing', 'wake');
+                    modelling_inputs{awh}.model_name, 'postprocessing', 'wake', 'wake');
                 output_path = fullfile(paths.results_loc, modelling_inputs{awh}.base_model_name,...
                     modelling_inputs{awh}.model_name, 'fields', 'wake');
                 if ~exist(output_path, 'dir')

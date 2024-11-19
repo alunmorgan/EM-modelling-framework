@@ -23,13 +23,22 @@ addParameter(p, 'precision', default_precision)
 parse(p, sets, varargin{:});
 
 paths = load_local_paths;
-ppi = analysis_settings;
-number_of_wake_lengths_to_analyse = 4;
+% ppi = analysis_settings;
+% number_of_wake_lengths_to_analyse = 4;
+
+for set_id = 1:length(p.Results.sets)
+    if ~exist(fullfile(paths.logfile_location, p.Results.sets{set_id}), 'dir')
+        mkdir(fullfile(paths.logfile_location, p.Results.sets{set_id}))
+    end %if
+end %for
 
 %% Simulation
 if any(matches(p.Results.stages, 'simulate'))
     orig_loc = pwd;
     for set_id = 1:length(p.Results.sets)
+        % Setting up log file
+        stamp = regexprep(datestr(now),':', '-');
+        diary(fullfile(paths.logfile_location, p.Results.sets{set_id}, stamp));
         try
             cd(fullfile(paths.inputfile_location, p.Results.sets{set_id}))
             run_inputs = feval(p.Results.sets{set_id});
@@ -44,96 +53,77 @@ if any(matches(p.Results.stages, 'simulate'))
     end %for
 end %if
 
-%% Post simulation
-for set_id = 1:length(p.Results.sets)
-    stamp = regexprep(datestr(now),':', '-');
-    if ~exist(fullfile(paths.logfile_location, p.Results.sets{set_id}), 'dir')
-        mkdir(fullfile(paths.logfile_location, p.Results.sets{set_id}))
-    end %if
-    % Setting up log file
-    diary(fullfile(paths.logfile_location, p.Results.sets{set_id}, stamp));
-
-
-    if any(matches(p.Results.stages, 'postprocess'))
-        if any(matches(p.Results.sim_types, 'geometry'))
-            % Converting any images from ps to png to reduce the file
-            % size. For larger models keeping the ps files can break the
-            % filesystem.
-            source_loc = fullfile(paths.data_loc, sets{set_id});
-            dest_loc = fullfile(paths.results_loc, sets{set_id});
-            [sim_names, ~] = dir_list_gen(source_loc, 'dirs',1);
-            for jse = 1:length(sim_names)
-                sim_pic_folder = fullfile(source_loc, sim_names{jse});
-                sim_pic_dest_folder = fullfile(dest_loc, sim_names{jse});
-                if exist(fullfile(sim_pic_dest_folder, 'geometry'),'dir') == 0
-                    mkdir(fullfile(sim_pic_dest_folder, 'geometry'))
-                end %if
-                [pic_names, ~] = dir_list_gen(fullfile(sim_pic_folder, 'geometry'),'ps',1);
-                if ~isempty(pic_names)
-                    for ns = 1:length(pic_names)
-                        pic_nme = pic_names{ns}(1:end-3);
-                        [~] = system(['convert ',fullfile(sim_pic_folder, 'geometry', pic_nme),...
-                            '.ps -rotate -90 ',...
-                            fullfile(sim_pic_dest_folder, 'geometry', pic_nme),'.png']);
-                    end %for
-                end %if
-            end %for
-        else
-            run_postprocessing(p.Results, set_id, paths);
-        end %if
-    end %if
-    if any(matches(p.Results.stages, 'field_extraction'))
-        run_field_extraction(p.Results, set_id, paths);
-    end %if
-
-
-    if any(matches(p.Results.stages, 'analyse'))
-        if any(matches(p.Results.sim_types, 'wake'))
-            run_wake_analysis(p.Results, set_id, paths)
-        end %if
-        if any(matches(p.Results.sim_types, 'sparameter'))
-            run_sparameter_analysis(p.Results, set_id, paths)
-        end %if
-        if any(matches(p.Results.sim_types, 'lossy_eigenmode'))
-            try
-                makeLossyEigenmodeSummaryTable(p.Results.sets{set_id}, results_loc)
-            catch ME3
-                warning([sets{set_id}, ' <strong>Problem with losy eigenmode analysis</strong>'])
-                display_error_message(ME3)
-            end %try
-        end %if
-    end %if
-    if any(matches(p.Results.stages, 'reconstruct'))
-        if any(matches(p.Results.sim_types, 'wake'))
-            run_wake_reconstruction(p.Results, set_id, paths, ppi, number_of_wake_lengths_to_analyse)
-        end %if
-    end %if
-    if any(matches(p.Results.stages, 'plot_analysis_data'))
-        if any(matches(p.Results.sim_types, 'wake'))
-            run_plot_wake_analysis(p.Results, set_id, paths, ppi)
-        end %if
-        if any(matches(p.Results.sim_types, 'sparameter'))
-            run_plot_sparameter_analysis(p.Results, set_id, paths)
-        end %if
-    end %if
-    if any(matches(p.Results.stages, 'plot_reconstruction_data'))
-        if any(matches(p.Results.sim_types, 'wake'))
-            run_plot_wake_reconstruction(p.Results, set_id, paths, ppi)
-        end %if
-    end %if
-    if any(matches(p.Results.stages, 'plot_fields'))
-        if any(matches(p.Results.sim_types, 'wake'))
-            plot_wake_fields(p.Results, set_id, paths)
-            generate_wake_field_vids(p.Results, set_id, paths)
-        end %if
-    end %if
-    if any(matches(p.Results.stages, 'plot_thermals'))
-        if any(matches(p.Results.sim_types, 'wake'))
-            extract_wall_losses(p.Results, set_id, paths);
-            plot_wall_losses(p.Results, set_id, paths)
-        end %if
-    end %if
-    if any(matches(p.Results.stages, 'report'))
-        generate_report_single_set(sets{set_id});
-    end %if
-end %for
+% %% Post simulation
+% for set_id = 1:length(p.Results.sets)
+%     % Setting up log file
+%     stamp = regexprep(datestr(now),':', '-');
+%     diary(fullfile(paths.logfile_location, p.Results.sets{set_id}, stamp));
+%     % find the simulated variations
+%     [model_varients_folders, ~] = dir_list_gen(fullfile(paths.data_loc, p.Results.sets{set_id}),'dirs', 1);
+%     for nes = 1:length(model_varients_folders)
+%         if ~exist(fullfile(paths.results_loc, p.Results.sets{set_id}, model_varients_folders{nes}),"dir")
+%             [folder_status, folder_message] = mkdir(fullfile(paths.results_loc, p.Results.sets{set_id}, model_varients_folders{nes}));
+%         end %if
+%     end %for
+%     if any(matches(p.Results.stages, 'postprocess'))
+%         if any(matches(p.Results.sim_types, 'geometry'))
+%             process_geometry_images(paths, p.Results.sets{set_id})
+%         else
+%             run_postprocessing(p.Results, set_id, paths);
+%         end %if
+%     end %if
+%     if any(matches(p.Results.stages, 'field_extraction'))
+%         run_field_extraction(p.Results, set_id, paths);
+%     end %if
+% 
+% 
+%     if any(matches(p.Results.stages, 'analyse'))
+%         if any(matches(p.Results.sim_types, 'wake'))
+%             run_wake_analysis(p.Results, set_id, paths)
+%         end %if
+%         if any(matches(p.Results.sim_types, 'sparameter'))
+%             run_sparameter_analysis(p.Results, set_id, paths)
+%         end %if
+%         if any(matches(p.Results.sim_types, 'lossy_eigenmode'))
+%             try
+%                 makeLossyEigenmodeSummaryTable(p.Results.sets{set_id}, results_loc)
+%             catch ME3
+%                 warning([sets{set_id}, ' <strong>Problem with losy eigenmode analysis</strong>'])
+%                 display_error_message(ME3)
+%             end %try
+%         end %if
+%     end %if
+%     if any(matches(p.Results.stages, 'reconstruct'))
+%         if any(matches(p.Results.sim_types, 'wake'))
+%             run_wake_reconstruction(p.Results, set_id, paths, ppi, number_of_wake_lengths_to_analyse)
+%         end %if
+%     end %if
+%     if any(matches(p.Results.stages, 'plot_analysis_data'))
+%         if any(matches(p.Results.sim_types, 'wake'))
+%             run_plot_wake_analysis(p.Results, set_id, paths, ppi)
+%         end %if
+%         if any(matches(p.Results.sim_types, 'sparameter'))
+%             run_plot_sparameter_analysis(p.Results, set_id, paths)
+%         end %if
+%     end %if
+%     if any(matches(p.Results.stages, 'plot_reconstruction_data'))
+%         if any(matches(p.Results.sim_types, 'wake'))
+%             run_plot_wake_reconstruction(p.Results, set_id, paths, ppi)
+%         end %if
+%     end %if
+%     if any(matches(p.Results.stages, 'plot_fields'))
+%         if any(matches(p.Results.sim_types, 'wake'))
+%             plot_wake_fields(p.Results, set_id, paths)
+%             generate_wake_field_vids(p.Results, set_id, paths)
+%         end %if
+%     end %if
+%     if any(matches(p.Results.stages, 'plot_thermals'))
+%         if any(matches(p.Results.sim_types, 'wake'))
+%             extract_wall_losses(p.Results, set_id, paths);
+%             plot_wall_losses(p.Results, set_id, paths)
+%         end %if
+%     end %if
+%     if any(matches(p.Results.stages, 'report'))
+%         generate_report_single_set(sets{set_id});
+%     end %if
+% end %for

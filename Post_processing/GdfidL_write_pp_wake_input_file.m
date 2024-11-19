@@ -74,14 +74,14 @@ if isfield(log, 'field_data')
     if isfield(log.field_data, 'EF')
         for kew = 1:size(log.field_data.EF,1)
             ov = cat(1,ov,['symbol = EF_e_', num2str(kew)]);
-            ov = cat(1,ov,['outfile= ', fullfile(pp_directory,'wake', ['EF_e_', num2str(kew)])]);
+            ov = cat(1,ov,['outfile= ', fullfile(pp_directory, ['EF_e_', num2str(kew)])]);
             ov = cat(1,ov,'    doit');
         end %for
     end %if
     if isfield(log.field_data, 'ED')
         for kew = 1:size(log.field_data.ED, 1)
             ov = cat(1,ov,['symbol = ED_e_', num2str(kew)]);
-            ov = cat(1,ov,['outfile= ', fullfile(pp_directory, 'wake', ['ED_e_', num2str(kew)])]);
+            ov = cat(1,ov,['outfile= ', fullfile(pp_directory, ['ED_e_', num2str(kew)])]);
             ov = cat(1,ov,'    doit');
         end %for
     end %if
@@ -92,10 +92,10 @@ if isfield(log, 'field_data')
                 cap_time_temp = num2str(log.field_data.stored.(stored_sets{kew}).capture_times(nsw));
                 cap_time_temp = regexprep(cap_time_temp, '\.', 'p');
                 ov = cat(1,ov,['symbol = ', stored_sets{kew},'_e_', num2str(log.field_data.stored.(stored_sets{kew}).field_sequence_numbers(nsw))]);
-                ov = cat(1,ov,['outfile= ', fullfile(pp_directory, 'wake', [stored_sets{kew},'_e_', cap_time_temp])]);
+                ov = cat(1,ov,['outfile= ', fullfile(pp_directory, [stored_sets{kew},'_e_', cap_time_temp])]);
                 ov = cat(1,ov,'    doit');
                 ov = cat(1,ov,['symbol = ', stored_sets{kew},'_h_', num2str(log.field_data.stored.(stored_sets{kew}).field_sequence_numbers(nsw))]);
-                ov = cat(1,ov,['outfile= ', fullfile(pp_directory, 'wake', [stored_sets{kew},'_h_', cap_time_temp])]);
+                ov = cat(1,ov,['outfile= ', fullfile(pp_directory, [stored_sets{kew},'_h_', cap_time_temp])]);
                 ov = cat(1,ov,'    doit');
             end %for
         end %for
@@ -170,7 +170,7 @@ if isfield(log, 'field_data')
         ov = cat(1,ov,'define( FMAXONMAT, 1e-6 )');
         for ii = field_start:length(log.field_data.ALL)
             ov = cat(1,ov,['       solution= ', num2str(ii)]);
-            ov = cat(1,ov,['plotopts =  -geometry 1440X900 -colorps -o ', fullfile(pp_directory, 'wake', ['All_scaling_',num2str(ii,'%02d'),'.ps'])]);
+            ov = cat(1,ov,['plotopts =  -geometry 1440X900 -colorps -o ', fullfile(pp_directory, ['All_scaling_',num2str(ii,'%02d'),'.ps'])]);
             ov = cat(1,ov,'       doit');
             ov = cat(1,ov,'define( FARROWMAX, max( FARROWMAX, @farrowmax ) )');
             ov = cat(1,ov,'define( FMAXONMAT, max( FMAXONMAT, @absfmax ) )');
@@ -184,7 +184,7 @@ if isfield(log, 'field_data')
         ov = cat(1,ov,'    fscale= 1.5 /  FARROWMAX');
         for ii = field_start:length(log.field_data.ALL)
             ov = cat(1,ov,['       solution= ', num2str(ii)]);
-            ov = cat(1,ov,['plotopts =  -geometry 1440X900 -colorps -o ', fullfile(pp_directory, 'wake', ['All_scaled_',num2str(ii,'%02d'),'.ps'])]);
+            ov = cat(1,ov,['plotopts =  -geometry 1440X900 -colorps -o ', fullfile(pp_directory, ['All_scaled_',num2str(ii,'%02d'),'.ps'])]);
             ov = cat(1,ov,'       doit   # Create the gld-File.');
         end %for
         ov = cat(1,ov,'    fonmat= no');
@@ -194,7 +194,7 @@ if isfield(log, 'field_data')
         ov = cat(1,ov,'    fmaxonmat= auto');
         for ii = field_start:length(log.field_data.ALL)
             ov = cat(1,ov,['       solution= ', num2str(ii)]);
-            ov = cat(1,ov,['plotopts =  -geometry 1440X900 -colorps -o ',fullfile(pp_directory, 'wake',['All_power_scaling_',num2str(ii,'%02d'),'.ps'])]);
+            ov = cat(1,ov,['plotopts =  -geometry 1440X900 -colorps -o ',fullfile(pp_directory, ['All_power_scaling_',num2str(ii,'%02d'),'.ps'])]);
             ov = cat(1,ov,'       doit');
             ov = cat(1,ov,'define( FARROWMAX, max( FARROWMAX, @farrowmax ) )');
             ov = cat(1,ov,'define( FMAXONMAT, max( FMAXONMAT, @absfmax ) )');
@@ -208,7 +208,7 @@ if isfield(log, 'field_data')
         ov = cat(1,ov,'    fscale= 1.5 /  FARROWMAX');
         for ii = field_start:length(log.field_data.ALL)
             ov = cat(1,ov,['       solution= ', num2str(ii)]);
-            ov = cat(1,ov,['plotopts =  -geometry 1440X900 -colorps -o ',fullfile(pp_directory, 'wake',['All_power_scaled_',num2str(ii,'%02d'),'.ps'])]);
+            ov = cat(1,ov,['plotopts =  -geometry 1440X900 -colorps -o ',fullfile(pp_directory, ['All_power_scaled_',num2str(ii,'%02d'),'.ps'])]);
             ov = cat(1,ov,'       doit   # Create the gld-File.');
         end %for
     end %if
@@ -245,6 +245,7 @@ for lae = 1:length(log.port_name)
     ov = cat(1,ov,'    doit');
     [temp, ~, ~] = fileparts(pp_directory);
     port_folder = fullfile(temp, ['wake_post_processing_ports-', log.port_name{lae}]);
+    mkdirtree(port_folder)
     out{lae +1} = [port_folder,'/model_wake_post_processing_ports-', log.port_name{lae}];
     write_out_data( ov, out{lae +1} )
 

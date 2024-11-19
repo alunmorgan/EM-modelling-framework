@@ -11,9 +11,9 @@ path_to_code = which(model_name);
 
 % Load the paths associated with the input file set. This is placed one
 % level above the py and m files for each model.
-addpath(fileparts(path_to_input_files))
+% addpath(fileparts(path_to_input_files))
 paths = load_local_paths;
-rmpath(fileparts(path_to_input_files))
+% rmpath(fileparts(path_to_input_files))
 
 store = fullfile(paths.data_loc, model_name);
 results_path = fullfile(paths.results_loc, model_name);

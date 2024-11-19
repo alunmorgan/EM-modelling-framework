@@ -1,4 +1,4 @@
-function out_name = GdfidL_write_pp_eigenmode_input_file(data_directory, pp_directory, log, pp_type, pp_settings, scratch_dir)
+function out_name = GdfidL_write_pp_eigenmode_input_file(log, data_directory, pp_directory, scratch_dir, pp_type, pp_settings)
 % Writes the postprocessing input file for an eigenmode simulation.
 %
 % log is a structure containing the information extracted from the log

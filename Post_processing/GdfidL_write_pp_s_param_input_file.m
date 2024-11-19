@@ -25,5 +25,6 @@ excite = regexp(data_loc, 'port_(.*)_excitation', 'tokens');
 excite = excite{1}{1};
 s_set = regexp(data_loc, 'set_(.*)_port_.*_excitation', 'tokens');
 s_set = s_set{1}{1};
+mkdirtree(pp_loc)
 pp_output_name = fullfile(pp_loc ,['model_s_param_set_',s_set, '_',excite,'_post_processing_input_file']);
 write_out_data(ov, pp_output_name )

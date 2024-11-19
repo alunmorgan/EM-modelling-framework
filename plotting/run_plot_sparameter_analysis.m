@@ -19,7 +19,7 @@ try
             GdfidL_plot_s_parameters(run_inputs_loc, analysis_loc, plot_analysis_folder)
             %             plot_model(datasets, ppi, p.Results.sim_types);
         else
-            fprintf('\nNo plotting folder... skipping wake analysis plotting.')
+            fprintf('\nNo plotting folder... skipping S-parameter analysis plotting.')
         end %if
     end %for
 catch ME5

@@ -14,7 +14,7 @@ function file_locs = GdfidL_run_simulation(sim_type, paths, modelling_inputs)
 % For the other types you just need a single simulation.
 f_range = 1.3E9:5E7:1.9E9; % FIXME This needs to become a parameter
 if strcmp(sim_type, 'sparameter')
-    active_port_inds = find(modelling_inputs.port_multiple ~= 0);
+    active_port_inds = 1:length(modelling_inputs.ports);
     if strcmp(modelling_inputs.beam, 'yes')
         active_port_inds = active_port_inds(3:end); % removing the beam ports from the list.
     end %if

@@ -10,12 +10,19 @@ cd(orig);
 % modelling_inputs = run_inputs_setup_STL(run_inputs, input_settings.versions,...
 %     input_settings.n_cores, input_settings.precision);
 for awh = 1:length(input_settings.sets)
-    [model_varients_folders, ~] = dir_list_gen(fullfile(input_settings.paths.results_loc, input_settings.sets{awh}),'dirs', 1);
+    % find the simulated variations
+    [model_varients_folders, ~] = dir_list_gen(fullfile(input_settings.paths.data_loc, input_settings.sets{awh}),'dirs', 1);
     for nes = 1:length(model_varients_folders)
+        %         create the postprocessing folder structure
+%         [folder_status, folder_message] = mkdir(fullfile(input_settings.paths.results_loc, input_settings.sets{awh}, model_varients_folders{nes},'postprocessing'));
         for herf = 1:length(input_settings.sim_types)
             try
-                data_directory = fullfile(input_settings.paths.data_loc, input_settings.sets{awh}, model_varients_folders{nes}, input_settings.sim_types{herf});
-                pp_directory = fullfile(input_settings.paths.results_loc, input_settings.sets{awh}, model_varients_folders{nes}, 'postprocessing', input_settings.sim_types{herf});
+                data_directory = fullfile(input_settings.paths.data_loc, ...
+                    input_settings.sets{awh}, model_varients_folders{nes},...
+                    input_settings.sim_types{herf});
+                pp_directory = fullfile(input_settings.paths.results_loc,...
+                    input_settings.sets{awh}, model_varients_folders{nes},...
+                    'postprocessing', input_settings.sim_types{herf});
                 pp_list_temp = GdfidL_post_process_models(data_directory, pp_directory);
                 pp_list = cat(1, pp_list, pp_list_temp);
             catch ME

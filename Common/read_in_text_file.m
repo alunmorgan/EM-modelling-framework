@@ -13,14 +13,15 @@ nrows = numel(cell2mat(textscan(fid,'%1c%*[^\n]')));
 frewind(fid);
 data = cell(nrows,1);
 pgs = 0;
-fprintf(['\nReading file...', file_location, '...'])
+fprintf('\nReading file...')
 fprintf('  0%%')
 nd =1;
 while true
     current_line = fgetl(fid);
-    if rem(nd, floor(nrows/100)) == 0
-        pgs = pgs + 1;
-        fprintf(['\b\b\b\b', num2str(pgs, '%03.f'),'%%'])
+    new_val = floor((nd ./ nrows) .* 100);
+    if new_val > pgs
+        pgs = new_val;
+        fprintf(['\b\b\b\b', num2str(new_val, '%03.f'),'%%'])
     end %if
     if current_line == -1
         break

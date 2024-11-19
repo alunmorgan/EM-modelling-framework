@@ -9,9 +9,7 @@ try
         analysis_folder = fullfile(pp_folders{nrs}, 'analysis', 'wake');
         [~,name_of_model,~] = fileparts(pp_folders{nrs});
         if exist(postprocess_folder, 'dir')
-            if ~exist(analysis_folder, 'dir')
-                mkdir(analysis_folder)
-            end
+            mkdirtree(analysis_folder)
             fprintf(['\nStarting wake analysis <strong>', name_of_model, '</strong>'])
             analyse_pp_data(postprocess_folder, analysis_folder);
         else

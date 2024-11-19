@@ -3,10 +3,10 @@ function top_level_postprocessing(paths, ppi, sets, varargin)
 %sets(cell of strings/char): Names of the model sets to run.
 
 
-sim_types = {'setup', 'geometry','wake', 'sparameter', 'eigenmode', 'lossy_eigenmode', 'shunt'};
+sim_types = {'geometry','wake', 'sparameter', 'eigenmode', 'lossy_eigenmode', 'shunt'};
 
-default_sim_types = {'setup', 'geometry', 'wake', 'sparameter', 'lossy_eigenmode'};
-default_stages = {'postprocess', 'field_extraction', 'analyse', 'reconstruct'  'plot_analysis_data', 'plot_reconstruction_data', 'plot_fields', 'plot_thermals','report'};
+default_sim_types = {'geometry', 'wake', 'sparameter', 'lossy_eigenmode'};
+default_stages = {'setup', 'postprocess', 'field_extraction', 'analyse', 'reconstruct'  'plot_analysis_data', 'plot_reconstruction_data', 'plot_fields', 'plot_thermals','report'};
 default_version = {'230330'};
 default_number_of_cores = {'60'}; % less than max to avoid contension with other users
 default_precision = {'double'};
@@ -105,7 +105,7 @@ for set_id = 1:length(p.Results.sets)
     %% Plotting (fields)
     if any(matches(p.Results.stages, 'plot_fields'))
         if any(matches(p.Results.sim_types, 'wake'))
-            plot_wake_fields(p.Results, set_id, paths)
+%             plot_wake_fields(p.Results, set_id, paths)
             generate_wake_field_vids(p.Results, set_id, paths)
         end %if
     end %if
@@ -118,8 +118,8 @@ for set_id = 1:length(p.Results.sets)
         end %if
     end %if
 
-    %% Report generation
-    if any(matches(p.Results.stages, 'report'))
-        generate_report_single_set(sets{set_id});
-    end %if
+%     %% Report generation
+%     if any(matches(p.Results.stages, 'report'))
+%         generate_report_single_set(sets{set_id});
+%     end %if
 end %for
