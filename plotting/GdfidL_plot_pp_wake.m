@@ -112,38 +112,61 @@ if ~isnan(structure_energy_loss)
         beam_ports = 0;
         signal_ports = 0;
     end %if
-    plot_data = [beam_ports * 1E9, signal_ports * 1E9, structure_energy_loss];
+    % abs around the structreu energy loss as the output changes between
+    % versions 230330 and 241105.
+    plot_data = [beam_ports * 1E9, signal_ports * 1E9, abs(structure_energy_loss)];
     % matlab will ignore any values of zero which messes up the maping of the
     % lables. This just makes any zero values a very small  positive value to avoid
     % this.
     plot_data(plot_data == 0) = 1e-12;
+
+    loss_from_beam = abs(analysed_data.Wake_potential.s.loss.s) * 1e9;
+    loss_accounted_for = sum(plot_data);
 
     if iscell(material_names)
         x = categorical(cellstr(['Beam ports', 'Signal ports',material_names]));
     elseif isnan(material_names)
         x = categorical(cellstr(['Beam ports', 'Signal ports']));
     end %if
-
-    subplot(2,1,1)
-    y1 = abs(analysed_data.Wake_potential.s.loss.s) * 1e9;
+    
+    subplot(3,1,1)
     temp = zeros(1, length(plot_data));
-    temp(1) = y1;
+    temp(1) = loss_from_beam;
     plot_data2 = [plot_data; temp];
     b = bar(plot_data2, 'stacked','FaceColor','flat');
     legend(x, 'Location', 'EastOutside')
     xticklabels({'Energy accounted for', 'Energy from beam'})
     b(1).CData(2,:) = [0, 0, 0];
 
-    subplot(2,1,2)
+    subplot(3,1,2)
     b3 = bar(x, plot_data, 'FaceColor','flat');
     xtips1 = b3(1).XEndPoints;
     ytips1 = b3(1).YEndPoints;
     labels1 = string(round(b3(1).YData .*100) ./100);
     text(xtips1,ytips1,labels1,'HorizontalAlignment','center',...
         'VerticalAlignment','bottom')
-    title('Thermal Losses into materials')
+    title('Thermal Losses into materials for a 1nC bunch')
     ylabel('Energy (nJ)')
     for hrd = 1:length(plot_data)
+        b3(1).CData(hrd,:) =  b(hrd).CData(1,:);
+    end %for
+
+    subplot(3,1,3)
+    beam_current = 0.3; %A
+    % scales the loss per 1nC bunch to the loss expected for 300mA operation.
+    % also scales the losses to the loss from beam assuming any unaccounted for
+    % loss is evenly distributed. (This is probably pesamistic as it is usually
+    % the port accounting which is off.)
+    plot_data3 = plot_data .* beam_current ./ loss_accounted_for .* loss_from_beam;
+    b3 = bar(x, plot_data3, 'FaceColor','flat');
+    xtips1 = b3(1).XEndPoints;
+    ytips1 = b3(1).YEndPoints;
+    labels1 = string(round(b3(1).YData .*100) ./100);
+    text(xtips1,ytips1,labels1,'HorizontalAlignment','center',...
+        'VerticalAlignment','bottom')
+    title('Thermal Losses into materials for 300mA operation')
+    ylabel('Energy (W)')
+    for hrd = 1:length(plot_data3)
         b3(1).CData(hrd,:) =  b(hrd).CData(1,:);
     end %for
     savemfmt(h_wake, output_folder,[prefix, 'Thermal_Losses_into_materials'])
