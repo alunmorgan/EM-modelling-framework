@@ -1,7 +1,7 @@
-function run_plot_sparameter_analysis(input_settings, set_id, paths)
+function run_plot_sparameter_analysis(input_settings, set_id)
 
 try
-    analysis_root = fullfile(paths.results_loc, input_settings.sets{set_id});
+    analysis_root = fullfile(input_settings.paths.results_loc, input_settings.sets{set_id});
     [a_folders] = dir_list_gen(analysis_root, 'dirs',1);
     for nrs = 1:length(a_folders)
         postprocess_folder = fullfile(a_folders{nrs}, 'postprocessing', 'sparameter');

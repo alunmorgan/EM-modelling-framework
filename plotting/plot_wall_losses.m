@@ -1,10 +1,10 @@
-function plot_wall_losses(input_settings, set_id, paths)
+function plot_wall_losses(input_settings, set_id)
 %Plots and saves the wall loss data
 % Args:
 %        wall_loss_data (struct): structured data on the polygons where losses
 %                                 occur.
 %       out_folder(str): location to put the saved files.
-analysis_root = fullfile(paths.results_loc, input_settings.sets{set_id});
+analysis_root = fullfile(input_settings.paths.results_loc, input_settings.sets{set_id});
 [a_folders] = dir_list_gen(analysis_root, 'dirs',1);
 a_folders = a_folders(~contains(a_folders, ' - Blended'));
 for nrs = 1:length(a_folders)

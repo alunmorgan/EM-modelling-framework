@@ -1,7 +1,7 @@
-function run_plot_wake_reconstruction(input_settings, set_id, paths, ppi)
+function run_plot_wake_reconstruction(input_settings, set_id)
 
 try
-    analysis_root = fullfile(paths.results_loc, input_settings.sets{set_id});
+    analysis_root = fullfile(input_settings.paths.results_loc, input_settings.sets{set_id});
     [a_folders] = dir_list_gen(analysis_root, 'dirs',1);
     for nrs = 1:length(a_folders)
         postprocess_folder = fullfile(a_folders{nrs}, 'postprocessing', 'wake');
@@ -34,8 +34,8 @@ try
             [temp, ~, ~] = fileparts(temp);
             [temp, ~, ~] = fileparts(temp);
             [~, prefix, ~] = fileparts(temp);
-            GdfidL_plot_pp_wake(run_inputs_loc, reconstruction_loc1, ppi, plot_reconstruction_folder)
-            GdfidL_plot_wake_reconstruction(files_to_load, ppi, plot_reconstruction_folder, prefix)
+            GdfidL_plot_pp_wake(run_inputs_loc, reconstruction_loc1, input_settings.ppi, plot_reconstruction_folder)
+            GdfidL_plot_wake_reconstruction(files_to_load, input_settings.ppi, plot_reconstruction_folder, prefix)
         else
             fprintf('\nNo plotting folder... skipping wake reconstruction plotting.')
         end %if

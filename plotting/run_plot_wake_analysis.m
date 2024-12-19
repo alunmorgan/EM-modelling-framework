@@ -1,7 +1,7 @@
-function run_plot_wake_analysis(input_settings, set_id, paths, ppi)
+function run_plot_wake_analysis(input_settings, set_id)
 
 try
-    analysis_root = fullfile(paths.results_loc, input_settings.sets{set_id});
+    analysis_root = fullfile(input_settings.paths.results_loc, input_settings.sets{set_id});
     [a_folders] = dir_list_gen(analysis_root, 'dirs',1);
     for nrs = 1:length(a_folders)
         postprocess_folder = fullfile(a_folders{nrs}, 'postprocessing', 'wake');
@@ -17,7 +17,7 @@ try
             %             datasets = find_datasets(fullfile(paths.results_loc, p.Results.sets{set_id}));
             run_inputs_loc = fullfile(postprocess_folder, 'wake', 'run_inputs.mat');
             analysis_loc = fullfile(analysis_folder, 'data_analysed_wake.mat');
-            GdfidL_plot_pp_wake(run_inputs_loc, analysis_loc, ppi, plot_analysis_folder)
+            GdfidL_plot_pp_wake(run_inputs_loc, analysis_loc, input_settings.ppi, plot_analysis_folder)
             %             plot_model(datasets, ppi, p.Results.sim_types);
         else
             fprintf('\nNo plotting folder... skipping wake analysis plotting.')

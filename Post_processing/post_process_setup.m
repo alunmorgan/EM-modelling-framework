@@ -1,4 +1,4 @@
-function post_process_setup(paths, modelling_inputs, type_selection)
+function post_process_setup(paths, ppi, modelling_inputs, type_selection)
 % Takes the output of the GdfidL run and postprocesses it to generate
 % reports.
 %
@@ -20,11 +20,11 @@ if any(contains({'wake', 'eigenmode', 'lossy_eigenmode'}, type_selection))
             [modelling_inputs.base_model_name, '.m']), ...
             fullfile(pp_directory,type_selection, ...
             [modelling_inputs.base_model_name, '.m']))
-        cd(fullfile(pp_directory, type_selection))
-        temp = feval(modelling_inputs.base_model_name);
-        cd(old)
-        pp_input = temp.ppi;
-        save(fullfile(pp_directory, type_selection, 'pp_inputs.mat'), "pp_input")
+%         cd(fullfile(pp_directory, type_selection))
+%         temp = feval(modelling_inputs.base_model_name);
+%         cd(old)
+%         pp_input = temp.ppi;
+        save(fullfile(pp_directory, type_selection, 'pp_inputs.mat'), "ppi")
         copyfile(fullfile(data_directory, 'model.gdf'),...
             fullfile(pp_directory, type_selection, 'model.gdf'));
         copyfile(fullfile(data_directory, 'model_log'),...

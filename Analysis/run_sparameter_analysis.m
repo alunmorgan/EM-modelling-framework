@@ -1,6 +1,7 @@
-function run_sparameter_analysis(input_settings, set_id, paths)
+function run_sparameter_analysis(input_settings, set_id)
+
 try
-    postprocess_root = fullfile(paths.results_loc, input_settings.sets{set_id});
+    postprocess_root = fullfile(input_settings.paths.results_loc, input_settings.sets{set_id});
     [pp_folders] = dir_list_gen(postprocess_root, 'dirs',1);
     for nrs = 1:length(pp_folders)
         postprocess_folder = fullfile(pp_folders{nrs}, 'postprocessing', 'sparameter');

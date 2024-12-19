@@ -1,15 +1,14 @@
-function run_wake_analysis(input_settings, set_id, paths)
+function run_wake_analysis(input_settings, set_id)
 %
-
 try
-    postprocess_root = fullfile(paths.results_loc, input_settings.sets{set_id});
+    postprocess_root = fullfile(input_settings.paths.results_loc, input_settings.sets{set_id});
     [pp_folders] = dir_list_gen(postprocess_root, 'dirs',1);
     for nrs = 1:length(pp_folders)
         postprocess_folder = fullfile(pp_folders{nrs}, 'postprocessing', 'wake');
         analysis_folder = fullfile(pp_folders{nrs}, 'analysis', 'wake');
+        mkdirtree(analysis_folder)
         [~,name_of_model,~] = fileparts(pp_folders{nrs});
         if exist(postprocess_folder, 'dir')
-            mkdirtree(analysis_folder)
             fprintf(['\nStarting wake analysis <strong>', name_of_model, '</strong>'])
             analyse_pp_data(postprocess_folder, analysis_folder);
         else

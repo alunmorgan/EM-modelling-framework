@@ -1,4 +1,4 @@
-function extract_wall_losses(input_settings, set_id, paths)
+function extract_wall_losses(input_settings, set_id)
 %Extracts wall loss data from the postprocessing log
 % Args:
 %       input_settings (str):
@@ -7,7 +7,7 @@ function extract_wall_losses(input_settings, set_id, paths)
 %
 % Example: extract_wall_losses(input_settings, set_id, paths)
 
-analysis_root = fullfile(paths.results_loc, input_settings.sets{set_id});
+analysis_root = fullfile(input_settings.paths.results_loc, input_settings.sets{set_id});
 [a_folders] = dir_list_gen(analysis_root, 'dirs',1);
 a_folders = a_folders(~contains(a_folders, ' - Blended'));
 for nrs = 1:length(a_folders)

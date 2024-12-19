@@ -1,6 +1,6 @@
-function run_wake_reconstruction(input_settings, set_id, paths, ppi, number_of_wake_lengths_to_analyse)
+function run_wake_reconstruction(input_settings, set_id, number_of_wake_lengths_to_analyse)
 
-reconstruct_root = fullfile(paths.results_loc, input_settings.sets{set_id});
+reconstruct_root = fullfile(input_settings.paths.results_loc, input_settings.sets{set_id});
         [r_folders] = dir_list_gen(reconstruct_root, 'dirs',1);
         if any(contains(input_settings.sim_types, 'wake'))
             try
@@ -14,7 +14,7 @@ reconstruct_root = fullfile(paths.results_loc, input_settings.sets{set_id});
                         end
                         fprintf(['\nStarting wake reconstruction <strong>', name_of_model, '</strong>'])
                         reconstruct_pp_data(postprocess_folder, reconstruction_folder, ...
-                            ppi, number_of_wake_lengths_to_analyse);
+                            input_settings.ppi, number_of_wake_lengths_to_analyse);
                     else
                         fprintf('\nNo postprocessing folder... skipping wake reconstruction.')
                     end %if
