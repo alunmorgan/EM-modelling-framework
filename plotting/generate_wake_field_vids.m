@@ -1,7 +1,7 @@
-function generate_wake_field_vids(input_settings, set_id, paths)
+function generate_wake_field_vids(input_settings, set_id)
 
 try
-    analysis_root = fullfile(paths.results_loc, input_settings.sets{set_id});
+    analysis_root = fullfile(input_settings.paths.results_loc, input_settings.sets{set_id});
     [a_folders] = dir_list_gen(analysis_root, 'dirs',1);
     a_folders = a_folders(~contains(a_folders, ' - Blended'));
 
