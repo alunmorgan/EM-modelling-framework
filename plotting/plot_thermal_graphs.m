@@ -5,18 +5,18 @@ function col_ofst = plot_thermal_graphs(h_wake, path_to_data, bunch_energy_loss,
 clf(h_wake)
 leg = {};
 % make the array that the bar function understands.
-% this is the total energy lossed from the beam.
+% this is the total energy lost from the beam.
 py(1,1) = bunch_energy_loss;
 py(2,1)=0;
 % These are the places that energy has been recorded.
 % assume beam ports are always there.
-py(2,2) = beam_port_energy_loss;
 py(1,2) =0;
+py(2,2) = beam_port_energy_loss;
 leg{1} = ['Beam ports (',num2str(py(2,2)) ,'nJ)'];
 if ~isnan(signal_port_energy_loss)
     % add signal ports if there is any signal.
-    py(2,3) = signal_port_energy_loss;
     py(1,3) =0;
+    py(2,3) = signal_port_energy_loss;
     leg{2} = ['Signal ports (',num2str(py(2,3)) ,'nJ)'];
 end %if
 
