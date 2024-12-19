@@ -1,7 +1,7 @@
 function analyse_pp_data(postprocess_folder, output_folder)
 
 
-if ~isfile(fullfile(postprocess_folder, 'data_analysed_wake.mat'))
+if ~isfile(fullfile(output_folder, 'data_analysed_wake.mat'))
 
     run_logs = load(fullfile(postprocess_folder,'wake', 'data_from_run_logs.mat'), 'run_logs');
     run_logs = run_logs.run_logs;
