@@ -23,7 +23,7 @@ for awh = 1:length(input_settings.sets)
                 pp_directory = fullfile(input_settings.paths.results_loc,...
                     input_settings.sets{awh}, model_varients_folders{nes},...
                     'postprocessing', input_settings.sim_types{herf});
-                pp_list_temp = GdfidL_post_process_models(data_directory, pp_directory);
+                pp_list_temp = GdfidL_post_process_models(input_settings.ppi, data_directory, pp_directory);
                 pp_list = cat(1, pp_list, pp_list_temp);
             catch ME
                 fprintf(['\n', input_settings.sets{set_id},' <strong>Problem with postprocessing models.</strong>'])

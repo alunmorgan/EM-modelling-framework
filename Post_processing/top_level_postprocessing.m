@@ -26,6 +26,17 @@ addParameter(p, 'precision', default_precision)
 parse(p, sets, varargin{:});
 input_data = p.Results;
 input_data.ppi = analysis_settings;
+%% Eigenmode plotting settings
+input_data.ppi.eigenmode.cuts = {'x', '0';'y', '0';'z', '0';};
+input_data.ppi.eigenmode.scale = '3';
+input_data.ppi.eigenmode.subsections{1}.ymin = '-4E-3';
+input_data.ppi.eigenmode.subsections{1}.ymax = '4E-3';
+input_data.ppi.eigenmode.subsections{1}.xmin = '13E-3';
+input_data.ppi.eigenmode.subsections{1}.xmax = '14E-3';
+input_data.ppi.eigenmode.subsections{1}.zmin = '-4E-3';
+input_data.ppi.eigenmode.subsections{1}.zmax = '4E-3';
+
+
 input_data.paths = load_local_paths;
 number_of_wake_lengths_to_analyse = 4;
 

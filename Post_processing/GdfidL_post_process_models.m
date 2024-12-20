@@ -1,4 +1,4 @@
-function pp_list = GdfidL_post_process_models(data_directory, pp_directory)
+function pp_list = GdfidL_post_process_models(pp_inputs, data_directory, pp_directory)
 % Takes the output of the GdfidL run and postprocesses it to generate
 % reports.
 %
@@ -26,8 +26,8 @@ if any(contains({'wake', 'eigenmode', 'lossy_eigenmode'}, type_selection))
             end %for
         elseif strcmp(type_selection, 'eigenmode') || strcmp(type_selection, 'lossy_eigenmode')
             run_logs = GdfidL_read_eigenmode_log(model_log_loc, type_selection);
-            pp_inputs = load(fullfile(pp_directory, 'pp_inputs.mat'));
-            e_file = GdfidL_write_pp_eigenmode_input_file(run_logs, data_directory, pp_directory, scratch_dir, type_selection, pp_inputs.pp_input);
+%             pp_inputs = load(fullfile(pp_directory, 'pp_inputs.mat'));
+            e_file = GdfidL_write_pp_eigenmode_input_file(run_logs, data_directory, pp_directory, scratch_dir, type_selection, pp_inputs);
             file_loc = write_single_postprocessing_batch_file(e_file, scratch_dir, run_logs.ver);
             pp_list = cat(1, pp_list, ['source "', file_loc, '"']);
         end %if
