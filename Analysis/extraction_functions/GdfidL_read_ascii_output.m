@@ -24,7 +24,7 @@ z_data_length = f_ind -z_ind - 1;
 f_data = data(f_ind+9:end);
 fprintf('GdfidL_read_ascii_output: Have data')
 
-parfor jd = 1:length(f_data)
+for jd = 1:length(f_data) % parfor chokes the server
 f_d = regexp(f_data{jd}, '\s*([0-9-Ee+.]+)\s+([0-9-Ee+.])+\s+([0-9-Ee+.]+)', 'tokens');
 f_d = f_d{1};
 fx(jd) = str2double(f_d{1});

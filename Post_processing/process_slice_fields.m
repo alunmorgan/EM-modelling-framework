@@ -62,7 +62,7 @@ for hes = 1:n_coords_2
 end %for
 
 % Run through all datafiles in the fileset in order to populate the data grid.
-parfor wns = 1:length(fileset)
+for wns = 1:length(fileset)% parfor chokes the server
     % Extract data into a variable.
     fprintf('.')
     test_input = read_single_fexport_file(fileset{wns}, scratch_path);
@@ -98,7 +98,7 @@ parfor wns = 1:length(fileset)
             end %for
         end %for
     end %if
-end %parfor
+end %for
 fprintf('\n')
 fprintf('Combining data')
 % Combine data for all filesets

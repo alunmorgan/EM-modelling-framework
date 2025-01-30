@@ -57,7 +57,7 @@ if sum(good_wake_data) > 1
         names_all{kdr} = data_out(kdr).out_name; 
     end %for
     names = unique(names_all);
-    parfor egvn = 1:length(names)
+    for egvn = 1:length(names) %parfor chokes the server
         temp_set = strcmp(names{egvn}, names_all)
         Generate_2D_graph_with_legend(graph_metadata, squeeze(data_out(:,temp_set)))
     end
@@ -81,7 +81,7 @@ if sum(good_s_data) > 1
             ck = ck +1;
         end %if
     end %for
-    parfor egvn = 1:size(data_out,2)
+    for egvn = 1:size(data_out,2) % parfor chokes the server
         Generate_2D_graph_with_legend(graph_metadata, squeeze(data_out(:,egvn)))
     end %for
 end %if
@@ -100,7 +100,7 @@ for hse = 1:length(sources)
 end %for
 if sum(good_field_data) > 1
     data_out_temp = cell(length(good_field_data),1);
-    parfor hse = 1:length(good_field_data)
+    for hse = 1:length(good_field_data) %parfor chokes the server
         if good_field_data(hse) == 1
             T = load(fullfile(source_path, sources{hse}, 'wake', 'field_data.mat'), 'field_data');
             data_out_temp{hse}(1, :) = blend_field_data(T.field_data, report_input.mesh_stepsize{hse}, swept_vals{hse}, 'max');
@@ -108,7 +108,7 @@ if sum(good_field_data) > 1
                 data_out_temp{hse}(ens, :) = blend_field_data(T.field_data, report_input.mesh_stepsize{hse}, swept_vals{hse}, field_snapshot_times(ens -1));
             end %for
         end %if
-    end %parfor
+    end %for
     data_out_temp(good_field_data == 0) = [];
     for nes = 1:length(data_out_temp)
         data_out(nes, :, :) = data_out_temp{nes}(:,:);

@@ -52,7 +52,7 @@ end %for
 fprintf('\n')
 %% convert the gld files for the field output images to ps.
 gld_files = dir_list_gen(lnk_name, 'gld', 1);
-parfor fjh = 1:length(gld_files)
+for fjh = 1:length(gld_files) %parfor chokes the server
     [~,name,~] = fileparts(gld_files{fjh});
     [status2,cmdout2] = system(['gd1.3dplot -colorps -geometry 800x600 -o ',fullfile(lnk_name, name), '.ps -i ' , gld_files{fjh}]);
     if status2==0
@@ -66,7 +66,7 @@ delete([lnk_name,'/*.gld'])
 
 %% convert ps to png
 [pic_names ,~]= dir_list_gen(lnk_name,'ps',1);
-parfor eh = 1:length(pic_names)
+for eh = 1:length(pic_names)%parfor chokes the server
     pName = pic_names{eh}(1:end-3);
     [sFlag, ~] = system(['convert ',fullfile(lnk_name, pName),'.ps -rotate -90 ',fullfile(lnk_name, pName),'.png'], '-echo');
     if sFlag == 0

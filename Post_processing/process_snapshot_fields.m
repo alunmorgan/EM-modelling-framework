@@ -102,7 +102,7 @@ delete(w)
                 end %if
             end %for
             clear test_input
-            parfor jwad = 1:n_coords_z
+            for jwad = 1:n_coords_z %parfor chokes the server
                 temp_slice = temp_slices{jwad};
                 for hfgs = 1:n_coords_y
                     x_start_index = (hfgs-1) * n_coords_x +1;
@@ -125,7 +125,7 @@ delete(w)
                         end %if
                     end %for
                 end %for
-            end %parfor
+            end %for
             %         fprintf(' Saving snapshot datafile...')
             timestamp_label = regexprep(num2str(timestamp), '\.', 'p');
             save(fullfile(out_path,['field_data_snapshots_Fx', field_type, fileset_name, timestamp_label, '.mat']), 'Fx', 'data')
