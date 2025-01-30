@@ -20,10 +20,6 @@ if any(contains({'wake', 'eigenmode', 'lossy_eigenmode'}, type_selection))
             [modelling_inputs.base_model_name, '.m']), ...
             fullfile(pp_directory,type_selection, ...
             [modelling_inputs.base_model_name, '.m']))
-%         cd(fullfile(pp_directory, type_selection))
-%         temp = feval(modelling_inputs.base_model_name);
-%         cd(old)
-%         pp_input = temp.ppi;
         save(fullfile(pp_directory, type_selection, 'pp_inputs.mat'), "ppi")
         copyfile(fullfile(data_directory, 'model.gdf'),...
             fullfile(pp_directory, type_selection, 'model.gdf'));
