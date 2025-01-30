@@ -163,27 +163,28 @@ eigen_temp = regexp(data{eigenmode_setup_lines(sjw)}, strcat('\s*eigenvalues\>\W
     end %for
 end %for
 res_sec_ind =  find_position_in_cell_lst(strfind(data,' The Eigensolutions are determined. I am writing the Results.'));
-    for ja = 1:str2num(log.eigenmode_setup.solutions)
-        if strcmpi(sim_type, 'eigenmode')
-            eigenmode_check = '\s*(\d+)\s+([\d.eE+-]+)\s+([\d.eE+-]+)\s+([\d.eE+-]+)\s.*';
-            toks_tmp = regexp(data{res_sec_ind + 3 + ja},eigenmode_check,'tokens');
-            log.eigenmodes.nums(ja) = str2double(toks_tmp{1}{1});
-            log.eigenmodes.freqs(ja) = str2double(toks_tmp{1}{2});
-            log.eigenmodes.acc(ja) = str2double(toks_tmp{1}{3});
-            log.eigenmodes.cont(ja) = str2double(toks_tmp{1}{4});
-        elseif strcmpi(sim_type, 'lossy_eigenmode')
-            lossy_eigenmode_check = '\W*(\d+)\W+([\d.eE+-]+)\W+([\d.eE+-]+)\W+([\d.eE+-]+)\W+([\d.eE+-]+)\W+([\d.eE+-]+)\W+([\d.eE+-]+)\W+\<-\W+(.*)';
-            toks_tmp = regexp(data{res_sec_ind + 2 + ja},lossy_eigenmode_check,'tokens');
-            log.eigenmodes.nums(ja) = str2double(toks_tmp{1}{1});
-            log.eigenmodes.freqs(ja) = complex(str2double(toks_tmp{1}{2}),...
-                str2double(toks_tmp{1}{3}));
-            log.eigenmodes.Q(ja) = str2double(toks_tmp{1}{6});
-            log.eigenmodes.acc(ja) = str2double(toks_tmp{1}{4});
-            log.eigenmodes.cont(ja) = str2double(toks_tmp{1}{5});
-            log.eigenmodes.arg_ratio(ja) = str2double(toks_tmp{1}{7});
-            log.eigenmodes.comment{ja} = toks_tmp{1}{8};
-        end %if
-    end %for
+
+eigenmode_check = '\s*(\d+)\s+([\d.eE+-]+)\s+([\d.eE+-]+)\s+([\d.eE+-]+)\s.*';
+lossy_eigenmode_check = '\W*(\d+)\W+([\d.eE+-]+)\W+([\d.eE+-]+)\W+([\d.eE+-]+)\W+([\d.eE+-]+)\W+([\d.eE+-]+)\W+([\d.eE+-]+)(.*)';
+for ja = 1:str2double(log.eigenmode_setup.solutions)
+    if strcmpi(sim_type, 'eigenmode')
+        toks_tmp = regexp(data{res_sec_ind + 3 + ja},eigenmode_check,'tokens');
+        log.eigenmodes.nums(ja) = str2double(toks_tmp{1}{1});
+        log.eigenmodes.freqs(ja) = str2double(toks_tmp{1}{2});
+        log.eigenmodes.acc(ja) = str2double(toks_tmp{1}{3});
+        log.eigenmodes.cont(ja) = str2double(toks_tmp{1}{4});
+    elseif strcmpi(sim_type, 'lossy_eigenmode')
+        toks_tmp = regexp(data{res_sec_ind + 2 + ja},lossy_eigenmode_check,'tokens');
+        log.eigenmodes.nums(ja) = str2double(toks_tmp{1}{1});
+        log.eigenmodes.freqs(ja) = complex(str2double(toks_tmp{1}{2}),...
+            str2double(toks_tmp{1}{3}));
+        log.eigenmodes.Q(ja) = str2double(toks_tmp{1}{6});
+        log.eigenmodes.acc(ja) = str2double(toks_tmp{1}{4});
+        log.eigenmodes.cont(ja) = str2double(toks_tmp{1}{5});
+        log.eigenmodes.arg_ratio(ja) = str2double(toks_tmp{1}{7});
+        log.eigenmodes.comment{ja} = toks_tmp{1}{8};
+    end %if
+end %for
 
 % Find the user defines variables.
 define_ind = find_position_in_cell_lst(regexp(data,'\s*#\s*was:\s*"\s*define\(.*,.*\)'));

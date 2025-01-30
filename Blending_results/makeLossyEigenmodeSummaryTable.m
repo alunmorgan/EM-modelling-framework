@@ -1,9 +1,11 @@
-function makeLossyEigenmodeSummaryTable(model_set, root)
+function makeLossyEigenmodeSummaryTable(models, set_id)
 
-variations = dir_list_gen(fullfile(root, model_set), 'dirs', 1);
+model_set = models.sets{set_id};
+variations = dir_list_gen(fullfile(models.paths.results_loc, model_set), 'dirs', 1);
 if ~isempty(variations)
     for iose = 1:length(variations)
-        expected_filename = fullfile(variations{iose},'lossy_eigenmode','data_from_run_logs.mat');
+        model_loc = fullfile(variations{iose},'postprocessing','lossy_eigenmode','lossy_eigenmode');
+        expected_filename = fullfile(model_loc,'data_from_run_logs.mat');
         if exist(expected_filename, 'file')
             load(expected_filename, 'run_logs')
         else
@@ -17,7 +19,8 @@ if ~isempty(variations)
             run_logs.eigenmodes.acc', ...
             run_logs.eigenmodes.cont', ...
             'VariableNames', varnames_base_summary);
-        writetable(eigenmode_summary, fullfile(variations{iose},'lossy_eigenmode',...
+        out_loc = fullfile(variations{iose},'analysis','lossy_eigenmode');
+        writetable(eigenmode_summary, fullfile(out_loc,...
             [model_set, '_lossy_eigenmode_summary.txt']), ...
             'Delimiter','|',...
             'WriteVariableNames',true, 'WriteRowNames',false)

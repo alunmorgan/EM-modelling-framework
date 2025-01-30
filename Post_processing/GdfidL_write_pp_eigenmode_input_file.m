@@ -11,7 +11,11 @@ function out_name = GdfidL_write_pp_eigenmode_input_file(log, data_directory, pp
 
 % slices(): selects which planes to plot
 slices = pp_settings.eigenmode.cuts;
-subsections = pp_settings.eigenmode.subsections;
+if isfield(pp_settings.eigenmode, 'subsections')
+    subsections = pp_settings.eigenmode.subsections;
+else
+    subsections = {};
+end %if
 scale = pp_settings.eigenmode.scale;
 
 ov{1} = '';
@@ -90,8 +94,20 @@ for jrd = 1:length(log.eigenmodes.nums)
             ov = cat(1,ov,'	 eyeposition = ( 0, -1, 0 )');
             ov = cat(1,ov, ['	 plotopts = -colorps -o ',pp_directory,'/', pp_type, num2str(jrd),'_y_cut_',plane_loc,'_flat_plot.ps']);
             ov = cat(1,ov,'    doit');
-        end %if        
+        end %if
     end %if
+end %for
+
+ov = cat(1,ov,'-energy');
+if strcmpi(pp_type, 'eigenmode')
+    ov = cat(1,ov,'    quantity = e');
+elseif strcmpi(pp_type, 'lossy_eigenmode')
+    ov = cat(1,ov,'    quantity = ere');
+end %if
+for jrd = 1:length(log.eigenmodes.nums)
+    ov = cat(1,ov,['    solution = ', num2str(log.eigenmodes.nums(jrd))]);
+    ov = cat(1,ov,'    doit');
+    ov = cat(1,ov,'    echo @eenergy');
 end %for
 % end %for
 %
@@ -164,7 +180,7 @@ if strcmpi(pp_type, 'eigenmode')
     ov = cat(1,ov,'  undefine(QValue_PATH)');
     ov = cat(1,ov,'  popflags');
     ov = cat(1,ov,'endmacro');
-    
+
     % Macro to calulate the R/Q
     ov = cat(1,ov,'macro rshunt');
     ov = cat(1,ov,'  pushflags, noprompt, nomenu, nomessage');

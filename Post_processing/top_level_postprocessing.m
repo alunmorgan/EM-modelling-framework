@@ -28,13 +28,13 @@ input_data = p.Results;
 input_data.ppi = analysis_settings;
 %% Eigenmode plotting settings
 input_data.ppi.eigenmode.cuts = {'x', '0';'y', '0';'z', '0';};
-input_data.ppi.eigenmode.scale = '3';
-input_data.ppi.eigenmode.subsections{1}.ymin = '-4E-3';
-input_data.ppi.eigenmode.subsections{1}.ymax = '4E-3';
-input_data.ppi.eigenmode.subsections{1}.xmin = '13E-3';
-input_data.ppi.eigenmode.subsections{1}.xmax = '14E-3';
-input_data.ppi.eigenmode.subsections{1}.zmin = '-4E-3';
-input_data.ppi.eigenmode.subsections{1}.zmax = '4E-3';
+input_data.ppi.eigenmode.scale = '2';
+% input_data.ppi.eigenmode.subsections{1}.ymin = '-4E-3';
+% input_data.ppi.eigenmode.subsections{1}.ymax = '4E-3';
+% input_data.ppi.eigenmode.subsections{1}.xmin = '13E-3';
+% input_data.ppi.eigenmode.subsections{1}.xmax = '14E-3';
+% input_data.ppi.eigenmode.subsections{1}.zmin = '-4E-3';
+% input_data.ppi.eigenmode.subsections{1}.zmax = '4E-3';
 
 
 input_data.paths = load_local_paths;
@@ -79,7 +79,7 @@ for set_id = 1:length(input_data.sets)
         end %if
         if any(matches(input_data.sim_types, 'lossy_eigenmode'))
             try
-                makeLossyEigenmodeSummaryTable(input_data.sets{set_id}, results_loc)
+                makeLossyEigenmodeSummaryTable(input_data, set_id)
             catch ME3
                 warning('top_level_post_processing:analysis', [sets{set_id}, ' <strong>Problem with losy eigenmode analysis</strong>'])
                 display_error_message(ME3)
@@ -101,6 +101,9 @@ for set_id = 1:length(input_data.sets)
         end %if
         if any(matches(p.Results.sim_types, 'sparameter'))
             run_plot_sparameter_analysis(input_data, set_id)
+        end %if
+         if any(matches(p.Results.sim_types, 'lossy_eigenmode'))
+            run_plot_eigenmode_analysis(input_data, set_id)
         end %if
     end %if
 
