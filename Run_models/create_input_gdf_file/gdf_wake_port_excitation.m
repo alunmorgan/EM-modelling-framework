@@ -21,6 +21,7 @@ else
             fs = cat(1,fs,['risetime = ', num2str(excitation_structure.user_signal_risetime(kds))]);
             fs = cat(1,fs,['decaytime = ', num2str(excitation_structure.user_signal_decaytime(kds))]);
             fs = cat(1,fs,['amplitude = ', num2str(excitation_structure.user_signal_amplitude(kds))]);
+            fs = cat(1,fs,['shifttime = ', num2str(excitation_structure.user_signal_delay(kds))]);
             fs = cat(1,fs,['frequency = ', num2str(excitation_structure.user_signal_frequency(kds))]);
         else
             fs = cat(1,fs,['risetime = ', num2str(excitation_structure.risetime(kds))]);
