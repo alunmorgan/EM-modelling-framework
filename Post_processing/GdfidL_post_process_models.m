@@ -10,14 +10,17 @@ fprintf(['\nWriting post processing input file for <strong>', model_name,'</stro
 
 pp_list = {};
 %% Post processing wakes, eigenmode and lossy eigenmode
-if any(contains({'wake', 'eigenmode', 'lossy_eigenmode'}, type_selection))
+if any(contains({'geometry','wake', 'eigenmode', 'lossy_eigenmode'}, type_selection))
     try
         % Writing postprocessor input files
         scratch_dir = fullfile('/scratch2',model_name, type_selection);
         pp_directory = fullfile(pp_directory, type_selection);
         mkdirtree(pp_directory)
         model_log_loc = fullfile(data_directory, 'model_log');
-        if strcmp(type_selection, 'wake')
+        if strcmp(type_selection, 'geometry')
+            file_loc = GdfidL_write_pp_geometry_bash_file(data_directory, pp_directory);
+            pp_list = cat(1, pp_list, ['source "', file_loc, '"']);
+        elseif strcmp(type_selection, 'wake')
             run_logs = GdfidL_read_wake_log(model_log_loc);
             [ip_files, scratch_locs] = GdfidL_write_pp_wake_input_file(run_logs, data_directory, pp_directory, scratch_dir);
             for wh = 1:length(ip_files)
