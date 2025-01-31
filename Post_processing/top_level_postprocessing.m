@@ -42,7 +42,6 @@ number_of_wake_lengths_to_analyse = 4;
 
 
 
-%% Post simulation
 for set_id = 1:length(input_data.sets)
     %% Setting up log file
     stamp = regexprep(datestr(now),':', '-');
@@ -50,18 +49,15 @@ for set_id = 1:length(input_data.sets)
         mkdirtree(fullfile(input_data.paths.logfile_location, input_data.sets{set_id}))
     end %if
     diary(fullfile(input_data.paths.logfile_location, input_data.sets{set_id}, stamp));
+
     % Setup directory structure and copy across setup datafiles
     if any(matches(input_data.stages, 'setup'))
-%         if ~any(matches(input_data.sim_types, 'geometry'))
-            run_setup(input_data, set_id);
-%         end %if
+        run_setup(input_data, set_id);
     end %if
 
     %% Postprocessing
     if any(matches(input_data.stages, 'postprocess'))
-%         if ~any(matches(input_data.sim_types, 'geometry'))
-            run_postprocessing(input_data, set_id);
-%         end %if
+        run_postprocessing(input_data, set_id);
     end %if
 
     %% Field extraction
@@ -79,7 +75,7 @@ for set_id = 1:length(input_data.sets)
         end %if
         if any(matches(input_data.sim_types, 'lossy_eigenmode'))
             try
-                makeLossyEigenmodeSummaryTable(input_data, set_id)
+                run_eigenmode_analysis(input_data, set_id)
             catch ME3
                 warning('top_level_post_processing:analysis', [sets{set_id}, ' <strong>Problem with losy eigenmode analysis</strong>'])
                 display_error_message(ME3)
@@ -102,7 +98,7 @@ for set_id = 1:length(input_data.sets)
         if any(matches(p.Results.sim_types, 'sparameter'))
             run_plot_sparameter_analysis(input_data, set_id)
         end %if
-         if any(matches(p.Results.sim_types, 'lossy_eigenmode'))
+        if any(matches(p.Results.sim_types, 'lossy_eigenmode'))
             run_plot_eigenmode_analysis(input_data, set_id)
         end %if
     end %if
@@ -130,8 +126,8 @@ for set_id = 1:length(input_data.sets)
         end %if
     end %if
 
-%     %% Report generation
-%     if any(matches(p.Results.stages, 'report'))
-%         generate_report_single_set(sets{set_id});
-%     end %if
+    %     %% Report generation
+    %     if any(matches(p.Results.stages, 'report'))
+    %         generate_report_single_set(sets{set_id});
+    %     end %if
 end %for

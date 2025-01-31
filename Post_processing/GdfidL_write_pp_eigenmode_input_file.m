@@ -5,11 +5,9 @@ function out_name = GdfidL_write_pp_eigenmode_input_file(log, data_directory, pp
 % files.
 % n_modes_range(list): the modes numbers to consider.
 % log (struct): data extracted from postprocessing log file.
-
 %
 % example: GdfidL_write_pp_eigenmode_input_file(data_directory, pp_directory, log, pp_type, pp_settings)
 
-% slices(): selects which planes to plot
 slices = pp_settings.eigenmode.cuts;
 if isfield(pp_settings.eigenmode, 'subsections')
     subsections = pp_settings.eigenmode.subsections;
@@ -109,19 +107,7 @@ for jrd = 1:length(log.eigenmodes.nums)
     ov = cat(1,ov,'    doit');
     ov = cat(1,ov,'    echo @eenergy');
 end %for
-% end %for
-%
-% ov = cat(1,ov,'-lineplot');
-% ov = cat(1,ov,'    onlyplotfiles = yes');
-% ov = cat(1,ov,'    quantity = e');
-% ov = cat(1,ov,'    component = z');
-% ov = cat(1,ov,'    direction = z');
-% ov = cat(1,ov,'    startpoint = (0,0,@zmin)');
-% for jrd = 1:n_modes
-%     ov = cat(1,ov, ['	 plotopts = -colorps -o eigenmode',num2str(jrd),'_z_field_plot.ps']);
-%     ov = cat(1,ov,['    solution = ',num2str(jrd)]);
-%     ov = cat(1,ov,'    doit');
-% end
+
 if strcmpi(pp_type, 'eigenmode')
     % Macro to calculate the Q from complex fields
     ov = cat(1,ov,'macro perQValue');
