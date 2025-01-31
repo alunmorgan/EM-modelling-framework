@@ -10,4 +10,5 @@ for be = 1:length(data)
     fprintf(fid,'\n','');
 end
 fclose(fid);
+disp(['Data written to ', name])
 

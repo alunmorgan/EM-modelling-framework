@@ -31,6 +31,7 @@ while true
 end %while
 fclose(fid);
 data = data';
+fprintf('\n')
 
 
 
