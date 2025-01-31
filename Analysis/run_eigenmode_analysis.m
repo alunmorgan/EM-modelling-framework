@@ -1,4 +1,4 @@
-function makeLossyEigenmodeSummaryTable(models, set_id)
+function run_eigenmode_analysis(models, set_id)
 
 model_set = models.sets{set_id};
 variations = dir_list_gen(fullfile(models.paths.results_loc, model_set), 'dirs', 1);
@@ -39,7 +39,6 @@ if ~isempty(variations)
             [model_set, '_lossy_eigenmode_summary.txt']), ...
             'Delimiter','|',...
             'WriteVariableNames',true, 'WriteRowNames',false)
-        save(fullfile(out_loc,...
-            [model_set, '_lossy_eigenmode_summary.mat']), "eigenmode_summary")
+        save(fullfile(out_loc, 'data_from_logs.mat'), "eigenmode_summary")
     end %for
 end %if
