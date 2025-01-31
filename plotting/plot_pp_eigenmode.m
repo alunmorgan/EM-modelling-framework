@@ -28,26 +28,21 @@ end %for
 [~, prefix, ~] = fileparts(temp);
 
 h_wake = figure('Position',fig_pos);
-t = tiledlayout(4,1);
+t = tiledlayout(3,1);
 ax1 = nexttile;
-stem(abs(run_logs.eigenmodes.freqs).* 1E-9, run_logs.eigenmodes.Q, 'm*', 'LineWidth', lw);
+stem(eigenmode_summary.("Frequency (GHz)"), eigenmode_summary.Q, 'm*', 'LineWidth', lw);
 title('Q');
 grid on;
 ax2 = nexttile;
-stem(abs(run_logs.eigenmodes.freqs).* 1E-9, run_logs.eigenmodes.cont, 'm*', 'LineWidth', lw);
-title('Cont');
+stem(eigenmode_summary.("Frequency (GHz)"), eigenmode_summary.("E-field Max"), 'm*', 'LineWidth', lw);
+title('E-field Max');
 grid on;
 ax3 = nexttile;
-stem(abs(run_logs.eigenmodes.freqs).* 1E-9, run_logs.eigenmodes.acc.*1E3, 'm*', 'LineWidth', lw);
-title('accuracy');
-ylabel('1E-3')
-grid on;
-ax4 = nexttile;
-stem(abs(run_logs.eigenmodes.freqs).* 1E-9, run_logs.eigenmodes.arg_ratio, 'm*', 'LineWidth', lw);
-title('arg ratio');
+stem(eigenmode_summary.("Frequency (GHz)"), eigenmode_summary.Accuracy, 'm*', 'LineWidth', lw);
+title('Accuracy');
 grid on;
 xlabel(t, 'Frequency (GHz)');
 title(t, 'Eigenmode results');
-linkaxes([ax1 ax2 ax3 ax4], 'x')
+linkaxes([ax1 ax2 ax3], 'x')
 
 savemfmt(h_wake, plot_analysis_folder, [prefix, 'eigenmode_summary'])
