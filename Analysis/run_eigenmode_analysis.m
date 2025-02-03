@@ -7,12 +7,14 @@ if ~isempty(variations)
         pp_log_file = fullfile(variations{iose},'postprocessing/lossy_eigenmode/lossy_eigenmode/model_lossy_eigenmode_post_processing.gdfpp_log');
         pp_log = read_eigenmode_postprocessing_log(pp_log_file);
         model_loc = fullfile(variations{iose},'postprocessing','lossy_eigenmode','lossy_eigenmode');
-        expected_filename = fullfile(model_loc,'data_from_run_logs.mat');
-        if exist(expected_filename, 'file')
-            load(expected_filename, 'run_logs')
-        else
-            return
-        end %if
+%         expected_filename = fullfile(model_loc,'data_from_run_logs.mat');
+%         if exist(expected_filename, 'file')
+%             load(expected_filename, 'run_logs')
+%         else
+%             return
+%         end %if
+        run_logs = GdfidL_read_eigenmode_log(...
+        fullfile(model_loc, 'model_log'), 'lossy_eigenmode');
 
         e_freqs = complex(pp_log.fmax(:,1),pp_log.fmax(:,2));
         f_freqs = complex(pp_log.emax(:,1),pp_log.emax(:,2));

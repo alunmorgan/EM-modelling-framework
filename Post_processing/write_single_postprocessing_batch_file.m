@@ -1,41 +1,61 @@
-function file_loc =write_single_postprocessing_batch_file(pp_input_file, scratch_loc, version)
+function file_loc =write_single_postprocessing_batch_file(data_directory, pp_input_file, scratch_loc, version)
 % This code writes and a shell script so that the
 % system environment is reliably used.
 
 [pp_directory, pp_input_name, pp_ip_end] = fileparts(pp_input_file);
 pp_input_name = [pp_input_name, pp_ip_end];
 
+% 
+%         copyfile(fullfile(paths.inputfile_location, ...
+%             modelling_inputs.base_model_name, ...
+%             [modelling_inputs.base_model_name, '.m']), ...
+%             fullfile(pp_directory,type_selection, ...
+%             [modelling_inputs.base_model_name, '.m']))
+
 %% Construct file
 shell_contents = {'#! /bin/bash'};
+shell_contents = cat(1,shell_contents,['SCRATCHLOC= ',scratch_loc]);
+shell_contents = cat(1,shell_contents,['PPDIR= ',pp_directory]);
+shell_contents = cat(1,shell_contents,['DDIR= ',data_directory]);
+shell_contents = cat(1,shell_contents,['PPNAME= ',pp_input_name]);
+shell_contents = cat(1,shell_contents,'cp $DDIR/model.gdf $PPDIR/model.gdf');
+shell_contents = cat(1,shell_contents,'cp $DDIR/model.log $PPDIR/model.log');
+shell_contents = cat(1,shell_contents,'cp $DDIR/run_inputs.mat $PPDIR/run_inputs.mat');
+shell_contents = cat(1,shell_contents,'# Generates the location for gd1pp scratch if it does not exist.');
+shell_contents = cat(1,shell_contents,'if [ ! -d $SCRATCHLOC ]; then');
+shell_contents = cat(1,shell_contents,'mkdir -p $SCRATCHLOC');
+shell_contents = cat(1,shell_contents,'fi');
+shell_contents = cat(1,shell_contents,'# Generates the location for postprocessing folder if it does not exist.');
+shell_contents = cat(1,shell_contents,'if [ ! -d $PPDIR ]; then');
+shell_contents = cat(1,shell_contents,'mkdir -p $PPDIR');
+shell_contents = cat(1,shell_contents,'fi');
+
 shell_contents = cat(1,shell_contents,'# get the original GdfidL version.');
 shell_contents = cat(1,shell_contents,'ORIGVER=$GDFIDL_VERSION');
 shell_contents = cat(1,shell_contents,'# get the original file location.');
 shell_contents = cat(1,shell_contents,'ORIGLOC=pwd');
 shell_contents = cat(1,shell_contents,'# Using soft links to truncate the file paths as this causes problems with the underlying FORTRAN.');
 shell_contents = cat(1,shell_contents,['TEMPOUT=/scratch2/temp',num2str(round(rand*1e4))]);
-shell_contents = cat(1,shell_contents,['ln -s ', pp_directory, ' $TEMPOUT']);
+shell_contents = cat(1,shell_contents,'ln -s $PPDIR $TEMPOUT');
 shell_contents = cat(1,shell_contents,'# ');
-shell_contents = cat(1,shell_contents,'# Generates the location for gd1pp scratch if it does not exist.');
-shell_contents = cat(1,shell_contents,['if [ ! -d ',scratch_loc,' ]; then']);
-shell_contents = cat(1,shell_contents,['mkdir -p ',scratch_loc]);
-shell_contents = cat(1,shell_contents,'fi');
+
 shell_contents = cat(1,shell_contents,'# Generates the location for field history if required and if it does not exist.');
-shell_contents = cat(1,shell_contents,['if [[ ',pp_input_name,' == *"_EfieldHistory"* ]]; then']);
-shell_contents = cat(1,shell_contents,[ '[[ ',pp_input_name, ' =~ .*_EfieldHistory([0-9]+) ]]']);
-shell_contents = cat(1,shell_contents,['if [ ! -d ',pp_directory,'/field_history/$BASH_REMATCH{1} ]; then']);
-shell_contents = cat(1,shell_contents,['mkdir -p ',pp_directory,'/field_history/$BASH_REMATCH{1}']);
+shell_contents = cat(1,shell_contents,'if [[ $PPNAME == *"_EfieldHistory"* ]]; then');
+shell_contents = cat(1,shell_contents, '[[ $PPNAME =~ .*_EfieldHistory([0-9]+) ]]');
+shell_contents = cat(1,shell_contents,'if [ ! -d $PPDIR/field_history/$BASH_REMATCH{1} ]; then');
+shell_contents = cat(1,shell_contents,'mkdir -p $PPDIR/field_history/$BASH_REMATCH{1}');
 shell_contents = cat(1,shell_contents,'fi');
 shell_contents = cat(1,shell_contents,'fi');
 shell_contents = cat(1,shell_contents,'# ');
 shell_contents = cat(1,shell_contents,'# setting the GdfidL version to test.');
 shell_contents = cat(1,shell_contents,['export GDFIDL_VERSION="', num2str(version),'"']);
 shell_contents = cat(1,shell_contents,'# run the postprocessor.');
-shell_contents = cat(1,shell_contents,['gd1.pp < $TEMPOUT/', pp_input_name, ' > $TEMPOUT/', pp_input_name, '_log']);
+shell_contents = cat(1,shell_contents,'gd1.pp < $TEMPOUT/$PPNAME > $TEMPOUT/$PPNAME_log');
 shell_contents = cat(1,shell_contents,'# restore the original GDFIDL_VERSION.');
 shell_contents = cat(1,shell_contents, 'export GDFIDL_VERSION=$ORIGVER');
 shell_contents = cat(1,shell_contents,'# copy everything in scratchbase to output folder and remove the scratchbase folder.');
-shell_contents = cat(1,shell_contents, ['mv ', scratch_loc, '/* $TEMPOUT']); 
-shell_contents = cat(1,shell_contents, ['rmdir ', scratch_loc]);
+shell_contents = cat(1,shell_contents, 'mv $SCRATCHLOC/* $TEMPOUT'); 
+shell_contents = cat(1,shell_contents, 'rmdir $SCRATCHLOC');
 shell_contents = cat(1,shell_contents,'# ');
 shell_contents = cat(1,shell_contents,'# convert the gld files for the field output images to ps and fix the naming then remove the ps files.');
 shell_contents = cat(1,shell_contents,'cd $TEMPOUT');

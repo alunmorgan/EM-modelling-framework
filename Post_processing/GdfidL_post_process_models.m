@@ -9,13 +9,13 @@ function pp_list = GdfidL_post_process_models(pp_inputs, data_directory, pp_dire
 fprintf(['\nWriting post processing input file for <strong>', model_name,'</strong> - ', type_selection])
 
 pp_list = {};
+scratch_dir = fullfile('/scratch2',model_name, type_selection);
+pp_directory = fullfile(pp_directory, type_selection);
+
 %% Post processing wakes, eigenmode and lossy eigenmode
 if any(contains({'geometry','wake', 'eigenmode', 'lossy_eigenmode'}, type_selection))
     try
         % Writing postprocessor input files
-        scratch_dir = fullfile('/scratch2',model_name, type_selection);
-        pp_directory = fullfile(pp_directory, type_selection);
-        mkdirtree(pp_directory)
         model_log_loc = fullfile(data_directory, 'model_log');
         if strcmp(type_selection, 'geometry')
             file_loc = GdfidL_write_pp_geometry_bash_file(data_directory, pp_directory);
@@ -24,7 +24,7 @@ if any(contains({'geometry','wake', 'eigenmode', 'lossy_eigenmode'}, type_select
             run_logs = GdfidL_read_wake_log(model_log_loc);
             [ip_files, scratch_locs] = GdfidL_write_pp_wake_input_file(run_logs, data_directory, pp_directory, scratch_dir);
             for wh = 1:length(ip_files)
-                file_loc = write_single_postprocessing_batch_file(ip_files{wh}, scratch_locs{wh}, run_logs.ver);
+                file_loc = write_single_postprocessing_batch_file(data_directory, ip_files{wh}, scratch_locs{wh}, run_logs.ver);
                 pp_list = cat(1, pp_list, ['source "', file_loc, '"']);
             end %for
         elseif strcmp(type_selection, 'eigenmode') || strcmp(type_selection, 'lossy_eigenmode')
@@ -51,7 +51,7 @@ elseif any(contains({'sparameter', 'shunt'}, type_selection))
                     continue
                 end %if
                 run_logs = GdfidL_read_s_parameter_log(fullfile(s_parameter_data_directory, 'model_log'));
-                s_scratch = fullfile('/scratch2',model_name, type_selection);
+                s_scratch = fullfile(scratch_dir, s_names);
                 s_file = GdfidL_write_pp_s_param_input_file(s_parameter_data_directory, s_parameter_output_directory, s_scratch);
                 file_loc = write_single_postprocessing_batch_file(s_file, s_scratch, run_logs.ver);
                 pp_list = cat(1, pp_list, ['source "', file_loc, '"']);

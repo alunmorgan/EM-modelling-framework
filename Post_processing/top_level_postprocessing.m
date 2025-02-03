@@ -6,7 +6,7 @@ function top_level_postprocessing(sets, varargin)
 sim_types = {'geometry','wake', 'sparameter', 'eigenmode', 'lossy_eigenmode', 'shunt'};
 
 default_sim_types = {'geometry', 'wake', 'sparameter', 'lossy_eigenmode'};
-default_stages = {'setup', 'postprocess', 'field_extraction', 'analyse', 'reconstruct'  'plot_analysis_data', 'plot_reconstruction_data', 'plot_fields', 'plot_thermals','report'};
+default_stages = {'postprocess', 'field_extraction', 'analyse', 'reconstruct'  'plot_analysis_data', 'plot_reconstruction_data', 'plot_fields', 'plot_thermals','report'};
 default_version = {'241105'};
 default_number_of_cores = {'60'}; % less than max to avoid contension with other users
 default_precision = {'double'};
@@ -40,8 +40,6 @@ input_data.ppi.eigenmode.scale = '2';
 input_data.paths = load_local_paths;
 number_of_wake_lengths_to_analyse = 4;
 
-
-
 for set_id = 1:length(input_data.sets)
     %% Setting up log file
     stamp = regexprep(datestr(now),':', '-');
@@ -49,11 +47,6 @@ for set_id = 1:length(input_data.sets)
         mkdirtree(fullfile(input_data.paths.logfile_location, input_data.sets{set_id}))
     end %if
     diary(fullfile(input_data.paths.logfile_location, input_data.sets{set_id}, stamp));
-
-    % Setup directory structure and copy across setup datafiles
-    if any(matches(input_data.stages, 'setup'))
-        run_setup(input_data, set_id);
-    end %if
 
     %% Postprocessing
     if any(matches(input_data.stages, 'postprocess'))
