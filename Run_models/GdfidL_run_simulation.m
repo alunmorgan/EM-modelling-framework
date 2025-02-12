@@ -61,11 +61,11 @@ for nes = 1:n_cycles
         construct_gdf_file(out_loc, paths, tail, sim_type, modelling_inputs, active_ports(nes), sparameter_set(nes), frequency)
         save(fullfile(out_loc,'run_inputs.mat'), 'paths', 'modelling_inputs')
         %         fprintf(['\nRunning ', sim_type,' simulation for ', modelling_inputs.model_name, '.'])
-        file_locs{ck} = write_single_simulation_batch_file(paths, restart_loc,...
+        file_locs{ck, 1} = write_single_simulation_batch_file(paths, restart_loc,...
             out_loc, scratch_loc, tail, modelling_inputs.precision, modelling_inputs.version);
         if ~isempty(file_locs{ck})
         % adding syntax to make it runable
-        file_locs{ck} = ['source "', file_locs{ck}, '"'];
+        file_locs{ck, 1} = ['source "', file_locs{ck}, '"'];
         end %if
         ck = ck +1;
         fprintf('\nDone')
