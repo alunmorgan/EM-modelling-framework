@@ -1,4 +1,4 @@
-function [out, scrtch]= GdfidL_write_pp_wake_input_file(log, data_directory, pp_directory, scratch_dir)
+function out= GdfidL_write_pp_wake_input_file(log, data_directory, pp_directory)
 % Writes the post processing input file.
 %
 % log is a structure containing the information extracted from the log
@@ -38,9 +38,7 @@ ov = cat(1,ov,'    2dplotopts = -geometry 1024x768');
 ov = cat(1,ov,'    plotopts = -geometry 1024x768');
 ov = cat(1,ov,'    nrofthreads = 42');
 ov = cat(1,ov,'    ');
-ov_setup = ov;
-scrtch{1} = scratch_dir;
-ov = cat(1,ov,strcat(['    scratchbase = ',scratch_dir,'/']));
+ov = cat(1,ov,strcat(['    scratchbase = ',pp_directory,'/']));
 
 ov = cat(1,ov,'-wakes');
 ov = cat(1,ov,'    watq = yes');
@@ -222,13 +220,12 @@ if isfield(log, 'voltage_monitors')
         ov = cat(1,ov,'  doit');
     end %for
 end %if
-out{1} = fullfile(pp_directory, 'model_wake_post_processing');
-write_out_data( ov, out{1} )
 
-
+%[temp, ~, ~] = fileparts(pp_directory);
 for lae = 1:length(log.port_name)
-    scrtch{lae +1} = [scratch_dir,'_ports',num2str(lae)];
-    ov = cat(1,ov_setup,strcat(['    scratchbase = ',scrtch{lae +1},'/']));
+    %port_folder = fullfile(temp, ['wake_post_processing_ports-', log.port_name{lae}]);
+    %mkdirtree(port_folder)
+    %ov = cat(1,ov_setup,strcat(['    scratchbase = ',scratch_dir,'_ports',num2str(lae),'/']));
     ov = cat(1,ov,'-sparameter');
     ov = cat(1,ov,strcat(['    ports = ',log.port_name{lae}]));
     ov = cat(1,ov,'    modes = all');
@@ -241,12 +238,8 @@ for lae = 1:length(log.port_name)
     ov = cat(1,ov,'    fsumpower = yes');
     ov = cat(1,ov,'    onlyplotfiles = yes');
     ov = cat(1,ov,'    doit');
-    ov = cat(1,ov,'-sparameter, showeh=no');
+    ov = cat(1,ov,'    showeh=no');
     ov = cat(1,ov,'    doit');
-    [temp, ~, ~] = fileparts(pp_directory);
-    port_folder = fullfile(temp, ['wake_post_processing_ports-', log.port_name{lae}]);
-    mkdirtree(port_folder)
-    out{lae +1} = [port_folder,'/model_wake_post_processing_ports-', log.port_name{lae}];
-    write_out_data( ov, out{lae +1} )
-
 end
+out = fullfile(pp_directory, 'model_wake_post_processing');
+write_out_data( ov, out)

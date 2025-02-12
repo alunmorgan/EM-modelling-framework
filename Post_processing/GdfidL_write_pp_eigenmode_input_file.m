@@ -1,4 +1,4 @@
-function out_name = GdfidL_write_pp_eigenmode_input_file(log, data_directory, pp_directory, scratch_dir, pp_type, pp_settings)
+function out_name = GdfidL_write_pp_eigenmode_input_file(log, data_directory, pp_directory, pp_type, pp_settings)
 % Writes the postprocessing input file for an eigenmode simulation.
 %
 % log is a structure containing the information extracted from the log
@@ -19,7 +19,7 @@ scale = pp_settings.eigenmode.scale;
 ov{1} = '';
 ov = cat(1,ov,'-general');
 ov = cat(1,ov,strcat(['    infile= ',data_directory]));
-ov = cat(1,ov,strcat(['    scratchbase = ',scratch_dir,'/']));
+ov = cat(1,ov,strcat(['    scratchbase = ',pp_directory,'/']));
 ov = cat(1,ov,'    2dplotopts = -geometry 1440x900');
 ov = cat(1,ov,'    plotopts = -geometry 1440x900');
 ov = cat(1,ov,'    nrofthreads = 40');
