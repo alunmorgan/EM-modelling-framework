@@ -6,7 +6,7 @@ function top_level_postprocessing(sets, varargin)
 sim_types = {'geometry','wake', 'sparameter', 'eigenmode', 'lossy_eigenmode', 'shunt'};
 
 default_sim_types = {'geometry', 'wake', 'sparameter', 'lossy_eigenmode'};
-default_stages = {'postprocess', 'field_extraction', 'analyse', 'reconstruct'  'plot_analysis_data', 'plot_reconstruction_data', 'plot_fields', 'plot_thermals','report'};
+default_stages = {'simulate', 'postprocess', 'field_extraction', 'analyse', 'reconstruct'  'plot_analysis_data', 'plot_reconstruction_data', 'plot_fields', 'plot_thermals','report'};
 default_version = {'241105'};
 default_number_of_cores = {'60'}; % less than max to avoid contension with other users
 default_precision = {'double'};
@@ -14,8 +14,6 @@ default_precision = {'double'};
 p = inputParser;
 p.StructExpand = false;
 p.CaseSensitive = false;
-%addRequired(p, 'paths');
-%addRequired(p, 'ppi'); % analysis_settings
 addRequired(p, 'sets');
 addParameter(p, 'sim_types', default_sim_types, @(x) any(matches(x,sim_types)))
 addParameter(p, 'stages', default_stages)
@@ -25,6 +23,22 @@ addParameter(p, 'precision', default_precision)
 
 parse(p, sets, varargin{:});
 input_data = p.Results;
+input_data.paths = load_local_paths;
+
+% %% MOVE TO BATCH FILE
+% for set_id = 1:length(input_data.sets)
+%     mkdirtree(fullfile(paths.logfile_location, input_data.sets{set_id}))
+% end %for
+
+for set_id = 1:length(input_data.sets)
+    %% Setting up log file
+    stamp = regexprep(datestr(now),':', '-');
+    if ~exist(fullfile(input_data.paths.logfile_location, input_data.sets{set_id}), 'dir')
+        mkdirtree(fullfile(input_data.paths.logfile_location, input_data.sets{set_id}))
+    end %if
+    diary(fullfile(input_data.paths.logfile_location, input_data.sets{set_id}, stamp));
+end %for
+
 input_data.ppi = analysis_settings;
 %% Eigenmode plotting settings
 input_data.ppi.eigenmode.cuts = {'x', '0';'y', '0';'z', '0';};
@@ -36,23 +50,19 @@ input_data.ppi.eigenmode.scale = '2';
 % input_data.ppi.eigenmode.subsections{1}.zmin = '-4E-3';
 % input_data.ppi.eigenmode.subsections{1}.zmax = '4E-3';
 
-
-input_data.paths = load_local_paths;
 number_of_wake_lengths_to_analyse = 4;
 
+%% Simulation
+if any(matches(input_data.stages, 'simulate'))
+    run_models(input_data)
+end %if
+
+%% Postprocessing
+if any(matches(input_data.stages, 'postprocess'))
+    run_postprocessing(input_data);
+end %if
+
 for set_id = 1:length(input_data.sets)
-    %% Setting up log file
-    stamp = regexprep(datestr(now),':', '-');
-    if ~exist(fullfile(input_data.paths.logfile_location, input_data.sets{set_id}), 'dir')
-        mkdirtree(fullfile(input_data.paths.logfile_location, input_data.sets{set_id}))
-    end %if
-    diary(fullfile(input_data.paths.logfile_location, input_data.sets{set_id}, stamp));
-
-    %% Postprocessing
-    if any(matches(input_data.stages, 'postprocess'))
-        run_postprocessing(input_data, set_id);
-    end %if
-
     %% Field extraction
     if any(matches(input_data.stages, 'field_extraction'))
         run_field_extraction(input_data, set_id);
