@@ -13,8 +13,8 @@ function file_loc = GdfidL_write_pp_geometry_bash_file(data_directory, pp_direct
 
 %% Construct file
 shell_contents = {'#! /bin/bash'};
-shell_contents = cat(1,shell_contents,['DATADIR=', data_directory]);
-shell_contents = cat(1,shell_contents,['PPDIR=', pp_directory]);
+shell_contents = cat(1,shell_contents,['DATADIR="', data_directory, '"']);
+shell_contents = cat(1,shell_contents,['PPDIR="', pp_directory, '"']);
 shell_contents = cat(1,shell_contents,'if [ ! -d $PPDIR ]; then');
 shell_contents = cat(1,shell_contents,'mkdir -p $PPDIR');
 shell_contents = cat(1,shell_contents,'fi');
