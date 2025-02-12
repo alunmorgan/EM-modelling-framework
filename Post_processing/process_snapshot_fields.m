@@ -4,21 +4,26 @@ function process_snapshot_fields(fileset, fileset_name, out_path)
 w = waitbar(0,'Processing snapshot files ...');
 w.UserData = [0 length(fileset)];
 mk = 1;
-number_of_parallel_files = 6;
-for wne = 1:number_of_parallel_files:length(fileset)
-    for wns = 1:number_of_parallel_files
-        if mk > length(fileset)
-            continue
-        else
-            f(wns) = parfeval(@read_single_fexport_file, 1, fileset{mk});
-            mk = mk + 1;
-        end %if
-    end %for
-    B = afterEach(f, @construct_snapshot_file, 0);
-    afterEach(B,@(~)updateWaitbar(w),0);
-    wait(B)
-    delete(f)
-    delete(B)
+% number_of_parallel_files = 6;
+% for wne = 1:number_of_parallel_files:length(fileset)
+%     for wns = 1:number_of_parallel_files
+%         if mk > length(fileset)
+%             continue
+%         else
+%             f(wns) = parfeval(@read_single_fexport_file, 1, fileset{mk});
+%             mk = mk + 1;
+%         end %if
+%     end %for
+%     B = afterEach(f, @construct_snapshot_file, 0);
+%     afterEach(B,@(~)updateWaitbar(w),0);
+%     wait(B)
+%     delete(f)
+%     delete(B)
+% end %for
+for wne = 1:length(fileset)
+        f = read_single_fexport_file(fileset{mk});
+        construct_snapshot_file(f)
+        updateWaitbar(w)
 end %for
 delete(w)
 
