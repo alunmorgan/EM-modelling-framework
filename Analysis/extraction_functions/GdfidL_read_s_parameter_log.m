@@ -1,4 +1,4 @@
-function run_logs = GdfidL_read_s_parameter_log( freq_folder )
+function run_logs = GdfidL_read_s_parameter_log(freq_folder)
 %Reads in the log file and extracts parameter data from it.
 %
 % log file is a string containing the full path to the file.

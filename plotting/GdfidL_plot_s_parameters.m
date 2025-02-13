@@ -4,13 +4,6 @@ function GdfidL_plot_s_parameters(run_inputs_loc, analysis_loc, output_folder)
 % Example: GdfidL_plot_s_parameters(s, ppi, fig_pos, pth)
 % [pth, ~,~] = fileparts(path_to_data);
 
-
-[temp, ~, ~] = fileparts(run_inputs_loc);
-[temp, ~, ~] = fileparts(temp);
-[temp, ~, ~] = fileparts(temp);
-[temp, ~, ~] = fileparts(temp);
-[~, prefix, ~] = fileparts(temp);
-
 fig_width = 800;
 fig_height = 600;
 fig_left = 10560 - fig_width;
@@ -34,16 +27,16 @@ for rnf = 1:size(files_to_load,1)
     end %if
 end %for
 
-plot_s_param_graph(sparameter_data, modelling_inputs.beam, cols_sep, fig_pos, output_folder, prefix, lower_cutoff, linewidth)
-plot_s_parameter_reflection_graph(sparameter_data, modelling_inputs.beam, cols_sep, lines, fig_pos, output_folder, prefix, lower_cutoff, linewidth)
+plot_s_param_graph(sparameter_data, modelling_inputs.beam, cols_sep, fig_pos, output_folder, modelling_inputs.model_name, modelling_inputs.port_names, lower_cutoff, linewidth)
+plot_s_parameter_reflection_graph(sparameter_data, modelling_inputs.beam, cols_sep, lines, fig_pos, output_folder, modelling_inputs.model_name, modelling_inputs.port_names, lower_cutoff, linewidth)
 receivers = unique(sparameter_data.reciever_list);
 % Only generate the transmission graphs if there is more than 1 signal port.
 if strcmp(modelling_inputs.beam, 'yes') && length(receivers) > 2
-    plot_s_parameter_transmission_graphs_port(sparameter_data, modelling_inputs.beam, cols_sep, lines, fig_pos, output_folder, prefix, lower_cutoff, linewidth)
-    plot_s_param_transmission_graphs_modes(sparameter_data, modelling_inputs.beam, cols_sep, lines, fig_pos, output_folder, prefix, lower_cutoff, linewidth)
+    plot_s_parameter_transmission_graphs_port(sparameter_data, modelling_inputs.beam, cols_sep, lines, fig_pos, output_folder, modelling_inputs.model_name, modelling_inputs.port_names, lower_cutoff, linewidth)
+    plot_s_param_transmission_graphs_modes(sparameter_data, modelling_inputs.beam, cols_sep, lines, fig_pos, output_folder, modelling_inputs.model_name, modelling_inputs.port_names, lower_cutoff, linewidth)
 elseif strcmp(modelling_inputs.beam, 'no')&& length(receivers) > 0
-    plot_s_parameter_transmission_graphs_port(sparameter_data, modelling_inputs.beam, cols_sep, lines, fig_pos, output_folder, prefix, lower_cutoff, linewidth)
-    plot_s_param_transmission_graphs_modes(sparameter_data, modelling_inputs.beam, cols_sep, lines, fig_pos, output_folder, prefix, lower_cutoff, linewidth)
+    plot_s_parameter_transmission_graphs_port(sparameter_data, modelling_inputs.beam, cols_sep, lines, fig_pos, output_folder, modelling_inputs.model_name, modelling_inputs.port_names, lower_cutoff, linewidth)
+    plot_s_param_transmission_graphs_modes(sparameter_data, modelling_inputs.beam, cols_sep, lines, fig_pos, output_folder, modelling_inputs.model_name, modelling_inputs.port_names, lower_cutoff, linewidth)
 end %if
 
 

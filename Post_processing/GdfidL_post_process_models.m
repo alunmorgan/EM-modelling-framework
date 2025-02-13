@@ -75,10 +75,12 @@ end %try
 
 try
     if any(contains('sparameter', input_settings.sim_types))
-        [s_names, ~] = dir_list_gen(data_directory, 'dirs', 1);
+        sparameter_data_dir = fullfile(data_directory, 'sparameter');
+        sparameter_pp_dir = fullfile(pp_directory, 'sparameter');
+        [s_names, ~] = dir_list_gen(sparameter_data_dir, 'dirs', 1);
         for osw = 1:length(s_names)
-            s_parameter_data_directory = fullfile(data_directory, s_names{osw});
-            s_parameter_output_directory = fullfile(pp_directory, s_names{osw});
+            s_parameter_data_directory = fullfile(sparameter_data_dir, s_names{osw});
+            s_parameter_output_directory = fullfile(sparameter_pp_dir, s_names{osw});
             mkdirtree(s_parameter_output_directory)
             if exist(fullfile(s_parameter_data_directory,'model_log'), 'file') ~= 2
                 fprintf(['\nMissing log file in ' s_parameter_data_directory]);
