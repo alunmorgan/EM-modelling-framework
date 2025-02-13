@@ -1,4 +1,4 @@
-function top_level_postprocessing(sets, varargin)
+function top_level_processing(sets, varargin)
 
 %sets(cell of strings/char): Names of the model sets to run.
 
