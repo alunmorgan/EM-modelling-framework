@@ -15,7 +15,7 @@ sim_list = cat(1,sim_list,'if [ ! -d $DATALOC ]; then');
 sim_list = cat(1,sim_list,'mkdir -p $DATALOC');
 sim_list = cat(1,sim_list,'fi');
 
-for nse = 1:length(input_settings.sets)
+for nse = 1:length(input_data.sets)
     cd(fullfile(input_data.paths.inputfile_location, input_data.sets{nse}))
     mi = feval(input_data.sets{nse});
     cd(default_location)
