@@ -45,7 +45,9 @@ sigma_ind = find_position_in_cell_lst(strfind(plot_data.header_info,'sigma'));
 if isempty(sigma_ind) == 0
     plot_data.sigma = regexp(plot_data.header_info{sigma_ind},...
         '.*sigma=\s*([0-9\.eE-+]+)\s*.*','tokens');
+    if ~isempty(plot_data.sigma)
     plot_data.sigma = str2double(plot_data.sigma{1}{1});
+    end %if
 end
 
 location_ind = find_position_in_cell_lst(strfind(plot_data.header_info,'(x,y)='));

@@ -117,7 +117,7 @@ for ng = length(mat_names_ind):-1:1
     mat_index(ng) = lg.mat_losses.single_mat_data{ng,1};
     %Initially setting the losses to zero so that is no losses are recorded the
     %data structure is still present.
-     lg.mat_losses.single_mat_data{ng,4} = [0,0];
+    lg.mat_losses.single_mat_data{ng,4} = [0,0];
 end
 clear ng tokens temp mat_names_ind
 % find the total material loss.
@@ -276,7 +276,7 @@ elseif length(charge_ind) > 1
 end %if
 
 
-% find the set beam sigma.
+% find the set beam pulse parameters.
 beam_sigma_ind = find_position_in_cell_lst(regexp(data,'lcharges>\s*sigma\s*=\s*'));
 if length(beam_sigma_ind) == 1
     beam_sigma = regexp(data{beam_sigma_ind},'lcharges>\s*sigma\s*=\s*([^,]*)(?:\s*,|\s*$)', 'tokens');
@@ -290,6 +290,22 @@ elseif length(beam_sigma_ind) > 1
     end %for
     lg.beam_sigma = temp_beam_sigma_num(1); %FIXME - is there a better way than just taking the first value?
 end %if
+beam_profile_type_ind = find_position_in_cell_lst(regexp(data,'lcharges>\s*shape\s*=\s*'));
+if ~isempty(beam_profile_type_ind)
+    beam_profile_type = regexp(data{beam_profile_type_ind},'lcharges>\s*shape\s*=\s*([^,]*)(?:\s*,|\s*$)', 'tokens');
+    lg.beam_profile_type = beam_profile_type{1}{1};
+end %if
+beam_profile_ind = find_position_in_cell_lst(regexp(data,'lcharges>\s*tablefile\s*=\s*'));
+if ~isempty(beam_profile_ind)
+    beam_profile = regexp(data{beam_profile_ind},'lcharges>\s*tablefile\s*=\s*([^,]*)(?:\s*,|\s*$)', 'tokens');
+    lg.beam_profile = beam_profile{1}{1};
+end %if
+beam_profile_xscale_ind = find_position_in_cell_lst(regexp(data,'lcharges>\s*xtable\s*=\s*'));
+if ~isempty(beam_profile_xscale_ind)
+    beam_profile_xscale = regexp(data{beam_profile_xscale_ind},'lcharges>\s*xtable\s*=\s*([^,]*)(?:\s*,|\s*$)', 'tokens');
+    lg.beam_profile_xscale = str2double(beam_profile_xscale{1}{1});
+end %if
+
 %find the memory usage
 memory_ind = find_position_in_cell_lst(strfind(data,'The Memory Usage is at least'));
 if ~isempty(memory_ind)

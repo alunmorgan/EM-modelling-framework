@@ -42,8 +42,8 @@ for jw = length(names):-1:1
         param_vals{jw, 2} = data.(set_name).('pp_inputs').('precision');
         
         if isfield(data.(set_name).('pp_inputs').('logs'), 'wake')
-        param_names(jw, 1:5) = {'Version','Precision', 'beam_sigma', 'mesh', 'wake'};
-        param_vals{jw, 3} = num2str(data.(set_name).('pp_inputs').('logs').('wake').('beam_sigma'));
+        param_names(jw, 1:5) = {'Version','Precision', 'beam_shape', 'mesh', 'wake'};
+        param_vals{jw, 3} = num2str(data.(set_name).('pp_inputs').('logs').('wake').('beam_shape'));
         param_vals{jw, 4} = num2str(data.(set_name).('pp_inputs').('logs').('wake').('mesh_step_size'));
         param_vals{jw, 5} = num2str(data.(set_name).('pp_inputs').('logs').('wake').('wake_length'));
         n_predefined = 5;

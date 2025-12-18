@@ -20,9 +20,9 @@ else
 end %if
 
 % Take the values from the wake simulation if it exists.
-if isfield(run_logs, 'beam_sigma')
-    mb_param_names(3:4) = {'beam_sigma', 'wake',};
-    mb_param_vals{3} = [num2str(run_logs.('beam_sigma')*1000), ' mm'];
+if isfield(run_logs, 'beam_shape')
+    mb_param_names(3:4) = {'beam_shape', 'wake',};
+    mb_param_vals{3} = [num2str(run_logs.('beam_shape')*1000), ' mm'];
     mb_param_vals{4} = [num2str(run_logs.('wake_length')), ' m'];
 end %if
 

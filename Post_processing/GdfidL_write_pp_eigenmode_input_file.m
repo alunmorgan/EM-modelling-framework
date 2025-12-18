@@ -1,4 +1,4 @@
-function out_name = GdfidL_write_pp_eigenmode_input_file(log, data_directory, pp_directory, pp_type, pp_settings)
+function out_name = GdfidL_write_pp_eigenmode_input_file(log, data_directory, pp_directory, pp_type, pp_settings, selected_modes, temp_dir)
 % Writes the postprocessing input file for an eigenmode simulation.
 %
 % log is a structure containing the information extracted from the log
@@ -19,7 +19,7 @@ scale = pp_settings.eigenmode.scale;
 ov{1} = '';
 ov = cat(1,ov,'-general');
 ov = cat(1,ov,strcat(['    infile= ',data_directory]));
-ov = cat(1,ov,strcat(['    scratchbase = ',pp_directory,'/']));
+ov = cat(1,ov,strcat(['    scratchbase = ',temp_dir, '/']));
 ov = cat(1,ov,'    2dplotopts = -geometry 1440x900');
 ov = cat(1,ov,'    plotopts = -geometry 1440x900');
 ov = cat(1,ov,'    nrofthreads = 40');
@@ -34,29 +34,29 @@ if strcmpi(pp_type, 'eigenmode')
 elseif strcmpi(pp_type, 'lossy_eigenmode')
     ov = cat(1,ov,'    quantity = ere');
 end %if
-for jrd = 1:length(log.eigenmodes.nums)
+for jrd = 1:length(selected_modes)
     ov = cat(1,ov,'	 lenarrows= 1E-6');
     for kse = 1:length(subsections)
         ov = set_bounding_box(ov, subsections{kse});
         ov = cat(1,ov,'	 eyeposition = ( -1.0, -2.30, 0.50 )');
-        ov = cat(1,ov, ['	 plotopts = -colorps -o ',pp_directory,'/',pp_type,num2str(jrd),'subsection_',num2str(kse),'_plot.ps']);
-        ov = cat(1,ov,['    solution = ', num2str(log.eigenmodes.nums(jrd))]);
+        ov = cat(1,ov, ['	 plotopts = -colorps -o ',temp_dir,'/',pp_type,num2str(selected_modes(jrd)),'subsection_',num2str(kse),'_plot.ps']);
+        ov = cat(1,ov,['    solution = ', num2str(selected_modes(jrd))]);
         ov = cat(1,ov,'    doit');
         ov = cat(1,ov,'	 eyeposition = ( -2.30, -1.0, 0.50 )');
-        ov = cat(1,ov, ['	 plotopts = -colorps -o ',pp_directory,'/',pp_type,num2str(jrd),'subsection_',num2str(kse),'_x_plot.ps']);
+        ov = cat(1,ov, ['	 plotopts = -colorps -o ',temp_dir,'/',pp_type,num2str(selected_modes(jrd)),'subsection_',num2str(kse),'_x_plot.ps']);
         ov = cat(1,ov,'    doit');
         ov = cat(1,ov,'	 eyeposition = ( -1.0, -2.30, 0.50 )');
-        ov = cat(1,ov, ['	 plotopts = -colorps -o ',pp_directory,'/',pp_type,num2str(jrd),'subsection_',num2str(kse),'_y_plot.ps']);
+        ov = cat(1,ov, ['	 plotopts = -colorps -o ',temp_dir,'/',pp_type,num2str(selected_modes(jrd)),'subsection_',num2str(kse),'_y_plot.ps']);
         ov = cat(1,ov,'    doit');
         ov = cat(1,ov,'	 eyeposition = ( -1.0, ,0.50 ,-2.30 )');
-        ov = cat(1,ov, ['	 plotopts = -colorps -o ',pp_directory,'/',pp_type,num2str(jrd),'subsection_',num2str(kse),'_z_plot.ps']);
+        ov = cat(1,ov, ['	 plotopts = -colorps -o ',temp_dir,'/',pp_type,num2str(selected_modes(jrd)),'subsection_',num2str(kse),'_z_plot.ps']);
         ov = cat(1,ov,'    doit');
     end %for
     ov = cat(1,ov,'	 lenarrows= 1');
     ov = reset_bounding_box(ov, log);
     ov = cat(1,ov,'	 eyeposition = ( -1.0, -2.30, 0.50 )');
-    ov = cat(1,ov, ['	 plotopts = -colorps -o ',pp_directory,'/',pp_type,num2str(jrd),'_plot.ps']);
-    ov = cat(1,ov,['    solution = ', num2str(log.eigenmodes.nums(jrd))]);
+    ov = cat(1,ov, ['	 plotopts = -colorps -o ',temp_dir,'/',pp_type,num2str(selected_modes(jrd)),'_plot.ps']);
+    ov = cat(1,ov,['    solution = ', num2str(selected_modes(jrd))]);
     ov = cat(1,ov,'    doit');
     for ndw = 1:size(slices,1)
         plane_loc = regexprep(slices{ndw,2}, ' ', '');
@@ -65,32 +65,32 @@ for jrd = 1:length(log.eigenmodes.nums)
         if strcmp(slices{ndw, 1},'z')
             ov = reset_bounding_box(ov, log);
             ov = cat(1,ov,['	 bbzlow = ', slices{ndw, 2}]);
-            ov = cat(1,ov,['    solution = ', num2str(log.eigenmodes.nums(jrd))]);
+            ov = cat(1,ov,['    solution = ', num2str(selected_modes(jrd))]);
             ov = cat(1,ov,'	 eyeposition = ( -1.0, ,0.50 ,-2.30 )');
-            ov = cat(1,ov, ['	 plotopts = -colorps -o ',pp_directory,'/', pp_type, num2str(jrd),'_z_cut_',plane_loc,'_plot.ps']);
+            ov = cat(1,ov, ['	 plotopts = -colorps -o ',temp_dir,'/', pp_type, num2str(selected_modes(jrd)),'_z_cut_',plane_loc,'_plot.ps']);
             ov = cat(1,ov,'    doit');
             ov = cat(1,ov,'	 eyeposition = ( 0, ,0 ,-1 )');
-            ov = cat(1,ov, ['	 plotopts = -colorps -o ',pp_directory,'/', pp_type, num2str(jrd),'_z_cut_',plane_loc,'_flat_plot.ps']);
+            ov = cat(1,ov, ['	 plotopts = -colorps -o ',temp_dir,'/', pp_type, num2str(selected_modes(jrd)),'_z_cut_',plane_loc,'_flat_plot.ps']);
             ov = cat(1,ov,'    doit');
         elseif strcmp(slices{ndw, 1},'x')
             ov = reset_bounding_box(ov, log);
             ov = cat(1,ov,['	 bbxlow = ', slices{ndw, 2}]);
-            ov = cat(1,ov,['    solution = ', num2str(log.eigenmodes.nums(jrd))]);
+            ov = cat(1,ov,['    solution = ', num2str(selected_modes(jrd))]);
             ov = cat(1,ov,'	 eyeposition = ( -2.30, -1.0, 0.50 )');
-            ov = cat(1,ov, ['	 plotopts = -colorps -o ',pp_directory,'/', pp_type, num2str(jrd),'_x_cut_',plane_loc,'_plot.ps']);
+            ov = cat(1,ov, ['	 plotopts = -colorps -o ',temp_dir,'/', pp_type, num2str(selected_modes(jrd)),'_x_cut_',plane_loc,'_plot.ps']);
             ov = cat(1,ov,'    doit');
             ov = cat(1,ov,'	 eyeposition = ( -1, 0, 0 )');
-            ov = cat(1,ov, ['	 plotopts = -colorps -o ',pp_directory,'/', pp_type, num2str(jrd),'_x_cut_',plane_loc,'_flat_plot.ps']);
+            ov = cat(1,ov, ['	 plotopts = -colorps -o ',temp_dir,'/', pp_type, num2str(selected_modes(jrd)),'_x_cut_',plane_loc,'_flat_plot.ps']);
             ov = cat(1,ov,'    doit');
         elseif strcmp(slices{ndw, 1},'y')
             ov = reset_bounding_box(ov, log);
             ov = cat(1,ov,['	 bbylow = ', slices{ndw, 2}]);
-            ov = cat(1,ov,['    solution = ', num2str(log.eigenmodes.nums(jrd))]);
+            ov = cat(1,ov,['    solution = ', num2str(selected_modes(jrd))]);
             ov = cat(1,ov,'	 eyeposition = ( -1.0, -2.30, 0.50 )');
-            ov = cat(1,ov, ['	 plotopts = -colorps -o ',pp_directory,'/', pp_type, num2str(jrd),'_y_cut_',plane_loc,'_plot.ps']);
+            ov = cat(1,ov, ['	 plotopts = -colorps -o ',temp_dir,'/', pp_type, num2str(selected_modes(jrd)),'_y_cut_',plane_loc,'_plot.ps']);
             ov = cat(1,ov,'    doit');
             ov = cat(1,ov,'	 eyeposition = ( 0, -1, 0 )');
-            ov = cat(1,ov, ['	 plotopts = -colorps -o ',pp_directory,'/', pp_type, num2str(jrd),'_y_cut_',plane_loc,'_flat_plot.ps']);
+            ov = cat(1,ov, ['	 plotopts = -colorps -o ',temp_dir,'/', pp_type, num2str(selected_modes(jrd)),'_y_cut_',plane_loc,'_flat_plot.ps']);
             ov = cat(1,ov,'    doit');
         end %if
     end %if
@@ -102,8 +102,8 @@ if strcmpi(pp_type, 'eigenmode')
 elseif strcmpi(pp_type, 'lossy_eigenmode')
     ov = cat(1,ov,'    quantity = ere');
 end %if
-for jrd = 1:length(log.eigenmodes.nums)
-    ov = cat(1,ov,['    solution = ', num2str(log.eigenmodes.nums(jrd))]);
+for jrd = 1:length(selected_modes)
+    ov = cat(1,ov,['    solution = ', num2str(selected_modes(jrd))]);
     ov = cat(1,ov,'    doit');
     ov = cat(1,ov,'    echo @eenergy');
 end %for
@@ -219,7 +219,7 @@ if strcmpi(pp_type, 'eigenmode')
         ov = cat(1,ov,['call rshunt(',num2str(hd),')']');
     end% for
 end %if
-out_name = fullfile(pp_directory, ['model_', pp_type, '_post_processing.gdfpp']);
+out_name = fullfile(pp_directory, ['model_', pp_type, '_post_processing-modes_',regexprep(num2str(selected_modes),'\s+', '_'),'.gdfpp']);
 write_out_data( ov, out_name)
 
 end %function

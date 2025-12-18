@@ -4,4 +4,4 @@ function data = add_gdf_file_to_report(gdf_loc)
 % Example: data = add_gdf_file_to_report(gdf_loc)
 
 data = read_in_text_file(gdf_loc);
-data = cat(1,'\begin{verbatim}', data, '\end{verbatim}');
+data = cat(1,'\begin{verbatim}', data', '\end{verbatim}');

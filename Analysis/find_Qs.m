@@ -4,7 +4,12 @@ function [peaks, Q, bw] = find_Qs(f_raw, spectrum, num)
 % frequencies.
 %
 % Example: [peaks, Q, bw] = find_Qs(f_raw, spectrum, num)
-
+if isempty(f_raw)
+    Q = NaN;
+    peaks = NaN;
+    bw = NaN;
+    return
+end %if
 if nargin == 3
     tmp_f = f_raw(floor(length(f_raw)/2):end);
     tmp = spectrum(floor(length(spectrum)/2:end));

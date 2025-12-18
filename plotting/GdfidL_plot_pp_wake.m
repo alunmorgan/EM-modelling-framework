@@ -23,38 +23,12 @@ for rnf = 1:size(files_to_load,1)
     end %if
 end %for
 
-% if ~exist('analysed_data','var') && exist('t_data', 'var') && exist('f_data', 'var')
-%     fprintf('\nReconstituting analysed_data from t_data and f_data');
-%     analysed_data = f_data;
-%     t_fields = fieldnames(t_data);
-%     for seh = 1:length(t_fields)
-%         analysed_data.(t_fields{seh}) = t_data.(t_fields{seh});
-%     end %for
-%     analysed_data.Wake_impedance.s.data(:,1) = analysed_data.f_raw;
-%     analysed_data.Wake_impedance.s.data(:,2) = analysed_data.Wake_Impedance_data;
-%     analysed_data.Wake_impedance.x.data(:,1) = analysed_data.f_raw;
-%     analysed_data.Wake_impedance.x.data(:,2) = analysed_data.Wake_Impedance_trans_X;
-%     analysed_data.Wake_impedance.y.data(:,1) = analysed_data.f_raw;
-%     analysed_data.Wake_impedance.y.data(:,2) = analysed_data.Wake_Impedance_trans_Y;
-%     analysed_data.Wake_potential.s.data(:,1) = analysed_data.timebase;
-%     analysed_data.Wake_potential.s.data(:,2) = analysed_data.wakepotential;
-%     analysed_data.Wake_potential.x.data(:,1) = analysed_data.timebase;
-%     analysed_data.Wake_potential.x.data(:,2) = analysed_data.wakepotential_trans_x;
-%     analysed_data.Wake_potential.y.data(:,1) = analysed_data.timebase;
-%     analysed_data.Wake_potential.y.data(:,2) = analysed_data.wakepotential_trans_y;
-%     analysed_data.Charge_distribution.data(:,1) = analysed_data.timebase;
-%     analysed_data.Charge_distribution.data(:,2) = analysed_data.charge_distribution;
-%     analysed_data.bunch_spectrum.data(:,1) = analysed_data.f_raw;
-%     analysed_data.bunch_spectrum.data(:,2) = analysed_data.bunch_spectra;
-%     analysed_data.Wake_impedance.s.loss.s = analysed_data.wake_loss_factor;
-%     analysed_data.Wake_impedance.x.loss.x = NaN;
-%     analysed_data.Wake_impedance.y.loss.y = NaN;
-% end %if
-
 %Line width of the graphs
 lw = 2;
+
 % limit to the horizontal axis.
 graph_freq_lim = ppi.hfod * 1e-9;
+
 % location and size of the default figures.
 fig_width = 800;
 fig_height = 600;
@@ -62,16 +36,17 @@ fig_left = 10560 - fig_width;
 fig_bottom = 1098 - fig_height;
 fig_pos = [fig_left fig_bottom fig_width fig_height];
 
-% setting up some style lists for the graphs.
-% cols = {'b','k','m','c','g',[1, 0.5, 0],[0.5, 1, 0],[1, 0, 0.5],[0.5, 0, 1],[0.5, 1, 0] };
-% l_st ={'--',':','-.','--',':','-.','--',':','-.'};
-
 % Extracting  losses
-% [model_mat_data, mat_loss, m_time, m_data] = ...
-%     extract_material_losses_from_wake_data(analysed_data, modelling_inputs.extension_names);
-
 [structure_energy_loss, material_names] =  ...
     extract_energy_loss_data_from_analysed_data(analysed_data);
+if isfield(analysed_data.port, 'labels')
+    port_names = analysed_data.port.labels;
+    for ns = 1:length(port_names)
+        port_names{ns} = regexprep(port_names{ns}, '_', ' ');
+    end %for
+else
+    port_names = {NaN};
+end %if
 
 % Extracting wake impedances
 cut_freq_ind = find(analysed_data.Wake_impedance.s.data(:,1)*1E-9 < graph_freq_lim,1,'last');
@@ -91,30 +66,32 @@ wpdy = analysed_data.Wake_potential.y.data; % V/pC
 wpdy(:,1) = wpdy(:,1) .* 1E9; % time in ns
 
 % Extracting spectra
-
 [peaks, Q, bw] = find_Qs(wi_re(:,1) .* 1e9, wi_re(:,2), 0.1);
-R_over_Q = peaks(:,2) ./ Q;
+if isnan(peaks)
+    R_over_Q = NaN;
+else
+    R_over_Q = peaks(:,2) ./ Q;
+end %if
 
 h_wake = figure('Position',fig_pos);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Thermal graphs
 if ~isnan(structure_energy_loss)
     clf(h_wake)
-    if isfield(analysed_data.port, 'timebase') && isfield(analysed_data.port.data, 'time') && isfield(analysed_data.port.data.time, 'power_port')
+    if isfield(analysed_data.port, 'timebase') &&...
+            ~any(isnan(analysed_data.port.timebase)) &&...
+            isfield(analysed_data.port.data, 'time') &&...
+            isfield(analysed_data.port.data.time, 'power_port')
         time_step = analysed_data.port.timebase(2) - analysed_data.port.timebase(1);
-        beam_ports = sum(analysed_data.port.data.time.power_port.data{1}) .* time_step + ...
-            sum(analysed_data.port.data.time.power_port.data{2}) .* time_step;
-        signal_ports = 0;
-        for jas = 3:length(analysed_data.port.data.time.power_port.data)
-            signal_ports = signal_ports + sum(analysed_data.port.data.time.power_port.data{jas}) .* time_step;
+        for jas = 1:length(analysed_data.port.data.time.power_port.data)
+            ports(jas) = sum(analysed_data.port.data.time.power_port.data{jas}) .* time_step;
         end %for
     else
-        beam_ports = 0;
-        signal_ports = 0;
+        ports = 0;
     end %if
-    % abs around the structreu energy loss as the output changes between
+    % abs around the structure energy loss as the output changes between
     % versions 230330 and 241105.
-    plot_data = [beam_ports * 1E9, signal_ports * 1E9, abs(structure_energy_loss)];
+    plot_data = [ports .* 1E9, abs(structure_energy_loss)];
     % matlab will ignore any values of zero which messes up the maping of the
     % lables. This just makes any zero values a very small  positive value to avoid
     % this.
@@ -122,56 +99,60 @@ if ~isnan(structure_energy_loss)
 
     loss_from_beam = abs(analysed_data.Wake_potential.s.loss.s) * 1e9;
     loss_accounted_for = sum(plot_data);
+    if ~isnan(port_names{1})
+        if iscell(material_names)
+            x = categorical(cellstr([port_names, material_names]));
+        elseif isnan(material_names)
+            x = categorical(cellstr(port_names));
+        end %if
 
-    if iscell(material_names)
-        x = categorical(cellstr(['Beam ports', 'Signal ports',material_names]));
-    elseif isnan(material_names)
-        x = categorical(cellstr(['Beam ports', 'Signal ports']));
+        subplot(5,1,[1 2])
+        temp = zeros(1, length(plot_data));
+        temp(1) = loss_from_beam;
+        plot_data2 = [plot_data; temp];
+        b = bar(plot_data2, 'stacked','FaceColor','flat');
+        legend(x, 'Location', 'NorthOutside', 'NumColumns', 4)
+        xticklabels({'Energy accounted for', 'Energy from beam'})
+        b(1).CData(2,:) = [0, 0, 0];
+        set(gca, 'YGrid', 'on', 'XGrid', 'off')
+
+        subplot(5,1,3)
+        b3 = bar(x, plot_data, 'FaceColor','flat');
+        h2 = gca;
+        h2.XTickLabel = {};
+        xtips1 = b3(1).XEndPoints;
+        ytips1 = b3(1).YEndPoints;
+        labels1 = string(round(b3(1).YData .*100) ./100);
+        text(xtips1,ytips1,labels1,'HorizontalAlignment','center',...
+            'VerticalAlignment','bottom')
+        title('Thermal Losses into materials for a 1nC bunch')
+        ylabel('Energy (nJ)')
+        for hrd = 1:length(plot_data)
+            b3(1).CData(hrd,:) =  b(hrd).CData(1,:);
+        end %for
+
+        subplot(5,1,[4 5])
+        beam_current = 0.3; %A
+        % scales the loss per 1nC bunch to the loss expected for 300mA operation.
+        % also scales the losses to the loss from beam assuming any unaccounted for
+        % loss is evenly distributed. (This is probably pesamistic as it is usually
+        % the port accounting which is off.)
+        plot_data3 = plot_data .* beam_current ./ loss_accounted_for .* loss_from_beam;
+        b3 = bar(x, plot_data3, 'FaceColor','flat');
+        xtips1 = b3(1).XEndPoints;
+        ytips1 = b3(1).YEndPoints;
+        labels1 = string(round(b3(1).YData .*100) ./100);
+        text(xtips1,ytips1,labels1,'HorizontalAlignment','center',...
+            'VerticalAlignment','bottom')
+        title('Thermal Losses into materials for 300mA operation')
+        ylabel('Energy (W)')
+        for hrd = 1:length(plot_data3)
+            b3(1).CData(hrd,:) =  b(hrd).CData(1,:);
+        end %for
+        set(gca, 'YGrid', 'on', 'XGrid', 'off')
+        savemfmt(h_wake, output_folder,[prefix, 'Thermal_Losses_into_materials'])
     end %if
-    
-    subplot(3,1,1)
-    temp = zeros(1, length(plot_data));
-    temp(1) = loss_from_beam;
-    plot_data2 = [plot_data; temp];
-    b = bar(plot_data2, 'stacked','FaceColor','flat');
-    legend(x, 'Location', 'EastOutside')
-    xticklabels({'Energy accounted for', 'Energy from beam'})
-    b(1).CData(2,:) = [0, 0, 0];
-
-    subplot(3,1,2)
-    b3 = bar(x, plot_data, 'FaceColor','flat');
-    xtips1 = b3(1).XEndPoints;
-    ytips1 = b3(1).YEndPoints;
-    labels1 = string(round(b3(1).YData .*100) ./100);
-    text(xtips1,ytips1,labels1,'HorizontalAlignment','center',...
-        'VerticalAlignment','bottom')
-    title('Thermal Losses into materials for a 1nC bunch')
-    ylabel('Energy (nJ)')
-    for hrd = 1:length(plot_data)
-        b3(1).CData(hrd,:) =  b(hrd).CData(1,:);
-    end %for
-
-    subplot(3,1,3)
-    beam_current = 0.3; %A
-    % scales the loss per 1nC bunch to the loss expected for 300mA operation.
-    % also scales the losses to the loss from beam assuming any unaccounted for
-    % loss is evenly distributed. (This is probably pesamistic as it is usually
-    % the port accounting which is off.)
-    plot_data3 = plot_data .* beam_current ./ loss_accounted_for .* loss_from_beam;
-    b3 = bar(x, plot_data3, 'FaceColor','flat');
-    xtips1 = b3(1).XEndPoints;
-    ytips1 = b3(1).YEndPoints;
-    labels1 = string(round(b3(1).YData .*100) ./100);
-    text(xtips1,ytips1,labels1,'HorizontalAlignment','center',...
-        'VerticalAlignment','bottom')
-    title('Thermal Losses into materials for 300mA operation')
-    ylabel('Energy (W)')
-    for hrd = 1:length(plot_data3)
-        b3(1).CData(hrd,:) =  b(hrd).CData(1,:);
-    end %for
-    savemfmt(h_wake, output_folder,[prefix, 'Thermal_Losses_into_materials'])
 end %if
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Electric field at the origin over time.
 if isfield(analysed_data, 'EfieldAtZerox')
@@ -213,7 +194,9 @@ xlabel('Time (ps)', 'Parent', ax)
 xlim([wp(1,1) wp(end,1)])
 ylabel('Charge density (As/m)', 'Parent', ax)
 grid on
-xlim([-40, 40])
+g_start = analysed_data.Charge_distribution.data(1,1)*1E12;
+g_end = analysed_data.Charge_distribution.data(end,1)*1E12;
+xlim([g_start, g_end])
 savemfmt(h_wake, output_folder, [prefix, 'charge_distribution'])
 
 clf(h_wake)
@@ -340,7 +323,7 @@ savemfmt(h_wake, output_folder, [prefix, 'Q_from_wake'])
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Port signals
-if isfield(analysed_data, 'port')
+if isfield(analysed_data, 'port') && ~any(isnan(analysed_data.port.timebase))
     port_names = regexprep(analysed_data.port.labels,'_',' ');
     clf(h_wake)
     if isfield(analysed_data.port, 'timebase')
@@ -366,8 +349,6 @@ if isfield(analysed_data, 'port')
         end %for
         savemfmt(h_wake, output_folder, [prefix, 'port_signals_first4ns'])
     end %if
-end %if
-if isfield(analysed_data, 'port')
     port_names = regexprep(analysed_data.port.labels,'_',' ');
     clf(h_wake)
     if isfield(analysed_data.port, 'timebase')
@@ -409,12 +390,12 @@ end %if
 %% Voltage monitors
 clf(h_wake)
 if isfield(analysed_data, 'voltages')
-            t1 = tiledlayout(ceil(length(analysed_data.voltages)/2),2, 'TileSpacing', 'compact');
-        title(t1, 'Voltage monitors')
-        xlabel(t1, 'Time (ns)')
-        ylabel(t1, 'Voltage (V)')
+    t1 = tiledlayout(ceil(length(analysed_data.voltages)/2),2, 'TileSpacing', 'compact');
+    title(t1, 'Voltage monitors')
+    xlabel(t1, 'Time (ns)')
+    ylabel(t1, 'Voltage (V)')
     for ens = 1:length(analysed_data.voltages)
-                    nt{ens} = nexttile;
+        nt{ens} = nexttile;
         try
             % This is to cope with the case of missing data files.
             plot(analysed_data.voltages{ens}.data(:,1) .* 1E9, analysed_data.voltages{ens}.data(:,2), 'b', 'Linewidth', 2)
@@ -503,31 +484,24 @@ savemfmt(h_wake, output_folder, [prefix, 'input_signal_alignment_check'])
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 clf(h_wake)
 ax = axes('Parent', h_wake);
-beg_ind = find(wp(:,1) > -0.05, 1, 'first');
-scaled_wp = wp(:,2) ./ max(abs(wp(:,2)));
 wp_time = wp(:,1);
+wp_amp = wp(:,2);
+scaled_wp = wp_amp ./ max(abs(wp_amp));
 scaled_cd = interp1(analysed_data.Charge_distribution.data(:,1) .* 1E9, ...
     analysed_data.Charge_distribution.data(:,2),wp_time);
-[~ ,centre_ind] = min(abs(wp(:,1)));
-span = centre_ind - beg_ind;
-scaled_wp = scaled_wp(centre_ind - span:centre_ind + span);
-wp_time = wp_time(centre_ind - span:centre_ind + span);
+scaled_cd = scaled_cd ./ max(scaled_cd);
 real_wp = scaled_wp + flipud(scaled_wp);
 imag_wp = scaled_wp - flipud(scaled_wp);
-scaled_cd = scaled_cd(centre_ind - span:centre_ind + span) ./ ...
-    max(scaled_cd(centre_ind - span:centre_ind + span));
 plot(wp_time, real_wp, 'b',...
     wp_time, imag_wp,'m',...
     wp_time, scaled_cd,':r',...
     'LineWidth',lw, 'Parent', ax)
 hold(ax, 'on')
-[~,ind] =  max(wp(:,2));
-plot([wp(ind,1) wp(ind,1)], get(gca,'Ylim'), ':m')
-hold(ax, 'off')
 xlabel('time (ns)')
 ylabel('a.u.')
 title('Lossy and reactive signal')
 legend('Real','Imaginary','Charge','Location','SouthEast')
+xlim([wp_time(1) 4]) % Hard coded 4ns length.
 savemfmt(h_wake, output_folder, [prefix, 'input_signal_lossy_reactive_check'])
 clf(h_wake)
 close(h_wake)

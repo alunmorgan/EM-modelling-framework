@@ -29,6 +29,11 @@ end %for
 
 plot_s_param_graph(sparameter_data, modelling_inputs.beam, cols_sep, fig_pos, output_folder, modelling_inputs.model_name, modelling_inputs.port_names, lower_cutoff, linewidth)
 plot_s_parameter_reflection_graph(sparameter_data, modelling_inputs.beam, cols_sep, lines, fig_pos, output_folder, modelling_inputs.model_name, modelling_inputs.port_names, lower_cutoff, linewidth)
+plot_s_parameter_vswr_graph(sparameter_data, cols_sep, lines, fig_pos, output_folder, modelling_inputs.model_name, linewidth)
+plot_s_parameter_impedance_graph(sparameter_data, cols_sep, lines, fig_pos, output_folder, modelling_inputs.model_name, linewidth)
+plot_s_parameter_mismatch_loss_graph(sparameter_data, cols_sep, lines, fig_pos, output_folder, modelling_inputs.model_name, linewidth)
+plot_s_parameter_loss_factor_graph(sparameter_data, cols_sep, lines, fig_pos, output_folder, modelling_inputs.model_name, linewidth)
+
 receivers = unique(sparameter_data.reciever_list);
 % Only generate the transmission graphs if there is more than 1 signal port.
 if strcmp(modelling_inputs.beam, 'yes') && length(receivers) > 2

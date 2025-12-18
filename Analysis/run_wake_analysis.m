@@ -9,10 +9,10 @@ try
         mkdirtree(analysis_folder)
         [~,name_of_model,~] = fileparts(pp_folders{nrs});
         if exist(postprocess_folder, 'dir')
-            fprintf(['\nStarting wake analysis <strong>', name_of_model, '</strong>'])
+            fprintf(['\nStarting wake analysis <strong>', name_of_model, '</strong>\n'])
             analyse_pp_data(postprocess_folder, analysis_folder);
         else
-            fprintf('\nNo postprocessing folder... skipping wake analysis.')
+            fprintf('\nNo postprocessing folder... skipping wake analysis.\n')
         end %if
     end %for
 catch ME

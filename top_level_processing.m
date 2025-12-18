@@ -6,10 +6,11 @@ function top_level_processing(sets, varargin)
 sim_types = {'geometry','wake', 'sparameter', 'eigenmode', 'lossy_eigenmode', 'shunt'};
 
 default_sim_types = {'geometry', 'wake', 'sparameter', 'lossy_eigenmode'};
-default_stages = {'simulate', 'postprocess', 'field_extraction', 'analyse', 'reconstruct'  'plot_analysis_data', 'plot_reconstruction_data', 'plot_fields', 'plot_thermals','report'};
+default_stages = {'simulate', 'postprocess', 'field_extraction', 'analyse', 'reconstruct'  'plot_analysed_data', 'plot_reconstruction_data', 'plot_fields', 'plot_thermals','report'};
 default_version = {'241105'};
 default_number_of_cores = {'60'}; % less than max to avoid contension with other users
 default_precision = {'double'};
+default_author = {'Alun Morgan'};
 
 p = inputParser;
 p.StructExpand = false;
@@ -20,15 +21,11 @@ addParameter(p, 'stages', default_stages)
 addParameter(p, 'versions', default_version)
 addParameter(p, 'n_cores', default_number_of_cores)
 addParameter(p, 'precision', default_precision)
+addParameter(p, 'author', default_author)
 
 parse(p, sets, varargin{:});
 input_data = p.Results;
 input_data.paths = load_local_paths;
-
-% %% MOVE TO BATCH FILE
-% for set_id = 1:length(input_data.sets)
-%     mkdirtree(fullfile(paths.logfile_location, input_data.sets{set_id}))
-% end %for
 
 for set_id = 1:length(input_data.sets)
     %% Setting up log file
@@ -51,6 +48,9 @@ input_data.ppi.eigenmode.scale = '2';
 % input_data.ppi.eigenmode.subsections{1}.zmax = '4E-3';
 
 number_of_wake_lengths_to_analyse = 4;
+% If 1 then the postprocessor will export the full fields to ascii files.
+% This can take a long time so may not be desired always.
+input_data.ppi.fullfieldexport = 0;
 
 %% Simulation
 if any(matches(input_data.stages, 'simulate'))
@@ -93,8 +93,15 @@ for set_id = 1:length(input_data.sets)
         end %if
     end %if
 
+    %% Plotting (postprocessing)
+    if any(matches(input_data.stages, 'plot_postprocessed_data'))
+        if any(matches(input_data.sim_types, 'wake'))
+            run_plot_wake_postprocessed(input_data, set_id)
+        end %if
+    end %if
+
     %% Plotting (analysis)
-    if any(matches(input_data.stages, 'plot_analysis_data'))
+    if any(matches(input_data.stages, 'plot_analysed_data'))
         if any(matches(input_data.sim_types, 'wake'))
             run_plot_wake_analysis(input_data, set_id)
         end %if
@@ -129,8 +136,8 @@ for set_id = 1:length(input_data.sets)
         end %if
     end %if
 
-    %     %% Report generation
-    %     if any(matches(p.Results.stages, 'report'))
-    %         generate_report_single_set(sets{set_id});
-    %     end %if
+    %% Report generation
+    if any(matches(p.Results.stages, 'report'))
+        generate_report_single_set(input_data, set_id);
+    end %if
 end %for

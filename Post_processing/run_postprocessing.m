@@ -5,7 +5,8 @@ pp_list = {'#! /bin/bash'};
 
 for awh = 1:length(input_settings.sets)
     % find the simulated variations
-    [model_varients_folders, ~] = dir_list_gen(fullfile(input_settings.paths.data_loc, input_settings.sets{awh}),'dirs', 1);
+    [model_varients_folders, ~] = dir_list_gen(...
+        fullfile(input_settings.paths.data_loc, input_settings.sets{awh}),'dirs', 1);
     for nes = 1:length(model_varients_folders)
             pp_list_temp = GdfidL_post_process_models(input_settings, awh, model_varients_folders{nes});
             pp_list = cat(1, pp_list, pp_list_temp);

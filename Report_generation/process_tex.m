@@ -1,14 +1,14 @@
-function process_tex(output_path, file_name)
+function process_tex(file_name)
 % Finds and processes the requested tex file in the output path.
 %
-% example: process_tex(output_path, file_name)
-old_path = pwd;
-cd(output_path)
-fprintf(['\nProcessing latex file. ', output_path, '/',file_name])
+% example: process_tex(file_name)
+fprintf(['\nProcessing latex file. ',file_name])
+[new_dir, ~, ~] = fileparts(file_name);
+old_dir = cd(new_dir);
 if ispc == 1
     latex_cmd = '"C:\Program Files\MiKTeX 2.9\miktex\bin\x64\pdflatex.exe" -etex -interaction nonstopmode -halt-on-error ';
 else
-    latex_cmd = 'pdflatex -interaction nonstopmode -halt-on-error ';
+    latex_cmd = 'latex -interaction nonstopmode -halt-on-error ';
 end %if
 [status(1), ~] = system([latex_cmd, file_name,'.tex']);
 fprintf('.')
@@ -20,7 +20,7 @@ file_ID = fopen([file_name, '_latex_log'], 'w');
 fwrite(file_ID,log);
 fclose(file_ID);
 if sum(status) >0
-    fprintf(['\nError in latex processing. See ', output_path, '/', file_name, '_latex_log for details'])
+    fprintf(['\nError in latex processing. See ', file_name, '_latex_log for details'])
 end
 if exist([file_name, '.dvi'],'file') ~= 0
     [conversion_status, ~] = system(['dvipdf ', file_name,'.dvi']);
@@ -29,7 +29,7 @@ if exist([file_name, '.dvi'],'file') ~= 0
         fprintf('\nError in converting dvi to pdf')
     end
 end %if
-fprintf('\nCleaning up')
+fprintf('\nCleaning up\n')
 if exist([file_name, '.dvi'],'file') ~= 0
     delete([file_name, '.dvi'])
 end %if
@@ -45,4 +45,4 @@ end %if
 if exist([file_name, '.toc'],'file') ~= 0
     delete([file_name, '.toc'])
 end %if
-cd(old_path)
+cd(old_dir);

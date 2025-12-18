@@ -1,4 +1,4 @@
-function out= GdfidL_write_pp_wake_input_file(log, data_directory, pp_directory)
+function out= GdfidL_write_pp_wake_input_file(log, data_directory, pp_directory, fullexport)
 % Writes the post processing input file.
 %
 % log is a structure containing the information extracted from the log
@@ -17,11 +17,21 @@ function out= GdfidL_write_pp_wake_input_file(log, data_directory, pp_directory)
 % the processing chain.
 
 % However for some models (e.g. BPMs) this quiet period needs to be extended.
+
+if strcmpi(log.beam_profile_type, 'gaussian')
+    delay_extent = '8 * SIGMA';
+elseif strcmpi(log.beam_profile_type, 'table')
+    pulse_profile = load(log.beam_profile);
+    pulse_start = pulse_profile(1,1);
+    pulse_end = pulse_profile(end,1);
+    pulse_length = (pulse_end - pulse_start) .* log.beam_profile_xscale; %m
+    delay_extent = num2str(2 .* pulse_length); % about the same as 6 sigma.
+end %if
 for jes = 1:length(log.port_name)
     if strcmp(log.port_name{jes}, 'Beam_in')
-        tfirst{jes} = '8 * SIGMA / 3e8'; % input beam port
+        tfirst{jes} = [delay_extent, ' / 3e8']; % input beam port
     elseif strcmp(log.port_name{jes}, 'Beam_out')
-        tfirst{jes} = '( @zmax - @zmin + 8 * SIGMA ) / 3e8'; % output beam port
+        tfirst{jes} = ['( @zmax - @zmin + ', delay_extent,' ) / 3e8']; % output beam port
     else
         % For the signal ports you WANT to include the effect of the beam signal
         %     as that is what you are trying to measure
@@ -36,7 +46,7 @@ ov = cat(1,ov,'-general');
 ov = cat(1,ov,strcat(['    infile= ',data_directory]));
 ov = cat(1,ov,'    2dplotopts = -geometry 1024x768');
 ov = cat(1,ov,'    plotopts = -geometry 1024x768');
-ov = cat(1,ov,'    nrofthreads = 42');
+ov = cat(1,ov,'    nrofthreads = 60');
 ov = cat(1,ov,'    ');
 ov = cat(1,ov,strcat(['    scratchbase = ',pp_directory,'/']));
 
@@ -67,40 +77,7 @@ ov = cat(1,ov,'    onlyplotfiles = yes');
 ov = cat(1,ov,'    doit');
 ov = cat(1,ov,'');
 
-if isfield(log, 'field_data')
-    ov = cat(1,ov,'-fexport');
-    if isfield(log.field_data, 'EF')
-        for kew = 1:size(log.field_data.EF,1)
-            ov = cat(1,ov,['symbol = EF_e_', num2str(kew)]);
-            ov = cat(1,ov,['outfile= ', fullfile(pp_directory, ['EF_e_', num2str(kew)])]);
-            ov = cat(1,ov,'    doit');
-        end %for
-    end %if
-    if isfield(log.field_data, 'ED')
-        for kew = 1:size(log.field_data.ED, 1)
-            ov = cat(1,ov,['symbol = ED_e_', num2str(kew)]);
-            ov = cat(1,ov,['outfile= ', fullfile(pp_directory, ['ED_e_', num2str(kew)])]);
-            ov = cat(1,ov,'    doit');
-        end %for
-    end %if
-    if isfield(log.field_data, 'stored')
-        stored_sets = fieldnames(log.field_data.stored);
-        for kew = 1:length(stored_sets)
-            for nsw = 1:length(log.field_data.stored.(stored_sets{kew}).field_sequence_numbers)
-                cap_time_temp = num2str(log.field_data.stored.(stored_sets{kew}).capture_times(nsw));
-                cap_time_temp = regexprep(cap_time_temp, '\.', 'p');
-                ov = cat(1,ov,['symbol = ', stored_sets{kew},'_e_', num2str(log.field_data.stored.(stored_sets{kew}).field_sequence_numbers(nsw))]);
-                ov = cat(1,ov,['outfile= ', fullfile(pp_directory, [stored_sets{kew},'_e_', cap_time_temp])]);
-                ov = cat(1,ov,'    doit');
-                ov = cat(1,ov,['symbol = ', stored_sets{kew},'_h_', num2str(log.field_data.stored.(stored_sets{kew}).field_sequence_numbers(nsw))]);
-                ov = cat(1,ov,['outfile= ', fullfile(pp_directory, [stored_sets{kew},'_h_', cap_time_temp])]);
-                ov = cat(1,ov,'    doit');
-            end %for
-        end %for
-    end %if
-end %if
-
-ov = cat(1,ov,'    -lineplot');
+ov = cat(1,ov,'-lineplot');
 ov = cat(1,ov,'    symbol=field_snapshots_e_1');
 ov = cat(1,ov,'    quantity=field_snapshots_e');
 ov = cat(1,ov,'    solution=1');
@@ -110,7 +87,7 @@ ov = cat(1,ov,'    direction=z');
 ov = cat(1,ov,'    onlyplotfiles = yes');
 ov = cat(1,ov,'    doit');
 
-ov = cat(1,ov,'    -lineplot');
+ov = cat(1,ov,'-lineplot');
 ov = cat(1,ov,'    symbol=field_snapshots_h_1');
 ov = cat(1,ov,'    quantity=field_snapshots_h');
 ov = cat(1,ov,'    solution=1');
@@ -119,6 +96,77 @@ ov = cat(1,ov,'    startpoint=(0,0,@zmin)');
 ov = cat(1,ov,'    direction=z');
 ov = cat(1,ov,'    onlyplotfiles = yes');
 ov = cat(1,ov,'    doit');
+
+ov = cat(1,ov,' -voltages');
+ov = cat(1,ov,'    timedata= yes');
+ov = cat(1,ov,'    freq= no');
+if isfield(log, 'voltage_monitors')
+    for kse = 1:length(log.voltage_monitors)
+        ov = cat(1,ov,['asymbol= ',log.voltage_monitors{kse},'_um    # The measured Voltage at the Voltage monitor named ',log.voltage_monitors{kse},'.']);
+        ov = cat(1,ov,'  doit');
+    end %for
+end %if
+
+if isfield(log, 'field_data')
+    if fullexport == 1
+        ov = cat(1,ov,'-fexport');
+        if isfield(log.field_data, 'EF')
+            for kew = 1:size(log.field_data.EF,1)
+                ov = cat(1,ov,['symbol = EF_e_', num2str(kew)]);
+                ov = cat(1,ov,['outfile= ', fullfile(pp_directory, ['EF_e_', num2str(kew)])]);
+                ov = cat(1,ov,'    doit');
+            end %for
+        end %if
+        if isfield(log.field_data, 'ED')
+            for kew = 1:size(log.field_data.ED, 1)
+                ov = cat(1,ov,['symbol = ED_e_', num2str(kew)]);
+                ov = cat(1,ov,['outfile= ', fullfile(pp_directory, ['ED_e_', num2str(kew)])]);
+                ov = cat(1,ov,'    doit');
+            end %for
+        end %if
+    end %if
+    if isfield(log.field_data, 'stored')
+        stored_sets = fieldnames(log.field_data.stored);
+        for kew = 1:length(stored_sets)
+            for nsw = 1:length(log.field_data.stored.(stored_sets{kew}).field_sequence_numbers)
+                cap_time_temp = num2str(log.field_data.stored.(stored_sets{kew}).capture_times(nsw));
+                cap_time_temp = regexprep(cap_time_temp, '\.', 'p');
+                if fullexport == 1
+                    ov = cat(1,ov,'-fexport');
+                    ov = cat(1,ov,['    symbol = ', stored_sets{kew},'_e_', num2str(log.field_data.stored.(stored_sets{kew}).field_sequence_numbers(nsw))]);
+                    ov = cat(1,ov,['    outfile= ', fullfile(pp_directory, [stored_sets{kew},'_e_', cap_time_temp])]);
+                    ov = cat(1,ov,'    doit');
+                    ov = cat(1,ov,['    symbol = ', stored_sets{kew},'_h_', num2str(log.field_data.stored.(stored_sets{kew}).field_sequence_numbers(nsw))]);
+                    ov = cat(1,ov,['    outfile= ', fullfile(pp_directory, [stored_sets{kew},'_h_', cap_time_temp])]);
+                    ov = cat(1,ov,'    doit');
+                end %if
+                ov = cat(1,ov,'-lineplot');
+                ov = cat(1,ov,'    startpoint=(0,0,@zmin)');
+                ov = cat(1,ov,'    direction=z');
+                ov = cat(1,ov,'    onlyplotfiles = yes');
+                ov = cat(1,ov,['    symbol = ', stored_sets{kew},'_e_', num2str(log.field_data.stored.(stored_sets{kew}).field_sequence_numbers(nsw))]);
+                ov = cat(1,ov,['    quantity = ',stored_sets{kew},'_e']);
+                ov = cat(1,ov,['    solution=', num2str(log.field_data.stored.(stored_sets{kew}).field_sequence_numbers(nsw))]);
+                ov = cat(1,ov,'    component=x');
+                ov = cat(1,ov,'    doit');
+                ov = cat(1,ov,'    component=y');
+                ov = cat(1,ov,'    doit');
+                ov = cat(1,ov,'    component=z');
+                ov = cat(1,ov,'    doit');
+                ov = cat(1,ov,['    symbol = ', stored_sets{kew},'_h_', num2str(log.field_data.stored.(stored_sets{kew}).field_sequence_numbers(nsw))]);
+                ov = cat(1,ov,['    quantity = ',stored_sets{kew},'_h']);
+                ov = cat(1,ov,['    solution=', num2str(log.field_data.stored.(stored_sets{kew}).field_sequence_numbers(nsw))]);
+                ov = cat(1,ov,'    component=x');
+                ov = cat(1,ov,'    doit');
+                ov = cat(1,ov,'    component=y');
+                ov = cat(1,ov,'    doit');
+                ov = cat(1,ov,'    component=z');
+                ov = cat(1,ov,'    doit');
+            end %for
+        end %for
+    end %if
+end %if
+
 
 fsns = log.field_data.stored.field_snapshots.field_sequence_numbers;
 for sef = 1:length(fsns)
@@ -211,21 +259,8 @@ if isfield(log, 'field_data')
         end %for
     end %if
 end %if
-ov = cat(1,ov,' -voltages');
-ov = cat(1,ov,'    timedata= yes');
-ov = cat(1,ov,'    freq= no');
-if isfield(log, 'voltage_monitors')
-    for kse = 1:length(log.voltage_monitors)
-        ov = cat(1,ov,['asymbol= ',log.voltage_monitors{kse},'_um    # The measured Voltage at the Voltage monitor named ',log.voltage_monitors{kse},'.']);
-        ov = cat(1,ov,'  doit');
-    end %for
-end %if
 
-%[temp, ~, ~] = fileparts(pp_directory);
 for lae = 1:length(log.port_name)
-    %port_folder = fullfile(temp, ['wake_post_processing_ports-', log.port_name{lae}]);
-    %mkdirtree(port_folder)
-    %ov = cat(1,ov_setup,strcat(['    scratchbase = ',scratch_dir,'_ports',num2str(lae),'/']));
     ov = cat(1,ov,'-sparameter');
     ov = cat(1,ov,strcat(['    ports = ',log.port_name{lae}]));
     ov = cat(1,ov,'    modes = all');
@@ -237,6 +272,7 @@ for lae = 1:length(log.port_name)
     ov = cat(1,ov,'    fintpower = yes');
     ov = cat(1,ov,'    fsumpower = yes');
     ov = cat(1,ov,'    onlyplotfiles = yes');
+    ov = cat(1,ov,'    showeh=yes');
     ov = cat(1,ov,'    doit');
     ov = cat(1,ov,'    showeh=no');
     ov = cat(1,ov,'    doit');

@@ -10,7 +10,7 @@ try
         [~,name_of_model,~] = fileparts(a_folders{nrs});
         mkdirtree(plot_analysis_folder)
         fprintf(['\nStarting lossy eigenmode analysis plotting <strong>', name_of_model, '</strong>'])
-        input_file_locations{1} = fullfile(postprocess_folder, 'lossy_eigenmode', 'run_inputs.mat');
+        input_file_locations{1} = fullfile(postprocess_folder, 'run_inputs.mat');
         input_file_locations{2} = fullfile(analysis_folder, 'data_from_logs.mat');
         plot_pp_eigenmode(input_file_locations, plot_analysis_folder)
     end %for

@@ -1,4 +1,4 @@
-function model_file = create_model_data_file_for_STL(modelling_inputs)
+function model_file = create_model_data_file_for_STL(modelling_inputs, sim_type, out_loc)
 % Combines the geometry-material-map, mesh_definition, and port_definition
 % files with the geometry STL files to form the core of the gdf input file.
 
@@ -82,10 +82,10 @@ for lrd = 1:length(stls)
     model_file = cat(1, model_file, ['zscale = ', num2str(model_scaling)]);
     model_file = cat(1, model_file, ['material=', stl_mapping{mat_ind,2}]);
     model_file = cat(1, model_file, 'doit');
-    if strcmp(modelling_inputs.geometry_plotting, 'stages')
+    if strcmp(sim_type, 'geometry') && strcmp(modelling_inputs.geometry_plotting, 'stages')
         [~,part_name, ~]=fileparts(stls{lrd});
         k = strfind(part_name, '-');
-        model_file_vols = create_3D_volume_plots(modelling_inputs, eyepos, [part_name(k+1:end), '_']);
+        model_file_vols = create_3D_volume_plots(modelling_inputs, eyepos, [part_name(k+1:end), '_'], out_loc);
         model_file = cat(1, model_file, model_file_vols);
     end %if
 end %for

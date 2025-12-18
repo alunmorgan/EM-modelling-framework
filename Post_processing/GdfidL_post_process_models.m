@@ -4,6 +4,8 @@ function pp_list = GdfidL_post_process_models(input_settings, model_set, model_v
 %
 % Example: GdfidL_post_process_models(paths, run_inputs, modelling_inputs, type_selection);
 
+n_processes = 10;
+
 data_directory = fullfile(input_settings.paths.data_loc, ...
     input_settings.sets{model_set}, model_varient);
 pp_directory = fullfile(input_settings.paths.results_loc,...
@@ -14,7 +16,7 @@ pp_inputs = input_settings.ppi;
 fprintf(['\nWriting post processing input files for <strong>', input_settings.sets{model_set},'</strong>'])
 fprintf(['\n',model_varient])
 pp_list = {};
-% mkdirtree(pp_directory)
+
 try
     if any(contains('geometry', input_settings.sim_types))
         geometry_file_loc = GdfidL_write_pp_geometry_bash_file(...
@@ -32,9 +34,11 @@ try
         wake_model_log_loc = fullfile(data_directory, 'wake','model_log');
         wake_data_dir = fullfile(data_directory, 'wake');
         wake_pp_dir = fullfile(pp_directory, 'wake');
+        mkdirtree(wake_pp_dir)
         wake_run_logs = GdfidL_read_wake_log(wake_model_log_loc);
-        wake_ip_file = GdfidL_write_pp_wake_input_file(wake_run_logs, wake_data_dir, wake_pp_dir );
-        wake_file_loc = write_single_postprocessing_batch_file(wake_data_dir, wake_ip_file, wake_run_logs.ver);
+        temp_dir = ['/scratch2/temp',num2str(round(rand*1e4))];
+        wake_ip_file = GdfidL_write_pp_wake_input_file(wake_run_logs, wake_data_dir, wake_pp_dir, input_settings.ppi.fullfieldexport);
+        wake_file_loc = write_single_postprocessing_batch_file(wake_data_dir, wake_ip_file, wake_run_logs.ver, temp_dir);
         pp_list = cat(1, pp_list, ['source "', wake_file_loc, '"']);
         fprintf('\nWake... done')
     end %if
@@ -47,10 +51,23 @@ try
         eigenmode_model_log_loc = fullfile(data_directory, 'eigenmode','model_log');
         eigenmode_data_dir = fullfile(data_directory, 'eigenmode');
         eigenmode_pp_dir = fullfile(pp_directory, 'eigenmode');
+        mkdirtree(eigenmode_pp_dir)
         eigenmode_run_logs = GdfidL_read_eigenmode_log(eigenmode_model_log_loc, 'eigenmode');
-        e_file = GdfidL_write_pp_eigenmode_input_file(eigenmode_run_logs, eigenmode_data_dir, eigenmode_pp_dir, 'eigenmode', pp_inputs);
-        eigenmode_file_loc = write_single_postprocessing_batch_file(eigenmode_data_dir, e_file, eigenmode_run_logs.ver);
-        pp_list = cat(1, pp_list, ['source "', eigenmode_file_loc, '"']);
+        group_size = ceil(length(eigenmode_run_logs.eigenmode.nums)/n_processes);
+        for nsr = 1:n_processes
+            if nsr * group_size > length(eigenmode_run_logs.eigenmode.nums)
+                last_mode = length(eigenmode_run_logs.eigenmode.nums);
+            else
+                last_mode = nsr * group_size;
+            end %if
+            temp_dir = ['/scratch2/temp',num2str(round(rand*1e4))];
+            e_file = GdfidL_write_pp_eigenmode_input_file(eigenmode_run_logs,...
+                eigenmode_data_dir, eigenmode_pp_dir, 'eigenmode', pp_inputs,...
+                ((nsr - 1) * group_size) +1:last_mode, temp_dir);
+            eigenmode_file_loc = write_single_postprocessing_batch_file(...
+                eigenmode_data_dir, e_file, eigenmode_run_logs.ver, temp_dir);
+            pp_list = cat(1, pp_list, ['source "', eigenmode_file_loc, '"']);
+        end %for
         fprintf('\nEigenmode... done')
     end %if
 catch W_ERR
@@ -62,10 +79,25 @@ try
         lossy_eigenmode_model_log_loc = fullfile(data_directory, 'lossy_eigenmode','model_log');
         lossy_eigenmode_data_dir = fullfile(data_directory, 'lossy_eigenmode');
         lossy_eigenmode_pp_dir = fullfile(pp_directory, 'lossy_eigenmode');
+        mkdirtree(lossy_eigenmode_pp_dir)
         lossy_eigenmode_run_logs = GdfidL_read_eigenmode_log(lossy_eigenmode_model_log_loc, 'lossy_eigenmode');
-        le_file = GdfidL_write_pp_eigenmode_input_file(lossy_eigenmode_run_logs, lossy_eigenmode_data_dir, lossy_eigenmode_pp_dir, 'lossy_eigenmode', pp_inputs);
-        lossy_eigenmode_file_loc = write_single_postprocessing_batch_file(lossy_eigenmode_data_dir, le_file, lossy_eigenmode_run_logs.ver);
-        pp_list = cat(1, pp_list, ['source "', lossy_eigenmode_file_loc, '"']);
+        for nsr = 1:n_processes
+            group_size = ceil(length(lossy_eigenmode_run_logs.eigenmodes.nums)/n_processes);
+            if nsr * group_size > length(lossy_eigenmode_run_logs.eigenmodes.nums)
+                last_mode = length(lossy_eigenmode_run_logs.eigenmodes.nums);
+            else
+                last_mode = nsr * group_size;
+            end %if
+            temp_dir = ['/scratch2/temp',num2str(round(rand*1e4))];
+            le_file = GdfidL_write_pp_eigenmode_input_file(lossy_eigenmode_run_logs,...
+                lossy_eigenmode_data_dir, lossy_eigenmode_pp_dir,...
+                'lossy_eigenmode', pp_inputs, ((nsr - 1) * group_size) +1:last_mode,...
+                temp_dir);
+            lossy_eigenmode_file_loc = write_single_postprocessing_batch_file(...
+                lossy_eigenmode_data_dir, le_file, lossy_eigenmode_run_logs.ver, ...
+                temp_dir);
+            pp_list = cat(1, pp_list, ['source "', lossy_eigenmode_file_loc, '"']);
+        end %for
         fprintf('\nLossy_eigenmode... done')
     end %if
 catch W_ERR
@@ -86,9 +118,13 @@ try
                 fprintf(['\nMissing log file in ' s_parameter_data_directory]);
                 continue
             end %if
-            run_logs = GdfidL_read_s_parameter_log(fullfile(s_parameter_data_directory, 'model_log'));
-            s_file = GdfidL_write_pp_s_param_input_file(s_parameter_data_directory, s_parameter_output_directory);
-            file_loc = write_single_postprocessing_batch_file(s_parameter_data_directory, s_file, run_logs.ver);
+            run_logs = GdfidL_read_s_parameter_log(fullfile(...
+                s_parameter_data_directory, 'model_log'));
+            temp_dir = ['/scratch2/temp',num2str(round(rand*1e4))];
+            s_file = GdfidL_write_pp_s_param_input_file(...
+                s_parameter_data_directory, s_parameter_output_directory);
+            file_loc = write_single_postprocessing_batch_file(...
+                s_parameter_data_directory, s_file, run_logs.ver, temp_dir);
             pp_list = cat(1, pp_list, ['source "', file_loc, '"']);
         end
     end %if

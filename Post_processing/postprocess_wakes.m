@@ -9,7 +9,7 @@ function postprocess_wakes(modelling_inputs, log, data_directory, pp_directory)
 %Example: wake_data = postprocess_wakes(ppi, modelling_inputs,log)
 
 %% Write the wake post processing input file
-GdfidL_write_pp_input_file(log, data_directory, pp_directory);
+GdfidL_write_pp_input_file(log, data_directory, pp_directory, fullexport);
 
 %% run the wake postprocessor
 a=dir_list_gen_tree(pp_directory, '',1);

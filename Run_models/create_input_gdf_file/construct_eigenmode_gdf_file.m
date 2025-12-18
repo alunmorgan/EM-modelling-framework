@@ -45,7 +45,7 @@ mesh_def = cat(1,mesh_def, '# by enforcing two meshplanes');
 mesh_def = cat(1,mesh_def, '#');
 mesh_fixed_planes = gdf_write_mesh_fixed_planes(modelling_inputs.beam_offset_x, ...
     modelling_inputs.beam_offset_y);
-data = create_model_data_file_for_STL(modelling_inputs);
+data = create_model_data_file_for_STL(modelling_inputs, 'eigenmode', out_loc);
 
 % data = read_file_full_line(models_location);
 % switch the port descriptions to the eigenvalues section.

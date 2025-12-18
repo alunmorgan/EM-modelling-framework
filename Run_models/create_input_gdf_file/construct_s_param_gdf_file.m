@@ -42,7 +42,7 @@ modelling_inputs.mesh = modify_mesh_definition(modelling_inputs.mesh, modelling_
 mesh_def = mesh_definition_construction(modelling_inputs.mesh, modelling_inputs.mesh_density_scaling);
 mesh_fixed_planes = gdf_write_mesh_fixed_planes(modelling_inputs.beam_offset_x, ...
     modelling_inputs.beam_offset_y);
-data = create_model_data_file_for_STL(modelling_inputs);
+data = create_model_data_file_for_STL(modelling_inputs, 'sparameter', out_loc);
 
 port_selection = modelling_inputs.port_multiple ~=0;
 port_defs = gdf_write_port_definitions( modelling_inputs.ports,...

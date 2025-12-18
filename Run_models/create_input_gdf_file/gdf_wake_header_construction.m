@@ -1,4 +1,4 @@
-function fs = gdf_wake_header_construction(paths, tail, npmls, num_threads, mesh, mesh_scaling, charge, sigma,...
+function fs = gdf_wake_header_construction(paths, tail, model_name, npmls, num_threads, mesh, mesh_scaling, charge, sigma,...
     beam_offset_x, beam_offset_y, wake_length, materials, material_labels)
 % Constructs the initial part of the gdf input file for GdfidL
 %
@@ -27,7 +27,9 @@ fs = {'###################################################'};
 fs = cat(1,fs,'define(INF, 10000)');
 fs = cat(1,fs,'define(LargeNumber, 1000)');
 fs = cat(1,fs,['define(STPSZE, ',num2str(mesh / mesh_scaling),') # Step size of mesh']);
-fs = cat(1,fs,['define(SIGMA, ',sigma,') # bunch length in mm']);
+if ~isnan(str2double(sigma))
+    fs = cat(1,fs,['define(SIGMA, ',sigma,') # bunch length in mm or a filename if shape is user defined']);
+end %if
 fs = cat(1,fs,['define(NPMLs, ',npmls,') # number of perfect matching layers used']);
 fs = cat(1,fs,['define(CHARGE, ', num2str(charge),') # Bunch charge in C']);
 fs = cat(1,fs,'define(vacuum, 0)');
@@ -56,8 +58,14 @@ fs = cat(1,fs,'###################################################');
 fs = cat(1,fs,'-fdtd');
 fs = cat(1,fs,'-lcharge');
 fs = cat(1,fs,'charge= CHARGE ');
-fs = cat(1,fs,'shape = gaussian');
-fs = cat(1,fs,'sigma= SIGMA');
+if isnan(str2double(sigma))
+    fs = cat(1,fs,'shape = table');
+    fs = cat(1,fs,['tablefile = ' ,paths.inputfile_location, '/', model_name, '/', sigma]);
+    fs = cat(1,fs,'xtable = 1');
+else
+    fs = cat(1,fs,'shape = gaussian');
+    fs = cat(1,fs,'sigma= SIGMA');
+end %if
 fs = cat(1,fs,['xposition= ', beam_offset_x]);
 fs = cat(1,fs,['yposition= ', beam_offset_y]);
 fs = cat(1,fs,'direction = beam_dir');
